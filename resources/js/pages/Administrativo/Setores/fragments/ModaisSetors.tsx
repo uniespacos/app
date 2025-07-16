@@ -90,7 +90,7 @@ export function ModaisSetor({
 
             {/* Modal de Usuários do Setor */}
             <Dialog open={!!viewingUsuarios} onOpenChange={() => setViewingUsuarios(null)}>
-                <DialogContent className="max-w-4xl">
+                <DialogContent className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[800px] md:max-w-[900px] lg:max-w-[1000px] xl:max-w-[1200px]">
                     <DialogHeader>
                         <DialogTitle>Usuários do Setor</DialogTitle>
                         <DialogDescription>
