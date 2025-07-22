@@ -16,7 +16,6 @@ type FiltroBuscaPermissionProps = {
 };
 
 export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, setSelectedAgendas }: FiltroBuscaPermissionProps) {
-    console.log(selectedAgendas);
     const [localFilters, setLocalFilters] = useState({
         selectedInstituicao: '',
         selectedUnidade: '',

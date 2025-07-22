@@ -6,14 +6,14 @@ import { Link, usePage } from '@inertiajs/react';
 import AppLogo from './app-logo';
 
 /* Ícones ---------------------------------------------------------------- */
-import { 
-    BookOpen, 
-    Building, 
-    Calendar, 
-    Eye, 
-    LayoutGrid, 
-    Star, 
-    Users, 
+import {
+    BookOpen,
+    Building,
+    Calendar,
+    Eye,
+    LayoutGrid,
+    Star,
+    Users,
     School,
     MapPin,
     Grid3X3,
@@ -68,7 +68,6 @@ export function AppSidebar() {
     const permissionId = (props.auth.user?.permission_type_id as PermissionId) ?? PermissionId.COMUM;
 
     const extraItems = roleExtrasMap[permissionId];
-    const label = roleLabels[permissionId];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

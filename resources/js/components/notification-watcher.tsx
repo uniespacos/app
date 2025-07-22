@@ -19,7 +19,7 @@ export default function NotificationWatcher() {
             window.Echo.private(`App.Models.User.${user.id}`).notification((notification: any) => {
                 // Use 'any' ou tipagem mais específica para a notificação
                 if (notification.type === 'App\\Notifications\\ReservaAvaliadaNotification') {
-                    console.log('Notificação de Reserva Avaliada:', notification.mensagem);
+                    //console.log('Notificação de Reserva Avaliada:', notification.mensagem);
                     alert(`Sua reserva para "${notification.espaco_nome}" foi ${notification.status_avaliacao}.`);
                 }
             });
@@ -28,7 +28,7 @@ export default function NotificationWatcher() {
             if (user.permission_type_id === 2) {
                 window.Echo.private(`App.Models.User.${user.id}`).notification((notification: any) => {
                     if (notification.type === 'App\\Notifications\\NovaSolicitacaoReservaNotification') {
-                        console.log('Notificação de Nova Solicitação:', notification.mensagem);
+                        //console.log('Notificação de Nova Solicitação:', notification.mensagem);
                         alert(`Nova solicitação de reserva de "${notification.usuario_nome}" para "${notification.espaco_nome}".`);
                     }
                 });

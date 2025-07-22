@@ -68,12 +68,8 @@ export function NotificationDropdown() {
                 onSuccess: () => {
                     setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() })));
                     setUnreadCount(0); // Zera o contador local após marcar como lido
-                    console.log('Notificações marcadas como lidas com sucesso via Inertia!');
                 },
-                onError: (errors) => {
-                    console.error('Erro ao marcar notificações como lidas via Inertia:', errors);
-                    alert('Erro ao marcar notificações como lidas. Verifique o console.');
-                },
+
                 onFinish: () => {
                     setIsLoading(false);
                 },

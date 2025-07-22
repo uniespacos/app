@@ -93,7 +93,7 @@ export default function AgendaDialogReserva({
     );
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <Dialog open={isOpen} onOpenChange={onOpenChange} modal >
             <DialogTrigger asChild>
                 <Button className="shadow-lg">
                     {isEditMode ? 'Editar' : 'Reservar'} {slotsSelecao.length} horário{slotsSelecao.length > 1 ? 's' : ''} em{' '}
@@ -159,7 +159,7 @@ export default function AgendaDialogReserva({
                                     <Label htmlFor="data-inicial" className="text-xs">
                                         Início
                                     </Label>
-                                    <Popover key={formData.data_inicial?.toString()} modal>
+                                    <Popover key={formData.data_inicial?.toString()}>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant={'outline'}
@@ -233,8 +233,8 @@ export default function AgendaDialogReserva({
                             <ScrollArea className="h-[150px] rounded-md border p-2">
                                 {Object.entries(slotsAgrupadosPorDia).map(([diaKey, { data, slots }]) => (
                                     <div key={diaKey} className="mb-3 last:mb-0">
-                                        <div className="mb-1 text-sm font-medium">{format(data, 'EEEE, dd/MM', { locale: ptBR })}</div>
-                                        <div className="border-muted border-l-2 pl-2">
+                                        <div className="mb-1 text-sm font-medium">{format(data, 'EEEE', { locale: ptBR })}</div>
+                                        <div className="border-muted border-">
                                             {slots.map((horario) => (
                                                 <div key={horario.id} className="text-muted-foreground py-1 text-sm">
                                                     {horario.horario_inicio} - {horario.horario_fim}
@@ -256,8 +256,8 @@ export default function AgendaDialogReserva({
                                     ? 'Salvando...'
                                     : 'Confirmando...'
                                 : isEditMode
-                                  ? 'Atualizar Reserva'
-                                  : 'Confirmar Reserva'}{' '}
+                                    ? 'Atualizar Reserva'
+                                    : 'Confirmar Reserva'}{' '}
                         </Button>
                     </DialogFooter>
                 </form>

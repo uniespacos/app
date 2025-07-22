@@ -1,10 +1,17 @@
 import espacoImage from '@/assets/espaco.png';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { getPrimeirosDoisNomes, getTurnoText } from '@/lib/utils';
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
-import { Calendar, Edit, Heart, Home, Users } from 'lucide-react';
+import { Building2, Calendar, Edit, Heart, MapPin, Users } from 'lucide-react';
 import { useState } from 'react';
 
 type CardEspacoProps = {
@@ -25,10 +32,6 @@ export default function EspacoCard({
     handleExcluirEspaco,
 }: CardEspacoProps) {
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
-    // Helper para formatar a localização
-    const formatarLocalizacao = (espaco: Espaco): string => {
-        return `${espaco.andar?.modulo?.unidade?.nome} > ${espaco.andar?.modulo?.nome} > ${espaco?.andar?.nome}`;
-    };
     const [processing, setProcessing] = useState(false);
 
     const handleFavoritarEspaco = () => {
@@ -67,13 +70,32 @@ export default function EspacoCard({
     };
     return (
         <Card className="overflow-hidden">
-            <CardHeader className="relative p-0">
+            <CardHeader className="relative">
                 {/* Adicione 'relative' aqui para posicionar o botão */}
-                <img
-                    src={espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage}
-                    alt={espaco.nome}
-                    className="h-40 w-full object-cover" // Use object-cover para melhor ajuste
-                />
+                <Carousel>
+                    <CarouselContent>
+                        {espaco.imagens ? espaco.imagens.map((img, index) => (
+                            <CarouselItem key={index}>
+                                <div>
+                                    <img
+                                        src={espaco.main_image_index ? `/storage/${img}` : espacoImage}
+                                        alt={espaco.nome}
+                                        className="h-40 w-full object-cover"
+                                    />
+                                </div>
+                            </CarouselItem>
+                        )) : <div className="p-1">
+                            <img
+                                src={espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage}
+                                alt={espaco.nome}
+                                className="h-40 w-full object-cover"
+                            />
+                        </div>}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                </Carousel>
+
                 <button
                     onClick={handleFavoritarEspaco}
                     disabled={processing} // Desabilita o botão enquanto processa
@@ -84,32 +106,24 @@ export default function EspacoCard({
                     <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current text-white' : 'text-gray-500'}`} />
                 </button>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent >
                 <div className="mb-2 flex items-start justify-between">
                     <CardTitle className="text-xl">Espaço: {espaco.nome}</CardTitle>
                 </div>
-
                 <div className="espaco-y-2 mt-4">
-                    <div className="flex items-center gap-2">
-                        <Users className="text-muted-foreground h-4 w-4" />
-                        <span>Capacidade: {espaco.capacidade_pessoas} pessoas</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Home className="text-muted-foreground h-4 w-4" />
-                        <span>{formatarLocalizacao(espaco)}</span>
-                    </div>
-
-                    <div className="space-y-2">
-                        <span className="text-muted-foreground">Gestores por turno:</span>
-                        <div className="grid grid-cols-3 gap-4 rounded-lg border p-4">
-                            {espaco.agendas?.map((agenda) => (
-                                <div key={agenda.id} className="flex flex-col items-center text-center">
-                                    <span className="text-muted-foreground text-sm font-semibold">{getTurnoText(agenda.turno)}</span>
-                                    <span className="mt-1 text-sm">{getPrimeirosDoisNomes(agenda.user?.name)}</span>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="mb-3 flex flex-col gap-2">
+                        <Badge variant="outline" className="flex items-center gap-1">
+                            <Building2 className="h-3 w-3" />
+                            {espaco.andar?.modulo?.nome}
+                        </Badge>
+                        <Badge variant="outline" className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {espaco.andar?.nome}
+                        </Badge>
+                        <Badge variant="outline" className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {espaco.capacidade_pessoas} pessoas
+                        </Badge>
                     </div>
                 </div>
             </CardContent>
@@ -117,7 +131,7 @@ export default function EspacoCard({
             <CardFooter className="flex flex-wrap gap-2 pt-0">
                 {isGerenciarEspacos && userType === 1 ? (
                     <>
-                        <Button variant="outline" size="sm" onClick={() => {}}>
+                        <Button variant="outline" size="sm" onClick={() => { }}>
                             <Edit className="mr-2 h-4 w-4" />
                             Ver Detalhes
                         </Button>
@@ -137,6 +151,6 @@ export default function EspacoCard({
                     </Button>
                 )}
             </CardFooter>
-        </Card>
+        </Card >
     );
 }

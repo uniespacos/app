@@ -8,7 +8,11 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
-
+export const identificarTurno = (hora: number): 'manha' | 'tarde' | 'noite' => {
+    if (hora >= 7 && hora <= 12) return 'manha';
+    if (hora >= 13 && hora <= 18) return 'tarde';
+    return 'noite';
+};
 export function pegarPrimeiroHorario(horarios: Horario[]) {
     if (horarios.length == 1) return horarios[0];
     let horario_tmp = horarios[0];

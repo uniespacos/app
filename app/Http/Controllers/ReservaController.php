@@ -59,7 +59,8 @@ class ReservaController extends Controller
                 'horarios' => function ($query) {
                     $query->orderBy('data')->orderBy('horario_inicio');
                 },
-                'horarios.agenda.espaco.andar.modulo.unidade.instituicao'
+                'horarios.agenda.espaco.andar.modulo.unidade.instituicao',
+                'horarios.agenda.user.setor'
             ])
             ->latest() // Ordena as reservas da mais nova para a mais antiga.
             ->paginate(10) // Pagina os resultados

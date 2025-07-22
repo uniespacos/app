@@ -1,7 +1,6 @@
 import DeleteItem from '@/components/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { diasSemanaParser, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
@@ -10,6 +9,7 @@ import { Separator } from '@radix-ui/react-separator';
 import { CalendarDays, CheckCircle, Clock, Edit, Eye, FileText, Home, User, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import ReservaDetalhes from './ReservasDetalhes';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -233,7 +233,12 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                 />
             )}
             {selectedReserva && (
-                <Dialog
+                <ReservaDetalhes
+                    selectedReserva={selectedReserva}
+                    setSelectedReserva={setSelectedReserva}
+                    setRemoverReserva={setRemoverReserva} />
+            )}
+            {/**<Dialog
                     open={!!selectedReserva}
                     onOpenChange={(isOpen) => {
                         if (!isOpen) {
@@ -241,7 +246,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                         }
                     }}
                 >
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
@@ -347,8 +352,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             )}
                         </DialogFooter>
                     </DialogContent>
-                </Dialog>
-            )}
+                </Dialog> */}
             <div className="mt-4 flex justify-center">
                 <div className="flex flex-wrap justify-center gap-1">
                     {links.map((link, index) =>
@@ -358,9 +362,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 key={index}
                                 href={link.url}
                                 preserveScroll
-                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${
-                                    link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
-                                }`}
+                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ) : (

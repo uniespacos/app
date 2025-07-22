@@ -23,7 +23,6 @@ interface UserSearchComboboxProps {
 export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder = 'Buscar usuário...', disabled = false }: UserSearchComboboxProps) {
     const [open, setOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
-    console.log(usuarios);
     const selectedUser = usuarios.find((user) => user.id === value);
 
     // Filtrar usuários baseado na busca

@@ -1,21 +1,23 @@
 import { cn } from '@/lib/utils';
-import { AgendaDiasSemanaType, SlotCalendario } from '@/types';
-import AgendaSlotCalendarioCell from './AgendaSlotCalendarioCell';
+import { AgendaDiasSemanaType, Reserva, SlotCalendario } from '@/types';
+import AgendaDetalhesReservaCell from './AgendaDetalhesReservaCell';
 
-type AgendaTurnoSectionProps = {
+type AgendaDetalhesSectionProps = {
     titulo: string;
     slotsDoTurno: Record<string, SlotCalendario[]>;
     diasSemana: AgendaDiasSemanaType[];
-    isSlotSelecionado: (slot: SlotCalendario) => boolean;
-    alternarSelecaoSlot: (slot: SlotCalendario) => void;
+    reservaSolicitada: Reserva,
 };
-export default function AgendaTurnoSection({
+export default function AgendaDetalhesSection({
     titulo,
     slotsDoTurno,
     diasSemana,
-    isSlotSelecionado,
-    alternarSelecaoSlot,
-}: AgendaTurnoSectionProps) {
+    reservaSolicitada,
+}: AgendaDetalhesSectionProps) {
+    function isSlotSolicitado(slot: SlotCalendario): boolean {
+        //
+    }
+
     return (
         <>
             <div
@@ -45,11 +47,10 @@ export default function AgendaTurnoSection({
                         {hora} - {hora.split(':')[0]}:50
                     </div>
                     {slots.map((slot) => (
-                        <AgendaSlotCalendarioCell
+                        <AgendaDetalhesReservaCell
                             key={slot.id}
                             slot={slot}
-                            isSelecionado={isSlotSelecionado(slot)}
-                            onSelect={() => alternarSelecaoSlot(slot)}
+                            isSolicitado={isSlotSolicitado(slot)}
                         />
                     ))}
                 </div>

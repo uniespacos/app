@@ -9,20 +9,18 @@ type AgendaCalendarioProps = {
     slotsPorTurno: AgendaSlotsPorTurnoType;
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
-    hoje: Date;
 };
 
-export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSelecionado, alternarSelecaoSlot, hoje }: AgendaCalendarioProps) {
+export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSelecionado, alternarSelecaoSlot }: AgendaCalendarioProps) {
     return (
-        <Card>
-            <ScrollArea className="h-[calc(100vh-220px)]">
-                <div className="min-w-[800px]">
-                    <div className="bg-background sticky top-0 z-10 grid grid-cols-[80px_repeat(7,1fr)] border-b">
+        <Card className="p-0">
+            <ScrollArea className="">
+                <div className="overflow-auto min-w-[800px] rounded-xl">
+                    <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
                         <div className="text-muted-foreground p-2 text-center text-sm font-medium"></div>
                         {diasSemana.map((dia) => (
                             <div key={dia.valor} className={cn('border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}>
                                 <div>{dia.abreviado}</div>
-                                <div className={cn('text-xs', dia.ehHoje ? 'text-primary font-bold' : 'text-muted-foreground')}>{dia.diaMes}</div>
                             </div>
                         ))}
                     </div>
@@ -32,7 +30,6 @@ export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSele
                         diasSemana={diasSemana}
                         isSlotSelecionado={isSlotSelecionado}
                         alternarSelecaoSlot={alternarSelecaoSlot}
-                        hoje={hoje}
                     />
                     <AgendaTurnoSection
                         titulo="TARDE"
@@ -40,7 +37,6 @@ export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSele
                         diasSemana={diasSemana}
                         isSlotSelecionado={isSlotSelecionado}
                         alternarSelecaoSlot={alternarSelecaoSlot}
-                        hoje={hoje}
                     />
                     <AgendaTurnoSection
                         titulo="NOITE"
@@ -48,7 +44,6 @@ export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSele
                         diasSemana={diasSemana}
                         isSlotSelecionado={isSlotSelecionado}
                         alternarSelecaoSlot={alternarSelecaoSlot}
-                        hoje={hoje}
                     />
                 </div>
             </ScrollArea>

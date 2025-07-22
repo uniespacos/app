@@ -55,7 +55,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                 return true;
             }),
         );
-        console.log(queryParams);
 
         router.get(route, queryParams, {
             preserveState: true, // Mantém o estado dos filtros na página

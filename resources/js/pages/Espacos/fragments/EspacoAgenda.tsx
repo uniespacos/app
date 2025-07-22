@@ -20,6 +20,7 @@ import AgendaDialogReserva from './AgendaDialogReserva';
 import AgendaEditModeAlert from './AgendaEditModeAlert';
 import AgendaHeader from './AgendaHeader';
 import AgendaNavegacao from './AgendaNavegacao';
+import { identificarTurno } from '@/lib/utils';
 
 const opcoesRecorrencia: OpcoesRecorrencia[] = [
     {
@@ -48,11 +49,7 @@ const opcoesRecorrencia: OpcoesRecorrencia[] = [
     },
 ];
 
-const identificarTurno = (hora: number): 'manha' | 'tarde' | 'noite' => {
-    if (hora >= 7 && hora <= 12) return 'manha';
-    if (hora >= 13 && hora <= 18) return 'tarde';
-    return 'noite';
-};
+
 
 type AgendaEspacoProps = {
     isEditMode?: boolean;
@@ -69,17 +66,17 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
             !isEditMode || !reserva?.horarios
                 ? []
                 : reserva.horarios.map(
-                      (horario) =>
-                          ({
-                              id: `${horario.data}|${horario.horario_inicio}`,
-                              status: 'selecionado',
-                              data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                              horario_inicio: horario.horario_inicio,
-                              horario_fim: horario.horario_fim,
-                              agenda_id: horario.agenda?.id,
-                              dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
-                          }) as SlotCalendario,
-                  ),
+                    (horario) =>
+                        ({
+                            id: `${horario.data}|${horario.horario_inicio}`,
+                            status: 'selecionado',
+                            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+                            horario_inicio: horario.horario_inicio,
+                            horario_fim: horario.horario_fim,
+                            agenda_id: horario.agenda?.id,
+                            dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
+                        }) as SlotCalendario,
+                ),
         [isEditMode, reserva],
     );
 
@@ -241,7 +238,6 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
         const novaSelecao = isSlotSelecionado(slot)
             ? slotsSelecao.filter((s) => s.id !== slot.id)
             : [...slotsSelecao, slot].sort((a, b) => a.data.getTime() - b.data.getTime() || a.horario_inicio.localeCompare(b.horario_inicio));
-        console.log('Antes: ', slotsSelecao.length);
         setSlotsSelecao(novaSelecao);
     };
     useEffect(() => {
@@ -290,7 +286,6 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
                 slotsPorTurno={slotsPorTurno}
                 isSlotSelecionado={isSlotSelecionado}
                 alternarSelecaoSlot={alternarSelecaoSlot}
-                hoje={hoje}
             />
 
             {slotsSelecao.length > 0 && (

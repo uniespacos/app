@@ -2,12 +2,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '@/lib/utils';
 import { SlotCalendario } from '@/types';
 
-type AgendaSlotCalendarioCellProps = {
+type AgendaDetalhesReservaCellProps = {
     slot: SlotCalendario;
-    isSelecionado: boolean;
-    onSelect: () => void;
+    isSolicitado: boolean;
 };
-export default function AgendaSlotCalendarioCell({ slot, isSelecionado, onSelect }: AgendaSlotCalendarioCellProps) {
+export default function AgendaDetalhesReservaCell({ slot, isSolicitado }: AgendaDetalhesReservaCellProps) {
     const isReservado = slot.status === 'reservado';
     return (
         <div
@@ -15,9 +14,8 @@ export default function AgendaSlotCalendarioCell({ slot, isSelecionado, onSelect
             className={cn(
                 'relative cursor-pointer border-l p-1 transition-all duration-200',
                 isReservado ? 'border-blue-300 bg-blue-100 shadow-md hover:bg-blue-200  cursor-not-allowed' : 'hover:bg-muted/10',
-                isSelecionado && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200 ',
+                isSolicitado && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200 ',
             )}
-            onClick={onSelect}
         >
             {(isReservado ? (
                 <TooltipProvider>
@@ -36,10 +34,10 @@ export default function AgendaSlotCalendarioCell({ slot, isSelecionado, onSelect
                     </Tooltip>
                 </TooltipProvider>
             ) : (
-                isSelecionado && (
+                isSolicitado && (
                     <div className="flex h-full w-full items-center justify-center">
                         <p className="text-xs text-green-900 font-bold">
-                            Selecionado
+                            Solicitado
                         </p>
                     </div>
                 )
