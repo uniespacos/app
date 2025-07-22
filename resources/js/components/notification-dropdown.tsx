@@ -118,7 +118,7 @@ export function NotificationDropdown() {
             }
             fetchTimeoutRef.current = setTimeout(() => {
                 fetchNotifications(); // Sempre busca as últimas notificações ao abrir
-            }, 5000);
+            }, 2000);
         } else {
             if (fetchTimeoutRef.current) {
                 clearTimeout(fetchTimeoutRef.current);

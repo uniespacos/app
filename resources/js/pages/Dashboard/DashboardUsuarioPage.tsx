@@ -9,7 +9,7 @@ import { CalendarClock, Clock, History, Plus } from 'lucide-react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: '🏠 Painel Inicial',
+        title: 'Painel Inicial',
         href: '/dashboard',
     },
 ];

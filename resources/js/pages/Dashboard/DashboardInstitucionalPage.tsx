@@ -9,7 +9,7 @@ import { FileText, PieChart, Search, Settings, Users } from 'lucide-react';
 import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: '🏠 Painel Inicial',
+        title: 'Painel Inicial',
         href: '/dashboard',
     },
 ];

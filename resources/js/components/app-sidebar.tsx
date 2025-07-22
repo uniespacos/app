@@ -6,9 +6,19 @@ import { Link, usePage } from '@inertiajs/react';
 import AppLogo from './app-logo';
 
 /* Ícones ---------------------------------------------------------------- */
-import { BookOpen, Building, Calendar, Eye, LayoutGrid, Star, Users } from 'lucide-react';
-
-// Adicione 'Users' para um ícone mais adequado
+import { 
+    BookOpen, 
+    Building, 
+    Calendar, 
+    Eye, 
+    LayoutGrid, 
+    Star, 
+    Users, 
+    School,
+    MapPin,
+    Grid3X3,
+    Briefcase
+} from 'lucide-react';
 
 /* ------------- Tipo local de item de menu (não exportado) ------------- */
 import type { LucideIcon } from 'lucide-react';
@@ -31,11 +41,11 @@ const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/rese
 
 const institucionalExtras: MenuItem[] = [
     { title: 'Gerir Espaços', href: '/institucional/espacos', icon: Building },
-    { title: 'Gerenciar Usuários', href: '/institucional/usuarios', icon: Users }, // Ícone 'Users' é mais adequado para gerenciamento de usuários
-    { title: 'Gerenciar Instituicoes', href: '/institucional/instituicoes', icon: Users }, // Ícone 'Users' é mais adequado para gerenciamento de usuários
-    { title: 'Gerenciar Unidades', href: '/institucional/unidades', icon: Users }, // Ícone 'Users' é mais adequado para gerenciamento de usuários
-    { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Users }, // Ícone 'Users' é mais adequado para gerenciamento de usuários
-    { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Users }, // Ícone 'Users' é mais adequado para gerenciamento de usuários
+    { title: 'Gerenciar Usuários', href: '/institucional/usuarios', icon: Users },
+    { title: 'Gerenciar Instituicoes', href: '/institucional/instituicoes', icon: School },
+    { title: 'Gerenciar Unidades', href: '/institucional/unidades', icon: MapPin },
+    { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Grid3X3 },
+    { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Briefcase },
 ];
 
 /* Rotulagem da seção extra --------------------------------------------- */

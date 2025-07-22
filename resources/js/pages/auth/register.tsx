@@ -68,8 +68,8 @@ export default function Register() {
                         {/* Logo Section */}
                         <div className="flex flex-col items-center justify-center space-y-8">
                             <div className="text-center">
-                                <img src="/placeholder.svg?height=128&width=200" alt="Logo UniEspaço" className="mx-auto mb-6 h-32 w-auto" />
-                                <h1 className="mb-2 text-3xl font-bold text-gray-900">Bem-vindo ao UniEspaço</h1>
+                                <img src="/placeholder.svg?height=128&width=200" alt="Logo UESB Reservas" className="mx-auto mb-6 h-32 w-auto" />
+                                <h1 className="mb-2 text-3xl font-bold text-gray-900">Bem-vindo ao UESB Reservas</h1>
                                 <p className="text-lg text-gray-600">Crie sua conta para começar a usar nossa plataforma</p>
                             </div>
                         </div>

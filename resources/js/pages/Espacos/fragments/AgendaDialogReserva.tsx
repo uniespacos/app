@@ -101,7 +101,7 @@ export default function AgendaDialogReserva({
                     {Object.keys(slotsAgrupadosPorDia).length > 1 ? 's' : ''}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-h-[90vh] w-full overflow-y-auto">
                 <form onSubmit={onSubmit}>
                     <DialogHeader>
                         <DialogTitle>{isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}</DialogTitle>

@@ -11,10 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AvaliarReservaRequest;
-use App\Models\Andar;
-use App\Models\Espaco;
-use App\Models\Modulo;
-use App\Models\User;
+
 use App\Notifications\NotificationModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -197,7 +194,7 @@ class GestorReservaController extends Controller
             $reserva->user->notify(new NotificationModel(
                 'Avaliação de Reserva',
                 "Sua reserva #{$reserva->id} foi avaliada como '{$novaSituacao}' por {$resultado}.",
-                route('reservas.show', $reserva->id)
+                route('reservas.index', ['reserva'=>$reserva])
             ));
             return Redirect::route('gestor.reservas.index')->with('success', 'solicitação avaliada com sucesso!');
         } catch (Exception $e) {

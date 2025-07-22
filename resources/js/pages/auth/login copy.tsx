@@ -103,7 +103,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                     {/* Lado direito - Imagem e logo */}
                     <div className="relative hidden flex-col items-center justify-center bg-[#e0f1f9] p-8 md:flex">
-                        <img src="/_img/Logo_uniEspaco.png" alt="Logo UniEspaço" className="mx-auto mb-3 w-52" />
+                        <img src="/_img/uesb_reservas_logo.png" alt="Logo UESB Reservas" className="mx-auto mb-3 w-52" />
 
                         <div className="relative">
                             <img src="/_img/ForCharacter.png" alt="Personagem" className="mb-2 w-64" />
