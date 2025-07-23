@@ -58,17 +58,37 @@ class ReservaController extends Controller
                 'user',
                 'horarios' => function ($query) {
                     $query->orderBy('data')->orderBy('horario_inicio');
+                    $query->with([
+                        'agenda'=> function ($q){
+                            $q->with([
+                                'user',
+                                'espaco.andar.modulo.unidade.instituicao', // Carrega a hierarquia completa
+                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                                'horarios.reservas.horarios' 
+                            ]);
+                        },
+                        
+                    ]);
                 },
-                'horarios.agenda.espaco.andar.modulo.unidade.instituicao',
-                'horarios.agenda.user.setor'
             ])
             ->latest() // Ordena as reservas da mais nova para a mais antiga.
             ->paginate(10) // Pagina os resultados
             ->withQueryString(); // Anexa os filtros aos links de paginação
         $reservaToShow = Reserva::find($filters['reserva'] ?? null);
         $reservaToShow != null ? $reservaToShow->load([
-            'horarios.agenda.espaco.andar.modulo.unidade.instituicao',
-            'horarios.agenda.user.setor'
+            'user',
+                'horarios' => function ($query) {
+                    $query->orderBy('data')->orderBy('horario_inicio');
+                    $query->with([
+                        'agenda'=> function ($q){
+                            $q->with([
+                                'espaco.andar.modulo.unidade.instituicao', // Carrega a hierarquia completa
+                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                                'horarios.reservas.horarios',
+                            ]);
+                        },
+                    ]);
+                },
         ]) : null;
 
         return Inertia::render('Reservas/ReservasPage', [

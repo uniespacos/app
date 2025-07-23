@@ -4,20 +4,21 @@ import { SlotCalendario } from '@/types';
 
 type AgendaDetalhesReservaCellProps = {
     slot: SlotCalendario;
-    isSolicitado: boolean;
 };
-export default function AgendaDetalhesReservaCell({ slot, isSolicitado }: AgendaDetalhesReservaCellProps) {
-    const isReservado = slot.status === 'reservado';
+export default function AgendaDetalhesReservaCell({ slot }: AgendaDetalhesReservaCellProps) {
+
+    console.log(slot.status)
     return (
         <div
             key={slot.id}
             className={cn(
                 'relative cursor-pointer border-l p-1 transition-all duration-200',
-                isReservado ? 'border-blue-300 bg-blue-100 shadow-md hover:bg-blue-200  cursor-not-allowed' : 'hover:bg-muted/10',
-                isSolicitado && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200 ',
+                slot.status === "reservado" ? 'border-blue-300 bg-blue-100 shadow-md hover:bg-blue-200  cursor-not-allowed' : 'hover:bg-muted/10',
+                slot.status === "solicitado" && 'border-yellow-300 bg-yellow-100 shadow-md hover:bg-yellow-200 ',
+                slot.status === "deferida" && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200',
             )}
         >
-            {(isReservado ? (
+            {slot.status === "reservado" && (
                 <TooltipProvider>
                     <Tooltip >
                         <TooltipTrigger asChild>
@@ -33,15 +34,24 @@ export default function AgendaDetalhesReservaCell({ slot, isSolicitado }: Agenda
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-            ) : (
-                isSolicitado && (
+            )}
+            {
+                slot.status === "deferida" && (
                     <div className="flex h-full w-full items-center justify-center">
                         <p className="text-xs text-green-900 font-bold">
-                            Solicitado
+                            Deferida
                         </p>
                     </div>
                 )
-            ))
+            }
+            {
+                slot.status === "solicitado" && (
+                    <div className="flex h-full w-full items-center justify-center">
+                        <p className="text-xs text-yellow-900 font-bold">
+                            Em analise
+                        </p>
+                    </div>
+                )
             }
         </div>
     );

@@ -12,11 +12,8 @@ export default function AgendaDetalhesSection({
     titulo,
     slotsDoTurno,
     diasSemana,
-    reservaSolicitada,
 }: AgendaDetalhesSectionProps) {
-    function isSlotSolicitado(slot: SlotCalendario): boolean {
-        //
-    }
+
 
     return (
         <>
@@ -50,7 +47,6 @@ export default function AgendaDetalhesSection({
                         <AgendaDetalhesReservaCell
                             key={slot.id}
                             slot={slot}
-                            isSolicitado={isSlotSolicitado(slot)}
                         />
                     ))}
                 </div>

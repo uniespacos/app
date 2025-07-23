@@ -1,13 +1,13 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AgendaGestoresPorTurnoType, AgendaSlotsPorTurnoType, Horario, Reserva, SlotCalendario } from "@/types";
 import { CalendarDays, Clock, Edit, FileText, Home, User, XCircle } from "lucide-react";
-import { SituacaoBadge, SituacaoIndicator } from "./ReservasList";
+import { SituacaoIndicator } from "./ReservasList";
 import { Separator } from "@/components/ui/separator";
-import { diasSemanaParser, formatDate, identificarTurno } from "@/lib/utils";
+import { formatDate, identificarTurno } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
-import { addDays, format, parse, startOfWeek } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { addDays, format, isSameDay, startOfWeek } from "date-fns";
+import { useCallback, useMemo } from "react";
 import AgendaDetalhesReserva from "./AgendaDetalhesReserva";
 
 type ReservaDetalhesProps = {
@@ -19,32 +19,15 @@ type ReservaDetalhesProps = {
 
 
 export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
-    console.log('selectedReserva', selectedReserva);
-    const slotsIniciais = useMemo(
-        () =>
-            selectedReserva.horarios.map(
-                (horario) =>
-                    ({
-                        id: `${horario.data}|${horario.horario_inicio}`,
-                        status: 'selecionado',
-                        data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                        horario_inicio: horario.horario_inicio,
-                        horario_fim: horario.horario_fim,
-                        agenda_id: horario.agenda?.id,
-                        dadosReserva: { horarioDB: horario, autor: selectedReserva.user!.name, reserva_titulo: selectedReserva.titulo },
-                    }) as SlotCalendario,
-            ),
-        [selectedReserva.horarios, selectedReserva.titulo, selectedReserva.user],
-    );
-    const agendas = selectedReserva.horarios.map((horario) => horario.agenda).filter((agenda) => agenda !== undefined);
-    const [todosSlots, setTodosSlots] = useState<SlotCalendario[]>([]);
-
+    const agendas = selectedReserva.horarios.map((horario) => horario.agenda).reduce((acc, agenda) => {
+        return acc.find(item => item?.id === agenda?.id) ? acc : [...acc, agenda]; // Remove duplicatas
+    }, [] as (typeof selectedReserva.horarios[0]['agenda'])[]);
     const { gestoresPorTurno, horariosReservadosMap } = useMemo(() => {
         const gestores: AgendaGestoresPorTurnoType = {};
         const reservadosMap = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
 
         agendas?.forEach((agenda) => {
-            if (agenda.user) {
+            if (agenda?.user) {
                 gestores[agenda.turno] = {
                     nome: agenda.user.name,
                     email: agenda.user.email,
@@ -52,10 +35,10 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                     agenda_id: agenda.id,
                 };
             }
-            agenda.horarios?.forEach((horario) => {
+            agenda?.horarios?.forEach((horario) => {
+
                 const reservaValida = horario.reservas?.find((r) => ['deferida', 'parcialmente_deferida'].includes(r.situacao));
                 if (reservaValida) {
-                    if (reservaValida.id === selectedReserva?.id) return;
                     const chave = `${horario.data}|${horario.horario_inicio}`;
                     reservadosMap.set(chave, {
                         horario: horario,
@@ -66,13 +49,68 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
             });
         });
         return { gestoresPorTurno: gestores, horariosReservadosMap: reservadosMap };
-    }, [agendas, selectedReserva?.id]);
-    console.log('gestoresPorTurno', gestoresPorTurno);
-    console.log('horariosReservadosMap', horariosReservadosMap);
-    
-    const [semanaAtual, setSemanaAtual] = useState(() => startOfWeek(slotsIniciais.length > 0 ? slotsIniciais[0].data : hoje, { weekStartsOn: 1 }));
+    }, [agendas]);
 
-    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(slotsIniciais);
+    const gerarSlotsParaSemana = useCallback((semanaInicio: Date) => {
+        const slotsGerados: SlotCalendario[] = [];
+        for (let diaOffset = 0; diaOffset < 7; diaOffset++) {
+            const diaAtual = addDays(semanaInicio, diaOffset);
+            const diaFormatado = format(diaAtual, 'yyyy-MM-dd');
+            const slotStatus = (situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa') => {
+                console.log('slotStatus', situacao);
+                switch (situacao) {
+                    case 'deferida':
+                        return 'deferida';
+                    case 'em_analise':
+                        return 'solicitado';
+                    case 'indeferida':
+                        return 'indeferida';
+                    default:
+                        return 'livre';
+                }
+            }
+            for (let hora = 7; hora < 22; hora++) {
+                const turno = identificarTurno(hora);
+                const inicio = `${String(hora).padStart(2, '0')}:00:00`;
+                const chave = `${diaFormatado}|${inicio}`;
+                const horarioReservado = horariosReservadosMap.get(chave);
+                if (horarioReservado) {
+                    const reservaStatus = selectedReserva?.horarios.find(h => h.id === horarioReservado.horario.id);
+                    const status = reservaStatus ? slotStatus(reservaStatus.pivot?.situacao ?? 'em_analise') : 'reservado';
+                    slotsGerados.push({
+                        id: chave,
+                        status: status,
+                        data: diaAtual,
+                        horario_inicio: inicio,
+                        horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
+                        dadosReserva: {
+                            horarioDB: horarioReservado.horario,
+                            autor: horarioReservado.autor,
+                            reserva_titulo: horarioReservado.reserva_titulo,
+                        },
+                    });
+                } else if (gestoresPorTurno[turno]) {
+                    const status = selectedReserva?.horarios.some(h => h.horario_inicio === inicio && isSameDay(h.data, diaAtual) && h.agenda?.id === gestoresPorTurno[turno].agenda_id)
+                        ? slotStatus(selectedReserva.horarios?.find(h => h.horario_inicio === inicio && isSameDay(h.data, diaAtual))?.pivot?.situacao ?? 'em_analise') : 'livre';
+                    slotsGerados.push({
+                        id: chave,
+                        status: status,
+                        data: diaAtual,
+                        horario_inicio: inicio,
+                        horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
+                        agenda_id: gestoresPorTurno[turno].agenda_id,
+                    });
+                }
+            }
+        }
+        return slotsGerados;
+    }, [gestoresPorTurno, horariosReservadosMap, selectedReserva?.horarios]);
+
+    const todosSlots = useMemo<SlotCalendario[]>(
+        () => gerarSlotsParaSemana(startOfWeek(new Date(), { weekStartsOn: 1 })), [gerarSlotsParaSemana]);
+
+
+
     const slotsPorTurno = useMemo(() => {
         // Primeiro, agrupa todos os slots por hora (07:00, 08:00, etc.), como na lógica original.
         const slotsPorHora: Record<string, SlotCalendario[]> = {};
@@ -98,47 +136,8 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
         });
 
         return resultado;
-    }, []);
-    useEffect(() => {
-        const gerarSlotsParaSemana = (semanaInicio: Date) => {
-            const slotsGerados: SlotCalendario[] = [];
-            for (let diaOffset = 0; diaOffset < 7; diaOffset++) {
-                const diaAtual = addDays(semanaInicio, diaOffset);
-                const diaFormatado = format(diaAtual, 'yyyy-MM-dd');
-                for (let hora = 7; hora < 22; hora++) {
-                    const turno = identificarTurno(hora);
-                    const inicio = `${String(hora).padStart(2, '0')}:00:00`;
-                    const chave = `${diaFormatado}|${inicio}`;
-                    const horarioReservado = horariosReservadosMap.get(chave);
-                    if (horarioReservado) {
-                        slotsGerados.push({
-                            id: chave,
-                            status: 'reservado',
-                            data: diaAtual,
-                            horario_inicio: inicio,
-                            horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
-                            dadosReserva: {
-                                horarioDB: horarioReservado.horario,
-                                autor: horarioReservado.autor,
-                                reserva_titulo: horarioReservado.reserva_titulo,
-                            },
-                        });
-                    } else if (gestoresPorTurno[turno]) {
-                        slotsGerados.push({
-                            id: chave,
-                            status: 'livre',
-                            data: diaAtual,
-                            horario_inicio: inicio,
-                            horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
-                            agenda_id: gestoresPorTurno[turno].agenda_id,
-                        });
-                    }
-                }
-            }
-            return slotsGerados;
-        };
-        setTodosSlots(gerarSlotsParaSemana(semanaAtual));
-    }, [semanaAtual, horariosReservadosMap, gestoresPorTurno]);
+    }, [todosSlots]);
+
     return (<Dialog
         open={!!selectedReserva}
         onOpenChange={(isOpen) => {
@@ -147,7 +146,7 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
             }
         }}
     >
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-auto">
             <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
@@ -193,9 +192,8 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                     <Clock className="h-4 w-4" />
                     Horários Solicitados
                 </h4>
-                <div className="grid gap-2">
-                    <AgendaDetalhesReserva diasSemana={[]} slotsPorTurno={slotsPorTurno} />
-                </div>
+                    <AgendaDetalhesReserva diasSemana={[]} slotsPorTurno={slotsPorTurno} reservaSolicitada={selectedReserva} />
+                
             </div>
 
             <DialogFooter>

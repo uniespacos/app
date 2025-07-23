@@ -198,6 +198,7 @@ export interface Reserva {
     updated_at: string;
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
+    pivot?: Pivot; // Dados da tabela pivô `reserva_horario`
 }
 
 // =============================================================================
@@ -235,7 +236,7 @@ export type DashboardStatusReservasType = {
 
 export interface SlotCalendario {
     id: string; // ID único gerado para o frontend (ex: "2025-06-13|09:00:00")
-    status: 'livre' | 'reservado' | 'selecionado';
+    status: 'livre' | 'reservado' | 'selecionado'| 'solicitado' | 'indeferida'|'deferida'; // Status do slot no calendário
     data: Date;
     horario_inicio: string;
     horario_fim: string;
