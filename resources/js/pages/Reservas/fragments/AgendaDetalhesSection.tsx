@@ -14,7 +14,6 @@ export default function AgendaDetalhesSection({
     diasSemana,
 }: AgendaDetalhesSectionProps) {
 
-
     return (
         <>
             <div

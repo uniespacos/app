@@ -6,8 +6,6 @@ type AgendaDetalhesReservaCellProps = {
     slot: SlotCalendario;
 };
 export default function AgendaDetalhesReservaCell({ slot }: AgendaDetalhesReservaCellProps) {
-
-    console.log(slot.status)
     return (
         <div
             key={slot.id}

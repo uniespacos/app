@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatDate, identificarTurno } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
-import { addDays, format, isSameDay, startOfWeek } from "date-fns";
+import { addDays, format, startOfWeek } from "date-fns";
 import { useCallback, useMemo } from "react";
 import AgendaDetalhesReserva from "./AgendaDetalhesReserva";
 
@@ -22,9 +22,10 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
     const agendas = selectedReserva.horarios.map((horario) => horario.agenda).reduce((acc, agenda) => {
         return acc.find(item => item?.id === agenda?.id) ? acc : [...acc, agenda]; // Remove duplicatas
     }, [] as (typeof selectedReserva.horarios[0]['agenda'])[]);
-    const { gestoresPorTurno, horariosReservadosMap } = useMemo(() => {
+    const { gestoresPorTurno, horariosReservadosMap, horariosSolicitadosMap } = useMemo(() => {
         const gestores: AgendaGestoresPorTurnoType = {};
         const reservadosMap = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
+        const solicitadosMap = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
 
         agendas?.forEach((agenda) => {
             if (agenda?.user) {
@@ -36,50 +37,46 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                 };
             }
             agenda?.horarios?.forEach((horario) => {
-
-                const reservaValida = horario.reservas?.find((r) => ['deferida', 'parcialmente_deferida'].includes(r.situacao));
-                if (reservaValida) {
+                if (selectedReserva.horarios.some((h) => h.id === horario.id)) {
                     const chave = `${horario.data}|${horario.horario_inicio}`;
-                    reservadosMap.set(chave, {
-                        horario: horario,
-                        autor: reservaValida.user?.name ?? 'Indefinido',
-                        reserva_titulo: reservaValida.titulo,
+                    solicitadosMap.set(chave, {
+                        horario: selectedReserva.horarios.find((h) => h.id === horario.id) ?? horario,
+                        autor: selectedReserva.user?.name ?? 'Indefinido',
+                        reserva_titulo: selectedReserva.titulo,
                     });
+                } else {
+                    const reservaValida = horario.reservas?.find((r) => ['deferida', 'parcialmente_deferida'].includes(r.situacao));
+                    if (reservaValida) {
+                        const chave = `${horario.data}|${horario.horario_inicio}`;
+                        reservadosMap.set(chave, {
+                            horario: horario,
+                            autor: reservaValida.user?.name ?? 'Indefinido',
+                            reserva_titulo: reservaValida.titulo,
+                        });
+                    }
                 }
             });
         });
-        return { gestoresPorTurno: gestores, horariosReservadosMap: reservadosMap };
-    }, [agendas]);
+        return { gestoresPorTurno: gestores, horariosReservadosMap: reservadosMap, horariosSolicitadosMap: solicitadosMap };
+    }, [agendas, selectedReserva.horarios, selectedReserva.titulo, selectedReserva.user?.name]);
+
 
     const gerarSlotsParaSemana = useCallback((semanaInicio: Date) => {
         const slotsGerados: SlotCalendario[] = [];
         for (let diaOffset = 0; diaOffset < 7; diaOffset++) {
             const diaAtual = addDays(semanaInicio, diaOffset);
             const diaFormatado = format(diaAtual, 'yyyy-MM-dd');
-            const slotStatus = (situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa') => {
-                console.log('slotStatus', situacao);
-                switch (situacao) {
-                    case 'deferida':
-                        return 'deferida';
-                    case 'em_analise':
-                        return 'solicitado';
-                    case 'indeferida':
-                        return 'indeferida';
-                    default:
-                        return 'livre';
-                }
-            }
+
             for (let hora = 7; hora < 22; hora++) {
                 const turno = identificarTurno(hora);
                 const inicio = `${String(hora).padStart(2, '0')}:00:00`;
                 const chave = `${diaFormatado}|${inicio}`;
                 const horarioReservado = horariosReservadosMap.get(chave);
+                const horarioSolicitado = horariosSolicitadosMap.get(chave) || horariosReservadosMap.get(`${diaFormatado}|${inicio}`);
                 if (horarioReservado) {
-                    const reservaStatus = selectedReserva?.horarios.find(h => h.id === horarioReservado.horario.id);
-                    const status = reservaStatus ? slotStatus(reservaStatus.pivot?.situacao ?? 'em_analise') : 'reservado';
                     slotsGerados.push({
                         id: chave,
-                        status: status,
+                        status: 'reservado',
                         data: diaAtual,
                         horario_inicio: inicio,
                         horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
@@ -89,12 +86,20 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                             reserva_titulo: horarioReservado.reserva_titulo,
                         },
                     });
-                } else if (gestoresPorTurno[turno]) {
-                    const status = selectedReserva?.horarios.some(h => h.horario_inicio === inicio && isSameDay(h.data, diaAtual) && h.agenda?.id === gestoresPorTurno[turno].agenda_id)
-                        ? slotStatus(selectedReserva.horarios?.find(h => h.horario_inicio === inicio && isSameDay(h.data, diaAtual))?.pivot?.situacao ?? 'em_analise') : 'livre';
+                } else if (horarioSolicitado) {
                     slotsGerados.push({
                         id: chave,
-                        status: status,
+                        status: horarioSolicitado.horario.pivot?.situacao === 'em_analise' ? 'solicitado' : 'deferida',
+                        data: diaAtual,
+                        horario_inicio: inicio,
+                        horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
+                        agenda_id: gestoresPorTurno[turno].agenda_id,
+                    });
+                }
+                else if (gestoresPorTurno[turno]) {
+                    slotsGerados.push({
+                        id: chave,
+                        status: 'livre',
                         data: diaAtual,
                         horario_inicio: inicio,
                         horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
@@ -104,7 +109,7 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
             }
         }
         return slotsGerados;
-    }, [gestoresPorTurno, horariosReservadosMap, selectedReserva?.horarios]);
+    }, [gestoresPorTurno, horariosReservadosMap, horariosSolicitadosMap]);
 
     const todosSlots = useMemo<SlotCalendario[]>(
         () => gerarSlotsParaSemana(startOfWeek(new Date(), { weekStartsOn: 1 })), [gerarSlotsParaSemana]);
@@ -185,15 +190,13 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
             </div>
             <Separator />
 
-            <Separator />
-
             <div>
                 <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
                     <Clock className="h-4 w-4" />
                     Horários Solicitados
                 </h4>
-                    <AgendaDetalhesReserva diasSemana={[]} slotsPorTurno={slotsPorTurno} reservaSolicitada={selectedReserva} />
-                
+                <AgendaDetalhesReserva diasSemana={[]} slotsPorTurno={slotsPorTurno} reservaSolicitada={selectedReserva} />
+
             </div>
 
             <DialogFooter>
