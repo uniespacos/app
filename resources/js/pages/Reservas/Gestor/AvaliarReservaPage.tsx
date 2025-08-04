@@ -30,6 +30,7 @@ type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
     horarios_avaliados: SlotCalendario[]; // Horários que o usuário seleciona
+    observacao: string;
     [key: string]: any; // Permite adicionar outros campos dinamicamente
 };
 
@@ -54,7 +55,9 @@ export default function AvaliarReserva() {
         situacao: reserva.situacao,
         motivo: '',
         horarios_avaliados: [],
+        observacao: reserva.observacao || '',
     });
+    const [observacao, setObservacao] = useState(reserva.observacao || '');
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
     const [motivo, setMotivo] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -323,7 +326,18 @@ export default function AvaliarReserva() {
                                             />
                                             <p className="text-sm text-red-600">Este campo é obrigatório para reservas indeferidas</p>
                                         </div>
-                                    )}
+                                    )}<div className="space-y-2">
+                                        <Label htmlFor="obsevacao" className="text-base font-medium text-blue-700">
+                                            Obsevação 
+                                        </Label>
+                                        <Textarea
+                                            id="obsevacao"
+                                            placeholder="Caso haja uma observação adicional, descreva aqui..."
+                                            value={observacao}
+                                            onChange={(e) => setObservacao(e.target.value)}
+                                            className="min-h-[100px] border-blue-200 focus:border-blue-500"
+                                        />
+                                    </div>
 
                                     <div className="flex gap-3 pt-4">
                                         <Button

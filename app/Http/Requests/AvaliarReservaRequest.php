@@ -25,6 +25,7 @@ class AvaliarReservaRequest extends FormRequest
         return [
             'situacao' => 'required|in:parcialmente_deferida,deferida,indeferida,em_analise', // Garante que o valor seja um dos esperados
             'motivo' => 'required_if:situacao,indeferida|nullable',
+            'observacao' => 'nullable|string|max:500', // Observação opcional, mas se fornecida, deve ser uma string com no máximo 500 caracteres
             'horarios_avaliados' => 'required|array', // Garante que seja um array
             'horarios_avaliados.*.status' => 'required', // Verifica se cada ID de horário é válido
             'horarios_avaliados.*.dadosReserva' => 'required',

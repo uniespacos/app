@@ -93,7 +93,14 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                     />
 
                 </div>
+                <Separator />
+                {selectedReserva.horarios.some((horario) => horario.pivot?.situacao === 'indeferida') && (
+                    <div>
+                        <h4 className="mb-2 font-medium text-red-900">Justificativa</h4>
+                        <p className="rounded-lg bg-red-50 p-3 text-red-700">{selectedReserva.descricao}</p>
+                    </div>)}
 
+                <Separator />
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setSelectedReserva(undefined)}>
                         Fechar
