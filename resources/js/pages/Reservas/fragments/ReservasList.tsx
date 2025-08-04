@@ -77,8 +77,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
         reservas.sort((a, b) => {
             if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-            if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
-            return 0;
+            if (b.situacao === 'em_analise' && a.situacao !== 'parcialmente_deferida') return 1;
+            return 0 ;
         }),
     );
 
