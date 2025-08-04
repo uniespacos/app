@@ -6,7 +6,7 @@ import { Building2, Home, MapPin, User, Users } from 'lucide-react';
 
 type AgendaHeaderProps = {
     espaco: Espaco;
-    gestoresPorTurno: AgendaGestoresPorTurnoType;
+    gestoresPorTurno: Map<string, AgendaGestoresPorTurnoType>;
 };
 
 export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderProps) {
@@ -44,16 +44,16 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                                             <div className="font-semibold">{turno.toUpperCase()}:</div>
                                             <div className="flex items-center gap-1">
                                                 <User className="text-muted-foreground h-3 w-3" />
-                                                <span>{gestoresPorTurno[turno]?.nome ?? 'N/A'}</span>
+                                                <span>{gestoresPorTurno.get(turno)?.nome ?? 'N/A'}</span>
                                             </div>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        {gestoresPorTurno[turno] ? (
+                                        {gestoresPorTurno.get(turno) ? (
                                             <div className="space-y-1">
-                                                <p className="font-medium">{gestoresPorTurno[turno].nome}</p>
-                                                <p className="text-xs">{gestoresPorTurno[turno].email}</p>
-                                                <p className="text-muted-foreground text-xs">{gestoresPorTurno[turno].departamento}</p>
+                                                <p className="font-medium">{gestoresPorTurno.get(turno)?.nome || 'N/A'}</p>
+                                                <p className="text-xs">{gestoresPorTurno.get(turno)?.email || 'N/A'}</p>
+                                                <p className="text-muted-foreground text-xs">{gestoresPorTurno.get(turno)?.departamento || 'N/A'}</p>
                                             </div>
                                         ) : (
                                             <p>Nenhum gestor para este turno.</p>

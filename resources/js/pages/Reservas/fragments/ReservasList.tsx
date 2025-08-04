@@ -2,11 +2,10 @@ import DeleteItem from '@/components/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { diasSemanaParser, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
+import { formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { Separator } from '@radix-ui/react-separator';
-import { CalendarDays, CheckCircle, Clock, Edit, Eye, FileText, Home, User, XCircle, XSquare } from 'lucide-react';
+import { CheckCircle, Clock, Edit, Eye, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
@@ -75,7 +74,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     const { data: reservas, links } = paginator;
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
-    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(reservas);
+    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
+        reservas.sort((a, b) => {
+            if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
+            if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
+            return 0;
+        }),
+    );
 
     useEffect(() => {
         if (isGestor) {
@@ -84,7 +89,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                     return horario.agenda?.user?.id === user?.id;
                 });
 
-                if (reserva.situacao === 'parcialmente_deferida') {
+                if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
                     const situacoes = horariosQueGerencio.map((horario) => horario.pivot?.situacao);
                     if (situacoes.includes('em_analise')) {
                         return {
@@ -108,7 +113,11 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
 
                 return reserva;
             });
-            setReservasFiltradas(reservasParaExibir);
+            setReservasFiltradas(reservasParaExibir.sort((a, b) => {
+                if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
+                if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
+                return 0;
+            }));
         } else {
             setReservasFiltradas(reservas);
         }
@@ -234,6 +243,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
             )}
             {selectedReserva && (
                 <ReservaDetalhes
+                    isGestor={isGestor}
                     selectedReserva={selectedReserva}
                     setSelectedReserva={setSelectedReserva}
                     setRemoverReserva={setRemoverReserva} />

@@ -1,17 +1,19 @@
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { AgendaDiasSemanaType, AgendaSlotsPorTurnoType, SlotCalendario } from '@/types';
-import AgendaTurnoSection from './AgendaTurnoSection';
+import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
+import CalendarShiftSection from '@/components/calendar-shift-section';
 
 type AgendaCalendarioProps = {
+    semanaInicio: Date;
     diasSemana: AgendaDiasSemanaType[];
-    slotsPorTurno: AgendaSlotsPorTurnoType;
+    agendas: Agenda[];
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
 };
 
-export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSelecionado, alternarSelecaoSlot }: AgendaCalendarioProps) {
+export default function AgendaCalendario({ semanaInicio, diasSemana, agendas, isSlotSelecionado, alternarSelecaoSlot }: AgendaCalendarioProps) {
+
     return (
         <Card className="p-0">
             <ScrollArea className="">
@@ -24,27 +26,16 @@ export default function AgendaCalendario({ diasSemana, slotsPorTurno, isSlotSele
                             </div>
                         ))}
                     </div>
-                    <AgendaTurnoSection
-                        titulo="MANHÃ"
-                        slotsDoTurno={slotsPorTurno.manha}
-                        diasSemana={diasSemana}
-                        isSlotSelecionado={isSlotSelecionado}
-                        alternarSelecaoSlot={alternarSelecaoSlot}
-                    />
-                    <AgendaTurnoSection
-                        titulo="TARDE"
-                        slotsDoTurno={slotsPorTurno.tarde}
-                        diasSemana={diasSemana}
-                        isSlotSelecionado={isSlotSelecionado}
-                        alternarSelecaoSlot={alternarSelecaoSlot}
-                    />
-                    <AgendaTurnoSection
-                        titulo="NOITE"
-                        slotsDoTurno={slotsPorTurno.noite}
-                        diasSemana={diasSemana}
-                        isSlotSelecionado={isSlotSelecionado}
-                        alternarSelecaoSlot={alternarSelecaoSlot}
-                    />
+                    {agendas.map((agenda) => {
+                        return (<CalendarShiftSection
+                            key={agenda.turno}
+                            titulo={agenda.turno}
+                            diasSemana={diasSemana}
+                            isSlotSelecionado={isSlotSelecionado}
+                            alternarSelecaoSlot={alternarSelecaoSlot}
+                            agenda={agenda}
+                            semanaInicio={semanaInicio} />);
+                    })}
                 </div>
             </ScrollArea>
         </Card>

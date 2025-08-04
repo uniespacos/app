@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Gestor;
 
 use App\Models\Agenda;
-use App\Models\Horario;
 use App\Models\Reserva;
 use Exception;
 use Illuminate\Http\Request;
@@ -11,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AvaliarReservaRequest;
-
 use App\Notifications\NotificationModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,8 +69,8 @@ class GestorReservaController extends Controller
                     $query->whereIn('agenda_id', $agendasDoGestorIds)
                         ->orderBy('data')
                         ->orderBy('horario_inicio');
+                    $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas']);
                 },
-                'horarios.agenda.espaco.andar.modulo.unidade.instituicao'
             ])
             ->latest();
 
@@ -123,14 +121,14 @@ class GestorReservaController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
         $reserva->load([
-            'user',
+            'user', // O usuário que solicitou a reserva
             'horarios' => function ($query) use ($agendasDoGestorIds) {
-                // Condição: O 'agenda_id' do horário DEVE estar na lista de IDs do gestor.
+                // Opcional, mas útil: só mostra os horários que são das agendas do gestor.
                 $query->whereIn('agenda_id', $agendasDoGestorIds)
                     ->orderBy('data')
                     ->orderBy('horario_inicio');
+                $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas', 'agenda.user']);
             },
-            'horarios.agenda.espaco.andar.modulo.unidade.instituicao'
         ]);
 
 
@@ -153,10 +151,14 @@ class GestorReservaController extends Controller
     public function update(AvaliarReservaRequest $request, Reserva $reserva)
     {
         $this->authorize('update', $reserva);
-
-
+        $validated = $request->validated();
+        $horariosAvaliados = collect($validated['horarios_avaliados'])
+            ->mapWithKeys(function ($dados) {
+                $horario = $dados['dadosReserva'];
+                return [$horario['horarioDB']['id'] => $dados['status'] === 'solicitado' ? 'em_analise' : $dados['status']];
+            });
         $gestor = Auth::user();
-        $novaSituacao = $request->input('situacao');
+        $novaSituacao = $validated['situacao'];
         // 2. Obter um array com os IDs de todas as agendas gerenciadas pelo gestor.
         $agendasDoGestorIds = Agenda::where('user_id', $gestor->id)->pluck('id');
 
@@ -168,19 +170,18 @@ class GestorReservaController extends Controller
 
         DB::beginTransaction();
         try {
-            // 3. Encontrar os IDs dos horários DENTRO DESTA RESERVA que:
-            //    a) Pertencem a uma das agendas do gestor.
-            //    b) Ainda estão com o status 'em_analise'.
-            $horariosIdsParaAvaliar = $reserva->horarios()
-                ->whereIn('agenda_id', $agendasDoGestorIds)
-                ->pluck('horarios.id');
 
             // 4. Atualiza a 'situacao' na tabela pivô APENAS para os horários encontrados.
-            $reserva->horarios()->updateExistingPivot($horariosIdsParaAvaliar, [
-                'situacao' => $novaSituacao,
-                'user_id' => $gestor->id,
-                'justificativa' => $request->input('motivo', null), // Justificativa opcional
-            ]);
+            foreach ($horariosAvaliados as $horarioId => $situacao) {
+                // Garante que o gestor só pode avaliar horários das suas agendas
+                if ($reserva->horarios()->whereIn('agenda_id', $agendasDoGestorIds)->find($horarioId)) {
+                    $reserva->horarios()->updateExistingPivot($horarioId, [
+                        'situacao' => $situacao,
+                        'user_id' => $gestor->id,
+                        'justificativa' => $situacao === 'indeferida' ? $validated['motivo'] : null, // Justificativa opcional
+                    ]);
+                }
+            }
 
             // 5. Atualiza o status GERAL da reserva (para 'deferido', 'indeferido', 'parcialmente_deferido').
             $this->atualizarStatusGeralDaReserva($reserva);
@@ -194,7 +195,7 @@ class GestorReservaController extends Controller
             $reserva->user->notify(new NotificationModel(
                 'Avaliação de Reserva',
                 "Sua reserva #{$reserva->id} foi avaliada como '{$novaSituacao}' por {$resultado}.",
-                route('reservas.index', ['reserva'=>$reserva])
+                route('reservas.index', ['reserva' => $reserva])
             ));
             return Redirect::route('gestor.reservas.index')->with('success', 'solicitação avaliada com sucesso!');
         } catch (Exception $e) {

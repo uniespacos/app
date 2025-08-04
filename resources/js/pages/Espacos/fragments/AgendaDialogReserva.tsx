@@ -93,7 +93,7 @@ export default function AgendaDialogReserva({
     );
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange} modal >
+        <Dialog open={isOpen} onOpenChange={onOpenChange} >
             <DialogTrigger asChild>
                 <Button className="shadow-lg">
                     {isEditMode ? 'Editar' : 'Reservar'} {slotsSelecao.length} horário{slotsSelecao.length > 1 ? 's' : ''} em{' '}

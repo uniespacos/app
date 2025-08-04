@@ -1,6 +1,6 @@
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
-import { format } from 'date-fns';
+import { addDays, format, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -127,3 +127,18 @@ export function getPrimeirosDoisNomes(nomeCompleto: string | undefined): string 
     const palavras = nomeCompleto.trim().split(' ');
     return palavras.slice(0, 2).join(' ');
   }
+
+
+export function diasDaSemana(semanaAtual: Date, hoje: Date) {
+    return Array.from({ length: 7 }).map((_, i) => {
+        const dia = addDays(semanaAtual, i);
+        return {
+            data: dia,
+            nome: format(dia, 'EEEE', { locale: ptBR }),
+            abreviado: format(dia, 'EEE', { locale: ptBR }),
+            diaMes: format(dia, 'dd/MM'),
+            valor: format(dia, 'yyyy-MM-dd'),
+            ehHoje: isSameDay(dia, hoje),
+        };
+    });
+}

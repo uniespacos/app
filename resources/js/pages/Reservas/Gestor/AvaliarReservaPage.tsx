@@ -6,12 +6,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { diasSemanaParser, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
-import { BreadcrumbItem, Reserva, SituacaoReserva } from '@/types';
+import { diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
+import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, User, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
+import { parse, startOfWeek } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,20 +29,40 @@ const breadcrumbs: BreadcrumbItem[] = [
 type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
+    horarios_avaliados: SlotCalendario[]; // Horários que o usuário seleciona
+    [key: string]: any; // Permite adicionar outros campos dinamicamente
 };
 
 export default function AvaliarReserva() {
-    const { props } = usePage<{ reserva: Reserva }>();
-    const reserva = props.reserva;
+    const { reserva, auth: { user } } = usePage<{ reserva: Reserva, auth: { user: UserType } }>().props;
+    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(reserva.horarios.map(
+        (horario) =>
+            ({
+                id: `${horario.data}|${horario.horario_inicio}`,
+                status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
+                    (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
+                        horario.pivot.situacao : 'solicitado',
+                data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+                horario_inicio: horario.horario_inicio,
+                horario_fim: horario.horario_fim,
+                agenda_id: horario.agenda?.id,
+                dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
+                isShowReservation: true,
+            }) as SlotCalendario,
+    ));
     const { setData, patch, reset } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
         motivo: '',
+        horarios_avaliados: [],
     });
-
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
     const [motivo, setMotivo] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const [semanaDaReserva] = useState(() => startOfWeek(reserva.horarios[0].data, { weekStartsOn: 1 }));
+    const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
+    const agendas = reserva.horarios.map((horario) => horario.agenda)
+        .filter((agenda): agenda is Agenda => agenda !== undefined)
+        .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
     useEffect(() => {
         // Inicializa o estado da decisão com a situação atual da reserva
         setDecisao(reserva.situacao as SituacaoReserva);
@@ -51,13 +73,110 @@ export default function AvaliarReserva() {
             setMotivo('');
         }
     }, [reserva.horarios, reserva.situacao]);
+    const situaçãoReserva = () => {
+        const horariosQueGerencio = reserva.horarios.filter((horario) => {
+            return horario.agenda?.user?.id === user.id;
+        });
+
+        if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
+            const situacoes = horariosQueGerencio.map((horario) => horario.pivot?.situacao);
+            if (situacoes.includes('em_analise')) {
+                return 'em_analise' as SituacaoReserva;
+            }
+            if (situacoes.includes('deferida')) {
+                return 'deferida' as SituacaoReserva;
+            }
+            if (situacoes.includes('indeferida')) {
+                return 'indeferida' as SituacaoReserva;
+            }
+        }
+        return 'em_analise' as SituacaoReserva;
+    }
+    function verificarStatusReserva(slots: SlotCalendario[]): SituacaoReserva {
+        if (slots.length === 0) {
+            return 'em_analise';
+        }
+
+        const todosIndeferidos = slots.every(slot => slot.status === 'indeferida');
+        if (todosIndeferidos) {
+            return 'indeferida';
+        }
+
+        const todosDeferidos = slots.every(slot => slot.status === 'deferida');
+        if (todosDeferidos) {
+            return 'deferida';
+        }
+
+        const temDeferidos = slots.some(slot => slot.status === 'deferida');
+        const temIndeferidos = slots.some(slot => slot.status === 'indeferida');
+        const temSolicitados = slots.some(slot => slot.status === 'solicitado');
+
+        if ((temDeferidos && temIndeferidos) || (temDeferidos && temSolicitados)) {
+            return 'parcialmente_deferida';
+        }
+
+        if (temIndeferidos && temSolicitados && !temDeferidos) {
+            console.log('Todos slots indeferidos ou solicitados, retornando em_analise');
+            return 'em_analise';
+        }
+
+        return 'em_analise';
+    }
+    useEffect(() => {
+        setSlotsSelecao((prev) => {
+            return prev.map((slot) => ({
+                ...slot,
+                status: decisao === 'em_analise' ? 'solicitado' :
+                    decisao === 'deferida' ? 'deferida' :
+                        decisao === 'indeferida' ? 'indeferida' : 'solicitado'
+            }));
+        })
+    }, [decisao]);
+    useEffect(() => {
+        const horariosAvaliados = slotsSelecao.filter(slot => {
+            return reserva.horarios.some(horario => `${horario.data}|${horario.horario_inicio}` === slot.id);
+        });
+        setData((prevData) => ({
+            ...prevData,
+            horarios_avaliados: horariosAvaliados,
+        }));
+
+    }, [reserva.horarios, setData, slotsSelecao]);
 
     useEffect(() => {
-        setData('situacao', decisao);
-    }, [decisao, setData]);
+        setData((prevData) => ({
+            ...prevData,
+            situacao: verificarStatusReserva(slotsSelecao),
+        }));
+    }, [slotsSelecao, setData]);
+    const avaliarSlot = (slot: SlotCalendario) => {
+
+        setSlotsSelecao((prevSlots) => {
+            const novosSlots = [...prevSlots];
+            const index = novosSlots.findIndex((s) => s.id === slot.id);
+
+            if (index !== -1) {
+                const slotAtual = novosSlots[index];
+                let proximoStatus: 'solicitado' | 'deferida' | 'indeferida';
+
+                // A lógica de alternância: solicitado -> deferida -> indeferida -> solicitado
+                if (slotAtual.status === 'solicitado' || slotAtual.status === 'selecionado') {
+                    proximoStatus = 'deferida';
+                } else if (slotAtual.status === 'deferida') {
+                    proximoStatus = 'indeferida';
+                } else {
+                    // de 'indeferida' ou qualquer outro estado, volta para 'solicitado'
+                    proximoStatus = 'solicitado';
+                }
+                novosSlots[index] = { ...slotAtual, status: proximoStatus };
+            }
+            return novosSlots;
+        });
+    };
+
 
     useEffect(() => {
-        setData('motivo', motivo);
+        setData(prev => ({ ...prev, motivo: motivo }));
     }, [motivo, setData]);
     const getSituacaoIcon = (situacao: string) => {
         switch (situacao) {
@@ -70,6 +189,7 @@ export default function AvaliarReserva() {
         }
     };
     function handleSubmit(e: React.FormEvent) {
+
         e.preventDefault();
         if (!decisao) return;
         if (decisao === 'indeferida' && !motivo.trim()) {
@@ -105,9 +225,9 @@ export default function AvaliarReserva() {
                                     {reserva.horarios[0].agenda?.espaco?.andar?.modulo?.nome} / {getTurnoText(reserva.horarios[0].agenda!.turno)}{' '}
                                 </p>
                             </div>
-                            <Badge className={`${getStatusReservaColor(reserva.situacao)} flex items-center gap-1`}>
-                                {getSituacaoIcon(reserva.situacao)}
-                                {getStatusReservaText(reserva.situacao)}
+                            <Badge className={`${getStatusReservaColor(situaçãoReserva())} flex items-center gap-1`}>
+                                {getSituacaoIcon(situaçãoReserva())}
+                                {getStatusReservaText(situaçãoReserva())}
                             </Badge>
                         </div>
 
@@ -150,19 +270,13 @@ export default function AvaliarReserva() {
                                         <Clock className="h-4 w-4" />
                                         Horários Solicitados
                                     </h4>
-                                    <div className="grid gap-2">
-                                        {reserva.horarios.map((horario) => {
-                                            const dia = new Date(horario.data);
-                                            return (
-                                                <div key={horario.id} className="flex items-center justify-between rounded-lg bg-blue-50 p-3">
-                                                    <span className="font-medium text-blue-900">{diasSemanaParser[dia.getDay()]}</span>
-                                                    <span className="text-blue-700">
-                                                        {horario.horario_inicio} às {horario.horario_fim}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                                    <CalendarReservationDetails
+                                        agendas={agendas}
+                                        semanaInicio={startOfWeek(new Date(), { weekStartsOn: 1 })}
+                                        diasSemana={diasDaSemana(semanaDaReserva, hoje)}
+                                        slotsSolicitados={slotsSelecao}
+                                        alternarSelecaoSlot={avaliarSlot}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
@@ -195,7 +309,7 @@ export default function AvaliarReserva() {
                                         </RadioGroup>
                                     </div>
 
-                                    {decisao === 'indeferida' && (
+                                    {(decisao === 'indeferida' || slotsSelecao.some((slot) => slot.status === 'indeferida')) && (
                                         <div className="space-y-2">
                                             <Label htmlFor="motivo" className="text-base font-medium text-red-700">
                                                 Motivo do Indeferimento *

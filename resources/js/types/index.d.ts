@@ -250,6 +250,7 @@ export interface SlotCalendario {
 
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
     agenda_id?: number;
+    isShowReservation?:boolean
 }
 
 export interface OpcoesRecorrencia {
@@ -295,7 +296,12 @@ export interface ImageWithPreview {
     path?: string;    // Path relativo para imagens existentes
 }
 
-export type AgendaGestoresPorTurnoType = Record<string, { nome: string; email: string; departamento: string; agenda_id: number }>;
+export type AgendaGestoresPorTurnoType = {
+    nome: string;
+    email: string;
+    departamento: string;
+    agenda_id: number
+};
 
 export type AgendaDiasSemanaType = {
     data: Date;
@@ -306,11 +312,7 @@ export type AgendaDiasSemanaType = {
     ehHoje: boolean;
 }
 
-export type AgendaSlotsPorTurnoType = {
-    manha: Record<string, SlotCalendario[]>;
-    tarde: Record<string, SlotCalendario[]>;
-    noite: Record<string, SlotCalendario[]>;
-}
+export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>
 export interface PermissionType {
   id: number
   name: "institucional" | "gestor" | "comum"
