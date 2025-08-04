@@ -51,9 +51,8 @@ class EspacoController extends Controller
                 $query->where('espacos.andar_id', $andar);
             })
             ->when($filters['capacidade'] ?? null, function ($query, $capacidade) {
-                if ($capacidade === 'pequeno') $query->where('espacos.capacidade_pessoas', '<=', 30);
-                if ($capacidade === 'medio') $query->whereBetween('espacos.capacidade_pessoas', [31, 100]);
-                if ($capacidade === 'grande') $query->where('espacos.capacidade_pessoas', '>', 100);
+                $query->where('espacos.capacidade_pessoas', $capacidade);
+
             })
             // Seleciona as colunas de espacos para evitar conflitos de 'id'
             ->select('espacos.*')
@@ -72,14 +71,19 @@ class EspacoController extends Controller
         $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
 
         $andares = Andar::whereHas('modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
-
+        $capacidadeEspacos = Espaco::query()
+            ->select('capacidade_pessoas')
+            ->distinct()
+            ->orderBy('capacidade_pessoas')
+            ->pluck('capacidade_pessoas');
         return Inertia::render('Espacos/EspacosPage', [
             'espacos' => $espacos, // Agora é um objeto paginador
             'andares' => $andares, // Ainda precisa de todos para popular os selects
             'modulos' => $modulos,
             'unidades' => $unidades,
             'filters' => $filters, // Envia os filtros de volta para a view
-            'user' => $user
+            'user' => $user,
+            'capacidadeEspacos' => $capacidadeEspacos
         ]);
     }
 
@@ -103,7 +107,9 @@ class EspacoController extends Controller
         ]);
 
         // 2. Verifica se o espaço tem pelo menos uma agenda (e, portanto, um gestor).
-        if ($espaco->agendas->isEmpty()) {
+        if (
+            $espaco->agendas()->whereNotNull('user_id')->count() === 0
+        ) {
             return redirect()->route('espacos.index')->with('error', 'Este espaço ainda não possui um gestor definido.');
         }
 

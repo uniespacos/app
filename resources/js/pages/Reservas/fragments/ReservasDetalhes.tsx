@@ -9,6 +9,8 @@ import { router } from "@inertiajs/react";
 import { parse, startOfWeek } from "date-fns";
 import { useMemo, useState } from "react";
 import CalendarReservationDetails from "./CalendarReservationDetails";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type ReservaDetalhesProps = {
     selectedReserva: Reserva; // Defina o tipo correto para a reserva
@@ -39,9 +41,10 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                 isShowReservation: true,
             }) as SlotCalendario,
     ));
+    const justificativaReserva = selectedReserva.horarios.find((horario) => horario.pivot?.situacao === 'indeferida')?.pivot?.justificativa;
     return (
         <Dialog open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
-            <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-auto">
+            <DialogContent className="h-[90vh] min-w-[100vh] overflow-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <FileText className="h-5 w-5" />
@@ -94,13 +97,24 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
 
                 </div>
                 <Separator />
-                {selectedReserva.horarios.some((horario) => horario.pivot?.situacao === 'indeferida') && (
-                    <div>
-                        <h4 className="mb-2 font-medium text-red-900">Justificativa</h4>
-                        <p className="rounded-lg bg-red-50 p-3 text-red-700">{selectedReserva.descricao}</p>
-                    </div>)}
+                {
+                    justificativaReserva && (
+                        <div>
+                            <h4 className="mb-2 font-medium text-red-900">Justificativa do indeferimento</h4>
+                            <p className="rounded-lg bg-red-50 p-3 text-red-700">{justificativaReserva}</p>
+                            <Separator className="mt-10" />
 
-                <Separator />
+                        </div>)
+                }
+
+                {
+                    selectedReserva.observacao && (
+                        <div>
+                            <h4 className="mb-2 font-medium text-blue-900">Observação</h4>
+                            <p className="rounded-lg bg-blue-50 p-3 text-blue-700">{selectedReserva.observacao}</p>
+                            <Separator className="mt-5" />
+                        </div>)
+                }
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setSelectedReserva(undefined)}>
                         Fechar

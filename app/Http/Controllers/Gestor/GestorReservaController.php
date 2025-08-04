@@ -171,6 +171,7 @@ class GestorReservaController extends Controller
         DB::beginTransaction();
         try {
 
+            $reserva->observacao = $validated['observacao'] ?? null; // Atualiza a observação da reserva, se fornecida.
             // 4. Atualiza a 'situacao' na tabela pivô APENAS para os horários encontrados.
             foreach ($horariosAvaliados as $horarioId => $situacao) {
                 // Garante que o gestor só pode avaliar horários das suas agendas
@@ -182,7 +183,6 @@ class GestorReservaController extends Controller
                     ]);
                 }
             }
-
             // 5. Atualiza o status GERAL da reserva (para 'deferido', 'indeferido', 'parcialmente_deferido').
             $this->atualizarStatusGeralDaReserva($reserva);
 

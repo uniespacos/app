@@ -19,10 +19,11 @@ type FiltroBuscaEspacosProps = {
         andar?: string;
         capacidade?: string;
     };
+    capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
 };
 
 export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
-    const { route, filters, unidades, modulos, andares } = props;
+    const { route, filters, unidades, modulos, andares, capacidadeEspacos } = props;
     const [localFilters, setLocalFilters] = useState({
         search: filters.search || '',
         unidade: filters.unidade || 'all',
@@ -74,10 +75,8 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             }
             if (name === 'modulo') {
                 setFilteredAndares(andares.filter((a) => a.modulo?.id.toString() === filters.modulo));
-
                 newFilters.andar = 'all';
             }
-
             return newFilters;
         });
     };
@@ -159,9 +158,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="qualquer">Qualquer</SelectItem>
-                                <SelectItem value="pequeno">Pequeno (até 30)</SelectItem>
-                                <SelectItem value="medio">Médio (31-100)</SelectItem>
-                                <SelectItem value="grande">Grande (+100)</SelectItem>
+                                {capacidadeEspacos.map((capacidade) => {
+                                    return <SelectItem value={capacidade.toString()}>{capacidade} Lugares</SelectItem>
+                                })}
                             </SelectContent>
                         </Select>
                     </div>

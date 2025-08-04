@@ -1,17 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription,  CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Bell, Calendar, CheckCircle, Clock, History, Home, Plus, Users, XCircle } from 'lucide-react';
+import {  Calendar, CheckCircle, Clock,    Users } from 'lucide-react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -19,25 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Dados de exemplo
-const pendingRequests = 8;
 
-const scheduledUnavailability = [
-    {
-        id: '1',
-        spaceName: 'Laboratório de Informática 3',
-        startDate: '20/05/2023',
-        endDate: '25/05/2023',
-        reason: 'Manutenção de Equipamentos',
-    },
-    {
-        id: '2',
-        spaceName: 'Sala de Videoconferência',
-        startDate: '15/05/2023',
-        endDate: '16/05/2023',
-        reason: 'Atualização de Software',
-    },
-];
 
 export default function Dashboard() {
     const { user, reservasPendentes, statusDasReservas, agendas } = usePage<{
@@ -47,10 +24,6 @@ export default function Dashboard() {
             total_espacos: number
         }, agendas: Agenda[]
     }>().props;
-    const [selectedReserva, setSelectedReserva] = useState<any>(null)
-    const [justificativa, setJustificativa] = useState("")
-    const [filtroTurno, setFiltroTurno] = useState<string>("todos")
-
     const getTurnoLabel = (turno: string) => {
         switch (turno) {
             case "manha":
@@ -64,18 +37,8 @@ export default function Dashboard() {
         }
     }
 
-    const handleAprovar = (reservaId: number) => {
-        // Implementar lógica de aprovação
-        console.log("Aprovando reserva:", reservaId)
-    }
-
-    const handleRejeitar = (reservaId: number) => {
-        // Implementar lógica de rejeição
-        console.log("Rejeitando reserva:", reservaId, "Justificativa:", justificativa)
-    }
-
     return (
-        <AppLayout> <Head title="Dashboard" />
+        <AppLayout breadcrumbs={breadcrumbs}> <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-y-6">
                     {/* Header */}
@@ -84,19 +47,7 @@ export default function Dashboard() {
                             <h1 className="text-3xl font-bold">Painel do Gestor</h1>
                             <p className="text-muted-foreground">Olá, {user.name} - Gerencie as reservas dos seus espaços</p>
                         </div>
-                        <div className="flex gap-2">
-                            <Select value={filtroTurno} onValueChange={setFiltroTurno}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Filtrar por turno" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="todos">Todos os turnos</SelectItem>
-                                    <SelectItem value="manha">Manhã</SelectItem>
-                                    <SelectItem value="tarde">Tarde</SelectItem>
-                                    <SelectItem value="noite">Noite</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+
                     </div>
 
                     {/* Stats Cards */}
@@ -171,9 +122,6 @@ export default function Dashboard() {
                                                         </Button>
                                                     </div>
                                                 </div>
-
-
-
                                             </div>
                                         ))}
                                     </div>
@@ -199,7 +147,9 @@ export default function Dashboard() {
                                                         </p>
                                                         <Badge variant="secondary">{getTurnoLabel(agenda.turno)}</Badge>
                                                     </div>
-                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline" onClick={}>
+                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline" onClick={() => {
+                                                        router.get(route('espacos.show', agenda.espaco?.id))
+                                                    }}>
                                                         <Calendar className="mr-2 h-4 w-4" />
                                                         Ver Agenda
                                                     </Button>

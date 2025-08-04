@@ -1,11 +1,14 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
+import { Espaco, Unidade, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { FileText, PieChart, Search, Settings, Users } from 'lucide-react';
+import { BarChart3, Building, Calendar, Plus, Settings, UserCheck, Users } from 'lucide-react';
 import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,171 +18,246 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const { users, reservas, espacos } = usePage<{ user: User; users: User[]; reservas: Reserva[]; espacos: Espaco[] }>().props;
-    const [institucional] = useState<User[]>(users.filter((u) => u.permission_type_id === 1));
-    const [gestores] = useState<User[]>(users.filter((u) => u.permission_type_id === 2));
-    const [comum] = useState<User[]>(users.filter((u) => u.permission_type_id === 3));
-    const [reservaEsseMes] = useState<Reserva[]>(reservas.filter((r) => new Date(r.data_inicial).getMonth() === new Date().getMonth()));
-    const [reservasPendenteAnalise] = useState<Reserva[]>(
-        reservas.filter((r) => r.horarios.filter((h) => h.pivot?.situacao === 'em_analise').length > 0),
-    );
-    // const { user } = props;
+    const { estatisticasPainel, espacos, user, gestores, unidades } = usePage<{
+        user: User;
+        users: User[];
+        estatisticasPainel: {
+            total_espacos: number;
+            total_gestores: number;
+            reservas_mes: number;
+        }; espacos: Espaco[]
+        gestores: User[];
+        unidades: Unidade[]
+    }>().props;
+    const [selectedEspaco, setSelectedEspaco] = useState<any>(null)
+    const [selectedGestor, setSelectedGestor] = useState("")
+    const [selectedTurno, setSelectedTurno] = useState("")
+
+    const getTurnoLabel = (turno: string) => {
+        switch (turno) {
+            case "manha":
+                return "Manhã"
+            case "tarde":
+                return "Tarde"
+            case "noite":
+                return "Noite"
+            default:
+                return turno
+        }
+    }
+
+    const handleDelegarGestor = () => {
+        // Implementar lógica de delegação
+        console.log("Delegando gestor:", selectedGestor, "para turno:", selectedTurno, "do espaço:", selectedEspaco?.id)
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Home" />
+            <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <Card className="col-span-1 sm:col-span-2 lg:col-span-2">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Usuários e Permissões</CardTitle>
-                            <Users className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Total de Usuários</p>
-                                    <p className="text-xl font-bold md:text-2xl">{users.length}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Administradores</p>
-                                    <p className="text-xl font-bold md:text-2xl">{institucional.length}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Gestores</p>
-                                    <p className="text-xl font-bold md:text-2xl">{gestores.length}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Comum</p>
-                                    <p className="text-xl font-bold md:text-2xl">{comum.length}</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex flex-wrap justify-between gap-2">
-                            <Button variant="outline" size="sm" onClick={() => router.get(route('institucional.usuarios.index'))}>
-                                Gerenciar usuarios
+                <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold">Painel Institucional</h1>
+                            <p className="text-muted-foreground">Olá, {user.name} bem vindo ao UESB Reservas</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={() => router.get(route('institucional.espacos.create'))}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Novo Espaço
                             </Button>
-                        </CardFooter>
-                    </Card>
+                        </div>
+                    </div>
 
-                    <Card className="col-span-1 sm:col-span-2 lg:col-span-2">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Espaços e Gestores</CardTitle>
-                            <Settings className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-wrap justify-between gap-2">
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Total de Espaços</p>
-                                    <p className="text-xl font-bold md:text-2xl">{espacos.length}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Disponíveis</p>
-                                    <p className="text-xl font-bold text-green-500 md:text-2xl">{espacos.length - 2} </p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-muted-foreground text-xs">Indisponíveis</p>
-                                    <p className="text-xl font-bold text-red-500 md:text-2xl">{2}</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex flex-wrap justify-between gap-2">
-                            <Button variant="outline" size="sm" onClick={() => router.get(route('institucional.espacos.index'))}>
-                                Gerenciar Espaços
-                            </Button>
+                    {/* Stats Cards */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total de Espaços</CardTitle>
+                                <Building className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{estatisticasPainel.total_espacos}</div>
+                                <p className="text-xs text-muted-foreground">Espaços cadastrados</p>
+                            </CardContent>
+                        </Card>
 
-                            <Button size="sm" onClick={() => router.get(route('institucional.espacos.create'))}>
-                                Adicionar Espaço
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Gestores Ativos</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{estatisticasPainel.total_gestores}</div>
+                                <p className="text-xs text-muted-foreground">Gestores delegados</p>
+                            </CardContent>
+                        </Card>
 
-                    <Card className="col-span-1 sm:col-span-2 lg:col-span-2">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Relatórios / Visões Gerais</CardTitle>
-                            <PieChart className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <Tabs defaultValue="overview">
-                                <TabsList className="mb-4 flex flex-wrap">
-                                    <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-                                    <TabsTrigger value="spaces">Por Espaço</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="overview" className="space-y-4">
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                        <div className="space-y-1">
-                                            <p className="text-muted-foreground text-xs">Total de Reservas</p>
-                                            <p className="text-xl font-bold md:text-2xl">{reservas.length}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-muted-foreground text-xs">Este Mês</p>
-                                            <p className="text-xl font-bold md:text-2xl">{reservaEsseMes.length}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-muted-foreground text-xs">Pendentes</p>
-                                            <p className="text-xl font-bold md:text-2xl">{reservasPendenteAnalise.length}</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-muted/50 h-[200px] rounded-md border p-4">
-                                        <div className="bg-muted/50 flex h-full w-full items-center justify-center rounded-md">
-                                            Gráfico de Reservas por Período
-                                        </div>
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="spaces">
-                                    <div className="bg-muted/50 h-[250px] rounded-md border p-4">
-                                        <div className="bg-muted/50 flex h-full w-full items-center justify-center rounded-md">
-                                            Gráfico de Reservas por Espaço
-                                        </div>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="outline" size="sm" className="w-full">
-                                <FileText className="mr-2 h-4 w-4" /> Exportar Relatórios
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Reservas do Mês</CardTitle>
+                                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{estatisticasPainel.reservas_mes}</div>
+                                <p className="text-xs text-muted-foreground">Total de reservas</p>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                    <Card className="col-span-1 sm:col-span-2 lg:col-span-2">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Filtros Avançados e Consultas</CardTitle>
-                            <Search className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium">Período</label>
-                                    <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                                        <Input type="date" className="w-full" placeholder="Data inicial" />
-                                        <Input type="date" className="w-full" placeholder="Data final" />
+                    {/* Main Content */}
+                    <Tabs defaultValue="espacos" className="space-y-4">
+                        <TabsList>
+                            <TabsTrigger value="espacos">Gerenciar Espaços</TabsTrigger>
+                            <TabsTrigger value="gestores">Delegar Gestores</TabsTrigger>
+                            <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="espacos" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Ultimos 5 espaços cadastrados</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        {espacos.map((espaco) => (
+                                            <div key={espaco.id} className="border rounded-lg p-4">
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="space-y-1">
+                                                        <h4 className="font-medium">{espaco.nome}</h4>
+                                                        <p className="text-sm text-muted-foreground">Capacidade: {espaco.capacidade_pessoas} pessoas</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {espaco.andar?.nome} - {espaco.andar?.modulo?.nome}, {espaco.andar?.modulo?.unidade?.nome}
+                                                        </p>
+                                                    </div>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            router.get(route('institucional.espacos.index'))
+                                                        }}
+                                                    >
+                                                        <Settings className="mr-1 h-4 w-4" />
+                                                        Editar
+                                                    </Button>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <h5 className="text-sm font-medium">Gestores por turno:</h5>
+                                                    <div className="flex gap-2 flex-wrap">
+                                                        {espaco.agendas?.map((agenda) => (
+                                                            <div key={agenda.id} className="flex items-center gap-2">
+                                                                <Badge variant="outline">{getTurnoLabel(agenda.turno)}</Badge>
+                                                                {agenda.user ? (
+                                                                    <span className="text-sm text-muted-foreground">{agenda.user.name}</span>
+                                                                ) : (
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="ghost"
+                                                                        onClick={() => {
+                                                                            router.get(route('institucional.espacos.index'))
+                                                                        }}
+                                                                    >
+                                                                        <UserCheck className="mr-1 h-3 w-3" />
+                                                                        Delegar
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium">Filtros</label>
-                                    <div className="flex space-x-2">
-                                        <Input className="w-full" placeholder="Espaço ou Setor" />
-                                        <Button variant="secondary" size="icon">
-                                            <Search className="h-4 w-4" />
-                                        </Button>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="gestores" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Gestores Cadastrados</CardTitle>
+                                    <CardDescription>Visualize todos os gestores e suas delegações</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                        {gestores.map((gestor) => (
+                                            <Card key={gestor.id}>
+                                                <CardContent className="p-4">
+                                                    <div className="space-y-2">
+                                                        <h4 className="font-medium">{gestor.name}</h4>
+                                                        <p className="text-sm text-muted-foreground">{gestor.email}</p>
+                                                        <p className="text-xs text-muted-foreground">{gestor.setor?.nome}</p>
+                                                        <Badge variant="secondary">
+                                                            <Users className="mr-1 h-3 w-3" />
+                                                            Gestor
+                                                        </Badge>
+                                                    </div>
+                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline">
+                                                        <Calendar className="mr-2 h-4 w-4" />
+                                                        Ver Delegações
+                                                    </Button>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
                                     </div>
-                                </div>
-                            </div>
-                            <div className="bg-muted/50 rounded-md border p-4">
-                                <div className="bg-muted/50 flex h-[150px] w-full items-center justify-center rounded-md">Resultados da Consulta</div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex flex-wrap justify-between gap-2">
-                            <Button variant="outline" size="sm">
-                                Limpar Filtros
-                            </Button>
-                            <Button size="sm">
-                                <FileText className="mr-2 h-4 w-4" /> Exportar Dados
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="relatorios" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Relatórios e Estatísticas</CardTitle>
+                                    <CardDescription>Visualize dados e métricas do sistema</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <Card>
+                                            <CardHeader>
+                                                <CardTitle className="text-lg">Ocupação por Unidade</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    {unidades.map((unidade) => (
+                                                        <div key={unidade.id} className="flex justify-between items-center">
+                                                            <span className="text-sm">{unidade.nome}</span>
+                                                            <Badge variant="outline">{Math.floor(Math.random() * 40 + 60)}%</Badge>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+
+                                        <Card>
+                                            <CardHeader>
+                                                <CardTitle className="text-lg">Reservas por Período</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm">Manhã</span>
+                                                        <Badge variant="outline">45%</Badge>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm">Tarde</span>
+                                                        <Badge variant="outline">35%</Badge>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm">Noite</span>
+                                                        <Badge variant="outline">20%</Badge>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }

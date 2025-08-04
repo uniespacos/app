@@ -30,7 +30,7 @@ type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
     horarios_avaliados: SlotCalendario[]; // Horários que o usuário seleciona
-    observacao: string;
+    observacao: string | null;
     [key: string]: any; // Permite adicionar outros campos dinamicamente
 };
 
@@ -55,7 +55,7 @@ export default function AvaliarReserva() {
         situacao: reserva.situacao,
         motivo: '',
         horarios_avaliados: [],
-        observacao: reserva.observacao || '',
+        observacao: reserva.observacao,
     });
     const [observacao, setObservacao] = useState(reserva.observacao || '');
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
@@ -125,16 +125,7 @@ export default function AvaliarReserva() {
 
         return 'em_analise';
     }
-    useEffect(() => {
-        setSlotsSelecao((prev) => {
-            return prev.map((slot) => ({
-                ...slot,
-                status: decisao === 'em_analise' ? 'solicitado' :
-                    decisao === 'deferida' ? 'deferida' :
-                        decisao === 'indeferida' ? 'indeferida' : 'solicitado'
-            }));
-        })
-    }, [decisao]);
+
     useEffect(() => {
         const horariosAvaliados = slotsSelecao.filter(slot => {
             return reserva.horarios.some(horario => `${horario.data}|${horario.horario_inicio}` === slot.id);
@@ -145,6 +136,13 @@ export default function AvaliarReserva() {
         }));
 
     }, [reserva.horarios, setData, slotsSelecao]);
+
+    useEffect(() => {
+        setData((prevData) => ({
+            ...prevData,
+            observacao: observacao,
+        }));
+    }, [observacao, setData]);
 
     useEffect(() => {
         setData((prevData) => ({
@@ -294,7 +292,17 @@ export default function AvaliarReserva() {
                                 <CardContent className="space-y-4">
                                     <div>
                                         <Label className="text-base font-medium">Decisão</Label>
-                                        <RadioGroup value={decisao} onValueChange={(value) => setDecisao(value as 'deferida' | 'indeferida')}>
+                                        <RadioGroup value={decisao} onValueChange={(value) => {
+                                            setSlotsSelecao((prev) => {
+                                                return prev.map((slot) => ({
+                                                    ...slot,
+                                                    status: value === 'em_analise' ? 'solicitado' :
+                                                        value === 'deferida' ? 'deferida' :
+                                                            value === 'indeferida' ? 'indeferida' : 'solicitado'
+                                                }));
+                                            });
+                                            setDecisao(value as 'deferida' | 'indeferida')
+                                        }}>
                                             <div className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-green-50">
                                                 <RadioGroupItem value="deferida" id="deferida" />
                                                 <Label htmlFor="deferida" className="flex cursor-pointer items-center gap-2">
@@ -328,7 +336,7 @@ export default function AvaliarReserva() {
                                         </div>
                                     )}<div className="space-y-2">
                                         <Label htmlFor="obsevacao" className="text-base font-medium text-blue-700">
-                                            Obsevação 
+                                            Obsevação
                                         </Label>
                                         <Textarea
                                             id="obsevacao"

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Reserva;
+use App\Models\Unidade;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +18,17 @@ class HomeController extends Controller
         $user = Auth::user();
         switch ($user->permission_type_id) {
             case 1: // Institucional
-                $users = User::all();
-                $espacos = Espaco::with(['agendas.horarios.reservas'])->get();
-                $reservas = Reserva::with(['horarios.agenda.espaco'])->get();
-                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('user', 'users', 'espacos', 'reservas'));
+                $user = Auth::user();
+                $users = User::latest()->take(5)->with(['agendas'])->get();
+                $espacos = Espaco::latest()->take(5)->with(['andar.modulo.unidade','agendas.user'])->get();
+                $estatisticasPainel = [
+                    'total_espacos' => Espaco::count(),
+                    'total_gestores' => User::where('permission_type_id', 2)->count(),
+                    'reservas_mes' => Reserva::whereMonth('created_at', now()->month)->count(),
+                ];
+                $gestores = User::where('permission_type_id', 2)->latest()->take(5)->get();
+                $unidades = Unidade::latest()->take(5)->with('modulos.andars.espacos')->get();
+                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('user', 'users', 'gestores', 'espacos', 'unidades', 'estatisticasPainel'));
             case 2: // Gestor
                 $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo'])->get();
                 $reservasPendentes = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
@@ -30,7 +38,7 @@ class HomeController extends Controller
                         ->orWhereHas('horarios', function ($subQuery) {
                             $subQuery->where('situacao', 'em_analise');
                         });
-                })->with(['horarios.agenda.espaco','user'])->get();
+                })->with(['horarios.agenda.espaco', 'user'])->get();
                 $baseReservaUserStats = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 })

@@ -78,7 +78,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
         reservas.sort((a, b) => {
             if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
             if (b.situacao === 'em_analise' && a.situacao !== 'parcialmente_deferida') return 1;
-            return 0 ;
+            return 0;
         }),
     );
 
@@ -97,13 +97,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             situacao: 'em_analise' as SituacaoReserva,
                         };
                     }
-                    if (situacoes.includes('deferida')) {
+                    if (situacoes.every((situacao) => situacao === 'deferida')) {
                         return {
                             ...reserva,
                             situacao: 'deferida' as SituacaoReserva,
                         };
                     }
-                    if (situacoes.includes('indeferida')) {
+                    if (situacoes.every((situacao) => situacao === 'indeferida')) {
                         return {
                             ...reserva,
                             situacao: 'indeferida' as SituacaoReserva,
@@ -143,8 +143,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             <TableHead>Título</TableHead>
                             <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="hidden md:table-cell">Local</TableHead>
-                            <TableHead className="hidden lg:table-cell">Data de Início</TableHead>
-                            <TableHead className="hidden lg:table-cell">Data de Término</TableHead>
+                            <TableHead className="hidden lg:table-cell">Data início</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -155,8 +154,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                     <div>
                                         {reserva.titulo}
                                         <p className="text-muted-foreground hidden text-sm sm:block">
-                                            {reserva.descricao.substring(0, 60)}
-                                            {reserva.descricao.length > 60 ? '...' : ''}
+                                            {reserva.descricao.substring(0, 30)}
+                                            {reserva.descricao.length > 30 ? '...' : ''}
                                         </p>
                                     </div>
                                 </TableCell>
@@ -166,16 +165,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 <TableCell className="hidden md:table-cell">
                                     <div>
                                         <p>
-                                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '} /{' '}
-                                            {reserva.horarios[0]?.agenda?.espaco?.andar?.nome ?? ' '} /{' '}
-                                            {reserva.horarios[0]?.agenda?.espaco?.andar?.modulo?.nome ?? ' '} /{' '}
+                                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '} /
                                             {reserva.horarios[0]?.agenda!.turno ? getTurnoText(reserva.horarios[0].agenda?.turno) : null}
                                         </p>
                                     </div>
                                 </TableCell>
 
                                 <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
-                                <TableCell className="hidden lg:table-cell"> {formatDate(reserva.data_final)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2">
                                         {/* 2. O botão de detalhes agora define a reserva selecionada no estado */}

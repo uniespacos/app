@@ -250,7 +250,7 @@ class InstitucionalEspacoController extends Controller
                 ]);
             });
             foreach ($espaco->agendas as $agenda) {
-                $agenda->user()->notify(new NotificationModel(
+                $agenda->user->notify(new NotificationModel(
                     'Gestão de Espaços',
                     'O espaço ' . $espaco->nome . ' foi atualizado.',
                     route('espacos.show', $espaco->id)
