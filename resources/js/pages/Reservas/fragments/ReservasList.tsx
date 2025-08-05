@@ -5,10 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { CheckCircle, Clock, Edit, Eye, XCircle, XSquare } from 'lucide-react';
+import { CheckCircle, Clock, Edit, Eye, SquareArrowDown, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -152,7 +153,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             <TableRow key={reserva.id}>
                                 <TableCell className="font-medium">
                                     <div>
-                                        {reserva.titulo}
+                                        {reserva.titulo.substring(0, 30)}
+                                        {reserva.titulo.length > 30 ? '...' : ''}
                                         <p className="text-muted-foreground hidden text-sm sm:block">
                                             {reserva.descricao.substring(0, 30)}
                                             {reserva.descricao.length > 30 ? '...' : ''}
@@ -174,51 +176,49 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2">
-                                        {/* 2. O botão de detalhes agora define a reserva selecionada no estado */}
-                                        <Button variant="ghost" size="sm" onClick={() => setSelectedReserva(reserva)}>
-                                            <Eye className="mr-1 h-4 w-4" />
-                                            Detalhes
-                                        </Button>
-
-                                        {reserva.situacao !== 'inativa' ? (
-                                            isGestor ? (
-                                                <Button
-                                                    onClick={() => handleAvaliarButton(reserva.id)}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    title={reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                    {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
+                                        <DropdownMenu key={reserva.id}>
+                                            <DropdownMenuTrigger asChild >
+                                                <Button variant="outline" size="sm" >
+                                                    <SquareArrowDown className="h-4 w-4" />
                                                 </Button>
-                                            ) : (
-                                                <>
-                                                    {reserva.situacao === 'em_analise' && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            title="Editar"
-                                                            onClick={() => {
-                                                                router.get(`reservas/${reserva.id}/edit`);
-                                                            }}
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => setSelectedReserva(reserva)}>
+                                                    <Eye className="mr-2 h-4 w-4" />
+                                                    Detalhes
+                                                </DropdownMenuItem>
+                                                {reserva.situacao !== 'inativa' ? (
+                                                    isGestor ? (
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleAvaliarButton(reserva.id)}
                                                         >
-                                                            <Edit />
-                                                            Editar
-                                                        </Button>
-                                                    )}
-                                                    <Button
-                                                        onClick={() => setRemoverReserva(reserva)}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-red-600"
-                                                        title="Cancelar"
-                                                    >
-                                                        <XCircle />
-                                                        Cancelar
-                                                    </Button>
-                                                </>
-                                            )
-                                        ) : null}
+                                                            <Edit className="h-4 w-4" />
+                                                            {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <>
+                                                            {reserva.situacao === 'em_analise' && (
+                                                                <DropdownMenuItem
+                                                                    onClick={() => {
+                                                                        router.get(`reservas/${reserva.id}/edit`);
+                                                                    }}
+                                                                >
+                                                                    <Edit />
+                                                                    Editar
+                                                                </DropdownMenuItem>
+                                                            )}
+                                                            <DropdownMenuItem
+                                                                onClick={() => setRemoverReserva(reserva)}
+                                                                className="text-red-600"
+                                                            >
+                                                                <XCircle className="text-red-600" />
+                                                                Cancelar
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )
+                                                ) : null}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </TableCell>
                             </TableRow>

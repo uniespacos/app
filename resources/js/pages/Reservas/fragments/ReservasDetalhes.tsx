@@ -43,8 +43,8 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.pivot?.situacao === 'indeferida')?.pivot?.justificativa;
     return (
-        <Dialog open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
-            <DialogContent className="h-[90vh] min-w-[100vh] overflow-auto">
+        <Dialog  open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
+            <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <FileText className="h-5 w-5" />

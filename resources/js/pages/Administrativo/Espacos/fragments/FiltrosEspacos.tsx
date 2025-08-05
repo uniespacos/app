@@ -57,17 +57,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
     return (
         <Card>
             <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                    {/* Busca por nome */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Buscar</label>
-                        <Input
-                            placeholder="Nome do espaço..."
-                            value={filtros.search || ''}
-                            onChange={(e) => setFiltros({ ...filtros, search: e.target.value })}
-                        />
-                    </div>
-
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     {/* Filtro por Unidade */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Unidade</label>
@@ -135,25 +125,36 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
                 </div>
 
                 {/* Botão de filtrar e limpar */}
-                <div className="mt-4 flex gap-2">
-                    <Button onClick={handleLimparFiltros} className="flex-1">
-                        <Search className="mr-2 h-4 w-4" />
-                        Aplicar Filtros
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() =>
-                            setFiltros({
-                                search: '',
-                                unidade: undefined,
-                                modulo: undefined,
-                                andar: undefined,
-                                capacidade: '',
-                            })
-                        }
-                    >
-                        Limpar
-                    </Button>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                    {/* Busca por nome */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Buscar</label>
+                        <Input
+                            placeholder="Nome do espaço..."
+                            value={filtros.search || ''}
+                            onChange={(e) => setFiltros({ ...filtros, search: e.target.value })}
+                        />
+                    </div>
+                    <div className="flex items-end justify-end space-x-2">
+                        <Button onClick={handleLimparFiltros} className='flex-1'>
+                            <Search className="mr-2 h-4 w-4" />
+                            Aplicar Filtros
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                setFiltros({
+                                    search: '',
+                                    unidade: undefined,
+                                    modulo: undefined,
+                                    andar: undefined,
+                                    capacidade: '',
+                                })
+                            }
+                        >
+                            Limpar
+                        </Button>
+                    </div>
                 </div>
             </CardContent>
         </Card>

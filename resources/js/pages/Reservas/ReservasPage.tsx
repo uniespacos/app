@@ -48,13 +48,12 @@ export default function MinhasReservas() {
             replace: true,
         });
     }, [debouncedSearch, selectedSituacao]);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Minhas Reservas" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
+            <div className='flex'>
+                <div className="flex-1 w-[100vh] container mx-auto space-y-6 py-6">
+                    <div className=" space-y-6 p-6">
                         <GenericHeader
                             titulo="Minhas Reservas"
                             descricao="Gerencie suas solicitações de reservas de espaços acadêmicos"
@@ -77,6 +76,6 @@ export default function MinhasReservas() {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+        </AppLayout >
     );
 }
