@@ -159,7 +159,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             <SelectContent>
                                 <SelectItem value="qualquer">Qualquer</SelectItem>
                                 {capacidadeEspacos.map((capacidade) => {
-                                    return <SelectItem value={capacidade.toString()}>{capacidade} Lugares</SelectItem>
+                                    return <SelectItem key={capacidade} value={capacidade.toString()}>{capacidade} Lugares</SelectItem>
                                 })}
                             </SelectContent>
                         </Select>

@@ -119,7 +119,7 @@ export default function CalendarShiftSection({
         setTodosSlots(gerarSlotsParaSemana(semanaInicio));
     }, [gerarSlotsParaSemana, semanaInicio]);
     return (
-        <>
+        <div key={agenda.id} >
             <div
                 className={cn(
                     'grid grid-cols-[80px_repeat(7,1fr)] border-b',
@@ -156,6 +156,6 @@ export default function CalendarShiftSection({
                     ))}
                 </div>
             ))}
-        </>
+        </div>
     );
 }

@@ -9,8 +9,7 @@ import { router } from "@inertiajs/react";
 import { parse, startOfWeek } from "date-fns";
 import { useMemo, useState } from "react";
 import CalendarReservationDetails from "./CalendarReservationDetails";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 
 type ReservaDetalhesProps = {
     selectedReserva: Reserva; // Defina o tipo correto para a reserva
@@ -43,31 +42,31 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.pivot?.situacao === 'indeferida')?.pivot?.justificativa;
     return (
-        <Dialog  open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
-            <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-auto">
+        <Dialog key={selectedReserva.id} open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
+            <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-scroll">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <FileText className="h-5 w-5" />
                         {selectedReserva.titulo}
                     </DialogTitle>
                     <DialogDescription className="flex-col justify-between">
-                        <div className="flex items-center gap-2 p-1">
+                        <span className="flex items-center gap-2 p-1">
                             <User className="h-4 w-4" />
                             Solicitado por: {selectedReserva.user?.name}
-                        </div>
-                        <div className="flex items-center gap-2 p-1">
+                        </span>
+                        <span className="flex items-center gap-2 p-1">
                             <Home className="h-4 w-4" />
                             Espaço: {selectedReserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
-                        </div>
-                        <div className="flex items-center gap-2 p-1">
+                        </span>
+                        <span className="flex items-center gap-2 p-1">
                             <SituacaoIndicator situacao={selectedReserva.situacao} />
-                        </div>
+                        </span>
                     </DialogDescription>
                 </DialogHeader>
-                <div>
+                <span>
                     <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
                     <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{selectedReserva.descricao}</p>
-                </div>
+                </span>
 
                 <Separator />
                 <div className="grid gap-4 md:grid-cols-2">

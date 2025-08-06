@@ -162,7 +162,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                     </div>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                    <SituacaoBadge situacao={reserva.situacao} />
+                                    <div>
+                                        <SituacaoBadge situacao={reserva.situacao} />
+                                    </div>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                     <div>
@@ -175,9 +177,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
 
                                 <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
                                 <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2 pt-2">
-                                        <DropdownMenu key={reserva.id}>
-                                            <DropdownMenuTrigger asChild >
+                                    <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
+                                        <DropdownMenu >
+                                            <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" size="sm" >
                                                     <SquareArrowDown className="h-4 w-4" />
                                                 </Button>

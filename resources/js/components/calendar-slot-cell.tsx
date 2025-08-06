@@ -57,7 +57,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                     Selecionado
                 </p>
             </div>
-        ) : <></>;
+        ) : <div />;
     }
 
 

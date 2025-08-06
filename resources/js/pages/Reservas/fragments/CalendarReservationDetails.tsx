@@ -31,6 +31,7 @@ export default function CalendarReservationDetails({ semanaInicio, diasSemana, a
                             return null; // Skip empty agendas
                         }
                         return (<CalendarShiftSection
+                            key={agenda.id}
                             titulo={agenda.turno}
                             agenda={agenda}
                             diasSemana={diasSemana}
