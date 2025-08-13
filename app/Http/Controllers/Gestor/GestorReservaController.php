@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Gestor;
 use App\Models\Agenda;
 use App\Models\Reserva;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -120,6 +121,7 @@ class GestorReservaController extends Controller
         if ($agendasDoGestorIds->isEmpty()) {
             abort(403, 'Acesso não autorizado.');
         }
+
         $reserva->load([
             'user', // O usuário que solicitou a reserva
             'horarios' => function ($query) use ($agendasDoGestorIds) {
@@ -127,13 +129,36 @@ class GestorReservaController extends Controller
                 $query->whereIn('agenda_id', $agendasDoGestorIds)
                     ->orderBy('data')
                     ->orderBy('horario_inicio');
-                $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas', 'agenda.user']);
+                $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas.horarios', 'agenda.user']);
             },
         ]);
 
+        $agendasId = $reserva->horarios()->whereUserId($gestor->id)->pluck('agenda_id')->unique();
 
+        $agendasHorariosAprovados = Agenda::whereIn('id', $agendasId)->whereHas('horarios', function ($query) {
+            // Filtra as agendas que possuem horários que correspondem ao critério abaixo
+            $query->whereHas('reservas', function ($subQuery) {
+                // AQUI ESTÁ A CHAVE: usamos um `where` direto, referenciando a tabela
+                // intermediária e a coluna. Isso evita qualquer mal-interpretação.
+                $subQuery->where('reserva_horario.situacao', 'deferida');
+            });
+        })->with([
+                    'horarios' => function ($query) {
+                        // Repete o filtro para garantir que apenas os horários com a
+                        // situação 'deferida' sejam carregados na coleção.
+                        $query->whereHas('reservas', function ($subQuery) {
+                            $subQuery->where('reserva_horario.situacao', 'deferida');
+                        });
+                    },
+                    'user'
+                ])->get();
+        $agendas = Agenda::whereIn('id', $agendasId)
+            ->with(['espaco.andar.modulo.unidade.instituicao', 'user'])
+            ->get();
         return Inertia::render('Reservas/Gestor/AvaliarReservaPage', [
-            'reserva' => $reserva
+            'reserva' => $reserva,
+            'agendas' => $agendas,
+            'agendasHorariosAprovados' => $agendasHorariosAprovados,
         ]);
     }
 

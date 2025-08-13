@@ -10,7 +10,7 @@ import { diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText, 
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, User, XCircle } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
 import { parse, startOfWeek } from 'date-fns';
@@ -35,22 +35,53 @@ type FormAvaliacaoType = {
 };
 
 export default function AvaliarReserva() {
-    const { reserva, auth: { user } } = usePage<{ reserva: Reserva, auth: { user: UserType } }>().props;
-    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(reserva.horarios.map(
-        (horario) =>
-            ({
-                id: `${horario.data}|${horario.horario_inicio}`,
-                status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
-                    (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
-                        horario.pivot.situacao : 'solicitado',
-                data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                horario_inicio: horario.horario_inicio,
-                horario_fim: horario.horario_fim,
-                agenda_id: horario.agenda?.id,
-                dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
-                isShowReservation: true,
-            }) as SlotCalendario,
-    ));
+    const { reserva, auth: { user }, agendas, agendasHorariosAprovados } = usePage<{ reserva: Reserva, auth: { user: UserType }, agendasHorariosAprovados: Agenda[], agendas: Agenda[] }>().props;
+    console.log(agendas);
+    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>([]);
+    useEffect(() => {
+
+        setSlotsSelecao(reserva.horarios.map(
+            (horario) => {
+                if (horario.pivot?.situacao === "em_analise") {
+                    const hasConflict = agendasHorariosAprovados.some((agenda) => {
+                        return agenda.horarios?.some(h => {
+                            return h.horario_inicio === horario.horario_inicio && h.data === horario.data
+                        });
+                    })
+                    if (hasConflict) {
+                        setMotivo(`
+                            O horário ${horario.horario_inicio} - ${horario.horario_fim} do dia ${formatDate(horario.data)}
+                            conflita com outra reserva já aprovada.    
+                        `);
+                        return ({
+                            id: `${horario.data}|${horario.horario_inicio}`,
+                            status: 'indeferida',
+                            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+                            horario_inicio: horario.horario_inicio,
+                            horario_fim: horario.horario_fim,
+                            agenda_id: horario.agenda?.id,
+                            dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
+                            isShowReservation: true,
+                            isLocked: true
+                        }) as SlotCalendario
+                    }
+                }
+                return ({
+                    id: `${horario.data}|${horario.horario_inicio}`,
+                    status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
+                        (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
+                            horario.pivot.situacao : 'solicitado',
+                    data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+                    horario_inicio: horario.horario_inicio,
+                    horario_fim: horario.horario_fim,
+                    agenda_id: horario.agenda?.id,
+                    dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
+                    isShowReservation: true,
+                }) as SlotCalendario
+            },
+        ))
+    }, [reserva.horarios, agendas, reserva.user, reserva.titulo, agendasHorariosAprovados]);
+
     const { setData, patch, reset } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
         motivo: '',
@@ -59,13 +90,11 @@ export default function AvaliarReserva() {
     });
     const [observacao, setObservacao] = useState(reserva.observacao || '');
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
-    const [motivo, setMotivo] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [semanaDaReserva] = useState(() => startOfWeek(reserva.horarios[0].data, { weekStartsOn: 1 }));
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
-    const agendas = reserva.horarios.map((horario) => horario.agenda)
-        .filter((agenda): agenda is Agenda => agenda !== undefined)
-        .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
+    const [motivo, setMotivo] = useState('');
+
     useEffect(() => {
         // Inicializa o estado da decisão com a situação atual da reserva
         setDecisao(reserva.situacao as SituacaoReserva);
@@ -119,7 +148,6 @@ export default function AvaliarReserva() {
         }
 
         if (temIndeferidos && temSolicitados && !temDeferidos) {
-            console.log('Todos slots indeferidos ou solicitados, retornando em_analise');
             return 'em_analise';
         }
 

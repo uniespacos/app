@@ -154,7 +154,7 @@ export interface Pivot {
     horario_id: number;
     situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
     justificativa?: string | null; // Justificativa opcional para indeferimento
-    user?:User
+    user?: User
 }
 
 /**
@@ -236,7 +236,7 @@ export type DashboardStatusReservasType = {
 
 export interface SlotCalendario {
     id: string; // ID único gerado para o frontend (ex: "2025-06-13|09:00:00")
-    status: 'livre' | 'reservado' | 'selecionado'| 'solicitado' | 'indeferida'|'deferida'; // Status do slot no calendário
+    status: 'livre' | 'reservado' | 'selecionado' | 'solicitado' | 'indeferida' | 'deferida'; // Status do slot no calendário
     data: Date;
     horario_inicio: string;
     horario_fim: string;
@@ -247,10 +247,10 @@ export interface SlotCalendario {
         autor: string;
         reserva_titulo: string;
     };
-
+    isLocked?: boolean;
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
     agenda_id?: number;
-    isShowReservation?:boolean
+    isShowReservation?: boolean
 }
 
 export interface OpcoesRecorrencia {
@@ -314,18 +314,18 @@ export type AgendaDiasSemanaType = {
 
 export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>
 export interface PermissionType {
-  id: number
-  name: "institucional" | "gestor" | "comum"
-  label: string
+    id: number
+    name: "institucional" | "gestor" | "comum"
+    label: string
 }
 
 export interface SelectedAgenda {
-  agenda: Agenda
-  espaco: Espaco
-  andar: Andar
-  modulo: Modulo
-  unidade: Unidade
-  instituicao: Instituicao
+    agenda: Agenda
+    espaco: Espaco
+    andar: Andar
+    modulo: Modulo
+    unidade: Unidade
+    instituicao: Instituicao
 }
 
 export interface FiltrosEspacosType {

@@ -11,6 +11,23 @@ type CalendarSlotCellProps = {
 export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: CalendarSlotCellProps) {
     const Cell = ({ isShowReservation = false, slot }: { isShowReservation?: boolean; slot: SlotCalendario }): JSX.Element => {
         if (isShowReservation) {
+            if (slot.status === "indeferida" && slot.isLocked) {
+                return (<TooltipProvider>
+                    <Tooltip >
+                        <TooltipTrigger asChild>
+                            <div className="flex h-full w-full items-center justify-center">
+                                <p className="text-xs text-red-900 font-bold">
+                                    Indeferido
+                                </p>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p className="font-bold">Título da reserva: {slot.dadosReserva?.reserva_titulo}</p>
+                            <p>Horario ja aprovado por em outra reserva pertencente à {slot.dadosReserva?.autor}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>)
+            }
             return (<>
                 {slot.status === "deferida" && (
                     <div className="flex h-full w-full items-center justify-center">
@@ -35,6 +52,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 )}
             </>)
         }
+
         return slot.status === "reservado" ? (
             <TooltipProvider>
                 <Tooltip >
@@ -71,9 +89,10 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 slot.status === "solicitado" && 'border-yellow-300 bg-yellow-100 shadow-md hover:bg-yellow-200 ',
                 slot.status === "deferida" && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200',
                 slot.status === "indeferida" && 'border-red-300 bg-red-100 shadow-md hover:bg-red-200',
+                slot.status === "indeferida" && slot.isLocked ? 'border-red-300 bg-red-100 shadow-md hover:bg-red-200  cursor-not-allowed' : 'hover:bg-muted/10',
 
             )}
-            onClick={onSelect}
+            onClick={slot.isLocked ? undefined : onSelect}
         >
             <Cell isShowReservation={slot.isShowReservation} slot={slot} />
         </div>
