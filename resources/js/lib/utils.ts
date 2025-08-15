@@ -142,3 +142,9 @@ export function diasDaSemana(semanaAtual: Date, hoje: Date) {
         };
     });
 }
+
+export function calcularDataInicioSemana(data: Date) {
+    const diaDaSemana = data.getDay();
+    const diasParaSubtrair = diaDaSemana === 0 ? 6 : diaDaSemana - 1; // Ajusta para que Segunda seja o primeiro dia
+    return addDays(data, -diasParaSubtrair);
+}

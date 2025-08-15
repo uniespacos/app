@@ -46,6 +46,15 @@ export default function CalendarShiftSection({
         });
         return { horariosReservadosMap: reservadosMap };
     }, [agenda, isEditMode, reservaToEdit?.id]);
+    const mapaSlotsSolicitados = useMemo(() => {
+        const map = new Map<string, SlotCalendario>();
+        if (slotsSolicitados) {
+            for (const slot of slotsSolicitados) {
+                map.set(slot.id, slot);
+            }
+        }
+        return map;
+    }, [slotsSolicitados]);
     const gerarSlotsParaSemana = useCallback((semanaInicio: Date) => {
         const gestor: AgendaGestoresPorTurnoType = {
             nome: agenda.user?.name ?? 'Indefinido',
@@ -62,9 +71,14 @@ export default function CalendarShiftSection({
                 if (turno != agenda.turno) continue; // Verifica se o turno do slot corresponde ao turno da agenda
                 const inicio = `${String(hora).padStart(2, '0')}:00:00`;
                 const chave = `${diaFormatado}|${inicio}`;
+                const horarioSolicitado = mapaSlotsSolicitados.get(chave);
+                if (horarioSolicitado) {
+                    slotsGerados.push(horarioSolicitado);
+                    continue; // Pula para a próxima iteração do loop
+                }
+
                 const horarioReservado = horariosReservadosMap.get(chave);
-                const horarioSolicitado = slotsSolicitados?.find(slot => slot.id === chave);
-                if (horarioReservado && !horarioSolicitado) {
+                if (horarioReservado) {
                     slotsGerados.push({
                         id: chave,
                         status: 'reservado',
@@ -77,10 +91,9 @@ export default function CalendarShiftSection({
                             reserva_titulo: horarioReservado.reserva_titulo,
                         },
                     });
-                } else if (horarioSolicitado) {
-                    slotsGerados.push(horarioSolicitado);
+                    continue; // Pula para a próxima iteração do loop
                 }
-                else if (gestor) {
+                if (gestor) {
                     slotsGerados.push({
                         id: chave,
                         status: 'livre',
@@ -93,7 +106,7 @@ export default function CalendarShiftSection({
             }
         }
         return slotsGerados;
-    }, [agenda.id, agenda.turno, agenda.user?.email, agenda.user?.name, agenda.user?.setor?.nome, horariosReservadosMap, slotsSolicitados]);
+    }, [agenda.id, agenda.turno, agenda.user?.email, agenda.user?.name, agenda.user?.setor?.nome, horariosReservadosMap, mapaSlotsSolicitados]);
     const slotsDoTurno = useMemo(() => {
         // Primeiro, agrupa todos os slots por hora (07:00, 08:00, etc.), como na lógica original.
         const slotsPorHora: Record<string, SlotCalendario[]> = {};

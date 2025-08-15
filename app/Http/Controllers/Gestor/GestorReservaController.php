@@ -129,36 +129,21 @@ class GestorReservaController extends Controller
                 $query->whereIn('agenda_id', $agendasDoGestorIds)
                     ->orderBy('data')
                     ->orderBy('horario_inicio');
-                $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas.horarios', 'agenda.user']);
+                $query->with([
+                    'agenda.espaco.andar.modulo.unidade.instituicao',
+                    'agenda.horarios' => function ($query) use ($agendasDoGestorIds) {
+                        // Opcional, mas útil: só mostra os horários que são das agendas do gestor.
+                        $query->whereIn('agenda_id', $agendasDoGestorIds)
+                            ->orderBy('data')
+                            ->orderBy('horario_inicio');
+                        $query->with(['reservas.horarios']);
+                    },
+                    'agenda.user'
+                ]);
             },
         ]);
-
-        $agendasId = $reserva->horarios()->whereUserId($gestor->id)->pluck('agenda_id')->unique();
-
-        $agendasHorariosAprovados = Agenda::whereIn('id', $agendasId)->whereHas('horarios', function ($query) {
-            // Filtra as agendas que possuem horários que correspondem ao critério abaixo
-            $query->whereHas('reservas', function ($subQuery) {
-                // AQUI ESTÁ A CHAVE: usamos um `where` direto, referenciando a tabela
-                // intermediária e a coluna. Isso evita qualquer mal-interpretação.
-                $subQuery->where('reserva_horario.situacao', 'deferida');
-            });
-        })->with([
-                    'horarios' => function ($query) {
-                        // Repete o filtro para garantir que apenas os horários com a
-                        // situação 'deferida' sejam carregados na coleção.
-                        $query->whereHas('reservas', function ($subQuery) {
-                            $subQuery->where('reserva_horario.situacao', 'deferida');
-                        });
-                    },
-                    'user'
-                ])->get();
-        $agendas = Agenda::whereIn('id', $agendasId)
-            ->with(['espaco.andar.modulo.unidade.instituicao', 'user'])
-            ->get();
         return Inertia::render('Reservas/Gestor/AvaliarReservaPage', [
             'reserva' => $reserva,
-            'agendas' => $agendas,
-            'agendasHorariosAprovados' => $agendasHorariosAprovados,
         ]);
     }
 

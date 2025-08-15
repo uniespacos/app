@@ -55,40 +55,27 @@ class ReservaController extends Controller
             )
             // Carrega todos os relacionamentos necessários em uma única consulta.
             ->with([
-                'user',
-                'horarios' => function ($query) {
+                'user', // Usuário que criou a reserva
+                'horarios' => function ($query) { // Os horários da reserva
                     $query->orderBy('data')->orderBy('horario_inicio');
-                    $query->with([
-                        'agenda'=> function ($q){
-                            $q->with([
-                                'user',
-                                'espaco.andar.modulo.unidade.instituicao', // Carrega a hierarquia completa
-                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                                'horarios.reservas.horarios' 
-                            ]);
-                        },
-                        
-                    ]);
                 },
+                // Carregamos as relações aninhadas a partir dos horários
+                'horarios.agenda.user.setor', // O gestor da agenda e seu setor
+                'horarios.agenda.espaco.andar.modulo.unidade.instituicao' // A hierarquia completa do espaço
             ])
             ->latest() // Ordena as reservas da mais nova para a mais antiga.
             ->paginate(10) // Pagina os resultados
             ->withQueryString(); // Anexa os filtros aos links de paginação
         $reservaToShow = Reserva::find($filters['reserva'] ?? null);
         $reservaToShow != null ? $reservaToShow->load([
-            'user',
-                'horarios' => function ($query) {
-                    $query->orderBy('data')->orderBy('horario_inicio');
-                    $query->with([
-                        'agenda'=> function ($q){
-                            $q->with([
-                                'espaco.andar.modulo.unidade.instituicao', // Carrega a hierarquia completa
-                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                                'horarios.reservas.horarios',
-                            ]);
-                        },
-                    ]);
-                },
+
+            'user', // Usuário que criou a reserva
+            'horarios' => function ($query) { // Os horários da reserva
+                $query->orderBy('data')->orderBy('horario_inicio');
+            },
+            // Carregamos as relações aninhadas a partir dos horários
+            'horarios.agenda.user.setor', // O gestor da agenda e seu setor
+            'horarios.agenda.espaco.andar.modulo.unidade.instituicao' // A hierarquia completa do espaço
         ]) : null;
 
         return Inertia::render('Reservas/ReservasPage', [
@@ -165,7 +152,7 @@ class ReservaController extends Controller
                         new NotificationModel(
                             'Nova solicitação de reserva',
                             'O usuário ' . $resultado .
-                                ' solicitou uma reserva.',
+                            ' solicitou uma reserva.',
                             route('gestor.reservas.show', ['reserva' => $reserva->id])
                         )
                     );
@@ -237,7 +224,7 @@ class ReservaController extends Controller
                         new NotificationModel(
                             'Reserva atualizada',
                             'O usuário ' . $resultado .
-                                ' atualizou uma reserva.',
+                            ' atualizou uma reserva.',
                             route(
                                 'gestor.reservas.show',
                                 ['reserva' => $reserva->id]
@@ -259,7 +246,7 @@ class ReservaController extends Controller
      */
     public function show(Reserva $reserva)
     {
-        //
+
     }
 
     /**
@@ -321,7 +308,7 @@ class ReservaController extends Controller
         $user = Auth::user(); // Obtém o usuário logado
 
         // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
 
@@ -351,7 +338,7 @@ class ReservaController extends Controller
                         new NotificationModel(
                             'Reserva cancelada',
                             'O usuário ' . $resultado .
-                                ' cancelou uma reserva.',
+                            ' cancelou uma reserva.',
                             route('gestor.reservas.index')
                         )
                     );

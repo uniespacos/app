@@ -3,7 +3,7 @@ import { Agenda, Reserva, SlotCalendario } from "@/types";
 import { CalendarDays, Clock, Edit, FileText, Home, User, XCircle } from "lucide-react";
 import { SituacaoIndicator } from "./ReservasList";
 import { Separator } from "@/components/ui/separator";
-import { diasDaSemana, formatDate } from "@/lib/utils";
+import { calcularDataInicioSemana, diasDaSemana, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
 import { parse, startOfWeek } from "date-fns";
@@ -20,14 +20,14 @@ type ReservaDetalhesProps = {
 
 
 export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
-    const [semanaDaReserva] = useState(() => startOfWeek(selectedReserva.horarios[0].data, { weekStartsOn: 1 }));
+    const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(selectedReserva.data_inicial)), [selectedReserva.data_inicial]);
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
     const agendas = selectedReserva.horarios.map((horario) => horario.agenda)
         .filter((agenda): agenda is Agenda => agenda !== undefined)
         .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
     const [slotsSelecao] = useState<SlotCalendario[]>(selectedReserva.horarios.map(
-        (horario) =>
-            ({
+        (horario) => {
+            return ({
                 id: `${horario.data}|${horario.horario_inicio}`,
                 status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
                     (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
@@ -38,7 +38,8 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                 agenda_id: horario.agenda?.id,
                 dadosReserva: { horarioDB: horario, autor: selectedReserva.user!.name, reserva_titulo: selectedReserva.titulo },
                 isShowReservation: true,
-            }) as SlotCalendario,
+            }) as SlotCalendario
+        }
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.pivot?.situacao === 'indeferida')?.pivot?.justificativa;
     return (
@@ -89,7 +90,7 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                     </h4>
                     <CalendarReservationDetails
                         agendas={agendas}
-                        semanaInicio={startOfWeek(new Date(), { weekStartsOn: 1 })}
+                        semanaInicio={startOfWeek(semanaDaReserva, { weekStartsOn: 1 })}
                         diasSemana={diasDaSemana(semanaDaReserva, hoje)}
                         slotsSolicitados={slotsSelecao}
                     />

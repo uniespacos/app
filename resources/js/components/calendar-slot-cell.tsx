@@ -89,7 +89,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 slot.status === "solicitado" && 'border-yellow-300 bg-yellow-100 shadow-md hover:bg-yellow-200 ',
                 slot.status === "deferida" && 'border-green-300 bg-green-100 shadow-md hover:bg-green-200',
                 slot.status === "indeferida" && 'border-red-300 bg-red-100 shadow-md hover:bg-red-200',
-                slot.status === "indeferida" && slot.isLocked ? 'border-red-300 bg-red-100 shadow-md hover:bg-red-200  cursor-not-allowed' : 'hover:bg-muted/10',
+                slot.status === "indeferida" && slot.isLocked && 'border-red-300 bg-red-100 shadow-md hover:bg-red-200  cursor-not-allowed',
 
             )}
             onClick={slot.isLocked ? undefined : onSelect}
