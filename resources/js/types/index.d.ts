@@ -147,17 +147,6 @@ export interface Espaco {
 export type SituacaoReserva = 'em_analise' | 'indeferida' | 'parcialmente_deferida' | 'deferida' | 'inativa';
 
 /**
- * Dados da tabela pivô `reserva_horario`, crucial para o status individual.|
- */
-export interface Pivot {
-    reserva_id: number;
-    horario_id: number;
-    situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
-    justificativa?: string | null; // Justificativa opcional para indeferimento
-    user?: User
-}
-
-/**
  * Modelo de Agenda, que define turnos e gestores para um Espaço.
  */
 export interface Agenda {
@@ -177,8 +166,10 @@ export interface Horario {
     horario_inicio: string;
     horario_fim: string;
     agenda?: Agenda; // Relação aninhada
-    reservas?: Reserva[];
-    pivot?: Pivot; // Dados da tabela pivô `reserva_horario`
+    reserva?: Reserva;
+    situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
+    justificativa?: string | null; // Justificativa opcional para indeferimento
+    user?: User
 }
 
 /**
@@ -198,7 +189,6 @@ export interface Reserva {
     updated_at: string;
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
-    pivot?: Pivot; // Dados da tabela pivô `reserva_horario`
 }
 
 // =============================================================================

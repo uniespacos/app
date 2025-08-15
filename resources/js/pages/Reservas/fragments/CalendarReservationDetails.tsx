@@ -14,6 +14,7 @@ type CalendarReservationDetailsProps = {
 
 export default function CalendarReservationDetails({ semanaInicio, diasSemana, agendas, slotsSolicitados, alternarSelecaoSlot }: CalendarReservationDetailsProps) {
     const alternarSelecaoSlotFn = (alternarSelecaoSlot || (() => { }));
+    console.log(slotsSolicitados, 'slotsSolicitados');
     return (
         <Card className="p-0">
             <ScrollArea className="">

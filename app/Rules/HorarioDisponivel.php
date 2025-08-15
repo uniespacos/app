@@ -47,11 +47,10 @@ class HorarioDisponivel implements ValidationRule, DataAwareRule
 
         // Consulta para verificar o conflito.
         $conflito = DB::table('horarios')
-            ->join('reserva_horario', 'horarios.id', '=', 'reserva_horario.horario_id')
             ->where('horarios.data', $data)
             ->where('horarios.horario_inicio', $horario_inicio)
             ->where('horarios.agenda_id', $agenda_id)
-            ->whereIn('reserva_horario.situacao', ['deferido'])
+            ->whereIn('horarios.situacao', ['deferida'])
             ->exists();
 
         // Se houver um conflito, chamamos a função $fail com a mensagem de erro.

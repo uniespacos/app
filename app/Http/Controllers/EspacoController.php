@@ -59,7 +59,14 @@ class EspacoController extends Controller
             ->with([
                 'andar.modulo.unidade', // Carrega a unidade do módulo do andar
                 'agendas' => function ($query) {
-                    $query->with('user'); // Carrega o gestor da agenda
+                    $query->with([
+                        'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                        'horarios' => function ($q) {
+                            // Carrega as reservas dos horários APROVADOS (deferidos)
+                            $q->where('situacao', 'deferida')
+                                ->with(['reserva.user', 'avaliador']);
+                        }
+                    ]);
                 }
             ])
             ->latest('espacos.created_at')
@@ -98,9 +105,10 @@ class EspacoController extends Controller
             'agendas' => function ($query) {
                 $query->with([
                     'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                    'horarios.reservas' => function ($q) {
+                    'horarios' => function ($q) {
                         // Carrega as reservas dos horários APROVADOS (deferidos)
-                        $q->wherePivot('situacao', 'deferida')->with('user');
+                        $q->where('situacao', 'deferida')
+                            ->with(['reserva.user', 'avaliador']);
                     }
                 ]);
             }

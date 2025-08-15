@@ -10,7 +10,7 @@ import { calcularDataInicioSemana, diasDaSemana, formatDate, getStatusReservaCol
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, User, XCircle } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
 import { parse, startOfWeek } from 'date-fns';
@@ -35,7 +35,7 @@ type FormAvaliacaoType = {
 };
 
 export default function AvaliarReserva() {
-    const { reserva, auth: { user }, agendasHorariosAprovados } = usePage<{ reserva: Reserva, auth: { user: UserType } }>().props;
+    const { reserva, auth: { user } } = usePage<{ reserva: Reserva, auth: { user: UserType } }>().props;
     const agendas = reserva.horarios.map((horario) => horario.agenda)
         .filter((agenda): agenda is Agenda => agenda !== undefined)
         .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
@@ -50,21 +50,16 @@ export default function AvaliarReserva() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(reserva.data_inicial)), [reserva.data_inicial]);
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
+    const isInitialMount = useRef(true);
+
     const [motivo, setMotivo] = useState<string>('');
-    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(reserva.horarios.map(
+    const initialSlots = useMemo<SlotCalendario[]>(() => reserva.horarios.map(
         (horario) => {
-           /**
-            *  if (horario.pivot?.situacao === "em_analise") {
-                const hasConflict = agendas.some((agenda) => {
-                    return agenda.horarios?.some((h) => {
-                        if (!!h.reservas && h.reservas?.length > 0) {
-                            return h.reservas.some((r) =>
-                                r.horarios.some(h2 => h2.horario_inicio === horario.horario_inicio && h2.data === horario.data && h2.pivot?.situacao === "deferida"));
-                        }
-                    });
-                });
+            if (horario.situacao === "em_analise") {
+                const hasConflict = (agendas.some(a => {
+                    return a.horarios?.some(h => h.situacao === "deferida" && h.data === horario.data && h.horario_inicio === horario.horario_inicio);
+                }));
                 if (hasConflict) {
-                    setMotivo(`O horário ${horario.horario_inicio} - ${horario.horario_fim} do dia ${formatDate(horario.data)} conflita com outra reserva já aprovada.`);
                     return ({
                         id: `${horario.data}|${horario.horario_inicio}`,
                         status: 'indeferida',
@@ -78,13 +73,12 @@ export default function AvaliarReserva() {
                     }) as SlotCalendario
                 }
             }
-            */
 
             return ({
                 id: `${horario.data}|${horario.horario_inicio}`,
-                status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
-                    (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
-                        horario.pivot.situacao : 'solicitado',
+                status: horario.situacao === 'em_analise' ? 'solicitado' :
+                    (horario.situacao === 'deferida' || horario.situacao === 'indeferida') ?
+                        horario.situacao : 'solicitado',
                 data: parse(horario.data, 'yyyy-MM-dd', new Date()),
                 horario_inicio: horario.horario_inicio,
                 horario_fim: horario.horario_fim,
@@ -93,8 +87,16 @@ export default function AvaliarReserva() {
                 isShowReservation: true,
             }) as SlotCalendario
         },
-    ));
+    ), [reserva.horarios, reserva.user, reserva.titulo, agendas]);
+    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(initialSlots);
 
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        setSlotsSelecao(initialSlots);
+    }, [initialSlots])
     // Roleta para avaliar o slot, varia entre 'solicitado', 'deferida' e 'indeferida'
     const avaliarSlot = (slot: SlotCalendario) => {
 
@@ -151,7 +153,7 @@ export default function AvaliarReserva() {
         });
 
         if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
-            const situacoes = horariosQueGerencio.map((horario) => horario.pivot?.situacao);
+            const situacoes = horariosQueGerencio.map((horario) => horario.situacao);
             if (situacoes.includes('em_analise')) {
                 return 'em_analise' as SituacaoReserva;
             }
@@ -226,8 +228,8 @@ export default function AvaliarReserva() {
         // Inicializa o estado da decisão com a situação atual da reserva
         setDecisao(reserva.situacao as SituacaoReserva);
         // Se a reserva já tiver uma justificativa, define o motivo
-        if (reserva.horarios.length > 0 && reserva.horarios[0].pivot?.justificativa) {
-            setMotivo(reserva.horarios[0].pivot.justificativa);
+        if (reserva.horarios.length > 0 && reserva.horarios[0].justificativa) {
+            setMotivo(reserva.horarios[0].justificativa);
         } else {
             setMotivo('');
         }

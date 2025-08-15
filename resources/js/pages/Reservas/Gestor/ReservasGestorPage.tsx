@@ -2,7 +2,7 @@ import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
 import { useDebounce } from '@/lib/utils';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { ReservasEmpty } from '../fragments/ReservasEmpty';
 import { ReservasFilters } from '../fragments/ReservasFilters';

@@ -59,7 +59,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                     <TooltipTrigger asChild>
                         <div className="flex h-full w-full items-center justify-center">
                             <p className="text-xs text-blue-900 font-bold">
-                                Reservado: {slot.dadosReserva?.reserva_titulo.split(' ').slice(0, 2).join(' ')}
+                                {slot.dadosReserva?.reserva_titulo.split(' ').slice(0, 2).join(' ')}
                             </p>
                         </div>
                     </TooltipTrigger>

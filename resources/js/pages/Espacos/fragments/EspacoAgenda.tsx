@@ -9,7 +9,7 @@ import {
     ValorOcorrenciaType,
 } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { addDays, addMonths, addWeeks, format,  parse, startOfWeek, subWeeks } from 'date-fns';
+import { addDays, addMonths, addWeeks, format, parse, startOfWeek, subWeeks } from 'date-fns';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import AgendaCalendario from './AgendaCalendario';
@@ -57,7 +57,7 @@ type AgendaEspacoProps = {
 export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: AgendaEspacoProps) {
     const { agendas } = espaco;
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
-
+    console.log('AgendaEspaço', { isEditMode, espaco, reserva });
     const slotsIniciais = useMemo(
         () =>
             !isEditMode || !reserva?.horarios

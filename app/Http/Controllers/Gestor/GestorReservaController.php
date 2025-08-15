@@ -70,7 +70,19 @@ class GestorReservaController extends Controller
                     $query->whereIn('agenda_id', $agendasDoGestorIds)
                         ->orderBy('data')
                         ->orderBy('horario_inicio');
-                    $query->with(['agenda.espaco.andar.modulo.unidade.instituicao', 'agenda.horarios.reservas']);
+                    $query->with([
+                        'agenda' => function ($query) {
+                            $query->with([
+                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                                'horarios' => function ($q) {
+                                    // Carrega as reservas dos horários APROVADOS (deferidos)
+                                    $q->where('situacao', 'deferida')
+                                        ->with(['reserva.user', 'avaliador']);
+                                },
+                                'espaco.andar.modulo.unidade.instituicao'
+                            ]);
+                        },
+                    ]);
                 },
             ])
             ->latest();
@@ -80,8 +92,25 @@ class GestorReservaController extends Controller
 
         $reservaToShow = Reserva::find($filters['reserva'] ?? null);
         $reservaToShow != null ? $reservaToShow->load([
-            'horarios.agenda.espaco.andar.modulo.unidade.instituicao',
-            'horarios.agenda.user.setor'
+            'horarios' => function ($query) use ($agendasDoGestorIds) {
+                // Opcional, mas útil: só mostra os horários que são das agendas do gestor.
+                $query->whereIn('agenda_id', $agendasDoGestorIds)
+                    ->orderBy('data')
+                    ->orderBy('horario_inicio');
+                $query->with([
+                    'agenda' => function ($query) {
+                        $query->with([
+                            'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                            'horarios' => function ($q) {
+                                // Carrega as reservas dos horários APROVADOS (deferidos)
+                                $q->where('situacao', 'deferida')
+                                    ->with(['reserva.user', 'avaliador']);
+                            },
+                            'espaco.andar.modulo.unidade.instituicao'
+                        ]);
+                    },
+                ]);
+            },
         ]) : null;
         // 7. Renderiza a view do Inertia com os dados no formato esperado pelo front-end.
         return Inertia::render('Reservas/Gestor/ReservasGestorPage', [
@@ -130,15 +159,17 @@ class GestorReservaController extends Controller
                     ->orderBy('data')
                     ->orderBy('horario_inicio');
                 $query->with([
-                    'agenda.espaco.andar.modulo.unidade.instituicao',
-                    'agenda.horarios' => function ($query) use ($agendasDoGestorIds) {
-                        // Opcional, mas útil: só mostra os horários que são das agendas do gestor.
-                        $query->whereIn('agenda_id', $agendasDoGestorIds)
-                            ->orderBy('data')
-                            ->orderBy('horario_inicio');
-                        $query->with(['reservas.horarios']);
+                    'agenda' => function ($query) {
+                        $query->with([
+                            'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                            'horarios' => function ($q) {
+                                // Carrega as reservas dos horários APROVADOS (deferidos)
+                                $q->where('situacao', 'deferida')
+                                    ->with(['reserva.user', 'avaliador']);
+                            },
+                            'espaco.andar.modulo.unidade.instituicao'
+                        ]);
                     },
-                    'agenda.user'
                 ]);
             },
         ]);
@@ -186,7 +217,8 @@ class GestorReservaController extends Controller
             foreach ($horariosAvaliados as $horarioId => $situacao) {
                 // Garante que o gestor só pode avaliar horários das suas agendas
                 if ($reserva->horarios()->whereIn('agenda_id', $agendasDoGestorIds)->find($horarioId)) {
-                    $reserva->horarios()->updateExistingPivot($horarioId, [
+                    $horario = $reserva->horarios()->find($horarioId);
+                    $horario->update([
                         'situacao' => $situacao,
                         'user_id' => $gestor->id,
                         'justificativa' => $situacao === 'indeferida' ? $validated['motivo'] : null, // Justificativa opcional
@@ -227,7 +259,7 @@ class GestorReservaController extends Controller
     protected function atualizarStatusGeralDaReserva(Reserva $reserva)
     {
         // Recarrega os status da tabela pivô para ter os dados mais recentes.
-        $statusDosHorarios = $reserva->horarios()->get()->pluck('pivot.situacao');
+        $statusDosHorarios = $reserva->horarios()->get()->pluck('situacao');
         if ($statusDosHorarios->every(fn($status) => $status === 'deferida')) {
             $reserva->situacao = 'deferida';
         } elseif ($statusDosHorarios->every(fn($status) => $status === 'indeferida')) {

@@ -58,24 +58,43 @@ class ReservaController extends Controller
                 'user', // Usuário que criou a reserva
                 'horarios' => function ($query) { // Os horários da reserva
                     $query->orderBy('data')->orderBy('horario_inicio');
+                    $query->with([
+                        'agenda' => function ($query) {
+                            $query->with([
+                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                                'horarios' => function ($q) {
+                                    // Carrega as reservas dos horários APROVADOS (deferidos)
+                                    $q->where('situacao', 'deferida')
+                                        ->with(['reserva.user', 'avaliador']);
+                                },
+                                'espaco.andar.modulo.unidade.instituicao'
+                            ]);
+                        },
+                    ]);
                 },
-                // Carregamos as relações aninhadas a partir dos horários
-                'horarios.agenda.user.setor', // O gestor da agenda e seu setor
-                'horarios.agenda.espaco.andar.modulo.unidade.instituicao' // A hierarquia completa do espaço
             ])
             ->latest() // Ordena as reservas da mais nova para a mais antiga.
             ->paginate(10) // Pagina os resultados
             ->withQueryString(); // Anexa os filtros aos links de paginação
         $reservaToShow = Reserva::find($filters['reserva'] ?? null);
         $reservaToShow != null ? $reservaToShow->load([
-
             'user', // Usuário que criou a reserva
             'horarios' => function ($query) { // Os horários da reserva
                 $query->orderBy('data')->orderBy('horario_inicio');
+                $query->with([
+                    'agenda' => function ($query) {
+                        $query->with([
+                            'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                            'horarios' => function ($q) {
+                                // Carrega as reservas dos horários APROVADOS (deferidos)
+                                $q->where('situacao', 'deferida')
+                                    ->with(['reserva.user', 'avaliador']);
+                            },
+                            'espaco.andar.modulo.unidade.instituicao'
+                        ]);
+                    },
+                ]);
             },
-            // Carregamos as relações aninhadas a partir dos horários
-            'horarios.agenda.user.setor', // O gestor da agenda e seu setor
-            'horarios.agenda.espaco.andar.modulo.unidade.instituicao' // A hierarquia completa do espaço
         ]) : null;
 
         return Inertia::render('Reservas/ReservasPage', [
@@ -118,21 +137,20 @@ class ReservaController extends Controller
 
                 $horariosData = $request->validated('horarios_solicitados');
                 // Prepara os dados para inserção em massa e os IDs para o anexo.
-                $gestores = [];
-                $horariosParaAnexar = [];
                 foreach ($horariosData as $horarioInfo) {
                     $gestor = Agenda::whereId($horarioInfo['agenda_id'])
                         ->with('user') // Carrega o gestor da agenda
                         ->first()
                         ->user;
                     $gestores[] = $gestor; // Coleta os gestores para notificação
-
-                    // Cria cada horário individualmente
-                    $horario = Horario::create($horarioInfo);
-                    // Prepara o array para anexar com o status 'em_analise' na tabela pivô
-                    $horariosParaAnexar[$horario->id] = [
+                    $horario = Horario::create([
+                        'data' => $horarioInfo['data'],
+                        'horario_inicio' => $horarioInfo['horario_inicio'],
+                        'horario_fim' => $horarioInfo['horario_fim'],
+                        'agenda_id' => $horarioInfo['agenda_id'],
+                        'reserva_id' => $reserva->id, // Vincula o horário à reserva
                         'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise'
-                    ];
+                    ]);
                 }
                 $gestores = array_unique($gestores); // Remove gestores duplicados
 
@@ -141,8 +159,6 @@ class ReservaController extends Controller
                         'situacao' => count($gestores) > 1 ? 'parcialmente_deferida' : 'deferida'
                     ]);
 
-                // 3. Anexa TODOS os horários à reserva com o status pivô correto.
-                $reserva->horarios()->attach($horariosParaAnexar);
                 foreach ($gestores as $gestor) {
                     // 4. Notifica cada gestor sobre a nova solicitação de reserva.
                     $partesDoNome = explode(' ', Auth::user()->name);
@@ -173,10 +189,11 @@ class ReservaController extends Controller
     public function update(StoreReservaRequest $request, Reserva $reserva)
     {
         $this->authorize('update', $reserva);
+        $user = Auth::user(); // Obtém o usuário logado
         // A validação já foi executada pela Form Request.
         // Usamos uma transação para garantir que tudo seja salvo, ou nada.
         try {
-            DB::transaction(function () use ($request, $reserva) {
+            DB::transaction(function () use ($request, $reserva, $user) {
                 // 1. Atualiza os dados da reserva.
                 $reserva->update([
                     'titulo' => $request->validated('titulo'),
@@ -184,21 +201,13 @@ class ReservaController extends Controller
                     'data_inicial' => $request->validated('data_inicial'),
                     'data_final' => $request->validated('data_final'),
                     'recorrencia' => $request->validated('recorrencia'),
-                    // O user_id não deve mudar, e a situação é gerenciada em outro lugar.
                 ]);
-                // 2. Pega os IDs dos horários antigos para depois deletá-los.
-                $horariosAntigosIds = $reserva->horarios()->pluck('horarios.id');
 
                 // 3. Desvincula todos os horários antigos.
-                $reserva->horarios()->detach();
-
-                // 4. Deleta os horários antigos que não estão mais associados a nenhuma reserva.
-                Horario::whereIn('id', $horariosAntigosIds)->whereDoesntHave('reservas')->delete();
-
+                $reserva->horarios()->delete();
 
                 // 5. Prepara e anexa os novos horários.
                 $horariosData = $request->validated('horarios_solicitados');
-                $horariosParaAnexar = [];
                 $gestores = [];
                 foreach ($horariosData as $horarioInfo) {
                     $gestor = Agenda::whereId($horarioInfo['agenda_id'])
@@ -206,15 +215,18 @@ class ReservaController extends Controller
                         ->first()
                         ->user;
                     $gestores[] = $gestor; // Coleta os gestores para notificação
-                    // Cria cada horário individualmente
-                    $horario = Horario::create($horarioInfo);
-                    // Prepara o array para anexar com o status 'em_analise' na tabela pivô
-                    $horariosParaAnexar[$horario->id] = ['situacao' => 'em_analise'];
+                    Horario::create([
+                        'data' => $horarioInfo['data'],
+                        'horario_inicio' => $horarioInfo['horario_inicio'],
+                        'horario_fim' => $horarioInfo['horario_fim'],
+                        'reserva_id' => $reserva->id, // Vincula o horário à reserva
+                        'agenda_id' => $horarioInfo['agenda_id'],
+                        'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise'
+                    ]);
                 }
                 $gestores = array_unique($gestores); // Remove gestores duplicados
 
                 // 6. Anexa os novos horários à reserva.
-                $reserva->horarios()->attach($horariosParaAnexar);
                 foreach ($gestores as $gestor) {
                     // 4. Notifica cada gestor sobre a nova solicitação de reserva.
                     $partesDoNome = explode(' ', Auth::user()->name);
@@ -272,9 +284,10 @@ class ReservaController extends Controller
             'agendas' => function ($query) {
                 $query->with([
                     'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                    'horarios.reservas' => function ($q) {
+                    'horarios' => function ($q) {
                         // Carrega as reservas dos horários APROVADOS (deferidos)
-                        $q->wherePivot('situacao', 'deferida')->with('user');
+                        $q->where('situacao', 'deferida')
+                            ->with(['reserva.user', 'avaliador']);
                     }
                 ]);
             }
@@ -323,7 +336,7 @@ class ReservaController extends Controller
                         ->first()
                         ->user;
                     $gestores[] = $gestor; // Coleta os gestores para notificação
-                    $reserva->horarios()->updateExistingPivot($horario->id, [
+                    $reserva->horarios()->update([
                         'situacao' => 'inativa'
                     ]);
                 }

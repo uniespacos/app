@@ -29,9 +29,9 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
         (horario) => {
             return ({
                 id: `${horario.data}|${horario.horario_inicio}`,
-                status: horario.pivot?.situacao === 'em_analise' ? 'solicitado' :
-                    (horario.pivot?.situacao === 'deferida' || horario.pivot?.situacao === 'indeferida') ?
-                        horario.pivot.situacao : 'solicitado',
+                status: horario.situacao === 'em_analise' ? 'solicitado' :
+                    (horario.situacao === 'deferida' || horario.situacao === 'indeferida') ?
+                        horario.situacao : 'solicitado',
                 data: parse(horario.data, 'yyyy-MM-dd', new Date()),
                 horario_inicio: horario.horario_inicio,
                 horario_fim: horario.horario_fim,
@@ -41,7 +41,7 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
             }) as SlotCalendario
         }
     ));
-    const justificativaReserva = selectedReserva.horarios.find((horario) => horario.pivot?.situacao === 'indeferida')?.pivot?.justificativa;
+    const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     return (
         <Dialog key={selectedReserva.id} open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
             <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-scroll">

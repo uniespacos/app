@@ -20,12 +20,16 @@ class Horario extends Model
         'user_id',
     ];
 
-    public function reservas()
+    public function reserva()
     {
         return $this->belongsTo(Reserva::class);
     }
     public function agenda()
     {
         return $this->belongsTo(Agenda::class);
+    }
+
+    public function avaliador() {
+        return $this->belongsTo(User::class);
     }
 }

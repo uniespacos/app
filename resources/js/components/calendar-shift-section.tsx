@@ -33,7 +33,8 @@ export default function CalendarShiftSection({
     const { horariosReservadosMap } = useMemo(() => {
         const reservadosMap = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
         agenda.horarios?.forEach((horario) => {
-            const reservaValida = horario.reservas?.find((r) => ['deferida', 'parcialmente_deferida'].includes(r.situacao));
+            const reservaValida = horario.situacao === 'deferida' ? horario.reserva : undefined;
+            console.log('horario', { horario, reservaValida, reservaToEdit });
             if (reservaValida) {
                 if ((isEditMode && reservaValida.id === reservaToEdit?.id)) return;
                 const chave = `${horario.data}|${horario.horario_inicio}`;
@@ -45,7 +46,7 @@ export default function CalendarShiftSection({
             }
         });
         return { horariosReservadosMap: reservadosMap };
-    }, [agenda, isEditMode, reservaToEdit?.id]);
+    }, [agenda.horarios, isEditMode, reservaToEdit]);
     const mapaSlotsSolicitados = useMemo(() => {
         const map = new Map<string, SlotCalendario>();
         if (slotsSolicitados) {

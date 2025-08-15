@@ -86,12 +86,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     useEffect(() => {
         if (isGestor) {
             const reservasParaExibir = reservas.map((reserva) => {
-                const horariosQueGerencio = reserva.horarios.filter((horario) => {
-                    return horario.agenda?.user?.id === user?.id;
-                });
-
                 if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
-                    const situacoes = horariosQueGerencio.map((horario) => horario.pivot?.situacao);
+                    const situacoes = reserva.horarios.map((horario) => horario.situacao);
                     if (situacoes.includes('em_analise')) {
                         return {
                             ...reserva,
