@@ -11,16 +11,18 @@ class Horario extends Model
     use HasFactory;
     protected $fillable = [
         'agenda_id',
+        'reserva_id',
         'horario_inicio',
         'horario_fim',
         'data',
+        'situacao',
+        'justificativa',
+        'user_id',
     ];
 
     public function reservas()
     {
-        return $this->belongsToMany(Reserva::class, 'reserva_horario')
-            ->withPivot(['situacao', 'justificativa', 'user_id'])
-            ->withTimestamps();
+        return $this->belongsTo(Reserva::class);
     }
     public function agenda()
     {
