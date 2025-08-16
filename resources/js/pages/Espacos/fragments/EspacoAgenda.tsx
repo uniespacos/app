@@ -57,7 +57,6 @@ type AgendaEspacoProps = {
 export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: AgendaEspacoProps) {
     const { agendas } = espaco;
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
-    console.log('AgendaEspaço', { isEditMode, espaco, reserva });
     const slotsIniciais = useMemo(
         () =>
             !isEditMode || !reserva?.horarios

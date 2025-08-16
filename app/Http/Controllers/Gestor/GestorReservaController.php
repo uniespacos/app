@@ -264,7 +264,7 @@ class GestorReservaController extends Controller
             $reserva->situacao = 'deferida';
         } elseif ($statusDosHorarios->every(fn($status) => $status === 'indeferida')) {
             $reserva->situacao = 'indeferida';
-        } elseif ($statusDosHorarios->contains('deferida')) {
+        } elseif ($statusDosHorarios->contains(fn($status) => $status !== "em_analise" && $status !== "inativa")) {
             // Se pelo menos um foi deferido (e não todos), é parcial.
             $reserva->situacao = 'parcialmente_deferida';
         } elseif ($statusDosHorarios->every(fn($status) => $status === 'inativa')) {
@@ -274,7 +274,6 @@ class GestorReservaController extends Controller
             // Se nenhum foi deferido ainda, mas nem todos foram indeferidos, continua em análise.
             $reserva->situacao = 'em_analise';
         }
-
         $reserva->save();
     }
 }

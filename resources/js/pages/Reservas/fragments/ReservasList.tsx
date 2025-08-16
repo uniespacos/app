@@ -181,10 +181,10 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={() => setSelectedReserva(reserva)}>
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    Detalhes
-                                                </DropdownMenuItem>
+                                                <ReservaDetalhes
+                                                    isGestor={isGestor}
+                                                    selectedReserva={reserva}
+                                                    setRemoverReserva={setRemoverReserva} />
                                                 {reserva.situacao !== 'inativa' ? (
                                                     isGestor ? (
                                                         <DropdownMenuItem
@@ -235,13 +235,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                     route={route('reservas.destroy', { reserva: removerReserva.id })}
                 />
             )}
-            {selectedReserva && (
-                <ReservaDetalhes
-                    isGestor={isGestor}
-                    selectedReserva={selectedReserva}
-                    setSelectedReserva={setSelectedReserva}
-                    setRemoverReserva={setRemoverReserva} />
-            )}
+
+
+
             <div className="mt-4 flex justify-center">
                 <div className="flex flex-wrap justify-center gap-1">
                     {links.map((link, index) =>

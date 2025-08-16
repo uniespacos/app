@@ -19,21 +19,19 @@ class EspacoController extends Controller
     public function index()
     {
         $user = Auth::user();
-        // Pega os parâmetros de filtro da URL (query string)
         $filters = Request::only(['search', 'unidade', 'modulo', 'andar', 'capacidade']);
-        $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
 
         $espacos = Espaco::query()
-            // O join com 'andars' e 'modulos' é necessário para filtrar por eles
             ->join('andars', 'espacos.andar_id', '=', 'andars.id')
             ->join('modulos', 'andars.modulo_id', '=', 'modulos.id')
             ->join('unidades', 'modulos.unidade_id', '=', 'unidades.id')
-            ->when(function ($query) use ($instituicao_id) {
-                // Filtra os espaços apenas da unidade do usuário autenticado
-                $query->where('unidades.instituicao_id', $instituicao_id);
-            })
-            // Começa a aplicar os filtros
+
+            // CORREÇÃO: Aplicando o filtro de instituição diretamente.
+            // Este filtro não é condicional, então usamos where() em vez de when().
+            ->where('unidades.instituicao_id', $instituicao_id)
+
+            // Agora os filtros condicionais funcionarão como esperado.
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('espacos.nome', 'like', '%' . $search . '%')
@@ -52,17 +50,14 @@ class EspacoController extends Controller
             })
             ->when($filters['capacidade'] ?? null, function ($query, $capacidade) {
                 $query->where('espacos.capacidade_pessoas', $capacidade);
-
             })
-            // Seleciona as colunas de espacos para evitar conflitos de 'id'
             ->select('espacos.*')
             ->with([
-                'andar.modulo.unidade', // Carrega a unidade do módulo do andar
+                'andar.modulo.unidade',
                 'agendas' => function ($query) {
                     $query->with([
-                        'user.setor', // Carrega o gestor (user) da agenda e seu setor
+                        'user.setor',
                         'horarios' => function ($q) {
-                            // Carrega as reservas dos horários APROVADOS (deferidos)
                             $q->where('situacao', 'deferida')
                                 ->with(['reserva.user', 'avaliador']);
                         }
@@ -71,24 +66,24 @@ class EspacoController extends Controller
             ])
             ->latest('espacos.created_at')
             ->paginate(6)
-            // Adiciona a query string à paginação para que os filtros sejam mantidos ao mudar de página
             ->withQueryString();
+
+        // ... o restante do seu código está perfeito.
         $unidades = Unidade::where('instituicao_id', $instituicao_id)->with('modulos.andars')->get();
-
         $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
-
         $andares = Andar::whereHas('modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
         $capacidadeEspacos = Espaco::query()
             ->select('capacidade_pessoas')
             ->distinct()
             ->orderBy('capacidade_pessoas')
             ->pluck('capacidade_pessoas');
+
         return Inertia::render('Espacos/EspacosPage', [
-            'espacos' => $espacos, // Agora é um objeto paginador
-            'andares' => $andares, // Ainda precisa de todos para popular os selects
+            'espacos' => $espacos,
+            'andares' => $andares,
             'modulos' => $modulos,
             'unidades' => $unidades,
-            'filters' => $filters, // Envia os filtros de volta para a view
+            'filters' => $filters,
             'user' => $user,
             'capacidadeEspacos' => $capacidadeEspacos
         ]);

@@ -159,7 +159,7 @@ export default function Login() {
                                     className="text-primary font-medium hover:underline"
                                     onClick={() => router.get(route('register'))}
                                 >
-                                    Cadastre-se gratuitamente
+                                    Cadastre-se!
                                 </button>
                             </div>
                         </CardFooter>

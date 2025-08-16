@@ -1,7 +1,7 @@
 import { cn, identificarTurno } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, AgendaGestoresPorTurnoType, AgendaSlotsDoTurnoType, Horario, Reserva, SlotCalendario } from '@/types';
 import CalendarSlotCell from './calendar-slot-cell';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { addDays, format } from 'date-fns';
 
 type CalendarShiftSectionProps = {
@@ -29,12 +29,10 @@ export default function CalendarShiftSection({
     const isSlotSelecionadoFn = isSlotSelecionado || (() => false);
     const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => { });
 
-    const [todosSlots, setTodosSlots] = useState<SlotCalendario[]>([]);
     const { horariosReservadosMap } = useMemo(() => {
         const reservadosMap = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
         agenda.horarios?.forEach((horario) => {
             const reservaValida = horario.situacao === 'deferida' ? horario.reserva : undefined;
-            console.log('horario', { horario, reservaValida, reservaToEdit });
             if (reservaValida) {
                 if ((isEditMode && reservaValida.id === reservaToEdit?.id)) return;
                 const chave = `${horario.data}|${horario.horario_inicio}`;
@@ -94,6 +92,7 @@ export default function CalendarShiftSection({
                     });
                     continue; // Pula para a próxima iteração do loop
                 }
+
                 if (gestor) {
                     slotsGerados.push({
                         id: chave,
@@ -108,6 +107,9 @@ export default function CalendarShiftSection({
         }
         return slotsGerados;
     }, [agenda.id, agenda.turno, agenda.user?.email, agenda.user?.name, agenda.user?.setor?.nome, horariosReservadosMap, mapaSlotsSolicitados]);
+    const todosSlots = useMemo(() => {
+        return gerarSlotsParaSemana(semanaInicio);
+    }, [gerarSlotsParaSemana, semanaInicio]);
     const slotsDoTurno = useMemo(() => {
         // Primeiro, agrupa todos os slots por hora (07:00, 08:00, etc.), como na lógica original.
         const slotsPorHora: Record<string, SlotCalendario[]> = {};
@@ -129,9 +131,7 @@ export default function CalendarShiftSection({
         return resultado;
     }, [titulo, todosSlots]);
 
-    useEffect(() => {
-        setTodosSlots(gerarSlotsParaSemana(semanaInicio));
-    }, [gerarSlotsParaSemana, semanaInicio]);
+
     return (
         <div key={agenda.id} >
             <div

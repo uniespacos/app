@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Agenda, Reserva, SlotCalendario } from "@/types";
 import { CalendarDays, Clock, Edit, FileText, Home, User, XCircle } from "lucide-react";
 import { SituacaoIndicator } from "./ReservasList";
@@ -13,13 +13,13 @@ import CalendarReservationDetails from "./CalendarReservationDetails";
 
 type ReservaDetalhesProps = {
     selectedReserva: Reserva; // Defina o tipo correto para a reserva
-    setSelectedReserva: (reserva: Reserva | undefined) => void; // Função para fechar
     isGestor?: boolean; // Se o usuário é um gestor
     setRemoverReserva: (selectedReserva: Reserva) => void; // Função para remover a reserva
 };
 
 
-export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
+export default function ReservaDetalhes({ selectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
+
     const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(selectedReserva.data_inicial)), [selectedReserva.data_inicial]);
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
     const agendas = selectedReserva.horarios.map((horario) => horario.agenda)
@@ -43,7 +43,14 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     return (
-        <Dialog key={selectedReserva.id} open={!!selectedReserva} onOpenChange={() => setSelectedReserva(undefined)}>
+        <Dialog key={selectedReserva.id}
+        >
+            <DialogTrigger>
+                <Button variant="link" className="w-full">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Detalhes
+                </Button>
+            </DialogTrigger>
             <DialogContent className="max-h-[90vh] min-w-[100vh] overflow-scroll">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
@@ -116,9 +123,7 @@ export default function ReservaDetalhes({ selectedReserva, setSelectedReserva, i
                         </div>)
                 }
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setSelectedReserva(undefined)}>
-                        Fechar
-                    </Button>
+
                     {isGestor ? (
                         <div>
                             <Button

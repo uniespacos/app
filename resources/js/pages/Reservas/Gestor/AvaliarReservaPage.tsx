@@ -1,246 +1,131 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { calcularDataInicioSemana, diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
+import { calcularDataInicioSemana, diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, User, XCircle } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
-import { parse, startOfWeek } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
+import { useReservationSlots } from '@/hooks/use-reservation-slots'; // Importa o novo hook
+import EvaluationForm from './fragments/EvaluationForm'; // Importa o novo componente
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Gerenciar Reservas',
-        href: '/gestor/reservas',
-    },
-    {
-        title: 'Avaliar reserva',
-        href: '/gestor/reservas',
-    },
+    { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
+    { title: 'Avaliar reserva', href: '/gestor/reservas' },
 ];
 
+// Define o tipo de dados para o formulário do Inertia, mantendo a estrutura original.
 type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
-    horarios_avaliados: SlotCalendario[]; // Horários que o usuário seleciona
+    horarios_avaliados: SlotCalendario[]; // Mantém o tipo original esperado pelo backend
     observacao: string | null;
-    [key: string]: any; // Permite adicionar outros campos dinamicamente
+    [key: string]: SituacaoReserva | string | (string | null) | any; // Permite outras propriedades dinâmicas
 };
 
-export default function AvaliarReserva() {
-    const { reserva, auth: { user } } = usePage<{ reserva: Reserva, auth: { user: UserType } }>().props;
-    const agendas = reserva.horarios.map((horario) => horario.agenda)
-        .filter((agenda): agenda is Agenda => agenda !== undefined)
-        .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
-    const { setData, patch, reset } = useForm<FormAvaliacaoType>({
+// Funções de ajuda podem permanecer aqui ou serem movidas para 'utils' se forem reutilizadas.
+const getSituacaoIcon = (situacao: string) => {
+    switch (situacao) {
+        case 'deferida': return <CheckCircle className="h-4 w-4 text-green-600" />;
+        case 'indeferida': return <XCircle className="h-4 w-4 text-red-600" />;
+        default: return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+    }
+};
+
+const verificarStatusReserva = (slots: SlotCalendario[]): SituacaoReserva => {
+    if (slots.length === 0) return 'em_analise';
+    const slotsAvaliáveis = slots.filter(slot => !slot.isLocked);
+    if (slotsAvaliáveis.length === 0) return 'em_analise'; // Se todos os slots estiverem bloqueados
+
+    const todosIndeferidos = slotsAvaliáveis.every(slot => slot.status === 'indeferida');
+    if (todosIndeferidos) return 'indeferida';
+
+    const todosDeferidos = slotsAvaliáveis.every(slot => slot.status === 'deferida');
+    if (todosDeferidos) return 'deferida';
+
+    const temDeferidos = slotsAvaliáveis.some(slot => slot.status === 'deferida');
+    if (temDeferidos) return 'parcialmente_deferida';
+
+    return 'em_analise';
+};
+
+export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { user: UserType } }) {
+    const agendas = useMemo(() => {
+        return reserva.horarios
+            .map((horario) => horario.agenda)
+            .filter((agenda): agenda is Agenda => agenda !== undefined)
+            .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
+    }, [reserva.horarios]);
+
+    const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(reserva.data_inicial)), [reserva.data_inicial]);
+    const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
+
+    // --- HOOKS CUSTOMIZADOS ---
+    const { initialSlots, slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva, agendas);
+
+    // --- ESTADO DO FORMULÁRIO E LÓGICA DE AVALIAÇÃO ---
+    const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
+    const [motivo, setMotivo] = useState<string>('');
+    const [observacao, setObservacao] = useState<string>(reserva.observacao || '');
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    const { data, setData, patch, reset } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
         motivo: '',
         horarios_avaliados: [],
         observacao: reserva.observacao,
     });
-    const [observacao, setObservacao] = useState<string>(reserva.observacao || '');
-    const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(reserva.data_inicial)), [reserva.data_inicial]);
-    const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
-    const isInitialMount = useRef(true);
 
-    const [motivo, setMotivo] = useState<string>('');
-    const initialSlots = useMemo<SlotCalendario[]>(() => reserva.horarios.map(
-        (horario) => {
-            if (horario.situacao === "em_analise") {
-                const hasConflict = (agendas.some(a => {
-                    return a.horarios?.some(h => h.situacao === "deferida" && h.data === horario.data && h.horario_inicio === horario.horario_inicio);
-                }));
-                if (hasConflict) {
-                    return ({
-                        id: `${horario.data}|${horario.horario_inicio}`,
-                        status: 'indeferida',
-                        data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                        horario_inicio: horario.horario_inicio,
-                        horario_fim: horario.horario_fim,
-                        agenda_id: horario.agenda?.id,
-                        dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
-                        isShowReservation: true,
-                        isLocked: true
-                    }) as SlotCalendario
-                }
-            }
+    // Lógica para desabilitar o RadioGroup
+    const isRadioGroupDisabled = useMemo(() => {
+        const statusUnicos = new Set(slotsSelecao.filter(slot => !slot.isLocked).map(slot => slot.status));
+        return statusUnicos.has('deferida') && statusUnicos.has('indeferida');
+    }, [slotsSelecao]);
 
-            return ({
-                id: `${horario.data}|${horario.horario_inicio}`,
-                status: horario.situacao === 'em_analise' ? 'solicitado' :
-                    (horario.situacao === 'deferida' || horario.situacao === 'indeferida') ?
-                        horario.situacao : 'solicitado',
-                data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                horario_inicio: horario.horario_inicio,
-                horario_fim: horario.horario_fim,
-                agenda_id: horario.agenda?.id,
-                dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
-                isShowReservation: true,
-            }) as SlotCalendario
-        },
-    ), [reserva.horarios, reserva.user, reserva.titulo, agendas]);
-    const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(initialSlots);
-
+    // Sincroniza o estado 'decisao' com o estado dos slots
     useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
+        const slotsAvaliáveis = slotsSelecao.filter(slot => !slot.isLocked);
+        if (slotsAvaliáveis.length === 0) {
+            setDecisao('em_analise');
             return;
         }
-        setSlotsSelecao(initialSlots);
-    }, [initialSlots])
-    // Roleta para avaliar o slot, varia entre 'solicitado', 'deferida' e 'indeferida'
-    const avaliarSlot = (slot: SlotCalendario) => {
-
-        setSlotsSelecao((prevSlots) => {
-            const novosSlots = [...prevSlots];
-            const index = novosSlots.findIndex((s) => s.id === slot.id);
-
-            if (index !== -1) {
-                const slotAtual = novosSlots[index];
-                let proximoStatus: 'solicitado' | 'deferida' | 'indeferida';
-
-                // A lógica de alternância: solicitado -> deferida -> indeferida -> solicitado
-                if (slotAtual.status === 'solicitado' || slotAtual.status === 'selecionado') {
-                    proximoStatus = 'deferida';
-                } else if (slotAtual.status === 'deferida') {
-                    proximoStatus = 'indeferida';
-                } else {
-                    // de 'indeferida' ou qualquer outro estado, volta para 'solicitado'
-                    proximoStatus = 'solicitado';
-                }
-                novosSlots[index] = { ...slotAtual, status: proximoStatus };
-            }
-            return novosSlots;
-        });
-    };
-
-    // Função para lidar com o envio do formulário
-    const handleSubmit = (e: React.FormEvent) => {
-
-        e.preventDefault();
-        if (!decisao) return;
-        if (decisao === 'indeferida' && !motivo.trim()) {
-            alert('Motivo é obrigatório para reservas indeferidas');
-            return;
-        }
-        setIsSubmitting(true);
-
-        patch(route('gestor.reservas.update', reserva.id), {
-            onSuccess: () => {
-                reset();
-            },
-            onError: (error) => {
-                const firstError = Object.values(error)[0];
-                toast.error(firstError || 'Ocorreu um erro de validação. Verifique os campos');
-            },
-        });
-        setIsSubmitting(false);
-    }
-
-    // Função para determinar a situação geral da reserva com base nos horários que o gestor pode gerenciar
-    const situaçãoReserva = () => {
-        const horariosQueGerencio = reserva.horarios.filter((horario) => {
-            return horario.agenda?.user?.id === user.id;
-        });
-
-        if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
-            const situacoes = horariosQueGerencio.map((horario) => horario.situacao);
-            if (situacoes.includes('em_analise')) {
-                return 'em_analise' as SituacaoReserva;
-            }
-            if (situacoes.includes('deferida')) {
-                return 'deferida' as SituacaoReserva;
-            }
-            if (situacoes.includes('indeferida')) {
-                return 'indeferida' as SituacaoReserva;
-            }
-        }
-        return 'em_analise' as SituacaoReserva;
-    }
-
-    // Função para verificar o status geral da reserva com base nos slots avaliados
-    const verificarStatusReserva = (slots: SlotCalendario[]): SituacaoReserva => {
-        if (slots.length === 0) {
-            return 'em_analise';
-        }
-
-        const todosIndeferidos = slots.every(slot => slot.status === 'indeferida');
-        if (todosIndeferidos) {
-            return 'indeferida';
-        }
-
-        const todosDeferidos = slots.every(slot => slot.status === 'deferida');
-        if (todosDeferidos) {
-            return 'deferida';
-        }
-
-        const temDeferidos = slots.some(slot => slot.status === 'deferida');
-        const temIndeferidos = slots.some(slot => slot.status === 'indeferida');
-        const temSolicitados = slots.some(slot => slot.status === 'solicitado');
-
-        if ((temDeferidos && temIndeferidos) || (temDeferidos && temSolicitados)) {
-            return 'parcialmente_deferida';
-        }
-
-        if (temIndeferidos && temSolicitados && !temDeferidos) {
-            return 'em_analise';
-        }
-
-        return 'em_analise';
-    }
-    // Função para obter o ícone baseado na situação da reserva
-    const getSituacaoIcon = (situacao: string) => {
-        switch (situacao) {
-            case 'deferida':
-                return <CheckCircle className="h-4 w-4 text-green-600" />;
-            case 'indeferida':
-                return <XCircle className="h-4 w-4 text-red-600" />;
-            default:
-                return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-        }
-    };
-    // Atualiza os slots de seleção sempre que a decisão mudar
-    useEffect(() => {
-        setSlotsSelecao((prev) => {
-            return prev.map((slot) => {
-                if (slot.status === "indeferida" && slot.isLocked) return slot; // Verifica se o slot está bloqueado
-                return ({
-                    ...slot,
-                    status: decisao === 'em_analise' ? 'solicitado' :
-                        decisao === 'deferida' ? 'deferida' :
-                            decisao === 'indeferida' ? 'indeferida' : 'solicitado'
-                })
-            });
-        });
-        setDecisao(decisao as 'deferida' | 'indeferida')
-    }, [decisao])
-    // Inicializa o estado da decisão e do motivo quando a reserva ou seus horários mudam
-    useEffect(() => {
-        // Inicializa o estado da decisão com a situação atual da reserva
-        setDecisao(reserva.situacao as SituacaoReserva);
-        // Se a reserva já tiver uma justificativa, define o motivo
-        if (reserva.horarios.length > 0 && reserva.horarios[0].justificativa) {
-            setMotivo(reserva.horarios[0].justificativa);
+        const primeiroStatus = slotsAvaliáveis[0].status;
+        const todosComMesmoStatus = slotsAvaliáveis.every(s => s.status === primeiroStatus);
+        if (todosComMesmoStatus) {
+            setDecisao(primeiroStatus as SituacaoReserva);
         } else {
-            setMotivo('');
+            setDecisao('em_analise');
         }
-    }, [reserva.horarios, reserva.situacao]);
+    }, [slotsSelecao]);
 
-    // Inicializa os slots de seleção com os horários da reserva quando a reserva ou agendas mudam
+    // Efeito para definir o motivo inicial (conflito ou justificativas)
     useEffect(() => {
+        const justificativasUnicas = Array.from(new Set(reserva.horarios.map(h => h.justificativa).filter(j => !!j && j.trim() !== '')));
+        const conflitos = initialSlots.filter(slot => slot.isLocked === true);
 
-    }, []);
+        if (conflitos.length > 0) {
+            const motivoConflito = conflitos
+                .map(slot => `Horário ${format(slot.data, 'dd/MM/yyyy')} às ${slot.horario_inicio.substring(0, 5)} indeferido por conflito.`)
+                .join('\n');
+            setMotivo(motivoConflito);
+            return;
+        }
 
-    // Atualiza os horários avaliados sempre que slotsSelecao mudar
+        if (justificativasUnicas.length === 1) {
+            setMotivo(justificativasUnicas[0]!);
+        } else if (justificativasUnicas.length > 1) {
+            setMotivo(justificativasUnicas.map(j => `- ${j}`).join('\n'));
+        }
+    }, [initialSlots, reserva.horarios]);
+
+    // Efeitos para sincronizar o estado com o formulário do Inertia
+    useEffect(() => { setData(prevData => ({ ...prevData, situacao: verificarStatusReserva(slotsSelecao) })); }, [slotsSelecao, setData]);
+
+
     useEffect(() => {
         const horariosAvaliados = slotsSelecao.filter(slot => {
             return reserva.horarios.some(horario => `${horario.data}|${horario.horario_inicio}` === slot.id);
@@ -249,29 +134,37 @@ export default function AvaliarReserva() {
             ...prevData,
             horarios_avaliados: horariosAvaliados,
         }));
+    }, [slotsSelecao, setData, reserva.horarios]);
 
-    }, [reserva.horarios, setData, slotsSelecao]);
+    useEffect(() => { setData(prevData => ({ ...prevData, motivo: motivo })) }, [motivo, setData]);
+    useEffect(() => { setData(prevData => ({ ...prevData, observacao: observacao })) }, [observacao, setData]);
 
-    // Atualiza a observação no formulário sempre que mudar
-    useEffect(() => {
-        setData((prevData) => ({
-            ...prevData,
-            observacao: observacao,
-        }));
-    }, [observacao, setData]);
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (data.situacao === 'indeferida' && !data.motivo.trim()) {
+            toast.error('Motivo é obrigatório para reservas indeferidas');
+            return;
+        }
+        setIsSubmitting(true);
+        patch(route('gestor.reservas.update', reserva.id), {
+            onSuccess: () => {
+                toast.success('Reserva avaliada com sucesso!');
+                reset();
+            },
+            onError: (errors) => {
+                const firstError = Object.values(errors)[0];
+                toast.error(firstError || 'Ocorreu um erro de validação.');
+            },
+            onFinish: () => setIsSubmitting(false),
+        });
+    };
 
-    // Atualiza a situação no formulário sempre que slotsSelecao mudar
-    useEffect(() => {
-        setData((prevData) => ({
-            ...prevData,
-            situacao: verificarStatusReserva(slotsSelecao),
-        }));
-    }, [slotsSelecao, setData]);
+    const handleDecisaoChange = (novaDecisao: SituacaoReserva) => {
+        setDecisao(novaDecisao);
+        handleDecisaoGlobalChange(novaDecisao);
+    }
 
-    // Atualiza o motivo no formulário sempre que mudar
-    useEffect(() => {
-        setData(prev => ({ ...prev, motivo: motivo }));
-    }, [motivo, setData]);
+    const situacaoHeader = verificarStatusReserva(slotsSelecao);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -284,55 +177,37 @@ export default function AvaliarReserva() {
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900">Avaliar Reserva</h1>
                                 <p className="mt-1 text-gray-600">
-                                    Espaço: {reserva.horarios[0].agenda?.espaco?.nome} / {reserva.horarios[0].agenda?.espaco?.andar?.nome}/{' '}
-                                    {reserva.horarios[0].agenda?.espaco?.andar?.modulo?.nome} / {getTurnoText(reserva.horarios[0].agenda!.turno)}{' '}
+                                    Espaço: {reserva.horarios[0].agenda?.espaco?.nome} / {reserva.horarios[0].agenda?.espaco?.andar?.nome}
                                 </p>
                             </div>
-                            <Badge className={`${getStatusReservaColor(situaçãoReserva())} flex items-center gap-1`}>
-                                {getSituacaoIcon(situaçãoReserva())}
-                                {getStatusReservaText(situaçãoReserva())}
+                            <Badge className={`${getStatusReservaColor(situacaoHeader)} flex items-center gap-1`}>
+                                {getSituacaoIcon(situacaoHeader)}
+                                {getStatusReservaText(situacaoHeader)}
                             </Badge>
                         </div>
 
                         {/* Informações da Reserva */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <FileText className="h-5 w-5" />
-                                    {reserva.titulo}
-                                </CardTitle>
-                                <CardDescription className="flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    Solicitado por: {reserva.user?.name}
-                                </CardDescription>
+                                <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />{reserva.titulo}</CardTitle>
+                                <CardDescription className="flex items-center gap-2"><User className="h-4 w-4" />Solicitado por: {reserva.user?.name}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
                                     <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{reserva.descricao}</p>
                                 </div>
-
                                 <Separator />
-
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div className="flex items-center gap-2">
-                                        <CalendarDays className="h-4 w-4 text-gray-500" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Período</p>
-                                            <p className="font-medium">
-                                                {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
-                                            </p>
-                                        </div>
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays className="h-4 w-4 text-gray-500" />
+                                    <div>
+                                        <p className="text-sm text-gray-500">Período</p>
+                                        <p className="font-medium">{formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}</p>
                                     </div>
                                 </div>
-
                                 <Separator />
-
                                 <div>
-                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
-                                        <Clock className="h-4 w-4" />
-                                        Horários Solicitados
-                                    </h4>
+                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900"><Clock className="h-4 w-4" />Horários Solicitados</h4>
                                     <CalendarReservationDetails
                                         agendas={agendas}
                                         semanaInicio={startOfWeek(semanaDaReserva, { weekStartsOn: 1 })}
@@ -344,76 +219,19 @@ export default function AvaliarReserva() {
                             </CardContent>
                         </Card>
 
-                        {/* Avaliação */}
-                        <form onSubmit={handleSubmit}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Avaliação da Reserva</CardTitle>
-                                    <CardDescription>Defina se a reserva será deferida ou indeferida</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div>
-                                        <Label className="text-base font-medium">Decisão</Label>
-                                        <RadioGroup value={decisao} onValueChange={(value) => setDecisao(value as SituacaoReserva)} >
-                                            <div className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-green-50">
-                                                <RadioGroupItem value="deferida" id="deferida" />
-                                                <Label htmlFor="deferida" className="flex cursor-pointer items-center gap-2">
-                                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                                    Deferir Reserva
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-red-50">
-                                                <RadioGroupItem value="indeferida" id="indeferida" />
-                                                <Label htmlFor="indeferida" className="flex cursor-pointer items-center gap-2">
-                                                    <XCircle className="h-4 w-4 text-red-600" />
-                                                    Indeferir Reserva
-                                                </Label>
-                                            </div>
-                                        </RadioGroup>
-                                    </div>
-
-                                    {(decisao === 'indeferida' || slotsSelecao.some((slot) => slot.status === 'indeferida')) && (
-                                        <div className="space-y-2">
-                                            <Label htmlFor="motivo" className="text-base font-medium text-red-700">
-                                                Motivo do Indeferimento *
-                                            </Label>
-                                            <Textarea
-                                                id="motivo"
-                                                placeholder="Descreva o motivo pelo qual a reserva está sendo indeferida..."
-                                                value={motivo}
-                                                onChange={(e) => setMotivo(e.target.value)}
-                                                className="min-h-[100px] border-red-200 focus:border-red-500"
-                                            />
-                                            <p className="text-sm text-red-600">Este campo é obrigatório para reservas indeferidas</p>
-                                        </div>
-                                    )}<div className="space-y-2">
-                                        <Label htmlFor="obsevacao" className="text-base font-medium text-blue-700">
-                                            Obsevação
-                                        </Label>
-                                        <Textarea
-                                            id="obsevacao"
-                                            placeholder="Caso haja uma observação adicional, descreva aqui..."
-                                            value={observacao}
-                                            onChange={(e) => setObservacao(e.target.value)}
-                                            className="min-h-[100px] border-blue-200 focus:border-blue-500"
-                                        />
-                                    </div>
-
-                                    <div className="flex gap-3 pt-4">
-                                        <Button
-                                            onClick={handleSubmit}
-                                            disabled={!decisao || (decisao === 'indeferida' && !motivo.trim()) || isSubmitting}
-                                            className="flex-1"
-                                        >
-                                            {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
-                                        </Button>
-                                        <Button variant="outline" className="px-8">
-                                            Cancelar
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </form>
+                        {/* Formulário de Avaliação */}
+                        <EvaluationForm
+                            decisao={decisao}
+                            motivo={motivo}
+                            observacao={observacao}
+                            isSubmitting={isSubmitting}
+                            isRadioGroupDisabled={isRadioGroupDisabled}
+                            slotsSelecao={slotsSelecao}
+                            onDecisaoChange={handleDecisaoChange}
+                            onMotivoChange={setMotivo}
+                            onObservacaoChange={setObservacao}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             </div>
