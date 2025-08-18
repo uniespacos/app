@@ -21,6 +21,7 @@ type CardEspacoProps = {
     handleSolicitarReserva?: (espacoId: string) => void;
     handleEditarEspaco?: (espacoId: string) => void;
     handleExcluirEspaco?: (espacoId: string) => void;
+    showFavoritar?: boolean; // Se deve mostrar o botão de favoritar
 };
 
 export default function EspacoCard({
@@ -30,6 +31,7 @@ export default function EspacoCard({
     handleSolicitarReserva,
     handleEditarEspaco,
     handleExcluirEspaco,
+    showFavoritar = true,
 }: CardEspacoProps) {
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
     const [processing, setProcessing] = useState(false);
@@ -103,14 +105,14 @@ export default function EspacoCard({
                 </Carousel>
 
                 {/* Botão de Favoritar posicionado sobre a imagem */}
-                <button
+                {showFavoritar && <button
                     onClick={handleFavoritarEspaco}
                     disabled={processing}
                     className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-all duration-200 ${isFavorited ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-700 hover:bg-gray-100'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
                     title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
                 >
                     <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
-                </button>
+                </button>}
             </div>
 
             {/* O CardHeader agora contém apenas o título, como é o padrão */}

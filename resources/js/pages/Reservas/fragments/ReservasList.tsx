@@ -178,6 +178,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
                                         <ReservaDetalhes
+                                            key={selectedReserva?.id}
                                             isOpen={!!selectedReserva}
                                             onOpenChange={(open) => {
                                                 if (!open) {

@@ -9,6 +9,7 @@ import { router } from "@inertiajs/react";
 import { parse, startOfWeek } from "date-fns";
 import { useMemo, useState } from "react";
 import CalendarReservationDetails from "./CalendarReservationDetails";
+import { DialogProps } from "@radix-ui/react-dialog";
 
 
 type ReservaDetalhesProps = {
@@ -17,10 +18,10 @@ type ReservaDetalhesProps = {
     selectedReserva: Reserva; // Defina o tipo correto para a reserva
     isGestor?: boolean; // Se o usuário é um gestor
     setRemoverReserva: (selectedReserva: Reserva) => void; // Função para remover a reserva
-};
+} & DialogProps;
 
 
-export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
+export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, ...props }: ReservaDetalhesProps) {
 
     const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(selectedReserva.data_inicial)), [selectedReserva.data_inicial]);
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
@@ -45,8 +46,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     return (
-        <Dialog key={selectedReserva.id} open={isOpen} onOpenChange={onOpenChange}
-        >
+        <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
             <DialogTrigger>
                 <Button variant="link" className="w-full">
                     <FileText className="mr-2 h-4 w-4" />

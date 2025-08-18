@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
 import TabsItemReserva from '@/components/tabs-item-reserva';
+import EspacoCard from '../Espacos/fragments/EspacoCard';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -44,18 +45,28 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
 
         setFilteredEspacosFavoritos(filtered);
     }, [espacosFavoritos, searchTerm]);
-    const getTurnoLabel = (turno: string) => {
-        switch (turno) {
-            case "manha":
-                return "Manhã"
-            case "tarde":
-                return "Tarde"
-            case "noite":
-                return "Noite"
-            default:
-                return turno
+    const getUniqueEspacosFromAgendas = (agendas: Agenda[]): Espaco[] => {
+        // 1. Cria um Map para armazenar os espaços.
+        // A chave será o ID do espaço (number) e o valor será o objeto Espaco.
+        const espacosMap = new Map<number, Espaco>();
+
+        // 2. Itera sobre cada agenda da lista.
+        for (const agenda of agendas) {
+            // Verifica se a agenda realmente tem um espaço associado.
+            if (agenda.espaco && agenda.espaco.id) {
+                // 3. Adiciona o espaço ao Map usando seu ID como chave.
+                // Se um espaço com o mesmo ID já existir no Map,
+                // o `set` simplesmente substituirá o valor, resultando
+                // na desduplicação automática e eficiente.
+                espacosMap.set(agenda.espaco.id, agenda.espaco);
+            }
         }
+
+        // 4. Converte os valores do Map (que são os objetos Espaco únicos) em um array.
+        return Array.from(espacosMap.values());
     }
+    const espacosUnicos = getUniqueEspacosFromAgendas(agendas);
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}> <Head title="Dashboard" />
@@ -106,12 +117,12 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                     </div>
 
                     {/* Main Content */}
-                    <Tabs defaultValue="reservas" className="space-y-4">
+                    <Tabs defaultValue="pendentes" className="space-y-4">
                         <TabsList>
-                            <TabsTrigger value="reservas" >  Ultimas 5 reservas solicitadas </TabsTrigger>
-                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
                             <TabsTrigger value="pendentes">Reservas Pendente Analise</TabsTrigger>
                             <TabsTrigger value="espacos">Espaços que gerencio</TabsTrigger>
+                            <TabsTrigger value="reservas" >  Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="reservas" className="space-y-4">
@@ -166,24 +177,8 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                        {agendas.map((agenda) => (
-                                            <Card key={agenda.id}>
-                                                <CardContent className="p-4">
-                                                    <div className="space-y-2">
-                                                        <h4 className="font-medium">{agenda.espaco?.nome}</h4>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {agenda.espaco?.andar?.nome} - {agenda.espaco?.andar?.modulo?.nome}
-                                                        </p>
-                                                        <Badge variant="secondary">{getTurnoLabel(agenda.turno)}</Badge>
-                                                    </div>
-                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline" onClick={() => {
-                                                        router.get(route('espacos.show', agenda.espaco?.id))
-                                                    }}>
-                                                        <Calendar className="mr-2 h-4 w-4" />
-                                                        Ver Agenda
-                                                    </Button>
-                                                </CardContent>
-                                            </Card>
+                                        {espacosUnicos?.map((espaco) => (
+                                            <EspacoCard showFavoritar={false} key={espaco?.id} espaco={espaco} userType={user.permission_type_id} handleSolicitarReserva={() => router.get(route("espacos.show", espaco.id))} />
                                         ))}
                                     </div>
                                 </CardContent>

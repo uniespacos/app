@@ -83,7 +83,7 @@ export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { 
     // Lógica para desabilitar o RadioGroup
     const isRadioGroupDisabled = useMemo(() => {
         const statusUnicos = new Set(slotsSelecao.filter(slot => !slot.isLocked).map(slot => slot.status));
-        return statusUnicos.has('deferida') && statusUnicos.has('indeferida');
+        return statusUnicos.values.length > 0 && statusUnicos.has('deferida') && statusUnicos.has('indeferida');
     }, [slotsSelecao]);
 
     // Sincroniza o estado 'decisao' com o estado dos slots
@@ -165,7 +165,7 @@ export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { 
     }
 
     const situacaoHeader = verificarStatusReserva(slotsSelecao);
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Avaliar reserva" />
