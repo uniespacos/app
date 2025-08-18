@@ -34,7 +34,6 @@ const commonNav: MenuItem[] = [
     { title: 'Painel Inicial', href: '/dashboard', icon: LayoutGrid },
     { title: 'Consultar Espaços', href: '/espacos', icon: Calendar },
     { title: 'Minhas Reservas', href: '/reservas', icon: BookOpen },
-    { title: 'Espaços Favoritos', href: route('espacos.favoritos'), icon: Star },
 ];
 
 const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/reservas', icon: Eye }];
