@@ -6,8 +6,9 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Calendar, CheckCircle, Clock, Heart, MapPin, Plus, Search, Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
+import EspacoCard from '../Espacos/fragments/EspacoCard';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -23,6 +24,23 @@ export default function Dashboard() {
         reservas: Reserva[];
     }>().props;
     const [searchTerm, setSearchTerm] = useState<string>("")
+
+    const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
+    useEffect(() => {
+        if (!searchTerm) {
+            setFilteredEspacosFavoritos(espacosFavoritos);
+            return;
+        }
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const filtered = espacosFavoritos.filter((espaco) =>
+            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
+            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        );
+
+        setFilteredEspacosFavoritos(filtered);
+    }, [searchTerm, espacosFavoritos]);
 
 
     return (
@@ -153,24 +171,8 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                    {espacosFavoritos.map((espaco) => (
-                                        <Card key={espaco.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                                            <CardContent className="p-4">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <h4 className="font-medium">{espaco.nome}</h4>
-                                                    <Heart className="h-4 w-4 text-red-500 fill-current" />
-                                                </div>
-                                                <p className="text-sm text-muted-foreground mb-2">
-                                                    Capacidade: {espaco.capacidade_pessoas} pessoas
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {espaco.andar?.nome} - {espaco.andar?.modulo?.nome}
-                                                </p>
-                                                <Button size="sm" className="w-full mt-3">
-                                                    Reservar
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
+                                    {filteredEspacosFavoritos.map((espaco) => (
+                                        <EspacoCard espaco={espaco} userType={user.permission_type_id} />
                                     ))}
                                 </div>
                             </CardContent>
