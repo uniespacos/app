@@ -1,15 +1,14 @@
+import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/components/tabs-item-reserva';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { Espaco, Unidade, User, type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Espaco, Reserva, Unidade, User, type BreadcrumbItem } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import { BarChart3, Building, Calendar, Plus, Settings, UserCheck, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -17,18 +16,36 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
-    const { estatisticasPainel, espacos, user, gestores, unidades } = usePage<{
-        user: User;
-        users: User[];
-        estatisticasPainel: {
-            total_espacos: number;
-            total_gestores: number;
-            reservas_mes: number;
-        }; espacos: Espaco[]
-        gestores: User[];
-        unidades: Unidade[]
-    }>().props;
+export default function Dashboard({ estatisticasPainel, espacos, user, gestores, unidades, espacosFavoritos, reservas }: {
+    user: User;
+    users: User[];
+    estatisticasPainel: {
+        total_espacos: number;
+        total_gestores: number;
+        reservas_mes: number;
+    }; espacos: Espaco[]
+    gestores: User[];
+    unidades: Unidade[]
+    espacosFavoritos: Espaco[];
+    reservas: Reserva[];
+}) {
+    const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    useEffect(() => {
+        if (!searchTerm) {
+            setFilteredEspacosFavoritos(espacosFavoritos);
+            return;
+        }
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const filtered = espacosFavoritos.filter((espaco) =>
+            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
+            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        );
+
+        setFilteredEspacosFavoritos(filtered);
+    }, [espacosFavoritos, searchTerm]);
     const [selectedEspaco, setSelectedEspaco] = useState<any>(null)
     const [selectedGestor, setSelectedGestor] = useState("")
     const [selectedTurno, setSelectedTurno] = useState("")
@@ -107,12 +124,22 @@ export default function Dashboard() {
                     </div>
 
                     {/* Main Content */}
-                    <Tabs defaultValue="espacos" className="space-y-4">
+                    <Tabs defaultValue="reservas" className="space-y-4">
                         <TabsList>
+                            <TabsTrigger value="reservas" > Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
                             <TabsTrigger value="espacos">Gerenciar Espaços</TabsTrigger>
                             <TabsTrigger value="gestores">Delegar Gestores</TabsTrigger>
                             <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
                         </TabsList>
+
+                        <TabsContent value="reservas" className="space-y-4">
+                            <TabsItemReserva reservas={reservas} />
+                        </TabsContent>
+
+                        <TabsContent value="favoritos" className="space-y-4">
+                            <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                        </TabsContent>
 
                         <TabsContent value="espacos" className="space-y-4">
                             <Card>

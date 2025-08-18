@@ -453,7 +453,7 @@ class DatabaseSeeder extends Seeder
                 $reserva = Reserva::factory()->create([
                     'user_id' => $user->id,
                     'data_inicial' => $dataAtual->format('Y-m-d'),
-                    'data_final' => $dataAtual->addWeek()->format('Y-m-d'),
+                    'data_final' =>  (clone $dataAtual)->addWeek()->format('Y-m-d'),
                 ]);
                 foreach ($horarios as $inicio) {
                     Horario::factory()->create([

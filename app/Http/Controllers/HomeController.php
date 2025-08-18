@@ -18,9 +18,11 @@ class HomeController extends Controller
         $user = Auth::user();
         switch ($user->permission_type_id) {
             case 1: // Institucional
+                $reservas = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo'])->latest()->take(5)->get();
+                $espacosFavoritos = $user->favoritos->load('andar.modulo');
                 $user = Auth::user();
                 $users = User::latest()->take(5)->with(['agendas'])->get();
-                $espacos = Espaco::latest()->take(5)->with(['andar.modulo.unidade','agendas.user'])->get();
+                $espacos = Espaco::latest()->take(5)->with(['andar.modulo.unidade', 'agendas.user'])->get();
                 $estatisticasPainel = [
                     'total_espacos' => Espaco::count(),
                     'total_gestores' => User::where('permission_type_id', 2)->count(),
@@ -28,8 +30,10 @@ class HomeController extends Controller
                 ];
                 $gestores = User::where('permission_type_id', 2)->latest()->take(5)->get();
                 $unidades = Unidade::latest()->take(5)->with('modulos.andars.espacos')->get();
-                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('user', 'users', 'gestores', 'espacos', 'unidades', 'estatisticasPainel'));
+                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('reservas', 'espacosFavoritos', 'user', 'users', 'gestores', 'espacos', 'unidades', 'estatisticasPainel'));
             case 2: // Gestor
+                $reservas = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo'])->latest()->take(5)->get();
+                $espacosFavoritos = $user->favoritos->load('andar.modulo');
                 $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo'])->get();
                 $reservasPendentes = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
@@ -38,7 +42,7 @@ class HomeController extends Controller
                         ->orWhereHas('horarios', function ($subQuery) {
                             $subQuery->where('situacao', 'em_analise');
                         });
-                })->with(['horarios.agenda.espaco', 'user'])->get();
+                })->with(['horarios.agenda.espaco', 'user'])->latest()->take(5)->get();
                 $baseReservaUserStats = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 })
@@ -51,10 +55,10 @@ class HomeController extends Controller
                         $query->where('user_id', $user->id);
                     })->count(),
                 ];
-                return Inertia::render('Dashboard/DashboardGestorPage', compact('user', 'agendas', 'reservasPendentes', 'statusDasReservas'));
+                return Inertia::render('Dashboard/DashboardGestorPage', compact('user', 'reservas', 'espacosFavoritos', 'agendas', 'reservasPendentes', 'statusDasReservas'));
             default: // Usuario Comum
                 $baseUserReservasQuery = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo']);
-                $reservas = (clone $baseUserReservasQuery)->get();
+                $reservas = (clone $baseUserReservasQuery)->latest()->take(5)->get();
                 $statusDasReservas = [
                     'em_analise' => (clone $baseUserReservasQuery)->where('situacao', 'em_analise')->count(),
                     'parcialmente_deferida' => (clone $baseUserReservasQuery)->where('situacao', 'parcialmente_deferida')->count(), // Novo status adicionado

@@ -1,12 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription,  CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import {  Calendar, CheckCircle, Clock,    Users } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Users } from 'lucide-react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
+import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/components/tabs-item-reserva';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -16,14 +19,31 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
-export default function Dashboard() {
-    const { user, reservasPendentes, statusDasReservas, agendas } = usePage<{
-        user: User; espacos: Espaco[]; reservasPendentes: Reserva[], statusDasReservas: {
-            pendentes: number
-            avaliadas_hoje: number
-            total_espacos: number
-        }, agendas: Agenda[]
-    }>().props;
+export default function Dashboard({ user, reservasPendentes, statusDasReservas, agendas, espacosFavoritos, reservas }: {
+    user: User; espacos: Espaco[]; reservasPendentes: Reserva[], statusDasReservas: {
+        pendentes: number
+        avaliadas_hoje: number
+        total_espacos: number
+    }, agendas: Agenda[]
+    , espacosFavoritos: Espaco[], reservas: Reserva[]
+}) {
+    const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    useEffect(() => {
+        if (!searchTerm) {
+            setFilteredEspacosFavoritos(espacosFavoritos);
+            return;
+        }
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const filtered = espacosFavoritos.filter((espaco) =>
+            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
+            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        );
+
+        setFilteredEspacosFavoritos(filtered);
+    }, [espacosFavoritos, searchTerm]);
     const getTurnoLabel = (turno: string) => {
         switch (turno) {
             case "manha":
@@ -86,12 +106,21 @@ export default function Dashboard() {
                     </div>
 
                     {/* Main Content */}
-                    <Tabs defaultValue="pendentes" className="space-y-4">
+                    <Tabs defaultValue="reservas" className="space-y-4">
                         <TabsList>
-                            <TabsTrigger value="pendentes">Reservas Pendentes</TabsTrigger>
-                            <TabsTrigger value="espacos">Meus Espaços</TabsTrigger>
+                            <TabsTrigger value="reservas" >  Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
+                            <TabsTrigger value="pendentes">Reservas Pendente Analise</TabsTrigger>
+                            <TabsTrigger value="espacos">Espaços que gerencio</TabsTrigger>
                         </TabsList>
 
+                        <TabsContent value="reservas" className="space-y-4">
+                            <TabsItemReserva reservas={reservas} />
+                        </TabsContent>
+
+                        <TabsContent value="favoritos" className="space-y-4">
+                            <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                        </TabsContent>
                         <TabsContent value="pendentes" className="space-y-4">
                             <Card>
                                 <CardHeader>
