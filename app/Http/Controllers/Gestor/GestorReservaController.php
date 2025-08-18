@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Gestor;
 
 use App\Models\Agenda;
+use App\Models\Horario;
 use App\Models\Reserva;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -188,16 +190,15 @@ class GestorReservaController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */
     public function update(AvaliarReservaRequest $request, Reserva $reserva)
     {
         $this->authorize('update', $reserva);
         $validated = $request->validated();
         $horariosAvaliados = collect($validated['horarios_avaliados'])
-            ->mapWithKeys(function ($dados) {
-                $horario = $dados['dadosReserva'];
-                return [$horario['horarioDB']['id'] => $dados['status'] === 'solicitado' ? 'em_analise' : $dados['status']];
-            });
+        ->mapWithKeys(function ($dados) {
+            $horario = $dados['dadosReserva'];
+            return [$horario['horarioDB']['id'] => $dados['status'] === 'solicitado' ? 'em_analise' : $dados['status']];
+        });
         $gestor = Auth::user();
         $novaSituacao = $validated['situacao'];
         // 2. Obter um array com os IDs de todas as agendas gerenciadas pelo gestor.
@@ -212,8 +213,8 @@ class GestorReservaController extends Controller
         DB::beginTransaction();
         try {
 
-            $reserva->observacao = $validated['observacao'] ?? null; // Atualiza a observação da reserva, se fornecida.
-            // 4. Atualiza a 'situacao' na tabela pivô APENAS para os horários encontrados.
+        $reserva->observacao = $validated['observacao'] ?? null; // Atualiza a observação da reserva, se fornecida.
+        // 4. Atualiza a 'situacao' na tabela pivô APENAS para os horários encontrados.
             foreach ($horariosAvaliados as $horarioId => $situacao) {
                 // Garante que o gestor só pode avaliar horários das suas agendas
                 if ($reserva->horarios()->whereIn('agenda_id', $agendasDoGestorIds)->find($horarioId)) {
@@ -246,6 +247,122 @@ class GestorReservaController extends Controller
             return back()->with('error', 'Ocorreu um erro inesperado ao avaliar a reserva.');
         }
     }
+    */
+    public function update(AvaliarReservaRequest $request, Reserva $reserva)
+    {
+        $this->authorize('update', $reserva);
+        $gestor = Auth::user();
+        $validated = $request->validated();
+
+        $agendasDoGestorIds = $gestor->agendas()->pluck('id');
+
+        if ($agendasDoGestorIds->isEmpty()) {
+            return back()->with('error', 'Você não é gestor de nenhuma agenda.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $horariosAvaliadosInput = collect($validated['horarios_avaliados']);
+            $motivoIndeferimento = $validated['motivo'] ?? null;
+
+            $processedPatterns = [];
+
+            foreach ($horariosAvaliadosInput as $avaliacao) {
+                $horarioId = $avaliacao['dadosReserva']['horarioDB']['id'];
+                $novoStatus = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
+
+                $horarioFonte = Horario::find($horarioId);
+
+                if (!$horarioFonte || $horarioFonte->reserva_id !== $reserva->id || !$agendasDoGestorIds->contains($horarioFonte->agenda_id)) {
+                    continue;
+                }
+
+                // --- INÍCIO DA CORREÇÃO PARA POSTGRESQL (USANDO WHERERAW) ---
+
+                // 1. Obtém o dia da semana do horário-fonte usando Carbon.
+                // A propriedade 'dayOfWeek' do Carbon retorna 0 para Domingo, 1 para Segunda, ..., 6 para Sábado.
+                // Isso corresponde ao padrão da função DOW (Day Of Week) do PostgreSQL.
+                $carbonDate = Carbon::parse($horarioFonte->data);
+                $dayOfWeek = $carbonDate->dayOfWeek;
+
+                // 2. Define o "padrão" do horário recorrente, incluindo o dia da semana.
+                $pattern = "{$horarioFonte->agenda_id}-{$horarioFonte->horario_inicio}-{$horarioFonte->horario_fim}-{$dayOfWeek}";
+
+                if (in_array($pattern, $processedPatterns)) {
+                    continue;
+                }
+
+                // 3. Atualiza TODOS os horários com o mesmo padrão usando whereRaw para compatibilidade.
+                Horario::where('reserva_id', $reserva->id)
+                    ->where('agenda_id', $horarioFonte->agenda_id)
+                    ->where('horario_inicio', $horarioFonte->horario_inicio)
+                    ->where('horario_fim', $horarioFonte->horario_fim)
+                    // A CONDIÇÃO CRUCIAL, usando a função EXTRACT(DOW FROM ...) do PostgreSQL de forma segura.
+                    ->whereRaw('EXTRACT(DOW FROM data) = ?', [$dayOfWeek])
+                    ->update([
+                        'situacao' => $novoStatus,
+                        'user_id' => $gestor->id,
+                        'justificativa' => $novoStatus === 'indeferida' ? $motivoIndeferimento : null,
+                    ]);
+
+                // --- FIM DA CORREÇÃO ---
+
+                $processedPatterns[] = $pattern;
+            }
+
+            $reserva->observacao = $validated['observacao'] ?? $reserva->observacao;
+            $this->atualizarStatusGeralDaReserva($reserva);
+
+            DB::commit();
+
+            $reserva->refresh();
+            $partesDoNome = explode(' ', $gestor->name);
+            $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
+
+            $reserva->user->notify(new NotificationModel(
+                'Sua reserva foi avaliada',
+                "A reserva '{$reserva->titulo}' foi avaliada. Status atual: {$reserva->situacao_formatada}.",
+                route('reservas.show', ['reserva' => $reserva->id])
+            ));
+
+            return Redirect::route('gestor.reservas.index')->with('success', 'Solicitação avaliada com sucesso!');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Erro ao avaliar reserva {$reserva->id}: " . $e->getMessage());
+            return back()->with('error', 'Ocorreu um erro inesperado ao avaliar a reserva.');
+        }
+    }
+
+    /**
+     * Recalcula e atualiza o status geral da reserva com base nos status de seus horários.
+     */
+    private function atualizarStatusGeralDaReserva(Reserva $reserva)
+    {
+        $reserva->load('horarios');
+
+        $totalHorarios = $reserva->horarios->count();
+        if ($totalHorarios === 0) {
+            $reserva->situacao = 'indeferida';
+            $reserva->save();
+            return;
+        }
+
+        $deferidosCount = $reserva->horarios->where('situacao', 'deferida')->count();
+        $indeferidosCount = $reserva->horarios->where('situacao', 'indeferida')->count();
+
+        $novaSituacaoGeral = 'em_analise';
+
+        if ($deferidosCount === $totalHorarios) {
+            $novaSituacaoGeral = 'deferida';
+        } elseif ($indeferidosCount === $totalHorarios) {
+            $novaSituacaoGeral = 'indeferida';
+        } elseif ($deferidosCount > 0 || $indeferidosCount > 0) {
+            $novaSituacaoGeral = 'parcialmente_deferida';
+        }
+
+        $reserva->situacao = $novaSituacaoGeral;
+        $reserva->save();
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -255,25 +372,25 @@ class GestorReservaController extends Controller
         //
     }
 
-
-    protected function atualizarStatusGeralDaReserva(Reserva $reserva)
-    {
-        // Recarrega os status da tabela pivô para ter os dados mais recentes.
-        $statusDosHorarios = $reserva->horarios()->get()->pluck('situacao');
-        if ($statusDosHorarios->every(fn($status) => $status === 'deferida')) {
-            $reserva->situacao = 'deferida';
-        } elseif ($statusDosHorarios->every(fn($status) => $status === 'indeferida')) {
-            $reserva->situacao = 'indeferida';
-        } elseif ($statusDosHorarios->contains(fn($status) => $status !== "em_analise" && $status !== "inativa")) {
-            // Se pelo menos um foi deferido (e não todos), é parcial.
-            $reserva->situacao = 'parcialmente_deferida';
-        } elseif ($statusDosHorarios->every(fn($status) => $status === 'inativa')) {
-            // Se pelo menos um foi deferido (e não todos), é parcial.
-            $reserva->situacao = 'inativa';
-        } else {
-            // Se nenhum foi deferido ainda, mas nem todos foram indeferidos, continua em análise.
-            $reserva->situacao = 'em_analise';
-        }
-        $reserva->save();
-    }
+    /*
+        protected function atualizarStatusGeralDaReserva(Reserva $reserva)
+        {
+            // Recarrega os status da tabela pivô para ter os dados mais recentes.
+            $statusDosHorarios = $reserva->horarios()->get()->pluck('situacao');
+            if ($statusDosHorarios->every(fn($status) => $status === 'deferida')) {
+                $reserva->situacao = 'deferida';
+            } elseif ($statusDosHorarios->every(fn($status) => $status === 'indeferida')) {
+                $reserva->situacao = 'indeferida';
+            } elseif ($statusDosHorarios->contains(fn($status) => $status !== "em_analise" && $status !== "inativa")) {
+                // Se pelo menos um foi deferido (e não todos), é parcial.
+                $reserva->situacao = 'parcialmente_deferida';
+            } elseif ($statusDosHorarios->every(fn($status) => $status === 'inativa')) {
+                // Se pelo menos um foi deferido (e não todos), é parcial.
+                $reserva->situacao = 'inativa';
+            } else {
+                // Se nenhum foi deferido ainda, mas nem todos foram indeferidos, continua em análise.
+                $reserva->situacao = 'em_analise';
+            }
+            $reserva->save();
+        }*/
 }

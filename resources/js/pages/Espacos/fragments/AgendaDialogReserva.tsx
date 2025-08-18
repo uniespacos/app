@@ -170,7 +170,7 @@ export default function AgendaDialogReserva({
                                             >
                                                 <Calendar className="mr-2 h-4 w-4" />
                                                 {formData.data_inicial ? (
-                                                    format(new Date(formData.data_inicial), 'dd/MM/yyyy')
+                                                    format(formData.data_inicial, 'dd/MM/yyyy')
                                                 ) : (
                                                     <span>Selecione</span>
                                                 )}
@@ -179,7 +179,7 @@ export default function AgendaDialogReserva({
                                         <PopoverContent className="w-auto p-0" align="start">
                                             <CalendarComponent
                                                 mode="single"
-                                                selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
+                                                selected={formData.data_inicial ? formData.data_inicial : undefined}
                                                 onSelect={(date) => setFormData((dataPrev) => ({ ...dataPrev, data_inicial: date ?? null }))}
                                                 initialFocus
                                                 disabled={(date) => date < hoje}

@@ -8,6 +8,7 @@ use App\Models\Horario;
 use App\Models\Reserva;
 use App\Notifications\NotificationModel;
 use App\Notifications\NovaSolicitacaoReservaNotification;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -114,7 +115,6 @@ class ReservaController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
 
 
     public function store(StoreReservaRequest $request)
@@ -142,41 +142,137 @@ class ReservaController extends Controller
                         ->with('user') // Carrega o gestor da agenda
                         ->first()
                         ->user;
-                    $gestores[] = $gestor; // Coleta os gestores para notificação
-                    $horario = Horario::create([
-                        'data' => $horarioInfo['data'],
-                        'horario_inicio' => $horarioInfo['horario_inicio'],
-                        'horario_fim' => $horarioInfo['horario_fim'],
-                        'agenda_id' => $horarioInfo['agenda_id'],
-                        'reserva_id' => $reserva->id, // Vincula o horário à reserva
+                        $gestores[] = $gestor; // Coleta os gestores para notificação
+                        Horario::create([
+                            'data' => $horarioInfo['data'],
+                            'horario_inicio' => $horarioInfo['horario_inicio'],
+                            'horario_fim' => $horarioInfo['horario_fim'],
+                            'agenda_id' => $horarioInfo['agenda_id'],
+                            'reserva_id' => $reserva->id, // Vincula o horário à reserva
                         'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise'
                     ]);
                 }
                 $gestores = array_unique($gestores); // Remove gestores duplicados
 
                 if ($gestor->id === $user->id)
-                    $reserva->update([
+                $reserva->update([
                         'situacao' => count($gestores) > 1 ? 'parcialmente_deferida' : 'deferida'
                     ]);
 
-                foreach ($gestores as $gestor) {
-                    // 4. Notifica cada gestor sobre a nova solicitação de reserva.
-                    $partesDoNome = explode(' ', Auth::user()->name);
-                    $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
-                    $resultado = implode(' ', $doisPrimeirosNomesArray);
-                    $gestor->notify(
+                    foreach ($gestores as $gestor) {
+                        // 4. Notifica cada gestor sobre a nova solicitação de reserva.
+                        $partesDoNome = explode(' ', Auth::user()->name);
+                        $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
+                        $resultado = implode(' ', $doisPrimeirosNomesArray);
+                        $gestor->notify(
                         new NotificationModel(
                             'Nova solicitação de reserva',
                             'O usuário ' . $resultado .
                             ' solicitou uma reserva.',
                             route('gestor.reservas.show', ['reserva' => $reserva->id])
-                        )
-                    );
+                            )
+                        );
+                    }
+                    return $reserva;
+                });
+
+                return redirect()->route('espacos.index')->with('success', 'Reserva solicitada com sucesso! Aguarde avaliação.');
+            } catch (Exception $error) {
+                Log::error('Erro ao solicitar reserva: ' . $error->getMessage());
+                return redirect()->route('espacos.index')->with('error', 'Erro ao solicitar reserva. Tente novamente.');
+            }
+        }
+    */
+    public function store(StoreReservaRequest $request)
+    {
+        $user = Auth::user();
+
+        try {
+            $reserva = DB::transaction(function () use ($request, $user) {
+                // 1. Cria a reserva principal com o status inicial.
+                $reserva = Reserva::create([
+                    'titulo' => $request->validated('titulo'),
+                    'descricao' => $request->validated('descricao'),
+                    'data_inicial' => $request->validated('data_inicial'),
+                    'data_final' => $request->validated('data_final'),
+                    'recorrencia' => $request->validated('recorrencia'),
+                    'user_id' => $user->id,
+                    'situacao' => 'em_analise',
+                ]);
+
+                // --- INÍCIO DA LÓGICA REFATORADA ---
+
+                $horariosData = $request->validated('horarios_solicitados');
+                $gestores = []; // Array para coletar todos os gestores únicos.
+
+                // Converte as datas da reserva para objetos Carbon para facilitar a comparação.
+                $dataFinalReserva = Carbon::parse($reserva->data_final);
+
+                // 2. Itera sobre cada "horário-molde" da primeira semana.
+                foreach ($horariosData as $horarioInfo) {
+                    // Obtém o gestor da agenda. Isso pode ser feito uma vez por horário-molde.
+                    $gestor = Agenda::findOrFail($horarioInfo['agenda_id'])->user;
+
+                    // Adiciona o gestor à lista (será unificada mais tarde).
+                    $gestores[] = $gestor;
+
+                    // Define a data de início para a recorrência deste horário específico.
+                    $dataIteracao = Carbon::parse($horarioInfo['data']);
+
+                    // 3. Loop de repetição semanal para cada horário-molde.
+                    // Este loop cria o horário para a primeira semana e todas as subsequentes.
+                    while ($dataIteracao->lte($dataFinalReserva)) {
+                        Horario::create([
+                            'data' => $dataIteracao->toDateString(), // Usa a data da iteração atual
+                            'horario_inicio' => $horarioInfo['horario_inicio'],
+                            'horario_fim' => $horarioInfo['horario_fim'],
+                            'agenda_id' => $horarioInfo['agenda_id'],
+                            'reserva_id' => $reserva->id,
+                            'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise',
+                        ]);
+
+                        // Avança a data em 7 dias para a próxima ocorrência do mesmo dia da semana.
+                        $dataIteracao->addWeek();
+                    }
                 }
+
+                // --- FIM DA LÓGICA REFATORADA ---
+
+                // Remove gestores duplicados para evitar notificações repetidas.
+                // Usamos a função collect para facilitar a manipulação e garantir a unicidade pelo ID.
+                $gestoresUnicos = collect($gestores)->unique('id');
+
+                // 4. Atualiza o status geral da reserva com base nos horários criados.
+                if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $user->id) {
+                    // Se o único gestor for o próprio solicitante, a reserva já nasce deferida.
+                    $reserva->update(['situacao' => 'deferida']);
+                } elseif (collect($gestores)->contains(fn($g) => $g->id === $user->id)) {
+                    // Se alguns horários são do próprio usuário e outros não.
+                    $reserva->update(['situacao' => 'parcialmente_deferida']);
+                }
+
+                // 5. Notifica cada gestor sobre a nova solicitação.
+                $partesDoNome = explode(' ', $user->name);
+                $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
+
+                foreach ($gestoresUnicos as $gestor) {
+                    // Não notifica o gestor se ele for o próprio solicitante.
+                    if ($gestor->id !== $user->id) {
+                        $gestor->notify(
+                            new NotificationModel(
+                                'Nova solicitação de reserva',
+                                'O usuário ' . $doisPrimeirosNomes . ' solicitou uma reserva.',
+                                route('gestor.reservas.show', ['reserva' => $reserva->id])
+                            )
+                        );
+                    }
+                }
+
                 return $reserva;
             });
 
             return redirect()->route('espacos.index')->with('success', 'Reserva solicitada com sucesso! Aguarde avaliação.');
+
         } catch (Exception $error) {
             Log::error('Erro ao solicitar reserva: ' . $error->getMessage());
             return redirect()->route('espacos.index')->with('error', 'Erro ao solicitar reserva. Tente novamente.');

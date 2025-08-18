@@ -109,7 +109,7 @@ export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { 
 
         if (conflitos.length > 0) {
             const motivoConflito = conflitos
-                .map(slot => `Horário ${format(slot.data, 'dd/MM/yyyy')} às ${slot.horario_inicio.substring(0, 5)} indeferido por conflito.`)
+                .map(slot => `Horário ${format(slot.data, 'dd/MM/yyyy')} às ${slot.horario_inicio.substring(0, 5)} indeferido por já haver reserva aprovada para do dia e horario.`)
                 .join('\n');
             setMotivo(motivoConflito);
             return;
@@ -165,7 +165,7 @@ export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { 
     }
 
     const situacaoHeader = verificarStatusReserva(slotsSelecao);
-
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Avaliar reserva" />

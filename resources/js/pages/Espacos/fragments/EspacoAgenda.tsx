@@ -84,8 +84,8 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
     const { data, setData, post, patch, reset, processing } = useForm<ReservaFormData>({
         titulo: reserva?.titulo ?? '',
         descricao: reserva?.descricao ?? '',
-        data_inicial: reserva?.data_inicial ? new Date(reserva.data_inicial) : hoje,
-        data_final: reserva?.data_final ? new Date(reserva.data_final) : addMonths(hoje, 1),
+        data_inicial: reserva?.data_inicial ? reserva.data_inicial : hoje,
+        data_final: reserva?.data_final ? reserva.data_final : addMonths(hoje, 1),
         recorrencia: reserva?.recorrencia ?? 'unica',
         horarios_solicitados: reserva?.horarios ?? [],
     });
@@ -112,7 +112,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
         const dataInicialCalculada = new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())));
 
         const dataFinalCalculada =
-            recorrencia !== 'personalizado'
+            recorrencia !== 'personalizado' && !reserva
                 ? recorrencia === 'unica'
                     ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
                     : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada)
@@ -123,7 +123,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
             data_inicial: dataInicialCalculada,
             data_final: dataFinalCalculada,
         }));
-    }, [recorrencia, setData, slotsSelecao]);
+    }, [data.data_final, recorrencia, reserva, setData, slotsSelecao]);
 
     const diasSemana = useMemo(
         () => diasDaSemana(semanaAtual, hoje),
