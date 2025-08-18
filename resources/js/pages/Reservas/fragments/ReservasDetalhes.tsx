@@ -12,13 +12,15 @@ import CalendarReservationDetails from "./CalendarReservationDetails";
 
 
 type ReservaDetalhesProps = {
+    isOpen: boolean; // Se o diálogo está aberto
+    onOpenChange: (open: boolean) => void; // Função para alterar o estado de abertura do diálogo
     selectedReserva: Reserva; // Defina o tipo correto para a reserva
     isGestor?: boolean; // Se o usuário é um gestor
     setRemoverReserva: (selectedReserva: Reserva) => void; // Função para remover a reserva
 };
 
 
-export default function ReservaDetalhes({ selectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
+export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva }: ReservaDetalhesProps) {
 
     const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(selectedReserva.data_inicial)), [selectedReserva.data_inicial]);
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
@@ -43,7 +45,7 @@ export default function ReservaDetalhes({ selectedReserva, isGestor, setRemoverR
     ));
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     return (
-        <Dialog key={selectedReserva.id}
+        <Dialog key={selectedReserva.id} open={isOpen} onOpenChange={onOpenChange}
         >
             <DialogTrigger>
                 <Button variant="link" className="w-full">

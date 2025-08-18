@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { DashboardStatusReservasType, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { Calendar, Clock, Heart, MapPin, Plus, Search, Star } from 'lucide-react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Calendar, CheckCircle, Clock, Heart, MapPin, Plus, Search, Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -23,35 +23,7 @@ export default function Dashboard() {
         reservas: Reserva[];
     }>().props;
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "deferida":
-                return "bg-green-100 text-green-800"
-            case "indeferida":
-                return "bg-red-100 text-red-800"
-            case "em_analise":
-                return "bg-yellow-100 text-yellow-800"
-            case "parcialmente_deferida":
-                return "bg-blue-100 text-blue-800"
-            default:
-                return "bg-gray-100 text-gray-800"
-        }
-    }
 
-    const getStatusLabel = (status: string) => {
-        switch (status) {
-            case "deferida":
-                return "Aprovada"
-            case "indeferida":
-                return "Rejeitada"
-            case "em_analise":
-                return "Em Análise"
-            case "parcialmente_deferida":
-                return "Parcialmente Aprovada"
-            default:
-                return status
-        }
-    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -118,7 +90,7 @@ export default function Dashboard() {
                 {/* Main Content */}
                 <Tabs defaultValue="reservas" className="space-y-4">
                     <TabsList>
-                        <TabsTrigger value="reservas">Minhas Reservas</TabsTrigger>
+                        <TabsTrigger value="reservas">Ultimas 5 reservas solicitadas</TabsTrigger>
                         <TabsTrigger value="favoritos">Espaços Favoritos</TabsTrigger>
                     </TabsList>
 
@@ -143,7 +115,17 @@ export default function Dashboard() {
                                                         {new Date(reserva.data_inicial).toLocaleDateString("pt-BR")}
                                                     </p>
                                                 </div>
-                                                <Badge className={getStatusColor(reserva.situacao)}>{getStatusLabel(reserva.situacao)}</Badge>
+                                                <div className="flex-col ">
+                                                    <SituacaoBadge situacao={reserva.situacao} />
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => router.get(route('reservas.index', { reserva: reserva.id }))}
+                                                        className="bg-blue-600 hover:bg-blue-700 mt-5"
+                                                    >
+                                                        <CheckCircle className="mr-1 h-4 w-4" />
+                                                        Ver detalhes
+                                                    </Button>
+                                                </div>
                                             </div>
                                         )
                                     })}

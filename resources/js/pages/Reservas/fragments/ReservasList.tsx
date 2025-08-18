@@ -5,11 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { CheckCircle, Clock, Edit, Eye, SquareArrowDown, XCircle, XSquare } from 'lucide-react';
+import { CheckCircle, Clock, Edit, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -84,6 +83,14 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     );
 
     useEffect(() => {
+        if (reservaToShow) {
+            setSelectedReserva(reservaToShow);
+        } else {
+            setSelectedReserva(undefined);
+        }
+    }, [reservaToShow]);
+
+    useEffect(() => {
         if (isGestor) {
             const reservasParaExibir = reservas.map((reserva) => {
                 if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
@@ -119,11 +126,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
             setReservasFiltradas(reservas);
         }
     }, [isGestor, reservas, user?.id]);
-    useEffect(() => {
-        if (reservaToShow) {
-            setSelectedReserva(reservaToShow);
-        }
-    }, [reservaToShow]);
+
     if (reservas.length === 0) {
         return fallback;
     }
@@ -174,49 +177,50 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
-                                        <DropdownMenu >
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" size="sm" >
-                                                    <SquareArrowDown className="h-4 w-4" />
+                                        <ReservaDetalhes
+                                            isOpen={!!selectedReserva}
+                                            onOpenChange={(open) => {
+                                                if (!open) {
+                                                    setSelectedReserva(undefined);
+                                                } else {
+                                                    setSelectedReserva(reserva);
+                                                }
+                                            }}
+                                            isGestor={isGestor}
+                                            selectedReserva={selectedReserva || reserva}
+                                            setRemoverReserva={setRemoverReserva} />
+                                        {reserva.situacao !== 'inativa' ? (
+                                            isGestor ? (
+                                                <Button
+                                                    onClick={() => handleAvaliarButton(reserva.id)}
+                                                    variant="outline"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                    {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <ReservaDetalhes
-                                                    isGestor={isGestor}
-                                                    selectedReserva={reserva}
-                                                    setRemoverReserva={setRemoverReserva} />
-                                                {reserva.situacao !== 'inativa' ? (
-                                                    isGestor ? (
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleAvaliarButton(reserva.id)}
+                                            ) : (
+                                                <>
+                                                    {reserva.situacao === 'em_analise' && (
+                                                        <Button
+                                                            onClick={() => {
+                                                                router.get(`reservas/${reserva.id}/edit`);
+                                                            }}
+                                                            variant="outline"
                                                         >
-                                                            <Edit className="h-4 w-4" />
-                                                            {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
-                                                        </DropdownMenuItem>
-                                                    ) : (
-                                                        <>
-                                                            {reserva.situacao === 'em_analise' && (
-                                                                <DropdownMenuItem
-                                                                    onClick={() => {
-                                                                        router.get(`reservas/${reserva.id}/edit`);
-                                                                    }}
-                                                                >
-                                                                    <Edit />
-                                                                    Editar
-                                                                </DropdownMenuItem>
-                                                            )}
-                                                            <DropdownMenuItem
-                                                                onClick={() => setRemoverReserva(reserva)}
-                                                                className="text-red-600"
-                                                            >
-                                                                <XCircle className="text-red-600" />
-                                                                Cancelar
-                                                            </DropdownMenuItem>
-                                                        </>
-                                                    )
-                                                ) : null}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                                            <Edit />
+                                                            Editar
+                                                        </Button>
+                                                    )}
+                                                    <Button
+                                                        onClick={() => setRemoverReserva(reserva)}
+                                                        variant="destructive"
+                                                    >
+                                                        <XCircle className="text-white" />
+                                                        Cancelar
+                                                    </Button>
+                                                </>
+                                            )
+                                        ) : null}
                                     </div>
                                 </TableCell>
                             </TableRow>
