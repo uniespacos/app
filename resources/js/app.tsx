@@ -10,16 +10,10 @@ import { initializeTheme } from './hooks/use-appearance';
 window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globalmente
 
 window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY as string, // Cast para string, pois .env pode ser string | undefined
+     broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY as string,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER as string,
     forceTLS: true,
-    authEndpoint: '/broadcasting/auth',
-    auth: {
-        headers: {
-            Authorization: 'Bearer ' + (localStorage.getItem('auth_token') || ''), // Lidar com null/undefined
-        },
-    },
 });
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

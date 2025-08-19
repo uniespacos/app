@@ -108,7 +108,7 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                         }}
                     />
                 </div>
-                <ScrollArea className="max-h-60">
+                <ScrollArea className="max-h-60 overflow-scroll">
                     <div className="p-1">
                         {filteredUsers.length === 0 ? (
                             <div className="text-muted-foreground py-6 text-center text-sm">

@@ -27,32 +27,14 @@ export function NotificationDropdown() {
         auth: {
             user: User;
         };
+        notifications: UserNotification[];
     }>();
     const user = props.auth.user;
-    const [notifications, setNotifications] = useState<UserNotification[]>([]);
+    const [notifications, setNotifications] = useState<UserNotification[]>(props.notifications || []);
     const [unreadCount, setUnreadCount] = useState<number>(user.unread_notifications.length);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const fetchTimeoutRef = useRef<number | null>(null);
 
-    // Função para buscar notificações do backend
-    const fetchNotifications = useCallback(async () => {
-        if (!user || isLoading) return;
-
-        setIsLoading(true);
-        try {
-            const response = await fetch(route('notifications.index')); // Use a helper route() do Laravel
-            if (response.ok) {
-                const data: UserNotification[] = await response.json();
-                setNotifications(data);
-                setUnreadCount(data.filter((n) => !n.read_at).length); // Recalcula e atualiza o estado local
-            }
-        } catch (error) {
-            console.error('Erro ao buscar notificações:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [user, isLoading]);
 
     // Função para marcar notificações como lidas
     const markAllAsRead = () => {
@@ -78,27 +60,45 @@ export function NotificationDropdown() {
     };
     useEffect(() => {
         if (user && window.Echo) {
-            window.Echo.private(`App.Models.User.${user.id}`).notification((notification: any) => {
-                setNotifications((prev) => [
+            const channel = window.Echo.private(`App.Models.User.${user.id}`);
+            console.log('[ECHO] Conectando ao canal privado:', `App.Models.User.${user.id}`);
+            channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
+                // Linha essencial para debug: veja exatamente o que está chegando!
+                console.log('[ECHO] Nova notificação recebida:', notification);
+
+                // 1. Mostra o toast com a propriedade correta (ex: título)
+                toast.success(notification.titulo);
+
+                // 2. Atualiza o estado das notificações, construindo o objeto corretamente
+                setNotifications((prevNotifications) => [
                     {
+                        // O payload do broadcast não vem com ID, então geramos um temporário ou usamos o que vier
                         id: notification.id || String(Date.now()),
-                        type: notification.type,
-                        data: notification,
+                        type: notification.type, // O Laravel Echo adiciona o 'type' automaticamente
                         read_at: null,
                         created_at: new Date().toISOString(),
+                        // Colocamos os dados recebidos dentro da propriedade 'data'
+                        data: {
+                            titulo: notification.titulo,
+                            descricao: notification.descricao,
+                            url: notification.url,
+                        },
                     },
-                    ...prev,
+                    ...prevNotifications, // Adiciona as notificações antigas depois
                 ]);
-                setUnreadCount((prev) => prev + 1);
-                toast.success(notification.data.mensagem);
+
+                // 3. Incrementa o contador de não lidas
+                setUnreadCount((prevCount) => prevCount + 1);
             });
+
+            // Função de limpeza para quando o componente for desmontado
+            return () => {
+                channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
+                // Usar window.Echo.leave() também é uma opção
+            };
         }
-        return () => {
-            if (user && window.Echo) {
-                window.Echo.leave(`App.Models.User.${user.id}`);
-            }
-        };
     }, [user]);
+
 
     useEffect(() => {
         // Isso é crucial para quando o usuário navega para uma nova página Inertia
@@ -106,21 +106,6 @@ export function NotificationDropdown() {
         setUnreadCount(props.auth.user.unread_notifications.length);
     }, [props.auth.user.unread_notifications.length]);
 
-    // Efeito para buscar e marcar como lidas ao abrir o popover (inalterado)
-    useEffect(() => {
-        if (isOpen) {
-            if (fetchTimeoutRef.current) {
-                clearTimeout(fetchTimeoutRef.current);
-            }
-            fetchTimeoutRef.current = setTimeout(() => {
-                fetchNotifications(); // Sempre busca as últimas notificações ao abrir
-            }, 2000);
-        } else {
-            if (fetchTimeoutRef.current) {
-                clearTimeout(fetchTimeoutRef.current);
-            }
-        }
-    }, [fetchNotifications, isOpen, user]); // Depende de isOpen e user (para re-fetch se o user mudar)
 
     // Função auxiliar para formatar a data
     const formatNotificationTime = (dateString: string) => {

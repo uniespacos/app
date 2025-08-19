@@ -41,7 +41,7 @@ const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/rese
 const institucionalExtras: MenuItem[] = [
     { title: 'Gerir Espaços', href: '/institucional/espacos', icon: Building },
     { title: 'Gerenciar Usuários', href: '/institucional/usuarios', icon: Users },
-    { title: 'Gerenciar Instituicoes', href: '/institucional/instituicoes', icon: School },
+    { title: 'Gerenciar Instituições', href: '/institucional/instituicoes', icon: School },
     { title: 'Gerenciar Unidades', href: '/institucional/unidades', icon: MapPin },
     { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Grid3X3 },
     { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Briefcase },

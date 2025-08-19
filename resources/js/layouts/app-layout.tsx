@@ -1,4 +1,3 @@
-import NotificationWatcher from '@/components/notification-watcher';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { FlashMessages, type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -25,7 +24,6 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
 
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            <NotificationWatcher /> {/* Inclua o observador de notificações */}
             <Toaster richColors position="top-right" />
             {children}
         </AppLayoutTemplate>

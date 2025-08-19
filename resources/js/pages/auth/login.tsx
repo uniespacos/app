@@ -34,7 +34,7 @@ export default function Login() {
             <div className="w-full max-w-md">
                 <Card className="w-full">
                     <CardHeader className="space-y-1">
-                        <CardTitle className="text-center text-2xl font-bold">Bem-vindo de volta</CardTitle>
+                        <CardTitle className="text-center text-2xl font-bold">Bem-vindo ao UESB Reservas</CardTitle>
                         <CardDescription className="text-muted-foreground text-center">
                             Entre com suas credenciais para acessar sua conta
                         </CardDescription>
