@@ -1,0 +1,69 @@
+services:
+    web:
+        build:
+            context: .
+            dockerfile: ./docker/production/nginx/Dockerfile
+            args:
+                - PUSHER_APP_KEY=${PUSHER_APP_KEY}
+                - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - uniespacos-storage-production:/var/www/storage:ro
+            - uniespacos-public-assets:/var/www/public/build:ro
+        networks:
+            - uniespacos-production
+        depends_on:
+            php-fpm:
+                condition: service_healthy # Wait for php-fpm health check
+    php-fpm:
+        build:
+            context: .
+            dockerfile: ./docker/common/php-fpm/Dockerfile
+            target: production # Use the 'production' stage in the Dockerfile 
+        restart: unless-stopped
+        volumes:
+            - uniespacos-public-assets:/var/www/public/build # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
+            - uniespacos-storage-production:/var/www/storage # Mount the storage volume
+        env_file:
+            - .env
+        networks:
+            - uniespacos-production
+        healthcheck:
+            test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    postgres:
+        image: postgres:16
+        restart: unless-stopped
+        user: postgres
+        ports:
+            - "${DB_PORT:-5432}:5432"
+        environment:
+            - PGPASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_DATABASE}
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - 'postgres-data-production:/var/lib/postgresql/data'
+        networks:
+            - uniespacos-production
+        healthcheck:
+            test: [ "CMD", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+networks:
+    uniespacos-production:
+
+volumes:
+    postgres-data-production:
+    uniespacos-storage-production:
+    uniespacos-public-assets:
