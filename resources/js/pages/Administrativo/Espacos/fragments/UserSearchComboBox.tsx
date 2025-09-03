@@ -123,7 +123,6 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                                 >
                                     <Check className={cn('mr-2 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')} />
                                     <Avatar className="h-8 w-8">
-                                        <AvatarImage src={user.profile_pic || '/placeholder.svg?height=32&width=32'} />
                                         <AvatarFallback className="text-xs">
                                             {user.name
                                                 .split(' ')

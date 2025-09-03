@@ -150,22 +150,24 @@ export function NotificationDropdown() {
                         ) : notifications.length === 0 ? (
                             <p className="text-muted-foreground text-center text-sm">Nenhuma notificação encontrada.</p>
                         ) : (
-                            notifications.map((notification) => (
-                                <div
-                                    key={notification.id}
-                                    className={`mb-3 rounded-md p-2 last:mb-0 ${notification.read_at ? 'bg-muted/50 text-muted-foreground' : 'bg-card'}`}
-                                >
-                                    <p className="text-sm font-medium">{notification.data.titulo}</p>
-                                    <p className="font-regular text-sm">{notification.data.descricao}</p>
+                            notifications.map((notification) => {
+                                return (
+                                    <div
+                                        key={notification.id}
+                                        className={`mb-3 rounded-md p-2 last:mb-0 ${notification.read_at ? 'bg-muted/50 text-muted-foreground' : 'bg-card'}`}
+                                    >
+                                        <p className="text-sm font-medium">{notification.data.titulo}</p>
+                                        <p className="font-regular text-sm">{notification.data.descricao}</p>
 
-                                    <p className="mt-1 text-xs text-gray-500">{formatNotificationTime(notification.created_at)}</p>
-                                    {notification.data.url && (
-                                        <a href={notification.data.url} className="mt-1 block text-xs text-blue-500 hover:underline">
-                                            Ver detalhes
-                                        </a>
-                                    )}
-                                </div>
-                            ))
+                                        <p className="mt-1 text-xs text-gray-500">{formatNotificationTime(notification.created_at)}</p>
+                                        {notification.data.url && (
+                                            <a href={notification.data.url} className="mt-1 block text-xs text-blue-500 hover:underline">
+                                                Ver detalhes
+                                            </a>
+                                        )}
+                                    </div>
+                                )
+                            })
                         )}
                     </div>
                 </ScrollArea>

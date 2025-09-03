@@ -221,7 +221,7 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                                             Gestor
                                                         </Badge>
                                                     </div>
-                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline">
+                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline" onClick={() => router.get(route('institucional.usuarios.index'))}>
                                                         <Calendar className="mr-2 h-4 w-4" />
                                                         Ver Delegações
                                                     </Button>

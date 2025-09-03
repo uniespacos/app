@@ -18,7 +18,9 @@ class NotificationModel extends Notification
     {
         $this->titulo = $titulo; // Título da notificação
         $this->descricao = $descricao; // Descrição da notificação
-        $this->url = $url; // A solicitação de reserva
+        // A "mágica" da substituição
+        $baseUrlCorreta = config('app.url'); // Pega a URL do .env (ex: http://192.168.1.105)
+        $this->url = str_replace('http://localhost', $baseUrlCorreta, $url);
     }
 
     /**

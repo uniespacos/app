@@ -160,8 +160,7 @@ export default function UsuariosPage() {
                                         <CardContent className="p-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-4">
-                                                    <Avatar>
-                                                        <AvatarImage src={user.profile_pic || '/placeholder.svg'} />
+                                                    <Avatar className="h-12 w-12">
                                                         <AvatarFallback>
                                                             {user.name
                                                                 .split(' ')

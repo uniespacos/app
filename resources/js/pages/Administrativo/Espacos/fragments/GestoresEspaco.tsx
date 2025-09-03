@@ -27,7 +27,6 @@ export function GestoresEspaco({ agendas }: GestoresEspacoProps) {
                     {agenda.user ? (
                         <div className="flex items-center gap-1">
                             <Avatar className="h-5 w-5">
-                                <AvatarImage src={agenda.user.profile_pic || '/placeholder.svg?height=20&width=20'} />
                                 <AvatarFallback className="text-xs">
                                     {agenda.user.name
                                         .split(' ')

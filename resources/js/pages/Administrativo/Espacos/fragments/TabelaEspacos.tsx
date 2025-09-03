@@ -58,17 +58,6 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
                                     <TableRow key={espaco.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                {espaco.imagens && espaco.imagens.length > 0 ? (
-                                                    <img
-                                                        src={espaco.imagens[0] || '/placeholder.svg'}
-                                                        alt={espaco.nome}
-                                                        className="h-12 w-12 rounded-md object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-md">
-                                                        <span className="text-muted-foreground text-xs">Sem foto</span>
-                                                    </div>
-                                                )}
                                                 <div>
                                                     <div className="font-medium">{espaco.nome}</div>
                                                     <div className="text-muted-foreground max-w-[200px] truncate text-sm">{espaco.descricao}</div>
