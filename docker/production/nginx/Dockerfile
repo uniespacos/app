@@ -20,11 +20,11 @@ RUN npm install && npm run build
 FROM nginx:alpine
 
 # Copia certificado SSL e chave privada
-#COPY ./docker/production/nginx/uesb2025fullchain.pem /etc/ssl/certs/uesb2025fullchain.pem
-#COPY ./docker/production/nginx/uesb2025privkey.pem /etc/ssl/private/uesb2025privkey.pem
+COPY ./docker/production/nginx/uesb2025fullchain.pem /etc/ssl/certs/uesb2025fullchain.pem
+COPY ./docker/production/nginx/uesb2025privkey.pem /etc/ssl/private/uesb2025privkey.pem
 
 # Substitui a configuração padrão do NGINX com o nosso default.conf
-COPY ./docker/production/nginx/nginx.conf /etc/nginx/conf.d/nginx.conf
+COPY ./docker/production/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copia os assets gerados no builder
 COPY --from=builder /var/www/public /var/www/public
