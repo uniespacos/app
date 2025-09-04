@@ -22,7 +22,7 @@ export default function VisualizarEspaço() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                        <AgendaEspaço isEditMode={reserva != undefined} reserva={reserva} espaco={espaco} />
+                        <AgendaEspaço isEditMode={!!reserva} reserva={reserva} espaco={espaco} />
                 </div>
         </AppLayout>
     );

@@ -25,15 +25,12 @@ class UpdateEspacoRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Pega o ID do espaço da rota (ex: /espacos/{espaco})
-        $espacoId = $this->route('espaco')->id;
+        dd($this);
         return [
             'nome' => [
                 'required',
                 'string',
                 'max:255',
-                // Garante que o nome é único, mas ignora o registro do espaço atual.
-                Rule::unique('espacos', 'nome')->ignore($espacoId),
             ],
             'capacidade_pessoas' => ['required', 'integer', 'min:1'],
             'descricao' => ['nullable', 'string'],
@@ -44,7 +41,7 @@ class UpdateEspacoRequest extends FormRequest
             'imagens.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:5120'], // Valida cada arquivo
 
             // O índice da nova imagem principal. Pode ser nulo se a imagem principal não mudar.
-            'main_image_index' => ['required', 'integer'],
+            'main_image_index' => ['nullable', 'integer'],
 
             // Lista de URLs/paths das imagens existentes que devem ser deletadas.
             'images_to_delete' => ['nullable', 'array'],

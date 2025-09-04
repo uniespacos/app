@@ -1,6 +1,6 @@
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
-import { format } from 'date-fns';
+import { addDays, format, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -8,7 +8,11 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
-
+export const identificarTurno = (hora: number): 'manha' | 'tarde' | 'noite' => {
+    if (hora >= 7 && hora <= 12) return 'manha';
+    if (hora >= 13 && hora <= 18) return 'tarde';
+    return 'noite';
+};
 export function pegarPrimeiroHorario(horarios: Horario[]) {
     if (horarios.length == 1) return horarios[0];
     let horario_tmp = horarios[0];
@@ -123,3 +127,24 @@ export function getPrimeirosDoisNomes(nomeCompleto: string | undefined): string 
     const palavras = nomeCompleto.trim().split(' ');
     return palavras.slice(0, 2).join(' ');
   }
+
+
+export function diasDaSemana(semanaAtual: Date, hoje: Date) {
+    return Array.from({ length: 7 }).map((_, i) => {
+        const dia = addDays(semanaAtual, i);
+        return {
+            data: dia,
+            nome: format(dia, 'EEEE', { locale: ptBR }),
+            abreviado: format(dia, 'EEE', { locale: ptBR }),
+            diaMes: format(dia, 'dd/MM'),
+            valor: format(dia, 'yyyy-MM-dd'),
+            ehHoje: isSameDay(dia, hoje),
+        };
+    });
+}
+
+export function calcularDataInicioSemana(data: Date) {
+    const diaDaSemana = data.getDay();
+    const diasParaSubtrair = diaDaSemana === 0 ? 6 : diaDaSemana - 1; // Ajusta para que Segunda seja o primeiro dia
+    return addDays(data, -diasParaSubtrair);
+}

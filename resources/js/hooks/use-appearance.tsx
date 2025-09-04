@@ -16,7 +16,7 @@ export function useAppearance() {
         appearance: 'light' as const,
         updateAppearance: () => {
             // Não faz nada - mantém sempre light
-            console.log('Theme switching is disabled');
+            //console.log('Theme switching is disabled');
         },
     };
 }

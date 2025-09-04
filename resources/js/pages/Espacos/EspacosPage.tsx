@@ -19,6 +19,7 @@ export default function EspacosPage() {
         user: { permission_type_id },
         espacos: { data: espacos, links },
         filters,
+        capacidadeEspacos
     } = usePage<{
         espacos: {
             data: Espaco[];
@@ -37,6 +38,7 @@ export default function EspacosPage() {
             capacidade?: string;
         };
         user: User;
+        capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
     }>().props;
     // Função para solicitar reserva
     const handleSolicitarReserva = (espacoId: string) => {
@@ -62,6 +64,7 @@ export default function EspacosPage() {
                                 modulos={modulos}
                                 andares={andares}
                                 filters={filters}
+                                capacidadeEspacos={capacidadeEspacos}
                             />
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                                 {espacos.map((espaco) => (

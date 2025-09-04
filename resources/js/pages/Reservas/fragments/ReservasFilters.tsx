@@ -27,7 +27,7 @@ export function ReservasFilters({
     isGestor = false,
 }: ReservasFiltersProps) {
     return (
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex  flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
                 <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                 <Input

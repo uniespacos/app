@@ -6,14 +6,14 @@ import { Link, usePage } from '@inertiajs/react';
 import AppLogo from './app-logo';
 
 /* Ícones ---------------------------------------------------------------- */
-import { 
-    BookOpen, 
-    Building, 
-    Calendar, 
-    Eye, 
-    LayoutGrid, 
-    Star, 
-    Users, 
+import {
+    BookOpen,
+    Building,
+    Calendar,
+    Eye,
+    LayoutGrid,
+    Star,
+    Users,
     School,
     MapPin,
     Grid3X3,
@@ -34,7 +34,6 @@ const commonNav: MenuItem[] = [
     { title: 'Painel Inicial', href: '/dashboard', icon: LayoutGrid },
     { title: 'Consultar Espaços', href: '/espacos', icon: Calendar },
     { title: 'Minhas Reservas', href: '/reservas', icon: BookOpen },
-    { title: 'Espaços Favoritos', href: route('espacos.favoritos'), icon: Star },
 ];
 
 const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/reservas', icon: Eye }];
@@ -42,7 +41,7 @@ const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/rese
 const institucionalExtras: MenuItem[] = [
     { title: 'Gerir Espaços', href: '/institucional/espacos', icon: Building },
     { title: 'Gerenciar Usuários', href: '/institucional/usuarios', icon: Users },
-    { title: 'Gerenciar Instituicoes', href: '/institucional/instituicoes', icon: School },
+    { title: 'Gerenciar Instituições', href: '/institucional/instituicoes', icon: School },
     { title: 'Gerenciar Unidades', href: '/institucional/unidades', icon: MapPin },
     { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Grid3X3 },
     { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Briefcase },
@@ -68,7 +67,6 @@ export function AppSidebar() {
     const permissionId = (props.auth.user?.permission_type_id as PermissionId) ?? PermissionId.COMUM;
 
     const extraItems = roleExtrasMap[permissionId];
-    const label = roleLabels[permissionId];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

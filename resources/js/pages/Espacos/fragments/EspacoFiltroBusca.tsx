@@ -19,10 +19,11 @@ type FiltroBuscaEspacosProps = {
         andar?: string;
         capacidade?: string;
     };
+    capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
 };
 
 export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
-    const { route, filters, unidades, modulos, andares } = props;
+    const { route, filters, unidades, modulos, andares, capacidadeEspacos } = props;
     const [localFilters, setLocalFilters] = useState({
         search: filters.search || '',
         unidade: filters.unidade || 'all',
@@ -55,7 +56,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                 return true;
             }),
         );
-        console.log(queryParams);
 
         router.get(route, queryParams, {
             preserveState: true, // Mantém o estado dos filtros na página
@@ -75,10 +75,8 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             }
             if (name === 'modulo') {
                 setFilteredAndares(andares.filter((a) => a.modulo?.id.toString() === filters.modulo));
-
                 newFilters.andar = 'all';
             }
-
             return newFilters;
         });
     };
@@ -87,10 +85,10 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         <>
             {/* Filtros e Busca */}
             <Card className="mb-6">
-                <CardContent className="pt-6">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <CardContent >
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {/* Busca */}
-                        <div className="relative sm:col-span-2 lg:col-span-5">
+                        <div className="relative sm:col-span-4 lg:col-span-4">
                             <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                             <Input
                                 placeholder="Buscar por nome do espaço, andar ou módulo..."
@@ -160,9 +158,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="qualquer">Qualquer</SelectItem>
-                                <SelectItem value="pequeno">Pequeno (até 30)</SelectItem>
-                                <SelectItem value="medio">Médio (31-100)</SelectItem>
-                                <SelectItem value="grande">Grande (+100)</SelectItem>
+                                {capacidadeEspacos.map((capacidade) => {
+                                    return <SelectItem key={capacidade} value={capacidade.toString()}>{capacidade} Lugares</SelectItem>
+                                })}
                             </SelectContent>
                         </Select>
                     </div>

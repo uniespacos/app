@@ -13,6 +13,7 @@ use App\Models\Reserva;
 use App\Models\Setor;
 use App\Models\Unidade;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -419,7 +420,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123123123'), // Senha padrão para todos os usuários
             'setor_id' => Setor::pluck('id')->random(),
         ]);
-        
+
         // Ao criar o Espaco, o EspacoFactory cria as Agendas,
         // e o novo AgendaFactory cria todos os Horários.
         echo "Criando Espaços, Agendas e Horários...\n";
@@ -433,44 +434,38 @@ class DatabaseSeeder extends Seeder
 
         echo "Criando reservas e vinculando aos horários...\n";
 
-        // Pega uma amostra de horários disponíveis no futuro para criar reservas
-        $horariosDisponiveis = Horario::where('data', '>', now()->addDay())->inRandomOrder()->limit(50)->get();
-
-        if ($horariosDisponiveis->isEmpty()) {
-            echo "Nenhum horário encontrado para criar reservas. Verifique os factories.\n";
-            return;
-        }
 
         // Para cada usuário, cria uma ou duas reservas
         foreach ($users as $user) {
             $numReservas = rand(1, 2);
-
+            $agenda = Agenda::all()->random();
+            $dataAtual = Carbon::today();
+            // Define os horários de início com base no turno da agenda
+            if ($agenda->turno === 'manha') {
+                $horarios = ['08:00:00', '09:00:00', '10:00:00', '11:00:00'];
+            } elseif ($agenda->turno === 'tarde') {
+                $horarios = ['14:00:00', '15:00:00', '16:00:00', '17:00:00'];
+            } else { // 'noite'
+                $horarios = ['19:00:00', '20:00:00', '21:00:00'];
+            }
             for ($i = 0; $i < $numReservas; $i++) {
-                // Pega de 1 a 3 horários aleatórios para a mesma reserva
-                $horariosParaReservar = $horariosDisponiveis->random(rand(1, 3));
-                if ($horariosParaReservar->isEmpty()) continue;
-
-                // Garante que os horários selecionados ainda não foram usados nesta seed
-                $horariosDisponiveis = $horariosDisponiveis->diff($horariosParaReservar);
-
                 // Cria a reserva
                 $reserva = Reserva::factory()->create([
                     'user_id' => $user->id,
-                    'data_inicial' => $horariosParaReservar->min('data') . ' ' . $horariosParaReservar->min('horario_inicio'),
-                    'data_final' => $horariosParaReservar->max('data') . ' ' . $horariosParaReservar->max('horario_fim'),
+                    'data_inicial' => $dataAtual->format('Y-m-d'),
+                    'data_final' =>  (clone $dataAtual)->addWeek()->format('Y-m-d'),
                 ]);
-
-                // Anexa os horários na tabela pivot (reserva_horario)
-                $reserva->horarios()->attach(
-                    $horariosParaReservar->pluck('id')->toArray(),
-                    [
-                        'user_id' => $user->id,
-                        'situacao' => 'deferida', // Pode variar: 'em_analise', 'deferida' etc.
-                        'justificativa' => null,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ]
-                );
+                foreach ($horarios as $inicio) {
+                    Horario::factory()->create([
+                        'agenda_id' => $agenda->id,
+                        'reserva_id' => $reserva->id,
+                        'data' => $dataAtual->format('Y-m-d'),
+                        'horario_inicio' => $inicio,
+                        'horario_fim' => Carbon::parse($inicio)->addMinutes(50)->format('H:i:s'),
+                        'situacao' => 'em_analise',
+                        'user_id' => $agenda->user_id ?? null, // Usa o user_id da agenda (pode ser null)
+                    ]);
+                }
             }
         }
 

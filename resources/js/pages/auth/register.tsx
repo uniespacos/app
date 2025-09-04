@@ -66,10 +66,9 @@ export default function Register() {
                 <div className="mx-auto max-w-6xl">
                     <div className="grid items-center gap-8 lg:grid-cols-2">
                         {/* Logo Section */}
-                        <div className="flex flex-col items-center justify-center space-y-8">
+                        <div className="flex flex-col items-center justify-center">
                             <div className="text-center">
-                                <img src="/placeholder.svg?height=128&width=200" alt="Logo UESB Reservas" className="mx-auto mb-6 h-32 w-auto" />
-                                <h1 className="mb-2 text-3xl font-bold text-gray-900">Bem-vindo ao UESB Reservas</h1>
+                                <img src="/_img/uniespacos_logo.png" alt="Logo UniEspaços" className="h-100 w-auto" />
                                 <p className="text-lg text-gray-600">Crie sua conta para começar a usar nossa plataforma</p>
                             </div>
                         </div>

@@ -2,11 +2,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AgendaGestoresPorTurnoType, Espaco } from '@/types';
-import { Calendar, MapPin, User, Users } from 'lucide-react';
+import { Building2, Home, MapPin, User, Users } from 'lucide-react';
 
 type AgendaHeaderProps = {
     espaco: Espaco;
-    gestoresPorTurno: AgendaGestoresPorTurnoType;
+    gestoresPorTurno: Map<string, AgendaGestoresPorTurnoType>;
 };
 
 export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderProps) {
@@ -14,18 +14,18 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
         <Card className="shadow-sm">
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-xl">
-                    <MapPin className="h-5 w-5" />
-                    Nome: {espaco.nome}
+                    <Home className="h-5 w-5" />
+                    {espaco.nome}
                 </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
                 <div className="mb-3 flex flex-wrap gap-2">
                     <Badge variant="outline" className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
+                        <Building2 className="h-3 w-3" />
                         {espaco.andar?.modulo?.nome}
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
+                        <MapPin className="h-3 w-3" />
                         {espaco.andar?.nome}
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
@@ -44,16 +44,16 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                                             <div className="font-semibold">{turno.toUpperCase()}:</div>
                                             <div className="flex items-center gap-1">
                                                 <User className="text-muted-foreground h-3 w-3" />
-                                                <span>{gestoresPorTurno[turno]?.nome ?? 'N/A'}</span>
+                                                <span>{gestoresPorTurno.get(turno)?.nome ?? 'N/A'}</span>
                                             </div>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        {gestoresPorTurno[turno] ? (
+                                        {gestoresPorTurno.get(turno) ? (
                                             <div className="space-y-1">
-                                                <p className="font-medium">{gestoresPorTurno[turno].nome}</p>
-                                                <p className="text-xs">{gestoresPorTurno[turno].email}</p>
-                                                <p className="text-muted-foreground text-xs">{gestoresPorTurno[turno].departamento}</p>
+                                                <p className="font-medium">{gestoresPorTurno.get(turno)?.nome || 'N/A'}</p>
+                                                <p className="text-xs">{gestoresPorTurno.get(turno)?.email || 'N/A'}</p>
+                                                <p className="text-muted-foreground text-xs">{gestoresPorTurno.get(turno)?.departamento || 'N/A'}</p>
                                             </div>
                                         ) : (
                                             <p>Nenhum gestor para este turno.</p>

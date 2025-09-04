@@ -46,7 +46,7 @@ export default function CadastroEspacoPage() {
         if (!isEditMode || !espaco.imagens) return [];
         // No modo de edição, inicializa com as imagens existentes
         return espaco.imagens.map((imgPath) => ({
-            file: new File([], imgPath, { type: 'image/jpeg' }), // Create a dummy File object for existing images
+            file: new File([], imgPath, { type: 'image/*' }), // Create a dummy File object for existing images
             preview: `/storage/${imgPath}`,
             path: imgPath, // Armazena o path relativo para enviar na exclusão
         }));

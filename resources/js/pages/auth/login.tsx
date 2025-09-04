@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AppLogoIcon from '@/components/app-logo-icon';
 
 type LoginForm = {
     email: string;
@@ -34,7 +35,12 @@ export default function Login() {
             <div className="w-full max-w-md">
                 <Card className="w-full">
                     <CardHeader className="space-y-1">
-                        <CardTitle className="text-center text-2xl font-bold">Bem-vindo de volta</CardTitle>
+                        <CardTitle className="text-center text-2xl font-bold">
+                            <div className='flex justify-center mb-2'>
+                                <AppLogoIcon className="size-34 text-white dark:text-black " />
+                            </div >
+                            Bem-vindo ao UniEspaços
+                        </CardTitle>
                         <CardDescription className="text-muted-foreground text-center">
                             Entre com suas credenciais para acessar sua conta
                         </CardDescription>
@@ -159,7 +165,7 @@ export default function Login() {
                                     className="text-primary font-medium hover:underline"
                                     onClick={() => router.get(route('register'))}
                                 >
-                                    Cadastre-se gratuitamente
+                                    Cadastre-se!
                                 </button>
                             </div>
                         </CardFooter>

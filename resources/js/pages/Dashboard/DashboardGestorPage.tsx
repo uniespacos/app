@@ -1,12 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
+import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Bell, Clock, History, Home, Plus } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Users } from 'lucide-react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
+import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/components/tabs-item-reserva';
+import EspacoCard from '../Espacos/fragments/EspacoCard';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -14,168 +18,175 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Dados de exemplo
-const pendingRequests = 8;
 
-const scheduledUnavailability = [
-    {
-        id: '1',
-        spaceName: 'Laboratório de Informática 3',
-        startDate: '20/05/2023',
-        endDate: '25/05/2023',
-        reason: 'Manutenção de Equipamentos',
-    },
-    {
-        id: '2',
-        spaceName: 'Sala de Videoconferência',
-        startDate: '15/05/2023',
-        endDate: '16/05/2023',
-        reason: 'Atualização de Software',
-    },
-];
 
-export default function Dashboard() {
-    const { espacos, reservas } = usePage<{ user: User; espacos: Espaco[]; reservas: Reserva[] }>().props;
-    // const { user } = props;
+export default function Dashboard({ user, reservasPendentes, statusDasReservas, agendas, espacosFavoritos, reservas }: {
+    user: User; espacos: Espaco[]; reservasPendentes: Reserva[], statusDasReservas: {
+        pendentes: number
+        avaliadas_hoje: number
+        total_espacos: number
+    }, agendas: Agenda[]
+    , espacosFavoritos: Espaco[], reservas: Reserva[]
+}) {
+    const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    useEffect(() => {
+        if (!searchTerm) {
+            setFilteredEspacosFavoritos(espacosFavoritos);
+            return;
+        }
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const filtered = espacosFavoritos.filter((espaco) =>
+            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
+            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        );
+
+        setFilteredEspacosFavoritos(filtered);
+    }, [espacosFavoritos, searchTerm]);
+    const getUniqueEspacosFromAgendas = (agendas: Agenda[]): Espaco[] => {
+        // 1. Cria um Map para armazenar os espaços.
+        // A chave será o ID do espaço (number) e o valor será o objeto Espaco.
+        const espacosMap = new Map<number, Espaco>();
+
+        // 2. Itera sobre cada agenda da lista.
+        for (const agenda of agendas) {
+            // Verifica se a agenda realmente tem um espaço associado.
+            if (agenda.espaco && agenda.espaco.id) {
+                // 3. Adiciona o espaço ao Map usando seu ID como chave.
+                // Se um espaço com o mesmo ID já existir no Map,
+                // o `set` simplesmente substituirá o valor, resultando
+                // na desduplicação automática e eficiente.
+                espacosMap.set(agenda.espaco.id, agenda.espaco);
+            }
+        }
+
+        // 4. Converte os valores do Map (que são os objetos Espaco únicos) em um array.
+        return Array.from(espacosMap.values());
+    }
+    const espacosUnicos = getUniqueEspacosFromAgendas(agendas);
+
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Home" />
+        <AppLayout breadcrumbs={breadcrumbs}> <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <Card className="col-span-1">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Solicitações Pendentes</CardTitle>
-                            <Bell className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-xl font-bold md:text-2xl">{pendingRequests} solicitações</div>
-                            <p className="text-muted-foreground text-xs">Aguardando sua análise</p>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full">Ver Solicitações</Button>
-                        </CardFooter>
-                    </Card>
+                <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold">Painel do Gestor</h1>
+                            <p className="text-muted-foreground">Olá, {user.name} - Gerencie as reservas dos seus espaços</p>
+                        </div>
 
-                    <Card className="col-span-1 sm:col-span-1 lg:col-span-2">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Espaços que Gerencio</CardTitle>
-                            <Home className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex-col space-y-2">
-                                {espacos.map((espaco, index) =>
-                                    index < 4 ? (
-                                        <div key={espaco.id} className="flex items-center justify-between gap-2 rounded-lg border p-2">
-                                            <div className="mr-2 truncate font-medium">{espaco.nome}</div>
-                                            <Badge className={'bg-yellow-500 hover:bg-yellow-600'}>
-                                                {espaco.agendas?.filter((a) => a.horarios?.filter((h) => h.pivot?.situacao === 'em_analise'))
-                                                    .length || 0}{' '}
-                                                Em analise
-                                            </Badge>
-                                            <Badge className={'bg-green-500 hover:bg-green-600'}>
-                                                {espaco.agendas?.filter((a) => a.horarios?.filter((h) => h.pivot?.situacao === 'deferida')).length ||
-                                                    0}{' '}
-                                                Deferidas
-                                            </Badge>
-                                            <Badge className={'bg-red-500 hover:bg-red-600'}>
-                                                {espaco.agendas?.filter((a) => a.horarios?.filter((h) => h.pivot?.situacao === 'indeferida'))
-                                                    .length || 0}{' '}
-                                                indeferidas
-                                            </Badge>
-                                        </div>
-                                    ) : null,
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    </div>
 
-                    <Card className="col-span-1">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Indisponibilidades Agendadas</CardTitle>
-                            <Clock className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                {scheduledUnavailability.map((unavailability) => (
-                                    <div key={unavailability.id} className="rounded-lg border p-2">
-                                        <div className="truncate font-medium">{unavailability.spaceName}</div>
-                                        <div className="text-muted-foreground text-xs">
-                                            {unavailability.startDate} até {unavailability.endDate}
-                                        </div>
-                                        <div className="text-xs">{unavailability.reason}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button variant="outline" size="sm">
-                                Ver Todas
-                            </Button>
-                            <Button size="sm">
-                                <Plus className="mr-1 h-4 w-4" /> Nova
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                    {/* Stats Cards */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{statusDasReservas.pendentes}</div>
+                                <p className="text-xs text-muted-foreground">Aguardando sua análise</p>
+                            </CardContent>
+                        </Card>
 
-                    <Card className="col-span-1 sm:col-span-2 lg:col-span-4">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Histórico de Decisões</CardTitle>
-                            <History className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent className="overflow-auto">
-                            <div className="w-full overflow-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Espaço</TableHead>
-                                            <TableHead className="hidden sm:table-cell">Solicitante</TableHead>
-                                            <TableHead className="hidden md:table-cell">Data</TableHead>
-                                            <TableHead className="hidden lg:table-cell">Horário</TableHead>
-                                            <TableHead>Decisão</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {reservas.map((reserva, index) =>
-                                            index < 6 ? (
-                                                <TableRow key={reserva.id}>
-                                                    <TableCell className="font-medium">
-                                                        {reserva.horarios.find((h) => h.agenda?.espaco != undefined)?.agenda?.espaco?.nome}
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell"> {reserva.user?.name}</TableCell>
-                                                    <TableCell className="hidden md:table-cell">
-                                                        {new Date(reserva.data_inicial).toISOString()}
-                                                    </TableCell>
-                                                    <TableCell className="hidden lg:table-cell">
-                                                        {reserva.horarios.find((h) => h.horario_inicio != undefined)?.horario_inicio}
-                                                    </TableCell>
-                                                    <TableCell>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Avaliadas Hoje</CardTitle>
+                                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{statusDasReservas.avaliadas_hoje}</div>
+                                <p className="text-xs text-muted-foreground">Reservas Avaliadas hoje</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Espaços Gerenciados</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{statusDasReservas.total_espacos}</div>
+                                <p className="text-xs text-muted-foreground">Sob sua responsabilidade</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Main Content */}
+                    <Tabs defaultValue="pendentes" className="space-y-4">
+                        <TabsList>
+                            <TabsTrigger value="pendentes">Reservas Pendente Analise</TabsTrigger>
+                            <TabsTrigger value="espacos">Espaços que gerencio</TabsTrigger>
+                            <TabsTrigger value="reservas" >  Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="reservas" className="space-y-4">
+                            <TabsItemReserva reservas={reservas} />
+                        </TabsContent>
+
+                        <TabsContent value="favoritos" className="space-y-4">
+                            <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                        </TabsContent>
+                        <TabsContent value="pendentes" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Reservas Aguardando Análise</CardTitle>
+                                    <CardDescription>Avalie as solicitações de reserva dos seus espaços</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        {reservasPendentes.map((reserva) => (
+                                            <div key={reserva.id} className="border rounded-lg p-4">
+                                                <div className="flex items-start justify-between mb-4">
+                                                    <div className="space-y-1">
+                                                        <h4 className="font-medium">{reserva.titulo}</h4>
+                                                        <p className="text-sm text-muted-foreground">{reserva.descricao}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Solicitante: {reserva.user?.name} ({reserva.user?.setor?.nome})
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex-col ">
                                                         <SituacaoBadge situacao={reserva.situacao} />
-                                                    </TableCell>
-                                                    <TableCell>
                                                         <Button
-                                                            variant="outline"
                                                             size="sm"
-                                                            className="w-full"
-                                                            onClick={() => router.get(route('gestor.reservas.index', { reserva: reserva.id }))}
+                                                            onClick={() => router.get(route('gestor.reservas.show', reserva.id))}
+                                                            className="bg-blue-600 hover:bg-blue-700 mt-5"
                                                         >
-                                                            Ver detalhes
+                                                            <CheckCircle className="mr-1 h-4 w-4" />
+                                                            Avaliar
                                                         </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : null,
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="outline" size="sm" className="w-full" onClick={() => router.get(route('gestor.reservas.index'))}>
-                                Ver histórico completo
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="espacos" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Espaços Sob Sua Gestão</CardTitle>
+                                    <CardDescription>Espaços que você gerencia por turno</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                        {espacosUnicos?.map((espaco) => (
+                                            <EspacoCard showFavoritar={false} key={espaco?.id} espaco={espaco} userType={user.permission_type_id} handleSolicitarReserva={() => router.get(route("espacos.show", espaco.id))} />
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }

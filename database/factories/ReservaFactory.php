@@ -36,11 +36,4 @@ class ReservaFactory extends Factory
             'user_id' => User::factory(),
         ];
     }
-    public function configure()
-    {
-        return $this->afterCreating(function (Reserva $reserva) {
-            $horarios = Horario::whereAgendaId(Agenda::pluck('id')->random())->inRandomOrder()->take(4)->pluck('id');
-            $reserva->horarios()->attach($horarios);
-        });
-    }
 }

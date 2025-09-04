@@ -23,7 +23,6 @@ interface UserSearchComboboxProps {
 export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder = 'Buscar usuário...', disabled = false }: UserSearchComboboxProps) {
     const [open, setOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
-    console.log(usuarios);
     const selectedUser = usuarios.find((user) => user.id === value);
 
     // Filtrar usuários baseado na busca
@@ -109,7 +108,7 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                         }}
                     />
                 </div>
-                <ScrollArea className="max-h-60">
+                <ScrollArea className="max-h-60 overflow-scroll">
                     <div className="p-1">
                         {filteredUsers.length === 0 ? (
                             <div className="text-muted-foreground py-6 text-center text-sm">
@@ -124,7 +123,6 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                                 >
                                     <Check className={cn('mr-2 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')} />
                                     <Avatar className="h-8 w-8">
-                                        <AvatarImage src={user.profile_pic || '/placeholder.svg?height=32&width=32'} />
                                         <AvatarFallback className="text-xs">
                                             {user.name
                                                 .split(' ')

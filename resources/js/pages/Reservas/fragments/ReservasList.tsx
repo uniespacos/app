@@ -1,15 +1,14 @@
 import DeleteItem from '@/components/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { diasSemanaParser, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
+import { formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { Separator } from '@radix-ui/react-separator';
-import { CalendarDays, CheckCircle, Clock, Edit, Eye, FileText, Home, User, XCircle, XSquare } from 'lucide-react';
+import { CheckCircle, Clock, Edit, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import ReservaDetalhes from './ReservasDetalhes';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -75,30 +74,40 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     const { data: reservas, links } = paginator;
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
-    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(reservas);
+    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
+        reservas.sort((a, b) => {
+            if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
+            if (b.situacao === 'em_analise' && a.situacao !== 'parcialmente_deferida') return 1;
+            return 0;
+        }),
+    );
+
+    useEffect(() => {
+        if (reservaToShow) {
+            setSelectedReserva(reservaToShow);
+        } else {
+            setSelectedReserva(undefined);
+        }
+    }, [reservaToShow]);
 
     useEffect(() => {
         if (isGestor) {
             const reservasParaExibir = reservas.map((reserva) => {
-                const horariosQueGerencio = reserva.horarios.filter((horario) => {
-                    return horario.agenda?.user?.id === user?.id;
-                });
-
-                if (reserva.situacao === 'parcialmente_deferida') {
-                    const situacoes = horariosQueGerencio.map((horario) => horario.pivot?.situacao);
+                if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
+                    const situacoes = reserva.horarios.map((horario) => horario.situacao);
                     if (situacoes.includes('em_analise')) {
                         return {
                             ...reserva,
                             situacao: 'em_analise' as SituacaoReserva,
                         };
                     }
-                    if (situacoes.includes('deferida')) {
+                    if (situacoes.every((situacao) => situacao === 'deferida')) {
                         return {
                             ...reserva,
                             situacao: 'deferida' as SituacaoReserva,
                         };
                     }
-                    if (situacoes.includes('indeferida')) {
+                    if (situacoes.every((situacao) => situacao === 'indeferida')) {
                         return {
                             ...reserva,
                             situacao: 'indeferida' as SituacaoReserva,
@@ -108,16 +117,16 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
 
                 return reserva;
             });
-            setReservasFiltradas(reservasParaExibir);
+            setReservasFiltradas(reservasParaExibir.sort((a, b) => {
+                if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
+                if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
+                return 0;
+            }));
         } else {
             setReservasFiltradas(reservas);
         }
     }, [isGestor, reservas, user?.id]);
-    useEffect(() => {
-        if (reservaToShow) {
-            setSelectedReserva(reservaToShow);
-        }
-    }, [reservaToShow]);
+
     if (reservas.length === 0) {
         return fallback;
     }
@@ -134,8 +143,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             <TableHead>Título</TableHead>
                             <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="hidden md:table-cell">Local</TableHead>
-                            <TableHead className="hidden lg:table-cell">Data de Início</TableHead>
-                            <TableHead className="hidden lg:table-cell">Data de Término</TableHead>
+                            <TableHead className="hidden lg:table-cell">Data início</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -144,44 +152,49 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                             <TableRow key={reserva.id}>
                                 <TableCell className="font-medium">
                                     <div>
-                                        {reserva.titulo}
+                                        {reserva.titulo.substring(0, 30)}
+                                        {reserva.titulo.length > 30 ? '...' : ''}
                                         <p className="text-muted-foreground hidden text-sm sm:block">
-                                            {reserva.descricao.substring(0, 60)}
-                                            {reserva.descricao.length > 60 ? '...' : ''}
+                                            {reserva.descricao.substring(0, 30)}
+                                            {reserva.descricao.length > 30 ? '...' : ''}
                                         </p>
                                     </div>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                    <SituacaoBadge situacao={reserva.situacao} />
+                                    <div>
+                                        <SituacaoBadge situacao={reserva.situacao} />
+                                    </div>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                     <div>
                                         <p>
-                                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '} /{' '}
-                                            {reserva.horarios[0]?.agenda?.espaco?.andar?.nome ?? ' '} /{' '}
-                                            {reserva.horarios[0]?.agenda?.espaco?.andar?.modulo?.nome ?? ' '} /{' '}
+                                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '} /
                                             {reserva.horarios[0]?.agenda!.turno ? getTurnoText(reserva.horarios[0].agenda?.turno) : null}
                                         </p>
                                     </div>
                                 </TableCell>
 
                                 <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
-                                <TableCell className="hidden lg:table-cell"> {formatDate(reserva.data_final)}</TableCell>
                                 <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2 pt-2">
-                                        {/* 2. O botão de detalhes agora define a reserva selecionada no estado */}
-                                        <Button variant="ghost" size="sm" onClick={() => setSelectedReserva(reserva)}>
-                                            <Eye className="mr-1 h-4 w-4" />
-                                            Detalhes
-                                        </Button>
-
+                                    <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
+                                        <ReservaDetalhes
+                                            key={selectedReserva?.id}
+                                            isOpen={!!selectedReserva}
+                                            onOpenChange={(open) => {
+                                                if (!open) {
+                                                    setSelectedReserva(undefined);
+                                                } else {
+                                                    setSelectedReserva(reserva);
+                                                }
+                                            }}
+                                            isGestor={isGestor}
+                                            selectedReserva={selectedReserva || reserva}
+                                            setRemoverReserva={setRemoverReserva} />
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
                                                 <Button
                                                     onClick={() => handleAvaliarButton(reserva.id)}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    title={reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
+                                                    variant="outline"
                                                 >
                                                     <Edit className="h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
@@ -190,12 +203,10 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                                 <>
                                                     {reserva.situacao === 'em_analise' && (
                                                         <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            title="Editar"
                                                             onClick={() => {
                                                                 router.get(`reservas/${reserva.id}/edit`);
                                                             }}
+                                                            variant="outline"
                                                         >
                                                             <Edit />
                                                             Editar
@@ -203,12 +214,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                                     )}
                                                     <Button
                                                         onClick={() => setRemoverReserva(reserva)}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-red-600"
-                                                        title="Cancelar"
+                                                        variant="destructive"
                                                     >
-                                                        <XCircle />
+                                                        <XCircle className="text-white" />
                                                         Cancelar
                                                     </Button>
                                                 </>
@@ -232,123 +240,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                     route={route('reservas.destroy', { reserva: removerReserva.id })}
                 />
             )}
-            {selectedReserva && (
-                <Dialog
-                    open={!!selectedReserva}
-                    onOpenChange={(isOpen) => {
-                        if (!isOpen) {
-                            setSelectedReserva(undefined); // Fecha o dialog limpando o estado
-                        }
-                    }}
-                >
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                                <FileText className="h-5 w-5" />
-                                {selectedReserva.titulo}
-                            </DialogTitle>
-                            <DialogDescription className="flex-col justify-between">
-                                <div className="flex items-center gap-2 p-1">
-                                    <User className="h-4 w-4" />
-                                    Solicitado por: {selectedReserva.user?.name}
-                                </div>
-                                <div className="flex items-center gap-2 p-1">
-                                    <Home className="h-4 w-4" />
-                                    Espaço: {selectedReserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
-                                </div>
-                                <div className="flex items-center gap-2 p-1">
-                                    <SituacaoIndicator situacao={selectedReserva.situacao} />
-                                </div>
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div>
-                            <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
-                            <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{selectedReserva.descricao}</p>
-                        </div>
 
-                        <Separator />
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="flex items-center gap-2">
-                                <CalendarDays className="h-4 w-4 text-gray-500" />
-                                <div>
-                                    <p className="text-sm text-gray-500">Período</p>
-                                    <p className="font-medium">
-                                        {formatDate(selectedReserva.data_inicial)} até {formatDate(selectedReserva.data_final)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <Separator />
 
-                        <Separator />
 
-                        <div>
-                            <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
-                                <Clock className="h-4 w-4" />
-                                Horários Solicitados
-                            </h4>
-                            <div className="grid gap-2">
-                                {selectedReserva.horarios.map((horario) => {
-                                    const dia = new Date(horario.data);
-                                    return (
-                                        <div key={horario.id} className="rounded-lg bg-blue-50 p-3">
-                                            <div className="flex items-center justify-between rounded-lg p-3">
-                                                <span className="font-medium text-blue-900">{diasSemanaParser[dia.getDay()]}</span>
-                                                <span className="text-blue-700">
-                                                    {horario.horario_inicio} às {horario.horario_fim}
-                                                </span>
-                                                {horario.pivot?.situacao && <SituacaoBadge situacao={horario.pivot.situacao} />}
-                                            </div>
-                                            {horario.pivot?.justificativa && horario.pivot?.situacao === 'indeferida' && (
-                                                <div className="flex items-center justify-between bg-red-50 p-3">
-                                                    <span className="font-medium text-red-900">Justificativa:</span>
-                                                    <span className="text-red-700">
-                                                        {horario.pivot?.justificativa
-                                                            ? horario.pivot.justificativa
-                                                            : 'Nenhuma justificativa fornecida'}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setSelectedReserva(undefined)}>
-                                Fechar
-                            </Button>
-                            {isGestor ? (
-                                <div>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            router.get(`/gestor/reservas/${selectedReserva.id}`);
-                                        }}
-                                    >
-                                        <Edit className="mr-1 h-4 w-4" />
-                                        Avaliar
-                                    </Button>
-                                </div>
-                            ) : (
-                                <div>
-                                    {selectedReserva.situacao === 'em_analise' && (
-                                        <Button variant="outline" onClick={() => router.get(route('reservas.edit', selectedReserva.id))}>
-                                            <Edit className="mr-1 h-4 w-4" />
-                                            Editar
-                                        </Button>
-                                    )}
-                                    <Button variant="destructive" onClick={() => setRemoverReserva(selectedReserva)}>
-                                        <XCircle className="mr-1 h-4 w-4" />
-                                        Cancelar
-                                    </Button>
-                                </div>
-                            )}
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            )}
             <div className="mt-4 flex justify-center">
                 <div className="flex flex-wrap justify-center gap-1">
                     {links.map((link, index) =>
@@ -358,9 +252,8 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 key={index}
                                 href={link.url}
                                 preserveScroll
-                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${
-                                    link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
-                                }`}
+                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
+                                    }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ) : (

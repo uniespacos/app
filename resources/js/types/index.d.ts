@@ -147,17 +147,6 @@ export interface Espaco {
 export type SituacaoReserva = 'em_analise' | 'indeferida' | 'parcialmente_deferida' | 'deferida' | 'inativa';
 
 /**
- * Dados da tabela pivô `reserva_horario`, crucial para o status individual.|
- */
-export interface Pivot {
-    reserva_id: number;
-    horario_id: number;
-    situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
-    justificativa?: string | null; // Justificativa opcional para indeferimento
-    user?:User
-}
-
-/**
  * Modelo de Agenda, que define turnos e gestores para um Espaço.
  */
 export interface Agenda {
@@ -177,8 +166,10 @@ export interface Horario {
     horario_inicio: string;
     horario_fim: string;
     agenda?: Agenda; // Relação aninhada
-    reservas?: Reserva[];
-    pivot?: Pivot; // Dados da tabela pivô `reserva_horario`
+    reserva?: Reserva;
+    situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
+    justificativa?: string | null; // Justificativa opcional para indeferimento
+    user?: User
 }
 
 /**
@@ -235,7 +226,7 @@ export type DashboardStatusReservasType = {
 
 export interface SlotCalendario {
     id: string; // ID único gerado para o frontend (ex: "2025-06-13|09:00:00")
-    status: 'livre' | 'reservado' | 'selecionado';
+    status: 'livre' | 'reservado' | 'selecionado' | 'solicitado' | 'indeferida' | 'deferida'; // Status do slot no calendário
     data: Date;
     horario_inicio: string;
     horario_fim: string;
@@ -246,9 +237,10 @@ export interface SlotCalendario {
         autor: string;
         reserva_titulo: string;
     };
-
+    isLocked?: boolean;
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
     agenda_id?: number;
+    isShowReservation?: boolean
 }
 
 export interface OpcoesRecorrencia {
@@ -294,7 +286,12 @@ export interface ImageWithPreview {
     path?: string;    // Path relativo para imagens existentes
 }
 
-export type AgendaGestoresPorTurnoType = Record<string, { nome: string; email: string; departamento: string; agenda_id: number }>;
+export type AgendaGestoresPorTurnoType = {
+    nome: string;
+    email: string;
+    departamento: string;
+    agenda_id: number
+};
 
 export type AgendaDiasSemanaType = {
     data: Date;
@@ -305,24 +302,20 @@ export type AgendaDiasSemanaType = {
     ehHoje: boolean;
 }
 
-export type AgendaSlotsPorTurnoType = {
-    manha: Record<string, SlotCalendario[]>;
-    tarde: Record<string, SlotCalendario[]>;
-    noite: Record<string, SlotCalendario[]>;
-}
+export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>
 export interface PermissionType {
-  id: number
-  name: "institucional" | "gestor" | "comum"
-  label: string
+    id: number
+    name: "institucional" | "gestor" | "comum"
+    label: string
 }
 
 export interface SelectedAgenda {
-  agenda: Agenda
-  espaco: Espaco
-  andar: Andar
-  modulo: Modulo
-  unidade: Unidade
-  instituicao: Instituicao
+    agenda: Agenda
+    espaco: Espaco
+    andar: Andar
+    modulo: Modulo
+    unidade: Unidade
+    instituicao: Instituicao
 }
 
 export interface FiltrosEspacosType {

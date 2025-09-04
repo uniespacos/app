@@ -32,17 +32,23 @@ class EspacoFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (Espaco $espaco) {
+
             // Cria as 3 agendas (manhã, tarde, noite) para cada espaço
             $turnos = ['manha', 'tarde', 'noite'];
             foreach ($turnos as $turno) {
+                $gestor = User::whereHas('setor.unidade', function ($unidadeQuery) use ($espaco) {
+                    $unidadeQuery->where('instituicao_id', $espaco->andar->modulo->unidade->instituicao_id);
+                })->pluck('id')->random();
                 Agenda::factory()->create([
                     'espaco_id' => $espaco->id,
                     'turno' => $turno,
-                    'user_id' => User::whereHas('setor.unidade', function ($unidadeQuery) use ($espaco) {
-                        $unidadeQuery->where('instituicao_id', $espaco->andar->modulo->unidade->instituicao_id);
-                    })->pluck('id')->random(), // Inicia sem usuário responsável
+                    'user_id' => $gestor, // Inicia sem usuário responsável
                 ]);
+                $user = User::where('id', $gestor)->first();
+                if ($user->permission_type_id != 2)
+                    $user->update(['permission_type_id' => 2]); // Define o tipo de permissão como gestor
             }
+
         });
     }
 }

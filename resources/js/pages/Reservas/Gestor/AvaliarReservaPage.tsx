@@ -1,94 +1,170 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { diasSemanaParser, formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
-import { BreadcrumbItem, Reserva, SituacaoReserva } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { calcularDataInicioSemana, diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
+import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, User, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
+import { format, startOfWeek } from 'date-fns';
+import { useReservationSlots } from '@/hooks/use-reservation-slots'; // Importa o novo hook
+import EvaluationForm from './fragments/EvaluationForm'; // Importa o novo componente
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Gerenciar Reservas',
-        href: '/gestor/reservas',
-    },
-    {
-        title: 'Avaliar reserva',
-        href: '/gestor/reservas',
-    },
+    { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
+    { title: 'Avaliar reserva', href: '/gestor/reservas' },
 ];
 
+// Define o tipo de dados para o formulário do Inertia, mantendo a estrutura original.
 type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
+    horarios_avaliados: SlotCalendario[]; // Mantém o tipo original esperado pelo backend
+    observacao: string | null;
+    [key: string]: SituacaoReserva | string | (string | null) | any; // Permite outras propriedades dinâmicas
 };
 
-export default function AvaliarReserva() {
-    const { props } = usePage<{ reserva: Reserva }>();
-    const reserva = props.reserva;
-    const { setData, patch, reset } = useForm<FormAvaliacaoType>({
+// Funções de ajuda podem permanecer aqui ou serem movidas para 'utils' se forem reutilizadas.
+const getSituacaoIcon = (situacao: string) => {
+    switch (situacao) {
+        case 'deferida': return <CheckCircle className="h-4 w-4 text-green-600" />;
+        case 'indeferida': return <XCircle className="h-4 w-4 text-red-600" />;
+        default: return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+    }
+};
+
+const verificarStatusReserva = (slots: SlotCalendario[]): SituacaoReserva => {
+    if (slots.length === 0) return 'em_analise';
+    const slotsAvaliáveis = slots.filter(slot => !slot.isLocked);
+    if (slotsAvaliáveis.length === 0) return 'em_analise'; // Se todos os slots estiverem bloqueados
+
+    const todosIndeferidos = slotsAvaliáveis.every(slot => slot.status === 'indeferida');
+    if (todosIndeferidos) return 'indeferida';
+
+    const todosDeferidos = slotsAvaliáveis.every(slot => slot.status === 'deferida');
+    if (todosDeferidos) return 'deferida';
+
+    const temDeferidos = slotsAvaliáveis.some(slot => slot.status === 'deferida');
+    if (temDeferidos) return 'parcialmente_deferida';
+
+    return 'em_analise';
+};
+
+export default function AvaliarReserva({ reserva }: { reserva: Reserva, auth: { user: UserType } }) {
+    const agendas = useMemo(() => {
+        return reserva.horarios
+            .map((horario) => horario.agenda)
+            .filter((agenda): agenda is Agenda => agenda !== undefined)
+            .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
+    }, [reserva.horarios]);
+
+    const semanaDaReserva = useMemo(() => calcularDataInicioSemana(new Date(reserva.data_inicial)), [reserva.data_inicial]);
+    const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
+
+    // --- HOOKS CUSTOMIZADOS ---
+    const { initialSlots, slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva, agendas);
+
+    // --- ESTADO DO FORMULÁRIO E LÓGICA DE AVALIAÇÃO ---
+    const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
+    const [motivo, setMotivo] = useState<string>('');
+    const [observacao, setObservacao] = useState<string>(reserva.observacao || '');
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    const { data, setData, patch, reset } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
         motivo: '',
+        horarios_avaliados: [],
+        observacao: reserva.observacao,
     });
 
-    const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
-    const [motivo, setMotivo] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    // Lógica para desabilitar o RadioGroup
+    const isRadioGroupDisabled = useMemo(() => {
+        const statusUnicos = new Set(slotsSelecao.filter(slot => !slot.isLocked).map(slot => slot.status));
+        return statusUnicos.values.length > 0 && statusUnicos.has('deferida') && statusUnicos.has('indeferida');
+    }, [slotsSelecao]);
 
+    // Sincroniza o estado 'decisao' com o estado dos slots
     useEffect(() => {
-        // Inicializa o estado da decisão com a situação atual da reserva
-        setDecisao(reserva.situacao as SituacaoReserva);
-        // Se a reserva já tiver uma justificativa, define o motivo
-        if (reserva.horarios.length > 0 && reserva.horarios[0].pivot?.justificativa) {
-            setMotivo(reserva.horarios[0].pivot.justificativa);
+        const slotsAvaliáveis = slotsSelecao.filter(slot => !slot.isLocked);
+        if (slotsAvaliáveis.length === 0) {
+            setDecisao('em_analise');
+            return;
+        }
+        const primeiroStatus = slotsAvaliáveis[0].status;
+        const todosComMesmoStatus = slotsAvaliáveis.every(s => s.status === primeiroStatus);
+        if (todosComMesmoStatus) {
+            setDecisao(primeiroStatus as SituacaoReserva);
         } else {
-            setMotivo('');
+            setDecisao('em_analise');
         }
-    }, [reserva.horarios, reserva.situacao]);
+    }, [slotsSelecao]);
+
+    // Efeito para definir o motivo inicial (conflito ou justificativas)
+    useEffect(() => {
+        const justificativasUnicas = Array.from(new Set(reserva.horarios.map(h => h.justificativa).filter(j => !!j && j.trim() !== '')));
+        const conflitos = initialSlots.filter(slot => slot.isLocked === true);
+
+        if (conflitos.length > 0) {
+            const motivoConflito = conflitos
+                .map(slot => `Horário ${format(slot.data, 'dd/MM/yyyy')} às ${slot.horario_inicio.substring(0, 5)} indeferido por já haver reserva aprovada para do dia e horario.`)
+                .join('\n');
+            setMotivo(motivoConflito);
+            return;
+        }
+
+        if (justificativasUnicas.length === 1) {
+            setMotivo(justificativasUnicas[0]!);
+        } else if (justificativasUnicas.length > 1) {
+            setMotivo(justificativasUnicas.map(j => `- ${j}`).join('\n'));
+        }
+    }, [initialSlots, reserva.horarios]);
+
+    // Efeitos para sincronizar o estado com o formulário do Inertia
+    useEffect(() => { setData(prevData => ({ ...prevData, situacao: verificarStatusReserva(slotsSelecao) })); }, [slotsSelecao, setData]);
+
 
     useEffect(() => {
-        setData('situacao', decisao);
-    }, [decisao, setData]);
+        const horariosAvaliados = slotsSelecao.filter(slot => {
+            return reserva.horarios.some(horario => `${horario.data}|${horario.horario_inicio}` === slot.id);
+        });
+        setData((prevData) => ({
+            ...prevData,
+            horarios_avaliados: horariosAvaliados,
+        }));
+    }, [slotsSelecao, setData, reserva.horarios]);
 
-    useEffect(() => {
-        setData('motivo', motivo);
-    }, [motivo, setData]);
-    const getSituacaoIcon = (situacao: string) => {
-        switch (situacao) {
-            case 'deferida':
-                return <CheckCircle className="h-4 w-4 text-green-600" />;
-            case 'indeferida':
-                return <XCircle className="h-4 w-4 text-red-600" />;
-            default:
-                return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-        }
-    };
-    function handleSubmit(e: React.FormEvent) {
+    useEffect(() => { setData(prevData => ({ ...prevData, motivo: motivo })) }, [motivo, setData]);
+    useEffect(() => { setData(prevData => ({ ...prevData, observacao: observacao })) }, [observacao, setData]);
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!decisao) return;
-        if (decisao === 'indeferida' && !motivo.trim()) {
-            alert('Motivo é obrigatório para reservas indeferidas');
+        if (data.situacao === 'indeferida' && !data.motivo.trim()) {
+            toast.error('Motivo é obrigatório para reservas indeferidas');
             return;
         }
         setIsSubmitting(true);
-
         patch(route('gestor.reservas.update', reserva.id), {
             onSuccess: () => {
+                toast.success('Reserva avaliada com sucesso!');
                 reset();
             },
-            onError: (error) => {
-                const firstError = Object.values(error)[0];
-                toast.error(firstError || 'Ocorreu um erro de validação. Verifique os campos');
+            onError: (errors) => {
+                const firstError = Object.values(errors)[0];
+                toast.error(firstError || 'Ocorreu um erro de validação.');
             },
+            onFinish: () => setIsSubmitting(false),
         });
-        setIsSubmitting(false);
+    };
+
+    const handleDecisaoChange = (novaDecisao: SituacaoReserva) => {
+        setDecisao(novaDecisao);
+        handleDecisaoGlobalChange(novaDecisao);
     }
+
+    const situacaoHeader = verificarStatusReserva(slotsSelecao);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -101,131 +177,61 @@ export default function AvaliarReserva() {
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900">Avaliar Reserva</h1>
                                 <p className="mt-1 text-gray-600">
-                                    Espaço: {reserva.horarios[0].agenda?.espaco?.nome} / {reserva.horarios[0].agenda?.espaco?.andar?.nome}/{' '}
-                                    {reserva.horarios[0].agenda?.espaco?.andar?.modulo?.nome} / {getTurnoText(reserva.horarios[0].agenda!.turno)}{' '}
+                                    Espaço: {reserva.horarios[0].agenda?.espaco?.nome} / {reserva.horarios[0].agenda?.espaco?.andar?.nome}
                                 </p>
                             </div>
-                            <Badge className={`${getStatusReservaColor(reserva.situacao)} flex items-center gap-1`}>
-                                {getSituacaoIcon(reserva.situacao)}
-                                {getStatusReservaText(reserva.situacao)}
+                            <Badge className={`${getStatusReservaColor(situacaoHeader)} flex items-center gap-1`}>
+                                {getSituacaoIcon(situacaoHeader)}
+                                {getStatusReservaText(situacaoHeader)}
                             </Badge>
                         </div>
 
                         {/* Informações da Reserva */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <FileText className="h-5 w-5" />
-                                    {reserva.titulo}
-                                </CardTitle>
-                                <CardDescription className="flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    Solicitado por: {reserva.user?.name}
-                                </CardDescription>
+                                <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />{reserva.titulo}</CardTitle>
+                                <CardDescription className="flex items-center gap-2"><User className="h-4 w-4" />Solicitado por: {reserva.user?.name}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
                                     <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{reserva.descricao}</p>
                                 </div>
-
                                 <Separator />
-
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <div className="flex items-center gap-2">
-                                        <CalendarDays className="h-4 w-4 text-gray-500" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Período</p>
-                                            <p className="font-medium">
-                                                {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
-                                            </p>
-                                        </div>
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays className="h-4 w-4 text-gray-500" />
+                                    <div>
+                                        <p className="text-sm text-gray-500">Período</p>
+                                        <p className="font-medium">{formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}</p>
                                     </div>
                                 </div>
-
                                 <Separator />
-
                                 <div>
-                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
-                                        <Clock className="h-4 w-4" />
-                                        Horários Solicitados
-                                    </h4>
-                                    <div className="grid gap-2">
-                                        {reserva.horarios.map((horario) => {
-                                            const dia = new Date(horario.data);
-                                            return (
-                                                <div key={horario.id} className="flex items-center justify-between rounded-lg bg-blue-50 p-3">
-                                                    <span className="font-medium text-blue-900">{diasSemanaParser[dia.getDay()]}</span>
-                                                    <span className="text-blue-700">
-                                                        {horario.horario_inicio} às {horario.horario_fim}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
+                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900"><Clock className="h-4 w-4" />Horários Solicitados</h4>
+                                    <CalendarReservationDetails
+                                        agendas={agendas}
+                                        semanaInicio={startOfWeek(semanaDaReserva, { weekStartsOn: 1 })}
+                                        diasSemana={diasDaSemana(semanaDaReserva, hoje)}
+                                        slotsSolicitados={slotsSelecao}
+                                        alternarSelecaoSlot={avaliarSlot}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* Avaliação */}
-                        <form onSubmit={handleSubmit}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Avaliação da Reserva</CardTitle>
-                                    <CardDescription>Defina se a reserva será deferida ou indeferida</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div>
-                                        <Label className="text-base font-medium">Decisão</Label>
-                                        <RadioGroup value={decisao} onValueChange={(value) => setDecisao(value as 'deferida' | 'indeferida')}>
-                                            <div className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-green-50">
-                                                <RadioGroupItem value="deferida" id="deferida" />
-                                                <Label htmlFor="deferida" className="flex cursor-pointer items-center gap-2">
-                                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                                    Deferir Reserva
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-2 rounded-lg border p-3 hover:bg-red-50">
-                                                <RadioGroupItem value="indeferida" id="indeferida" />
-                                                <Label htmlFor="indeferida" className="flex cursor-pointer items-center gap-2">
-                                                    <XCircle className="h-4 w-4 text-red-600" />
-                                                    Indeferir Reserva
-                                                </Label>
-                                            </div>
-                                        </RadioGroup>
-                                    </div>
-
-                                    {decisao === 'indeferida' && (
-                                        <div className="space-y-2">
-                                            <Label htmlFor="motivo" className="text-base font-medium text-red-700">
-                                                Motivo do Indeferimento *
-                                            </Label>
-                                            <Textarea
-                                                id="motivo"
-                                                placeholder="Descreva o motivo pelo qual a reserva está sendo indeferida..."
-                                                value={motivo}
-                                                onChange={(e) => setMotivo(e.target.value)}
-                                                className="min-h-[100px] border-red-200 focus:border-red-500"
-                                            />
-                                            <p className="text-sm text-red-600">Este campo é obrigatório para reservas indeferidas</p>
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-3 pt-4">
-                                        <Button
-                                            onClick={handleSubmit}
-                                            disabled={!decisao || (decisao === 'indeferida' && !motivo.trim()) || isSubmitting}
-                                            className="flex-1"
-                                        >
-                                            {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
-                                        </Button>
-                                        <Button variant="outline" className="px-8">
-                                            Cancelar
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </form>
+                        {/* Formulário de Avaliação */}
+                        <EvaluationForm
+                            decisao={decisao}
+                            motivo={motivo}
+                            observacao={observacao}
+                            isSubmitting={isSubmitting}
+                            isRadioGroupDisabled={isRadioGroupDisabled}
+                            slotsSelecao={slotsSelecao}
+                            onDecisaoChange={handleDecisaoChange}
+                            onMotivoChange={setMotivo}
+                            onObservacaoChange={setObservacao}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             </div>

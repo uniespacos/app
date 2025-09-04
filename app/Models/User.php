@@ -66,4 +66,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Espaco::class, 'espaco_user', 'user_id', 'espaco_id');
     }
+
+    public function horariosAvaliados()
+    {
+        return $this->hasMany(Horario::class, 'user_id');
+    }
+    /**
+     * Define o canal de broadcast privado para as notificações do usuário.
+     * Isso garante que o nome do canal seja consistente em toda a aplicação.
+     *
+     * @return string
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'App.Models.User.' . $this->getKey();
+    }
 }

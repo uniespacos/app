@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Reserva;
+use App\Models\Unidade;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,44 +18,56 @@ class HomeController extends Controller
         $user = Auth::user();
         switch ($user->permission_type_id) {
             case 1: // Institucional
-                $users = User::all();
-                $espacos = Espaco::with(['agendas.horarios.reservas'])->get();
-                $reservas = Reserva::with(['horarios.agenda.espaco'])->get();
-                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('user', 'users', 'espacos', 'reservas'));
+                $reservas = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo'])->latest()->take(5)->get();
+                $espacosFavoritos = $user->favoritos->load('andar.modulo');
+                $user = Auth::user();
+                $users = User::latest()->take(5)->with(['agendas'])->get();
+                $espacos = Espaco::latest()->take(5)->with(['andar.modulo.unidade', 'agendas.user'])->get();
+                $estatisticasPainel = [
+                    'total_espacos' => Espaco::count(),
+                    'total_gestores' => User::where('permission_type_id', 2)->count(),
+                    'reservas_mes' => Reserva::whereMonth('created_at', now()->month)->count(),
+                ];
+                $gestores = User::where('permission_type_id', 2)->latest()->take(5)->get();
+                $unidades = Unidade::latest()->take(5)->with('modulos.andars.espacos')->get();
+                return Inertia::render('Dashboard/DashboardInstitucionalPage', compact('reservas', 'espacosFavoritos', 'user', 'users', 'gestores', 'espacos', 'unidades', 'estatisticasPainel'));
             case 2: // Gestor
-                $espacos = Espaco::whereHas('agendas', function ($query) use ($user) {
+                $reservas = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo'])->latest()->take(5)->get();
+                $espacosFavoritos = $user->favoritos->load('andar.modulo');
+                $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo'])->get();
+                $reservasPendentes = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
-                })->with(['agendas.horarios.reservas'])->get();
-                $reservas = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
+                })->where(function ($query) {
+                    $query->where('situacao', 'em_analise')
+                        ->orWhereHas('horarios', function ($subQuery) {
+                            $subQuery->where('situacao', 'em_analise');
+                        });
+                })->with(['horarios.agenda.espaco', 'user'])->latest()->take(5)->get();
+                $baseReservaUserStats = Reserva::whereHas('horarios.agenda', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
-                })->with(['horarios.agenda.espaco'])->get();
-                return Inertia::render('Dashboard/DashboardGestorPage', compact('user', 'espacos', 'reservas'));
+                })
+                ;
+
+                $statusDasReservas = [
+                    'pendentes' => (clone $baseReservaUserStats)->where('situacao', 'em_analise')->count(),
+                    'avaliadas_hoje' => (clone $baseReservaUserStats)->whereIn('situacao', ['deferida', 'parcialmente_deferida', 'indeferida'])->whereDate('updated_at', today())->count(),
+                    'total_espacos' => Espaco::whereHas('agendas', function ($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    })->count(),
+                ];
+                return Inertia::render('Dashboard/DashboardGestorPage', compact('user', 'reservas', 'espacosFavoritos', 'agendas', 'reservasPendentes', 'statusDasReservas'));
             default: // Usuario Comum
-                $baseUserReservasQuery = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco']);
-                $reservas = (clone $baseUserReservasQuery)->get();
+                $baseUserReservasQuery = Reserva::where('user_id', $user->id)->with(['horarios.agenda.espaco.andar.modulo']);
+                $reservas = (clone $baseUserReservasQuery)->latest()->take(5)->get();
                 $statusDasReservas = [
                     'em_analise' => (clone $baseUserReservasQuery)->where('situacao', 'em_analise')->count(),
                     'parcialmente_deferida' => (clone $baseUserReservasQuery)->where('situacao', 'parcialmente_deferida')->count(), // Novo status adicionado
-                    'deferida'   => (clone $baseUserReservasQuery)->where('situacao', 'deferida')->count(),
+                    'deferida' => (clone $baseUserReservasQuery)->where('situacao', 'deferida')->count(),
                     'indeferida' => (clone $baseUserReservasQuery)->where('situacao', 'indeferida')->count(),
                 ];
 
-                // 1. Primeiro, busca apenas o objeto da próxima reserva
-                $proximaReserva = (clone $baseUserReservasQuery)
-                    ->where('data_inicial', '>=', now())->whereIn('situacao', ['deferida', 'parcialmente_deferida'])
-                    ->orderBy('data_inicial', 'asc')
-                    ->first();
-                // 2. Se a reserva existir, carregue os relacionamentos nela
-
-                if ($proximaReserva) {
-                    $proximaReserva->load('horarios.agenda.espaco');
-                }
-                // 3. Agora você pode acessar o espaço da mesma forma
-                $espacoDaProximaReserva = null;
-                if ($proximaReserva && $proximaReserva->horarios->isNotEmpty()) {
-                    $espacoDaProximaReserva = $proximaReserva->horarios->first()->agenda->espaco;
-                }
-                return Inertia::render('Dashboard/DashboardUsuarioPage', compact('user', 'proximaReserva', 'statusDasReservas', 'reservas', 'espacoDaProximaReserva'));
+                $espacosFavoritos = $user->favoritos->load('andar.modulo');
+                return Inertia::render('Dashboard/DashboardUsuarioPage', compact('user', 'espacosFavoritos', 'statusDasReservas', 'reservas'));
         }
     }
 }

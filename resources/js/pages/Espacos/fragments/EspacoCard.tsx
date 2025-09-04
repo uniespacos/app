@@ -1,10 +1,17 @@
 import espacoImage from '@/assets/espaco.png';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { getPrimeirosDoisNomes, getTurnoText } from '@/lib/utils';
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
-import { Calendar, Edit, Heart, Home, Users } from 'lucide-react';
+import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 
 type CardEspacoProps = {
@@ -14,6 +21,7 @@ type CardEspacoProps = {
     handleSolicitarReserva?: (espacoId: string) => void;
     handleEditarEspaco?: (espacoId: string) => void;
     handleExcluirEspaco?: (espacoId: string) => void;
+    showFavoritar?: boolean; // Se deve mostrar o botão de favoritar
 };
 
 export default function EspacoCard({
@@ -23,12 +31,9 @@ export default function EspacoCard({
     handleSolicitarReserva,
     handleEditarEspaco,
     handleExcluirEspaco,
+    showFavoritar = true,
 }: CardEspacoProps) {
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
-    // Helper para formatar a localização
-    const formatarLocalizacao = (espaco: Espaco): string => {
-        return `${espaco.andar?.modulo?.unidade?.nome} > ${espaco.andar?.modulo?.nome} > ${espaco?.andar?.nome}`;
-    };
     const [processing, setProcessing] = useState(false);
 
     const handleFavoritarEspaco = () => {
@@ -65,73 +70,98 @@ export default function EspacoCard({
             );
         }
     };
+    const imageSources = (espaco.imagens && espaco.imagens.length > 0)
+        ? espaco.imagens.map(img => `/storage/${img}`) // Assumindo que '/storage/' é o caminho correto
+        : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
+
     return (
-        <Card className="overflow-hidden">
-            <CardHeader className="relative p-0">
-                {/* Adicione 'relative' aqui para posicionar o botão */}
-                <img
-                    src={espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage}
-                    alt={espaco.nome}
-                    className="h-40 w-full object-cover" // Use object-cover para melhor ajuste
-                />
-                <button
+        // Adicionado 'flex flex-col' para que o conteúdo possa crescer e o rodapé ficar alinhado na base
+        <Card className="flex flex-col overflow-hidden h-full">
+            {/* --- Seção da Imagem/Carrossel --- */}
+            {/* O container da imagem agora é um 'div' separado com posicionamento relativo */}
+            <div className="relative">
+                <Carousel className="w-full">
+                    <CarouselContent>
+                        {imageSources.map((src, index) => (
+                            <CarouselItem key={index}>
+                                <div className="aspect-video"> {/* Proporção 16:9 para consistência */}
+                                    <img
+                                        src={src}
+                                        alt={`Imagem ${index + 1} de ${espaco.nome}`}
+                                        className="h-full w-full object-cover"
+                                        onError={(e) => { e.currentTarget.src = espacoImage; }} // Fallback para imagem quebrada
+                                    />
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    {/* Mostra os botões de navegação apenas se houver mais de uma imagem */}
+                    {imageSources.length > 1 && (
+                        <>
+                            <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2" />
+                            <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2" />
+                        </>
+                    )}
+                </Carousel>
+
+                {/* Botão de Favoritar posicionado sobre a imagem */}
+                {showFavoritar && <button
                     onClick={handleFavoritarEspaco}
-                    disabled={processing} // Desabilita o botão enquanto processa
-                    // Posiciona o botão no canto superior direito da imagem
-                    className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-colors duration-200 ${isFavorited ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-700 hover:bg-gray-100'} ${processing ? 'cursor-not-allowed opacity-70' : ''} `}
+                    disabled={processing}
+                    className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-all duration-200 ${isFavorited ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-700 hover:bg-gray-100'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
                     title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
                 >
-                    <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current text-white' : 'text-gray-500'}`} />
-                </button>
+                    <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
+                </button>}
+            </div>
+
+            {/* O CardHeader agora contém apenas o título, como é o padrão */}
+            <CardHeader>
+                <CardTitle className="text-xl truncate" title={espaco.nome}>
+                    {espaco.nome}
+                </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-                <div className="mb-2 flex items-start justify-between">
-                    <CardTitle className="text-xl">Espaço: {espaco.nome}</CardTitle>
-                </div>
 
-                <div className="espaco-y-2 mt-4">
-                    <div className="flex items-center gap-2">
-                        <Users className="text-muted-foreground h-4 w-4" />
-                        <span>Capacidade: {espaco.capacidade_pessoas} pessoas</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Home className="text-muted-foreground h-4 w-4" />
-                        <span>{formatarLocalizacao(espaco)}</span>
-                    </div>
-
-                    <div className="space-y-2">
-                        <span className="text-muted-foreground">Gestores por turno:</span>
-                        <div className="grid grid-cols-3 gap-4 rounded-lg border p-4">
-                            {espaco.agendas?.map((agenda) => (
-                                <div key={agenda.id} className="flex flex-col items-center text-center">
-                                    <span className="text-muted-foreground text-sm font-semibold">{getTurnoText(agenda.turno)}</span>
-                                    <span className="mt-1 text-sm">{getPrimeirosDoisNomes(agenda.user?.name)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+            {/* Adicionado 'flex-grow' para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
+            <CardContent className="flex-grow">
+                <div className="grid grid-cols-2 gap-2">
+                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                        <Building2 className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{espaco.andar?.modulo?.nome ?? 'N/A'}</span>
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{espaco.andar?.nome ?? 'N/A'}</span>
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{espaco.andar?.modulo?.unidade?.nome ?? 'N/A'}</span>
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                        <Users className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{espaco.capacidade_pessoas} pessoas</span>
+                    </Badge>
                 </div>
             </CardContent>
 
-            <CardFooter className="flex flex-wrap gap-2 pt-0">
+            {/* O rodapé se alinha na parte inferior do card */}
+            <CardFooter className="flex flex-wrap gap-2 pt-4">
                 {isGerenciarEspacos && userType === 1 ? (
                     <>
-                        <Button variant="outline" size="sm" onClick={() => {}}>
-                            <Edit className="mr-2 h-4 w-4" />
+                        <Button variant="outline" size="sm" onClick={() => { /* Lógica para ver detalhes */ }}>
                             Ver Detalhes
                         </Button>
-                        <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(espaco.id.toString())}>
+                        <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Editar Espaço
+                            Editar
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(espaco.id.toString())}>
-                            <Edit className="mr-2 h-4 w-4" />
+                        <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Excluir
                         </Button>
                     </>
                 ) : (
-                    <Button variant="default" size="sm" onClick={() => handleSolicitarReserva?.(espaco.id.toString())}>
+                    <Button className="w-full" variant="default" size="sm" onClick={() => handleSolicitarReserva?.(String(espaco.id))}>
                         <Calendar className="mr-2 h-4 w-4" />
                         Ver agenda
                     </Button>
