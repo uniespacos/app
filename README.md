@@ -165,7 +165,7 @@ A imagem de produção está configurada para ter todos os arquivos do projeto d
 
 1. Para garantir a segurança vamos e integridade dos dados vamos fazer o backup do banco de dados.
 ```bash
-  docker exec -it uniespacos-lmp-postgres-1 pg_dump -U uniespacos uniespacos > backup.sql
+  docker exec -it app-postgres-1 pg_dump -U uniespacos uniespacos > backup.sql
 ```
 
 2. Para não haver conflitos, vamos derrubar  os containers.
@@ -174,14 +174,14 @@ A imagem de produção está configurada para ter todos os arquivos do projeto d
 ```
 
 3. Agora vamos listar os volumes do docker e pegar o nome do volume referente ao public/assets.
-obs.: Volume vai ser `uniespacos-lmp_uniespacos-public-assets`. Garanta que está excluindo exatamente esse.
+obs.: Volume vai ser `app_uniespacos-public-assets`. Garanta que está excluindo exatamente esse.
 ```bash
   docker volume ls
 ```
 
 4. Excluir o volume referente ao public assets compartilhados pelo web e php-fpm
 ```bash
-  docker volume rm uniespacos-lmp_uniespacos-public-assets
+  docker volume rm app_uniespacos-public-assets
 ```
 
 5. Agora basta rodar o comando de subir o container rebuildando a imagem
@@ -193,7 +193,7 @@ obs.: Volume vai ser `uniespacos-lmp_uniespacos-public-assets`. Garanta que est�
 
 7. Deu problema e excluiu o banco? Faça o rollback atraves do backup gerado no inicio.
 ```bash
-  docker exec -i uniespacos-lmp-postgres-1 psql -U uniespacos uniespacos < backup.sql
+  docker exec -i app-postgres-1 psql -U uniespacos uniespacos < backup.sql
 ```
 
 
