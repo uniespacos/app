@@ -23,4 +23,12 @@ export default defineConfig({
         },
         dedupe: ['@inertiajs/react']
     },
+    // Ambiente de desenvolvimento
+    server: {
+        host: '0.0.0.0', // Escuta em todas as interfaces de rede
+        port: 5173,      // A porta padrão do Vite
+        hmr: {
+            host: 'localhost', // O navegador se conectará ao HMR via localhost
+        }
+    }
 });
