@@ -48,7 +48,7 @@ export default function Dashboard() {
                     <div>
                         <h1 className="text-3xl font-bold">Olá, {user.name}!</h1>
                         <p className="text-muted-foreground">
-                            {user.setor ? `${user.setor.nome} (${user.setor.sigla})` : "Bem-vindo ao UESB Reservas!"}
+                            {user.setor ? `${user.setor.nome} (${user.setor.sigla})` : "Bem-vindo ao UniEspaços!"}
                         </p>
                     </div>
                     <Button className="w-fit" onClick={() => router.get(route('espacos.index'))}>

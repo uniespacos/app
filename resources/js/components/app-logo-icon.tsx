@@ -1,8 +1,7 @@
-import { CalendarCheck2Icon } from 'lucide-react';
-import { SVGAttributes } from 'react';
+import { HTMLAttributes, SVGAttributes } from 'react';
 
-export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
+export default function AppLogoIcon(props: SVGAttributes<SVGElement> & HTMLAttributes<HTMLElement>) {
     return (
-        <CalendarCheck2Icon {...props} />
+        <img {...props} src='/_img/icon_logo.svg' />
     );
 }

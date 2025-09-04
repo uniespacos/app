@@ -77,7 +77,7 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                             <h1 className="text-3xl font-bold">Painel Institucional</h1>
-                            <p className="text-muted-foreground">Olá, {user.name} bem vindo ao UESB Reservas</p>
+                            <p className="text-muted-foreground">Olá, {user.name} bem vindo ao UniEspaços</p>
                         </div>
                         <div className="flex gap-2">
                             <Button onClick={() => router.get(route('institucional.espacos.create'))}>
