@@ -112,6 +112,7 @@ docker compose -f compose.dev.yml up -d
 ```bash
 docker compose -f compose.dev.yml exec workspace bash
 composer install
+php artisan storage:link
 php artisan migrate --seed
 npm install
 npm run dev
