@@ -25,7 +25,6 @@ class UpdateEspacoRequest extends FormRequest
      */
     public function rules(): array
     {
-        dd($this);
         return [
             'nome' => [
                 'required',
