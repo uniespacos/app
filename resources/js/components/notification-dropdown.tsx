@@ -61,10 +61,8 @@ export function NotificationDropdown() {
     useEffect(() => {
         if (user && window.Echo) {
             const channel = window.Echo.private(`App.Models.User.${user.id}`);
-            console.log('[ECHO] Conectando ao canal privado:', `App.Models.User.${user.id}`);
             channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
                 // Linha essencial para debug: veja exatamente o que está chegando!
-                console.log('[ECHO] Nova notificação recebida:', notification);
 
                 // 1. Mostra o toast com a propriedade correta (ex: título)
                 toast.success(notification.titulo);
