@@ -65,7 +65,6 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
 
     const handleDelegarGestor = () => {
         // Implementar lógica de delegação
-        console.log("Delegando gestor:", selectedGestor, "para turno:", selectedTurno, "do espaço:", selectedEspaco?.id)
     }
 
     return (
