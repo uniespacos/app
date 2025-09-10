@@ -13,7 +13,11 @@ type AgendaCalendarioProps = {
 };
 
 export default function AgendaCalendario({ semanaInicio, diasSemana, agendas, isSlotSelecionado, alternarSelecaoSlot }: AgendaCalendarioProps) {
-
+    // Ordena as agendas com base no nome do turno, manha primeiro, tarde depois noite
+    agendas.sort((a, b) => {
+        const ordemTurnos = ['manha', 'tarde', 'noite'];
+        return ordemTurnos.indexOf(a.turno) - ordemTurnos.indexOf(b.turno);
+    });
     return (
         <Card className="p-0">
             <ScrollArea className="">
