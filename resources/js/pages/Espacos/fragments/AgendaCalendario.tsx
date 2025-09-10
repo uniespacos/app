@@ -31,14 +31,16 @@ export default function AgendaCalendario({ semanaInicio, diasSemana, agendas, is
                         ))}
                     </div>
                     {agendas.map((agenda) => {
-                        return (<CalendarShiftSection
-                            key={agenda.turno}
-                            titulo={agenda.turno}
-                            diasSemana={diasSemana}
-                            isSlotSelecionado={isSlotSelecionado}
-                            alternarSelecaoSlot={alternarSelecaoSlot}
-                            agenda={agenda}
-                            semanaInicio={semanaInicio} />);
+                        if (agenda.user)
+                            return (<CalendarShiftSection
+                                key={agenda.turno}
+                                titulo={agenda.turno}
+                                diasSemana={diasSemana}
+                                isSlotSelecionado={isSlotSelecionado}
+                                alternarSelecaoSlot={alternarSelecaoSlot}
+                                agenda={agenda}
+                                semanaInicio={semanaInicio} />);
+                        return null
                     })}
                 </div>
             </ScrollArea>
