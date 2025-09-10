@@ -2,7 +2,7 @@ import DeleteItem from '@/components/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDate, getStatusReservaColor, getStatusReservaText, getTurnoText } from '@/lib/utils';
+import { formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { CheckCircle, Clock, Edit, XCircle, XSquare } from 'lucide-react';
@@ -141,9 +141,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                     <TableHeader>
                         <TableRow>
                             <TableHead>Título</TableHead>
-                            <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="hidden md:table-cell">Local</TableHead>
-                            <TableHead className="hidden lg:table-cell">Data início</TableHead>
+                            <TableHead className="hidden lg:table-cell">Periodo</TableHead>
+                            <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -160,21 +160,21 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                         </p>
                                     </div>
                                 </TableCell>
+
+                                <TableCell className="hidden md:table-cell">
+                                    <div>
+                                        <p>
+                                            {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
+                                        </p>
+                                    </div>
+                                </TableCell>
+
+                                <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}</TableCell>
                                 <TableCell className="hidden md:table-cell">
                                     <div>
                                         <SituacaoBadge situacao={reserva.situacao} />
                                     </div>
                                 </TableCell>
-                                <TableCell className="hidden md:table-cell">
-                                    <div>
-                                        <p>
-                                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '} /
-                                            {reserva.horarios[0]?.agenda!.turno ? getTurnoText(reserva.horarios[0].agenda?.turno) : null}
-                                        </p>
-                                    </div>
-                                </TableCell>
-
-                                <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
                                         <ReservaDetalhes
