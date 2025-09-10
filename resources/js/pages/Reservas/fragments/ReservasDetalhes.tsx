@@ -47,8 +47,8 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     return (
         <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
-            <DialogTrigger>
-                <Button variant="link" className="w-full">
+            <DialogTrigger asChild >
+                <Button variant="outline">
                     <FileText className="mr-2 h-4 w-4" />
                     Detalhes
                 </Button>

@@ -53,13 +53,13 @@ class InstitucionalEspacoController extends Controller
             ->with(['agendas', 'setor'])
             ->get();
         return Inertia::render('Administrativo/Espacos/GerenciarEspacos', [
-            'espacos' =>  Espaco::whereHas(
+            'espacos' => Espaco::whereHas(
                 'andar.modulo.unidade.instituicao',
                 fn($q) => $q->where('instituicao_id', $instituicao_id)
             )->with([
-                'andar.modulo.unidade.instituicao',
-                'agendas.user'
-            ])->get(), // Agora é um objeto paginador
+                        'andar.modulo.unidade.instituicao',
+                        'agendas.user'
+                    ])->get(), // Agora é um objeto paginador
             'andares' => $andares, // Ainda precisa de todos para popular os selects
             'modulos' => $modulos,
             'unidades' => $unidades,
@@ -104,7 +104,7 @@ class InstitucionalEspacoController extends Controller
                         $storedImagePaths[] = $path;
 
                         // Corrigido: usa o dado validado 'main_image_index'
-                        if (isset($validated['main_image_index']) && (int)$validated['main_image_index'] === $index) {
+                        if (isset($validated['main_image_index']) && (int) $validated['main_image_index'] === $index) {
                             $mainImagePath = $path;
                         }
                     }
@@ -170,7 +170,8 @@ class InstitucionalEspacoController extends Controller
                         $user_name = User::find($reserva->user_id);
                         array_push($horarios_reservados[$agenda->turno], ['horario' => $horario, 'autor' => $user_name->name]);
                     }
-                };
+                }
+                ;
             }
             if (count($gestores_espaco) <= 0) {
                 throw new Exception();
@@ -250,11 +251,12 @@ class InstitucionalEspacoController extends Controller
                 ]);
             });
             foreach ($espaco->agendas as $agenda) {
-                $agenda->user->notify(new NotificationModel(
-                    'Gestão de Espaços',
-                    'O espaço ' . $espaco->nome . ' foi atualizado.',
-                    route('espacos.show', $espaco->id)
-                ));
+                if ($agenda->user)
+                    $agenda->user->notify(new NotificationModel(
+                        'Gestão de Espaços',
+                        'O espaço ' . $espaco->nome . ' foi atualizado.',
+                        route('espacos.show', $espaco->id)
+                    ));
             }
 
             return redirect()->route('institucional.espacos.index')->with('success', 'Espaço atualizado com sucesso!');
@@ -276,7 +278,7 @@ class InstitucionalEspacoController extends Controller
         $user = Auth::user(); // Obtém o usuário logado
 
         // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
         try {

@@ -354,7 +354,7 @@ class ReservaController extends Controller
      */
     public function show(Reserva $reserva)
     {
-
+        return redirect()->route('reservas.index', ['reserva' => $reserva->id]);
     }
 
     /**
