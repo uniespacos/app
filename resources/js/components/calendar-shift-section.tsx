@@ -54,6 +54,14 @@ export default function CalendarShiftSection({
         }
         return map;
     }, [slotsSolicitados]);
+
+    // Horários simulados para teste
+    const horariosMockados = useCallback(() => ({
+        manha: ['07:30 - 08:20', '08:20 - 09:10', '09:10 - 10:00', '10:10 - 11:00', '11:00 - 11:50', '11:50 - 12:40'],
+        tarde: ['13:00 - 13:50', '13:50 - 14:40', '14:40 - 15:30', '15:40 - 16:30', '16:30 - 17:20'],
+        noite: ['18:00 - 18:50', '18:50 - 19:40', '19:40 - 20:30', '20:40 - 21:30', '21:30 - 22:20'],
+    }), []);
+
     const gerarSlotsParaSemana = useCallback((semanaInicio: Date) => {
         const gestor: AgendaGestoresPorTurnoType = {
             nome: agenda.user?.name ?? 'Indefinido',
@@ -62,18 +70,29 @@ export default function CalendarShiftSection({
             agenda_id: agenda.id,
         };
         const slotsGerados: SlotCalendario[] = [];
+
+        // Obtém os slots definidos para o turno da agenda, usando os dados mockados
+        // const horariosDoTurno = agenda.horarios_por_turno[agenda.turno]; // Linha original
+        const horariosDoTurno = horariosMockados()[agenda.turno];
+
+
+        if (!horariosDoTurno) {
+            // Retorna um array vazio se não houver horários definidos para este turno
+            return [];
+        }
+
         for (let diaOffset = 0; diaOffset < 7; diaOffset++) {
             const diaAtual = addDays(semanaInicio, diaOffset);
             const diaFormatado = format(diaAtual, 'yyyy-MM-dd');
-            for (let hora = 7; hora < 22; hora++) {
-                const turno = identificarTurno(hora);
-                if (turno != agenda.turno) continue; // Verifica se o turno do slot corresponde ao turno da agenda
-                const inicio = `${String(hora).padStart(2, '0')}:00:00`;
-                const chave = `${diaFormatado}|${inicio}`;
+
+            for (const slotTime of horariosDoTurno) {
+                const [horario_inicio_str, horario_fim_str] = slotTime.split(' - ').map(s => s.trim() + ':00'); // Garante o formato HH:mm:ss
+
+                const chave = `${diaFormatado}|${horario_inicio_str}`;
                 const horarioSolicitado = mapaSlotsSolicitados.get(chave);
                 if (horarioSolicitado) {
                     slotsGerados.push(horarioSolicitado);
-                    continue; // Pula para a próxima iteração do loop
+                    continue;
                 }
 
                 const horarioReservado = horariosReservadosMap.get(chave);
@@ -82,15 +101,15 @@ export default function CalendarShiftSection({
                         id: chave,
                         status: 'reservado',
                         data: diaAtual,
-                        horario_inicio: inicio,
-                        horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
+                        horario_inicio: horario_inicio_str,
+                        horario_fim: horario_fim_str,
                         dadosReserva: {
                             horarioDB: horarioReservado.horario,
                             autor: horarioReservado.autor,
                             reserva_titulo: horarioReservado.reserva_titulo,
                         },
                     });
-                    continue; // Pula para a próxima iteração do loop
+                    continue;
                 }
 
                 if (gestor) {
@@ -98,38 +117,39 @@ export default function CalendarShiftSection({
                         id: chave,
                         status: 'livre',
                         data: diaAtual,
-                        horario_inicio: inicio,
-                        horario_fim: `${String(hora).padStart(2, '0')}:50:00`,
+                        horario_inicio: horario_inicio_str,
+                        horario_fim: horario_fim_str,
                         agenda_id: gestor.agenda_id,
                     });
                 }
             }
         }
         return slotsGerados;
-    }, [agenda.id, agenda.turno, agenda.user?.email, agenda.user?.name, agenda.user?.setor?.nome, horariosReservadosMap, mapaSlotsSolicitados]);
+    }, [agenda.id, agenda.turno, agenda.user?.email, agenda.user?.name, agenda.user?.setor?.nome, horariosMockados, horariosReservadosMap, mapaSlotsSolicitados]);
     const todosSlots = useMemo(() => {
         return gerarSlotsParaSemana(semanaInicio);
     }, [gerarSlotsParaSemana, semanaInicio]);
     const slotsDoTurno = useMemo(() => {
-        // Primeiro, agrupa todos os slots por hora (07:00, 08:00, etc.), como na lógica original.
-        const slotsPorHora: Record<string, SlotCalendario[]> = {};
-        for (let hora = 7; hora < 22; hora++) {
-            if (titulo !== identificarTurno(hora)) continue; // Verifica se o turno do slot corresponde ao turno da agenda
-            const horaFormatada = `${String(hora).padStart(2, '0')}:00`;
-            slotsPorHora[horaFormatada] = todosSlots.filter((slot) => slot.horario_inicio.startsWith(horaFormatada));
-        }
-        // Depois, distribui essas horas nos seus respectivos turnos.
         const resultado: AgendaSlotsDoTurnoType = {};
 
-        Object.entries(slotsPorHora).forEach(([hora, slotsDaHora]) => {
+        // Use os horários mockados aqui também
+        // const horariosDoTurno = agenda.horarios_por_turno[titulo.toLowerCase()]; // Linha original
+        const horariosDoTurno = horariosMockados()[titulo.toLowerCase() as 'manha' | 'tarde' | 'noite'];
+
+        if (!horariosDoTurno) {
+            return {};
+        }
+
+        for (const slotTime of horariosDoTurno) {
+            const [horario_inicio] = slotTime.split(' - ').map(s => s.trim() + ':00');
+            const slotsDaHora = todosSlots.filter((slot) => slot.horario_inicio === horario_inicio);
             if (slotsDaHora.length > 0) {
-                // Só adiciona a linha se houver slots
-                resultado[hora] = slotsDaHora;
+                resultado[slotTime] = slotsDaHora;
             }
-        });
+        }
 
         return resultado;
-    }, [titulo, todosSlots]);
+    }, [horariosMockados, titulo, todosSlots]);
 
 
     return (
@@ -158,7 +178,7 @@ export default function CalendarShiftSection({
                     )}
                 >
                     <div className="text-muted-foreground border-r p-2 pr-3 text-right text-xs">
-                        {hora} - {hora.split(':')[0]}:50
+                        {hora}
                     </div>
                     {slots.map((slot) => (
                         <CalendarSlotCell
