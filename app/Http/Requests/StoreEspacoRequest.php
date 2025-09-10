@@ -13,8 +13,7 @@ class StoreEspacoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        //TODO: Implementar GATE AQUI
-        return true;
+        return auth()->user()->permission_type_id === 1; // Apenas administradores podem criar espaços
     }
 
     /**
