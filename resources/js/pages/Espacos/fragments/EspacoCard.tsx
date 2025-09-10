@@ -35,7 +35,7 @@ export default function EspacoCard({
 }: CardEspacoProps) {
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
     const [processing, setProcessing] = useState(false);
-
+    const modulo = espaco.andar?.modulo?.nome;
     const handleFavoritarEspaco = () => {
         setProcessing(true);
         if (isFavorited) {
@@ -124,10 +124,12 @@ export default function EspacoCard({
 
             {/* Adicionado 'flex-grow' para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
             <CardContent className="flex-grow">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
                     <Badge variant="outline" className="flex items-center gap-1.5 truncate">
                         <Building2 className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{espaco.andar?.modulo?.nome ?? 'N/A'}</span>
+                        <span className="truncate">
+                            {modulo && modulo.length > 30 ? `${modulo.substring(0, 15)} ...` : modulo ?? 'N/A'}
+                        </span>
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 truncate">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
@@ -135,7 +137,7 @@ export default function EspacoCard({
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 truncate">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{espaco.andar?.modulo?.unidade?.nome ?? 'N/A'}</span>
+                        <span className="truncate">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 truncate">
                         <Users className="h-4 w-4 flex-shrink-0" />
