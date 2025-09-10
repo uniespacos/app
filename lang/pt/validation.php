@@ -1,5 +1,3 @@
-Com certeza! Aqui está a tradução completa do arquivo de validação do Laravel para o português do Brasil.
-
 <?php
 
 return [
