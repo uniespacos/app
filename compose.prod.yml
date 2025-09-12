@@ -11,6 +11,7 @@ services:
             - "80:80"
             - "443:443"
         volumes:
+            - app_socket:/var/run
             - uniespacos-storage-production:/var/www/storage:ro
             - uniespacos-public-assets:/var/www/public/build:ro
         networks:
@@ -25,6 +26,7 @@ services:
             target: production # Use the 'production' stage in the Dockerfile 
         restart: unless-stopped
         volumes:
+            - app_socket:/var/run
             - uniespacos-public-assets:/var/www/public/build # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
             - uniespacos-storage-production:/var/www/storage # Mount the storage volume
         env_file:
@@ -63,7 +65,10 @@ services:
 networks:
     uniespacos-production:
 
+
 volumes:
+    app-socket-production:
+        driver: local
     postgres-data-production:
     uniespacos-storage-production:
     uniespacos-public-assets:

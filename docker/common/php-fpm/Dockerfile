@@ -102,6 +102,15 @@ COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
 # -----------------------------------------------------------
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+RUN echo "memory_limit = 512M" >> "$PHP_INI_DIR/php.ini"
+
+RUN sed -i 's/pm = ondemand/pm = dynamic/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;pm.max_children = 5/pm.max_children = 50/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;pm.start_servers = 2/pm.start_servers = 10/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;pm.min_spare_servers = 1/pm.min_spare_servers = 5/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;pm.max_spare_servers = 3/pm.max_spare_servers = 20/' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm.sock/' /usr/local/etc/php-fpm.d/www.conf
+
 # Enable PHP-FPM status page by modifying zz-docker.conf with sed
 RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
 # Update the variables_order to include E (for ENV)
@@ -150,7 +159,7 @@ RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
     echo "xdebug.log_level=${XDEBUG_LOG_LEVEL}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     echo "xdebug.client_host=${XDEBUG_HOST}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ; \
     echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ; \
-fi
+    fi
 
 # Add ARGs for syncing permissions
 ARG UID=1000
@@ -158,12 +167,12 @@ ARG GID=1000
 
 # Create a new user with the specified UID and GID, reusing an existing group if GID exists
 RUN if getent group ${GID}; then \
-      group_name=$(getent group ${GID} | cut -d: -f1); \
-      useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
+    group_name=$(getent group ${GID} | cut -d: -f1); \
+    useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
     else \
-      groupadd -g ${GID} www && \
-      useradd -m -u ${UID} -g www -s /bin/bash www; \
-      group_name=www; \
+    groupadd -g ${GID} www && \
+    useradd -m -u ${UID} -g www -s /bin/bash www; \
+    group_name=www; \
     fi
 
 # Dynamically update php-fpm to use the new user and group
