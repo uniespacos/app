@@ -104,16 +104,11 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 RUN echo "memory_limit = 512M" >> "$PHP_INI_DIR/php.ini"
 
-RUN mkdir -p /var/www/socket && chown www-data:www-data /var/www/socket
-
-
-
 RUN sed -i 's/pm = ondemand/pm = dynamic/' /usr/local/etc/php-fpm.conf && \
     sed -i 's/;pm.max_children = 5/pm.max_children = 50/' /usr/local/etc/php-fpm.conf && \
     sed -i 's/;pm.start_servers = 2/pm.start_servers = 10/' /usr/local/etc/php-fpm.conf && \
     sed -i 's/;pm.min_spare_servers = 1/pm.min_spare_servers = 5/' /usr/local/etc/php-fpm.conf && \
     sed -i 's/;pm.max_spare_servers = 3/pm.max_spare_servers = 20/' /usr/local/etc/php-fpm.conf
-RUN sed -i 's/listen = 9000/listen = \/var\/www\/socket\/php-fpm.sock/' /usr/local/etc/php-fpm.conf
 
 # Enable PHP-FPM status page by modifying zz-docker.conf with sed
 RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
