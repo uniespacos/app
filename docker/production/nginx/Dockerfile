@@ -19,17 +19,27 @@ RUN npm install && npm run build
 # Stage 2: NGINX with HTTPS support
 FROM nginx:alpine
 
+RUN adduser -u 1000 -S -G www-data www-data
+
 # Copia certificado SSL e chave privada
-COPY ./docker/production/nginx/uesb2025fullchain.pem /etc/ssl/certs/uesb2025fullchain.pem
-COPY ./docker/production/nginx/uesb2025privkey.pem /etc/ssl/private/uesb2025privkey.pem
+#COPY ./docker/production/nginx/uesb2025fullchain.pem /etc/ssl/certs/uesb2025fullchain.pem
+#COPY ./docker/production/nginx/uesb2025privkey.pem /etc/ssl/private/uesb2025privkey.pem
 
 # Substitui a configuração padrão do NGINX com o nosso default.conf
-COPY ./docker/production/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/production/nginx/app.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/production/nginx/nginx.conf /etc/nginx/nginx.conf
+
+RUN touch /var/run/nginx.pid \
+    && chown -Rf www-data:www-data \
+    /var/run/nginx.pid \
+    /var/cache/nginx \
+    /var/log/nginx
 
 # Copia os assets gerados no builder
 COPY --from=builder /var/www/public /var/www/public
 
 WORKDIR /var/www/public
+USER www-data
 
 EXPOSE 80
 EXPOSE 443

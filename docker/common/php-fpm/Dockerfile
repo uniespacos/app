@@ -60,6 +60,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Stage 2: Production environment
 FROM php:8.2.29-fpm as production
 
+
 # Install only runtime libraries needed in production
 # libfcgi-bin and procps are required for the php-fpm-healthcheck script
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -104,14 +105,11 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 RUN echo "memory_limit = 512M" >> "$PHP_INI_DIR/php.ini"
 
-RUN sed -i 's/pm = ondemand/pm = dynamic/' /usr/local/etc/php-fpm.conf && \
-    sed -i 's/;pm.max_children = 5/pm.max_children = 50/' /usr/local/etc/php-fpm.conf && \
-    sed -i 's/;pm.start_servers = 2/pm.start_servers = 10/' /usr/local/etc/php-fpm.conf && \
-    sed -i 's/;pm.min_spare_servers = 1/pm.min_spare_servers = 5/' /usr/local/etc/php-fpm.conf && \
-    sed -i 's/;pm.max_spare_servers = 3/pm.max_spare_servers = 20/' /usr/local/etc/php-fpm.conf
+COPY ./docker/common/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+RUN rm /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Enable PHP-FPM status page by modifying zz-docker.conf with sed
-RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
+# RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
 # Update the variables_order to include E (for ENV)
 #RUN sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' "$PHP_INI_DIR/php.ini"
 
