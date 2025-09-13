@@ -61,6 +61,15 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 FROM php:8.2.29-fpm as production
 
 
+ARG UNAME=www-data
+ARG UGROUP=www-data
+ARG UID=1000
+ARG GID=1001
+
+RUN groupmod -g ${GID} ${UGROUP} && \
+    usermod -u ${UID} -g ${UGROUP} ${UNAME}
+
+
 # Install only runtime libraries needed in production
 # libfcgi-bin and procps are required for the php-fpm-healthcheck script
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -69,6 +78,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libfcgi-bin \
     procps \
+    gosu \ 
+    libfcgi-bin \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Adiciona o repositório do Node.js (estamos usando a versão 22.x LTS)
@@ -123,14 +134,14 @@ WORKDIR /var/www
 RUN chown -R www-data:www-data /var/www
 
 # Switch to the non-privileged user to run the application
-USER www-data
+#USER www-data
 
 # Change the default command to run the entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["php-fpm", "-F"]
 
 
 # Stage 3: Development image

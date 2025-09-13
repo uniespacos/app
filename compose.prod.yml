@@ -29,12 +29,14 @@ services:
             - socket:/socket # Volume for the PHP-FPM socket
             - uniespacos-public-assets:/var/www/public/build # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
             - uniespacos-storage-production:/var/www/storage # Mount the storage volume
+        environment:
+            FCGI_CONNECT: /socket/php-fpm.sock
         env_file:
             - .env
         networks:
             - uniespacos-production
         healthcheck:
-            test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
+            test: [ "CMD-SHELL", "gosu www-data php-fpm-healthcheck || exit 1" ]
             interval: 10s
             timeout: 5s
             retries: 3
@@ -68,6 +70,7 @@ networks:
 
 volumes:
     socket:
+        driver: local
     postgres-data-production:
     uniespacos-storage-production:
     uniespacos-public-assets:

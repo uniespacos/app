@@ -1,32 +1,25 @@
 #!/bin/sh
 set -e
 
-# Initialize storage directory if empty
-# -----------------------------------------------------------
-# If the storage directory is empty, copy the initial contents
-# and set the correct permissions.
-# -----------------------------------------------------------
+# Corrige permissões
+chown www-data:www-data /socket
+
+# Inicializa storage se estiver vazio
 if [ ! "$(ls -A /var/www/storage)" ]; then
   echo "Initializing storage directory..."
   cp -R /var/www/storage-init/. /var/www/storage
   chown -R www-data:www-data /var/www/storage
 fi
 
-# Remove storage-init directory
 rm -rf /var/www/storage-init
 
-# Run Laravel migrations
-# -----------------------------------------------------------
-# Ensure the database schema is up to date.
-# -----------------------------------------------------------
-php artisan migrate --force
+# Só roda migrations/config/cache se for o container principal
+if [ "$1" = "php-fpm" ]; then
+  echo "Running migrations and caching..."
+  php artisan migrate --force
+  php artisan config:cache
+  php artisan route:cache
+fi
 
-# Clear and cache configurations
-# -----------------------------------------------------------
-# Improves performance by caching config and routes.
-# -----------------------------------------------------------
-php artisan config:cache
-php artisan route:cache
-
-# Run the default command
+# Importante: mantém o processo do PHP-FPM no foreground
 exec "$@"
