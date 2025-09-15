@@ -10,6 +10,15 @@ use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    /**
+     * The model to policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Reserva::class => ReservaPolicy::class, // <-- ADICIONE ESTA LINHA
+    ];
     /**
      * Register any application services.
      */
