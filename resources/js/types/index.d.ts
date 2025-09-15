@@ -78,6 +78,16 @@ export interface BreadcrumbItem {
     href: string;
 }
 
+export type ValidationStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface ConflictInfo {
+    horario_checado_id: number;
+    conflito_reserva_id: number;
+    conflito_reserva_titulo: string;
+    conflito_user_name: string;
+}
+
+
 // =============================================================================
 // 2. TIPOS DA HIERARQUIA DE LOCALIZAÇÃO (MODELOS DO LARAVEL)
 // Estrutura física da instituição, em ordem hierárquica.
@@ -169,7 +179,15 @@ export interface Horario {
     reserva?: Reserva;
     situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
     justificativa?: string | null; // Justificativa opcional para indeferimento
-    user?: User
+    user?: User;
+    is_conflicted?: boolean;
+    conflict_details?: string;
+
+        // --- NOVOS CAMPOS VINDOS DO BACKEND ---
+    validation_status: ValidationStatus;
+    // O cache é um objeto onde a chave é o ID do horário (string) e o valor são os detalhes do conflito
+    conflict_cache: Record<string, ConflictInfo> | null;
+    cache_validated_at: string | null;
 }
 
 /**
@@ -236,6 +254,7 @@ export interface SlotCalendario {
         horarioDB: Horario; // O objeto Horario original do banco
         autor: string;
         reserva_titulo: string;
+        conflito?: string | null; // <-- ADICIONE ESTA LINHA
     };
     isLocked?: boolean;
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
