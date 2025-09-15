@@ -45,6 +45,7 @@ class ReservaController extends Controller
         // 3. Query principal para a lista de reservas (paginada)
         $reservas = Reserva::query()
             ->where('user_id', $user->id)
+            ->where('situacao', '!=', 'inativa')
             // Otimização: Só busca reservas que estejam ativas no período da semana
             ->where(function ($query) use ($inicioSemana, $fimSemana) {
                 $query->where('data_inicial', '<=', $fimSemana)
