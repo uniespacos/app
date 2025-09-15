@@ -39,6 +39,22 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
+    queue-worker:
+        build:
+            context: .
+            dockerfile: ./docker/common/php-fpm/Dockerfile
+            target: production
+        restart: unless-stopped
+        command: php artisan queue:work --verbose --tries=3 --timeout=90
+        volumes:
+            - uniespacos-storage-production:/var/www/storage
+        env_file:
+            - .env
+        networks:
+            - uniespacos-production
+        depends_on:
+            - postgres
+            - php-fpm
 
     postgres:
         image: postgres:16
