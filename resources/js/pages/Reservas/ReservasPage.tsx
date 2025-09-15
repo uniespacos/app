@@ -9,6 +9,7 @@ import { ReservasEmpty } from './fragments/ReservasEmpty';
 import { ReservasFilters } from './fragments/ReservasFilters';
 import { ReservasList } from './fragments/ReservasList';
 import { ReservasLoading } from './fragments/reservasLoading';
+import { format } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,16 +18,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function MinhasReservas({ reservas: paginator, filters, reservaToShow }: {
+export default function MinhasReservas({ reservas: paginator, filters, reservaToShow, semana }: {
     user: User;
     reservas: Paginator<Reserva>;
     filters: { search?: string; situacao?: string };
     reservaToShow?: Reserva;
+    semana: { referencia: string };
 }) {
     // 2. O estado dos filtros agora "mora" aqui, no componente pai
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedSituacao, setSelectedSituacao] = useState(filters.situacao || '');
-    const [data, setData] = useState<Date | undefined>(undefined);
+    const [data, setData] = useState<Date | undefined>(new Date(semana.referencia + 'T12:00:00'));
     const isInitialMount = useRef(true);
     // 3. Debounce para o campo de busca
     const [debouncedSearch] = useDebounce(searchTerm, 500);
@@ -38,9 +40,11 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
             isInitialMount.current = false;
             return;
         }
-        const params = {
+        const params: { search?: string; situacao?: string; semana?: string } = { // <-- Tipagem dos params
             search: debouncedSearch || undefined,
             situacao: selectedSituacao || undefined,
+            // Adiciona o parâmetro 'semana' à requisição!
+            semana: data ? format(data, 'yyyy-MM-dd') : undefined,
         };
 
         router.get(route('reservas.index'), params, {
@@ -48,7 +52,7 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
             preserveScroll: true,
             replace: true,
         });
-    }, [debouncedSearch, selectedSituacao]);
+    }, [data, debouncedSearch, selectedSituacao]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Minhas Reservas" />
@@ -72,7 +76,7 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
                             onDateChange={setData}
                         />
                         <Suspense fallback={<ReservasLoading />}>
-                            <ReservasList fallback={<ReservasEmpty />} paginator={paginator} isGestor={false} reservaToShow={reservaToShow} />
+                            <ReservasList fallback={<ReservasEmpty />} paginator={paginator} isGestor={false} reservaToShow={reservaToShow} routeName={"reservas.index"} />
                         </Suspense>
                     </div>
                 </div>

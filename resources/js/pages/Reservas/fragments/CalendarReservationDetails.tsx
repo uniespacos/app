@@ -5,14 +5,13 @@ import CalendarShiftSection from "@/components/calendar-shift-section";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type CalendarReservationDetailsProps = {
-    semanaInicio: Date;
     diasSemana: AgendaDiasSemanaType[];
     agendas: Agenda[];
     slotsSolicitados: SlotCalendario[]
     alternarSelecaoSlot?: (slot: SlotCalendario) => void;
 };
 
-export default function CalendarReservationDetails({ semanaInicio, diasSemana, agendas, slotsSolicitados, alternarSelecaoSlot }: CalendarReservationDetailsProps) {
+export default function CalendarReservationDetails({  diasSemana, agendas, slotsSolicitados, alternarSelecaoSlot }: CalendarReservationDetailsProps) {
     const alternarSelecaoSlotFn = (alternarSelecaoSlot || (() => { }));
     return (
         <Card className="p-0">
@@ -21,8 +20,9 @@ export default function CalendarReservationDetails({ semanaInicio, diasSemana, a
                     <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
                         <div className="text-muted-foreground  text-center text-sm font-medium"></div>
                         {diasSemana.map((dia) => (
-                            <div key={dia.valor} className={cn('border-l p-2 bg-gray-50 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}>
-                                <div>{dia.abreviado}</div>
+                          <div key={dia.valor} className={cn('border-l bg-gray-50 p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}>
+                                <div>{dia.abreviado.replace('.', '')}</div>
+                                <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
                             </div>
                         ))}
                     </div>
@@ -36,9 +36,7 @@ export default function CalendarReservationDetails({ semanaInicio, diasSemana, a
                             agenda={agenda}
                             diasSemana={diasSemana}
                             slotsSolicitados={slotsSolicitados}
-                            semanaInicio={semanaInicio}
                             alternarSelecaoSlot={alternarSelecaoSlotFn}
-
                         />);
                     })}
 
