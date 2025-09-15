@@ -139,7 +139,6 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     // Função para ABRIR o modal de detalhes
     // Ela faz uma requisição para buscar os dados completos da reserva
     const handleAbrirDetalhes = (reserva: Reserva) => {
-        console.log(routeName)
         router.get(route(routeName), {
             reserva: reserva.id,
             // Pede ao backend a semana inicial da reserva
