@@ -1,15 +1,7 @@
 import { Button } from '@/components/ui/button';
-import {
-    AgendaGestoresPorTurnoType,
-    Espaco,
-    OpcoesRecorrencia,
-    Reserva,
-    ReservaFormData,
-    SlotCalendario,
-    ValorOcorrenciaType,
-} from '@/types';
-import { useForm } from '@inertiajs/react';
-import { addDays, addMonths, addWeeks, format, parse, startOfWeek, subWeeks } from 'date-fns';
+import { Espaco, OpcoesRecorrencia, Reserva, ReservaFormData, SlotCalendario, ValorOcorrenciaType } from '@/types';
+import { router, useForm } from '@inertiajs/react'; // ALTERADO: Importar useForm
+import { addDays, addMonths, addWeeks, format, parse, parseISO, subWeeks } from 'date-fns';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import AgendaCalendario from './AgendaCalendario';
@@ -18,161 +10,173 @@ import AgendaEditModeAlert from './AgendaEditModeAlert';
 import AgendaHeader from './AgendaHeader';
 import AgendaNavegacao from './AgendaNavegacao';
 import { diasDaSemana } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 const opcoesRecorrencia: OpcoesRecorrencia[] = [
-    {
-        valor: 'unica',
-        label: 'Apenas esta semana',
-        descricao: 'A reserva será feita apenas para os dias selecionados nesta semana',
-        calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6),
-    },
-    {
-        valor: '15dias',
-        label: 'Próximos 15 dias',
-        descricao: 'A reserva será replicada pelos próximos 15 dias',
-        calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 14),
-    },
-    {
-        valor: '1mes',
-        label: '1 mês',
-        descricao: 'A reserva será replicada por 1 mês',
-        calcularDataFinal: (dataInicial: Date) => addMonths(dataInicial, 1),
-    },
-    {
-        valor: 'personalizado',
-        label: 'Período personalizado',
-        descricao: 'Defina um período personalizado para a recorrência',
-        calcularDataFinal: (dataInicial: Date) => dataInicial,
-    },
+    { valor: 'unica', label: 'Apenas esta semana', descricao: 'A reserva será feita apenas para os dias selecionados nesta semana', calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6) },
+    { valor: '15dias', label: 'Próximos 15 dias', descricao: 'A reserva será replicada pelos próximos 15 dias', calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 14) },
+    { valor: '1mes', label: '1 mês', descricao: 'A reserva será replicada por 1 mês', calcularDataFinal: (dataInicial: Date) => addMonths(dataInicial, 1) },
+    { valor: 'personalizado', label: 'Período personalizado', descricao: 'Defina um período personalizado para a recorrência', calcularDataFinal: (dataInicial: Date) => dataInicial },
 ];
-
-
 
 type AgendaEspacoProps = {
     isEditMode?: boolean;
     espaco: Espaco;
     reserva?: Reserva;
+    semana: { referencia: string }
 };
 
-export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: AgendaEspacoProps) {
+export default function AgendaEspaço({ isEditMode = false, espaco, reserva, semana }: AgendaEspacoProps) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [semanaVisivel, setSemanaVisivel] = useState(() => parseISO(semana.referencia));
+    useEffect(() => {
+        setSemanaVisivel(parseISO(semana.referencia));
+    }, [semana.referencia]);
     const { agendas } = espaco;
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
-    
-    const slotsIniciais = useMemo(
-        () =>
-            !isEditMode || !reserva?.horarios
-                ? []
-                : reserva.horarios.map(
-                    (horario) =>
-                        ({
-                            id: `${horario.data}|${horario.horario_inicio}`,
-                            status: 'selecionado',
-                            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                            horario_inicio: horario.horario_inicio,
-                            horario_fim: horario.horario_fim,
-                            agenda_id: horario.agenda?.id,
-                            dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
-                        }) as SlotCalendario,
-                ),
-        [isEditMode, reserva],
-    );
 
-    const [semanaAtual, setSemanaAtual] = useState(() => startOfWeek(slotsIniciais.length > 0 ? slotsIniciais[0].data : hoje, { weekStartsOn: 1 }));
+    // Gera a lista de slots selecionados inicialmente caso seja modo de edição
+    const slotsIniciais = useMemo(() => {
+        if (!isEditMode || !reserva?.horarios) return [];
+        return reserva.horarios.map((horario) => ({
+            id: `${horario.data}|${horario.horario_inicio}`,
+            status: 'selecionado',
+            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+            horario_inicio: horario.horario_inicio,
+            horario_fim: horario.horario_fim,
+            agenda_id: horario.agenda?.id,
+            dadosReserva: { horarioDB: horario, autor: reserva.user!.name, reserva_titulo: reserva.titulo },
+        }) as SlotCalendario);
+    }, [isEditMode, reserva]);
+
     const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(slotsIniciais);
-    const [dialogAberto, setDialogAberto] = useState(false);
-    const [recorrencia, setRecorrencia] = useState<ValorOcorrenciaType>(reserva?.recorrencia || 'unica');
 
-    const { data, setData, post, patch, reset, processing } = useForm<ReservaFormData>({
-        titulo: reserva?.titulo ?? '',
-        descricao: reserva?.descricao ?? '',
-        data_inicial: reserva?.data_inicial ? reserva.data_inicial : hoje,
-        data_final: reserva?.data_final ? reserva.data_final : addMonths(hoje, 1),
-        recorrencia: reserva?.recorrencia ?? 'unica',
-        horarios_solicitados: reserva?.horarios ?? [],
-    });
-
-    const { gestoresPorTurno } = useMemo(() => {
-        const gestores = new Map<string, AgendaGestoresPorTurnoType>();
-        agendas?.forEach((agenda) => {
-            if (agenda.user) {
-                gestores.set(agenda.turno, {
-                    nome: agenda.user.name,
-                    email: agenda.user.email,
-                    departamento: agenda.user.setor?.nome ?? 'N/I',
-                    agenda_id: agenda.id,
-                });
-            }
-        });
-        return { gestoresPorTurno: gestores };
-    }, [agendas]);
 
     useEffect(() => {
-        // Se não existir recorrecia
-        const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === recorrencia);
-        if (!opcaoRecorrencia || slotsSelecao.length === 0) return;
+        if (!reserva?.horarios) {
+            setSlotsSelecao([]); // Limpa a seleção se não houver horários
+            return;
+        }
+
+        // Mapeia os novos horários recebidos do backend para o formato de SlotCalendario
+        const novosSlots = reserva.horarios.map((horario) => ({
+            id: `${horario.data}|${horario.horario_inicio}`,
+            status: 'selecionado', // No modo de edição, os horários da reserva estão sempre "selecionados"
+            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+            horario_inicio: horario.horario_inicio,
+            horario_fim: horario.horario_fim,
+            agenda_id: horario.agenda?.id,
+            dadosReserva: {
+                horarioDB: horario,
+                autor: reserva.user!.name,
+                reserva_titulo: reserva.titulo
+            },
+        }) as SlotCalendario);
+
+        // Atualiza o estado, fazendo com que o calendário redesenhe com os horários corretos
+        setSlotsSelecao(novosSlots);
+
+    }, [reserva]); // A dependência é o objeto 'reserva' inteiro, para reagir a qualquer mudança nele.
+    // --- FIM DA CORREÇÃO ---
+
+    const [dialogAberto, setDialogAberto] = useState(false);
+
+    // ALTERAÇÃO PRINCIPAL: Centralizando o estado do formulário com useForm
+    const { data, setData, post, patch, processing, errors, reset } = useForm<ReservaFormData>({
+        titulo: reserva?.titulo ?? '',
+        descricao: reserva?.descricao ?? '',
+        data_inicial: reserva?.data_inicial ? new Date(reserva.data_inicial) : hoje,
+        data_final: reserva?.data_final ? new Date(reserva.data_final) : addMonths(hoje, 1),
+        recorrencia: reserva?.recorrencia ?? 'unica',
+        horarios_solicitados: [], // Começa vazio, será populado pelo useEffect
+        edit_scope: 'recurring',
+        edited_week_date: format(semanaVisivel, 'yyyy-MM-dd'),
+    });
+
+    // Efeito para sincronizar os slots selecionados com o formulário do Inertia
+    useEffect(() => {
+        const horariosParaEnviar = slotsSelecao.map(s => ({
+            // Para o backend, não precisamos de todos os dados do SlotCalendario
+            data: format(s.data, 'yyyy-MM-dd'),
+            horario_inicio: s.horario_inicio,
+            horario_fim: s.horario_fim,
+            agenda_id: s.agenda_id,
+        }));
+        setData(prevData => ({ ...prevData, horarios_solicitados: horariosParaEnviar }));
+    }, [slotsSelecao, setData]);
+
+
+    // Efeito para calcular as datas de início e fim com base na seleção e recorrência
+    useEffect(() => {
+        if (slotsSelecao.length === 0) return;
+
+        const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === data.recorrencia);
+        if (!opcaoRecorrencia) return;
+
         const dataInicialCalculada = new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())));
 
-        const dataFinalCalculada =
-            recorrencia !== 'personalizado' && !reserva
-                ? recorrencia === 'unica'
-                    ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                    : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada)
-                : data.data_final;
+        let dataFinalCalculada: Date | null = data.data_final;
+        if (data.recorrencia !== 'personalizado') {
+            dataFinalCalculada = data.recorrencia === 'unica'
+                ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada);
+        }
 
-        setData((prevData) => ({
+        setData(prevData => ({
             ...prevData,
             data_inicial: dataInicialCalculada,
             data_final: dataFinalCalculada,
         }));
-    }, [data.data_final, recorrencia, reserva, setData, slotsSelecao]);
-
-    const diasSemana = useMemo(
-        () => diasDaSemana(semanaAtual, hoje),
-        [semanaAtual, hoje],
-    );
+    }, [data.recorrencia, slotsSelecao, setData, data.data_final]);
 
 
-    const irParaSemanaAnterior = () => setSemanaAtual(subWeeks(semanaAtual, 1));
-    const irParaProximaSemana = () => setSemanaAtual(addWeeks(semanaAtual, 1));
+    const diasSemana = useMemo(() => diasDaSemana(semanaVisivel, hoje), [semanaVisivel, hoje]);
+
+    const navegarParaSemana = (novaData: Date) => {
+        const routeName = isEditMode ? 'reservas.edit' : 'espacos.show';
+        const routeParams = isEditMode ? { reserva: reserva!.id } : { espaco: espaco.id };
+        router.get(route(routeName, routeParams), { semana: format(novaData, 'yyyy-MM-dd') }, {
+            preserveState: true, preserveScroll: true, replace: true,
+            onStart: () => setIsLoading(true), onFinish: () => setIsLoading(false),
+        });
+    };
+
+    const irParaSemanaAnterior = () => navegarParaSemana(subWeeks(semanaVisivel, 1));
+    const irParaProximaSemana = () => navegarParaSemana(addWeeks(semanaVisivel, 1));
+
     const limparSelecao = () => setSlotsSelecao([]);
-    const isSlotSelecionado = (slot: SlotCalendario) => slotsSelecao.some((s) => s.id === slot.id);
+    const isSlotSelecionado = (slot: SlotCalendario) => slotsSelecao.some(s => s.id === slot.id);
 
     const alternarSelecaoSlot = (slot: SlotCalendario) => {
-        if (slot.status !== 'livre') return;
+        if (slot.status === 'reservado') return;
         const novaSelecao = isSlotSelecionado(slot)
             ? slotsSelecao.filter((s) => s.id !== slot.id)
             : [...slotsSelecao, slot].sort((a, b) => a.data.getTime() - b.data.getTime() || a.horario_inicio.localeCompare(b.horario_inicio));
         setSlotsSelecao(novaSelecao);
     };
-    useEffect(() => {
-        setData((prevData) => ({
-            ...prevData,
-            horarios_solicitados: slotsSelecao.map((s) => ({
-                data: format(s.data, 'yyyy-MM-dd'),
-                horario_inicio: s.horario_inicio,
-                horario_fim: s.horario_fim,
-                agenda_id: s.agenda_id,
-            })),
-        }));
-    }, [setData, slotsSelecao]);
 
     const handleFormSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (slotsSelecao.length === 0) {
+        if (data.horarios_solicitados.length === 0) {
             toast.error('Selecione pelo menos um horário para reservar.');
             return;
         }
+
+        // Atualiza a data da semana de edição antes de enviar
+        setData(prevData => ({ ...prevData, edited_week_date: format(semanaVisivel, 'yyyy-MM-dd') }));
+
         const options = {
             onSuccess: () => {
                 limparSelecao();
                 setDialogAberto(false);
-                reset();
-                toast.success(isEditMode ? 'Reserva atualizada com sucesso!' : 'Reserva solicitada com sucesso!');
+                reset(); // Reseta o formulário do Inertia
+                toast.success(isEditMode ? 'Sua reserva foi enviada para atualização!' : 'Solicitação enviada para processamento!');
             },
-            onError: (errors: Record<string, string>) => {
-                toast.error((Object.values(errors)[0] as string) || 'Ocorreu um erro de validação.');
+            onError: (formErrors: Record<string, string>) => {
+                toast.error(Object.values(formErrors)[0] || 'Ocorreu um erro de validação.');
             },
         };
+
         if (isEditMode) {
             patch(route('reservas.update', { reserva: reserva?.id }), options);
         } else {
@@ -180,36 +184,54 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva }: A
         }
     };
 
+
+    const gestoresPorTurno = useMemo(() => {
+        const gestores = new Map();
+        agendas?.forEach((agenda) => {
+            if (agenda.user) {
+                gestores.set(agenda.turno, { nome: agenda.user.name, email: agenda.user.email, departamento: agenda.user.setor?.nome ?? 'N/I', agenda_id: agenda.id });
+            }
+        });
+        return gestores;
+    }, [agendas])
+
     return (
         <div className="container mx-auto max-w-7xl space-y-4 py-4">
             {isEditMode && reserva && <AgendaEditModeAlert reserva={reserva} />}
             <AgendaHeader espaco={espaco} gestoresPorTurno={gestoresPorTurno} />
-            <AgendaNavegacao semanaAtual={semanaAtual} onAnterior={irParaSemanaAnterior} onProxima={irParaProximaSemana} />
-            <AgendaCalendario
-                diasSemana={diasSemana}
-                isSlotSelecionado={isSlotSelecionado}
-                alternarSelecaoSlot={alternarSelecaoSlot}
-                semanaInicio={semanaAtual}
-                agendas={agendas || []} />
+            <AgendaNavegacao semanaAtual={semanaVisivel} onAnterior={irParaSemanaAnterior} onProxima={irParaProximaSemana} />
+
+            <div className="relative">
+                <AgendaCalendario
+                    diasSemana={diasSemana}
+                    isSlotSelecionado={isSlotSelecionado}
+                    alternarSelecaoSlot={alternarSelecaoSlot}
+                    semanaInicio={semanaVisivel}
+                    agendas={agendas || []}
+                    slotsDaReserva={slotsSelecao} // ADICIONE ESTA LINHA
+                />
+                {isLoading && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                )}
+            </div>
 
             {slotsSelecao.length > 0 && (
                 <div className="fixed right-4 bottom-4 z-20 flex flex-col items-end gap-2">
                     <AgendaDialogReserva
                         isOpen={dialogAberto}
-                        isEditMode={isEditMode}
                         onOpenChange={setDialogAberto}
                         onSubmit={handleFormSubmit}
-                        formData={data}
-                        setFormData={setData}
-                        recorrencia={recorrencia}
-                        setRecorrencia={setRecorrencia}
                         slotsSelecao={slotsSelecao}
                         hoje={hoje}
-                        isSubmitting={processing}
+                        isSubmitting={processing} // Usar o 'processing' do useForm
+                        isEditMode={isEditMode}
+                        // Passar o objeto 'data' e a função 'setData' do useForm
+                        formData={data}
+                        setFormData={setData}
                     />
-                    <Button variant="outline" size="sm" onClick={limparSelecao}>
-                        Limpar seleção
-                    </Button>
+                    <Button variant="outline" size="sm" onClick={limparSelecao}>Limpar seleção</Button>
                 </div>
             )}
         </div>
