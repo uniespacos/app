@@ -45,31 +45,23 @@ class AvaliarReservaJob implements ShouldQueue
                 $motivoDoGestor = $this->validatedData['motivo'] ?? null;
                 $horariosDaAvaliacao = collect($this->validatedData['horarios_avaliados']);
 
-                // --- LÓGICA PRINCIPAL ---
-
-                // Passo 1: Obter a lista definitiva de TODOS os conflitos para a reserva inteira.
-                // Isso é a nossa fonte da verdade para as "exceções".
                 $conflitosMap = $conflictService->findConflictsFor($this->reserva->id);
                 $horariosConflitantesIds = $conflitosMap->keys();
 
-                // Passo 2: Separar a lógica baseada no escopo da avaliação ('single' ou 'recurring').
                 if ($scope === 'single') {
-                    // --- LÓGICA PARA ATUALIZAR APENAS UMA SEMANA ---
+                    // --- LÓGICA PARA 'APENAS ESTA SEMANA' (JÁ ESTAVA CORRETA) ---
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
                         $statusDoGestor = $avaliacao['status'];
                         $justificativaFinal = $motivoDoGestor;
                         $statusFinal = $statusDoGestor;
 
-                        // Se este horário específico está na lista de conflitos, sobrescreve a decisão do gestor.
                         if ($horariosConflitantesIds->contains($horarioId)) {
                             $statusFinal = 'indeferida';
                             $justificativaFinal = $conflitosMap->get($horarioId)->conflict_details;
                         }
-
-                        // Atualiza o horário individualmente.
-                        Horario::where('id', $horarioId)
-                            ->whereIn('agenda_id', $agendasDoGestorIds) // Segurança
+                        
+                        Horario::where('id', $horarioId)->whereIn('agenda_id', $agendasDoGestorIds)
                             ->update([
                                 'situacao' => $statusFinal,
                                 'user_id' => $this->gestor->id,
@@ -78,11 +70,11 @@ class AvaliarReservaJob implements ShouldQueue
                     }
 
                 } else { // recurring
-                    // --- LÓGICA PARA ATUALIZAR TODA A RESERVA (DUAS FASES) ---
+                    // --- LÓGICA RECORRENTE TOTALMENTE REFEITA ---
 
-                    // FASE 1: Lidar com as exceções. Marcar todos os conflitos como indeferidos.
+                    // FASE 1: Lidar com as exceções. Marcar TODOS os conflitos da reserva como indeferidos.
                     if ($horariosConflitantesIds->isNotEmpty()) {
-                        foreach ($horariosConflitantesIds as $id) {
+                        foreach($horariosConflitantesIds as $id) {
                             $justificativa = $conflitosMap->get($id)->conflict_details ?? 'Conflito com outra reserva.';
                             Horario::where('id', $id)->update([
                                 'situacao' => 'indeferida',
@@ -92,22 +84,46 @@ class AvaliarReservaJob implements ShouldQueue
                         }
                     }
 
-                    // FASE 2: Aplicar a regra geral do gestor para todos os outros horários.
-                    // Pega a decisão do primeiro horário NÃO conflitante da avaliação como a "decisão geral".
-                    $decisaoGeral = $horariosDaAvaliacao
-                        ->first(fn($h) => !$horariosConflitantesIds->contains($h['id']))['status'] ?? 'em_analise';
+                    // FASE 2: Aplicar as decisões do gestor para cada padrão de horário recorrente.
+                    $processedPatterns = [];
+                    foreach ($horariosDaAvaliacao as $avaliacao) {
+                        $horarioId = $avaliacao['id'];
+                        
+                        // Pula os horários que já foram tratados como conflitos
+                        if($horariosConflitantesIds->contains($horarioId)) continue;
+                        
+                        $horarioFonte = $this->reserva->horarios()->find($horarioId);
+                        if(!$horarioFonte) continue;
 
-                    $this->reserva->horarios()
-                        ->whereNotIn('id', $horariosConflitantesIds) // IMPORTANTE: Exclui os que já tratamos
-                        ->whereIn('agenda_id', $agendasDoGestorIds)
-                        ->update([
-                            'situacao' => $decisaoGeral,
-                            'user_id' => $this->gestor->id,
-                            'justificativa' => $decisaoGeral === 'indeferida' ? $motivoDoGestor : null
-                        ]);
+                        $dayOfWeek = Carbon::parse($horarioFonte->data)->dayOfWeek;
+                        
+                        // O padrão agora inclui o horário de início, garantindo a granularidade
+                        $pattern = "{$horarioFonte->agenda_id}-{$horarioFonte->horario_inicio}-{$dayOfWeek}";
+
+                        if (in_array($pattern, $processedPatterns)) {
+                            continue; // Já processamos este padrão (ex: outra Quarta às 10h na mesma semana)
+                        }
+
+                        $statusParaReplicar = $avaliacao['status'];
+                        $justificativaParaReplicar = $statusParaReplicar === 'indeferida' ? $motivoDoGestor : null;
+
+                        // Atualiza todos os horários que correspondem a este padrão,
+                        // exceto os que já foram marcados como conflito.
+                        $this->reserva->horarios()
+                            ->whereNotIn('id', $horariosConflitantesIds)
+                            ->whereIn('agenda_id', $agendasDoGestorIds)
+                            ->where('horario_inicio', $horarioFonte->horario_inicio)
+                            ->whereRaw('EXTRACT(DOW FROM data) = ?', [$dayOfWeek])
+                            ->update([
+                                'situacao' => $statusParaReplicar,
+                                'user_id' => $this->gestor->id,
+                                'justificativa' => $justificativaParaReplicar,
+                            ]);
+
+                        $processedPatterns[] = $pattern;
+                    }
                 }
 
-                // Atualiza o status geral da reserva e a observação
                 $this->reserva->observacao = $this->validatedData['observacao'] ?? $this->reserva->observacao;
                 $this->atualizarStatusGeralDaReserva($this->reserva);
             });
