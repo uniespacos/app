@@ -1,6 +1,6 @@
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
-import { addDays, format, isSameDay } from 'date-fns';
+import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -41,10 +41,14 @@ export function pegarUltimoHorario(horarios: Horario[]) {
 }
 
 export const formatDate = (dateString: string | Date) => {
-    if (typeof dateString === 'string') {
-        return format(new Date(dateString), "dd 'de' MMMM", { locale: ptBR });
+    if (!dateString) return 'Data inválida';
+    try {
+        const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
+        return format(date, "dd/MM/yyyy", { locale: ptBR });
+    } catch (error) {
+        console.error("Erro ao formatar data:", dateString, error);
+        return "Data inválida";
     }
-    return format(dateString, "dd 'de' MMMM", { locale: ptBR });
 };
 
 export const formatDateTime = (dateString: string | Date) => {
@@ -120,18 +124,20 @@ export function useDebounce(value: string, delay: number) {
 export function getPrimeirosDoisNomes(nomeCompleto: string | undefined): string {
     // 1. Verifica se o nome não é nulo ou vazio
     if (!nomeCompleto) {
-      return 'N/A';
+        return 'N/A';
     }
 
     // 2. Divide o nome em palavras, pega as duas primeiras e junta de volta
     const palavras = nomeCompleto.trim().split(' ');
     return palavras.slice(0, 2).join(' ');
-  }
+}
 
 
-export function diasDaSemana(semanaAtual: Date, hoje: Date) {
+export function diasDaSemana(dataReferencia: Date, hoje: Date) {
+    const inicioDaSemana = startOfWeek(dataReferencia, { weekStartsOn: 1 }); // 1 = Segunda-feira
+
     return Array.from({ length: 7 }).map((_, i) => {
-        const dia = addDays(semanaAtual, i);
+        const dia = addDays(inicioDaSemana, i);
         return {
             data: dia,
             nome: format(dia, 'EEEE', { locale: ptBR }),
@@ -144,7 +150,5 @@ export function diasDaSemana(semanaAtual: Date, hoje: Date) {
 }
 
 export function calcularDataInicioSemana(data: Date) {
-    const diaDaSemana = data.getDay();
-    const diasParaSubtrair = diaDaSemana === 0 ? 6 : diaDaSemana - 1; // Ajusta para que Segunda seja o primeiro dia
-    return addDays(data, -diasParaSubtrair);
+    return startOfWeek(data, { weekStartsOn: 1 });
 }

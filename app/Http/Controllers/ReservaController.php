@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReservaRequest;
+use App\Jobs\ProcessarCriacaoReserva;
+use App\Jobs\UpdateReservaJob;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
+use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Notifications\NotificationModel;
@@ -16,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ReservaController extends Controller
@@ -27,81 +32,69 @@ class ReservaController extends Controller
     public function index(Request $request) // Recebe a Request
     {
         $user = Auth::user();
-        // Pega os parâmetros de filtro da URL (query string), exatamente como no outro controller
         $filters = $request->only(['search', 'situacao', 'reserva']);
 
+        // 1. Pega a data de referência da semana a partir da request.
+        // Se o parâmetro 'semana' não for enviado, usa a data de hoje.
+        $dataReferencia = Carbon::parse($request->input('semana', 'today'))->locale('pt_BR');
+
+        // 2. Calcula o início (segunda-feira) e o fim (domingo) da semana.
+        $inicioSemana = $dataReferencia->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $fimSemana = $dataReferencia->copy()->endOfWeek(Carbon::SUNDAY)->format('Y-m-d');
+
+        // 3. Query principal para a lista de reservas (paginada)
         $reservas = Reserva::query()
-            ->where('user_id', $user->id) // Query base para as reservas do usuário logado
-            // Aplica os filtros de forma condicional
-            ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->where('titulo', 'like', '%' . $search . '%')
-                        ->orWhere('descricao', 'like', '%' . $search . '%');
-                });
-                $query->orderByRaw(
-                    "CASE WHEN titulo LIKE ? THEN 1 ELSE 2 END",
-                    ['%' . $search . '%']
-                );
+            ->where('user_id', $user->id)
+            ->where('situacao', '!=', 'inativa')
+            // Otimização: Só busca reservas que estejam ativas no período da semana
+            ->where(function ($query) use ($inicioSemana, $fimSemana) {
+                $query->where('data_inicial', '<=', $fimSemana)
+                    ->where('data_final', '>=', $inicioSemana);
             })
-            ->when(
-                $filters['situacao'] ?? null,
-                // 1. Função a ser executada SE 'situacao' EXISTIR no filtro
-                function ($query, $situacao) {
-                    $query->where('situacao', $situacao);
-                },
-                // 2. Função a ser executada SE 'situacao' NÃO EXISTIR no filtro
-                function ($query) {
-                    $query->where('situacao', '!=', 'inativa');
-                }
-            )
-            // Carrega todos os relacionamentos necessários em uma única consulta.
+            ->when($filters['search'] ?? null, function ($query, $search) { // Filtro de busca
+                $query->where('titulo', 'like', '%' . $search . '%');
+            })
+            ->when($filters['situacao'] ?? null, function ($query, $situacao) { // Filtro de situação
+                $query->where('situacao', $situacao);
+            })
             ->with([
-                'user', // Usuário que criou a reserva
-                'horarios' => function ($query) { // Os horários da reserva
-                    $query->orderBy('data')->orderBy('horario_inicio');
-                    $query->with([
-                        'agenda' => function ($query) {
-                            $query->with([
-                                'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                                'horarios' => function ($q) {
-                                    // Carrega as reservas dos horários APROVADOS (deferidos)
-                                    $q->where('situacao', 'deferida')
-                                        ->with(['reserva.user', 'avaliador']);
-                                },
-                                'espaco.andar.modulo.unidade.instituicao'
-                            ]);
-                        },
-                    ]);
+                // 4. A MÁGICA: Filtra o relacionamento 'horarios' para a semana específica.
+                'horarios' => function ($query) use ($inicioSemana, $fimSemana) {
+                    $query->whereBetween('data', [$inicioSemana, $fimSemana])
+                        ->orderBy('data')->orderBy('horario_inicio')
+                        ->with(['agenda.espaco']); // Eager load necessário para a lista
                 },
+                'user:id,name'
             ])
-            ->latest() // Ordena as reservas da mais nova para a mais antiga.
-            ->paginate(10) // Pagina os resultados
-            ->withQueryString(); // Anexa os filtros aos links de paginação
-        $reservaToShow = Reserva::find($filters['reserva'] ?? null);
-        $reservaToShow != null ? $reservaToShow->load([
-            'user', // Usuário que criou a reserva
-            'horarios' => function ($query) { // Os horários da reserva
-                $query->orderBy('data')->orderBy('horario_inicio');
-                $query->with([
-                    'agenda' => function ($query) {
-                        $query->with([
-                            'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                            'horarios' => function ($q) {
-                                // Carrega as reservas dos horários APROVADOS (deferidos)
-                                $q->where('situacao', 'deferida')
-                                    ->with(['reserva.user', 'avaliador']);
-                            },
-                            'espaco.andar.modulo.unidade.instituicao'
-                        ]);
-                    },
-                ]);
-            },
-        ]) : null;
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        // 5. Query para a reserva específica que será exibida no modal (reservaToShow)
+        $reservaToShow = null;
+        if ($filters['reserva'] ?? null) {
+            $reservaToShow = Reserva::with([
+                'user',
+                // O mesmo filtro de semana é aplicado aqui!
+                'horarios' => function ($query) use ($inicioSemana, $fimSemana) {
+                    $query->whereBetween('data', [$inicioSemana, $fimSemana])
+                        ->orderBy('data')->orderBy('horario_inicio')
+                        ->with(['agenda.espaco.andar.modulo.unidade', 'avaliador']);
+                },
+            ])->find($filters['reserva']);
+        }
 
         return Inertia::render('Reservas/ReservasPage', [
-            'reservas' => $reservas, // Envia o objeto paginador completo
-            'filters' => $filters,   // Envia os filtros de volta para a view
-            'reservaToShow' => $reservaToShow, // Envia a reserva selecionada para exibição
+            'reservas' => $reservas,
+            'filters' => $filters,
+            'reservaToShow' => $reservaToShow,
+            // 6. Envia as informações da semana atual para o frontend.
+            // Isso é crucial para a navegação de semana no modal.
+            'semana' => [
+                'inicio' => $inicioSemana,
+                'fim' => $fimSemana,
+                'referencia' => $dataReferencia->format('Y-m-d'),
+            ]
         ]);
     }
 
@@ -115,167 +108,21 @@ class ReservaController extends Controller
 
     /**
      * Store a newly created resource in storage.
-
-
+     */
     public function store(StoreReservaRequest $request)
     {
-        $user = Auth::user();
-        // A validação já foi executada pela Form Request.
-        // Usamos uma transação para garantir que tudo seja salvo, ou nada.
         try {
-            DB::transaction(function () use ($request, $user) {
-                // 1. Cria a reserva com o status inicial 'em_analise'.
-                $reserva = Reserva::create([
-                    'titulo' => $request->validated('titulo'),
-                    'descricao' => $request->validated('descricao'),
-                    'data_inicial' => $request->validated('data_inicial'),
-                    'data_final' => $request->validated('data_final'),
-                    'recorrencia' => $request->validated('recorrencia'),
-                    'user_id' => Auth::id(),
-                    'situacao' => 'em_analise', // Status geral inicial
-                ]);
+            $dadosValidados = $request->validated();
+            $solicitante = Auth::user();
 
-                $horariosData = $request->validated('horarios_solicitados');
-                // Prepara os dados para inserção em massa e os IDs para o anexo.
-                foreach ($horariosData as $horarioInfo) {
-                    $gestor = Agenda::whereId($horarioInfo['agenda_id'])
-                        ->with('user') // Carrega o gestor da agenda
-                        ->first()
-                        ->user;
-                        $gestores[] = $gestor; // Coleta os gestores para notificação
-                        Horario::create([
-                            'data' => $horarioInfo['data'],
-                            'horario_inicio' => $horarioInfo['horario_inicio'],
-                            'horario_fim' => $horarioInfo['horario_fim'],
-                            'agenda_id' => $horarioInfo['agenda_id'],
-                            'reserva_id' => $reserva->id, // Vincula o horário à reserva
-                        'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise'
-                    ]);
-                }
-                $gestores = array_unique($gestores); // Remove gestores duplicados
+            ProcessarCriacaoReserva::dispatch($dadosValidados, $solicitante);
 
-                if ($gestor->id === $user->id)
-                $reserva->update([
-                        'situacao' => count($gestores) > 1 ? 'parcialmente_deferida' : 'deferida'
-                    ]);
-
-                    foreach ($gestores as $gestor) {
-                        // 4. Notifica cada gestor sobre a nova solicitação de reserva.
-                        $partesDoNome = explode(' ', Auth::user()->name);
-                        $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
-                        $resultado = implode(' ', $doisPrimeirosNomesArray);
-                        $gestor->notify(
-                        new NotificationModel(
-                            'Nova solicitação de reserva',
-                            'O usuário ' . $resultado .
-                            ' solicitou uma reserva.',
-                            route('gestor.reservas.show', ['reserva' => $reserva->id])
-                            )
-                        );
-                    }
-                    return $reserva;
-                });
-
-                return redirect()->route('espacos.index')->with('success', 'Reserva solicitada com sucesso! Aguarde avaliação.');
-            } catch (Exception $error) {
-                Log::error('Erro ao solicitar reserva: ' . $error->getMessage());
-                return redirect()->route('espacos.index')->with('error', 'Erro ao solicitar reserva. Tente novamente.');
-            }
-        }
-    */
-    public function store(StoreReservaRequest $request)
-    {
-        $user = Auth::user();
-
-        try {
-            $reserva = DB::transaction(function () use ($request, $user) {
-                // 1. Cria a reserva principal com o status inicial.
-                $reserva = Reserva::create([
-                    'titulo' => $request->validated('titulo'),
-                    'descricao' => $request->validated('descricao'),
-                    'data_inicial' => $request->validated('data_inicial'),
-                    'data_final' => $request->validated('data_final'),
-                    'recorrencia' => $request->validated('recorrencia'),
-                    'user_id' => $user->id,
-                    'situacao' => 'em_analise',
-                ]);
-
-                // --- INÍCIO DA LÓGICA REFATORADA ---
-
-                $horariosData = $request->validated('horarios_solicitados');
-                $gestores = []; // Array para coletar todos os gestores únicos.
-
-                // Converte as datas da reserva para objetos Carbon para facilitar a comparação.
-                $dataFinalReserva = Carbon::parse($reserva->data_final);
-
-                // 2. Itera sobre cada "horário-molde" da primeira semana.
-                foreach ($horariosData as $horarioInfo) {
-                    // Obtém o gestor da agenda. Isso pode ser feito uma vez por horário-molde.
-                    $gestor = Agenda::findOrFail($horarioInfo['agenda_id'])->user;
-
-                    // Adiciona o gestor à lista (será unificada mais tarde).
-                    $gestores[] = $gestor;
-
-                    // Define a data de início para a recorrência deste horário específico.
-                    $dataIteracao = Carbon::parse($horarioInfo['data']);
-
-                    // 3. Loop de repetição semanal para cada horário-molde.
-                    // Este loop cria o horário para a primeira semana e todas as subsequentes.
-                    while ($dataIteracao->lte($dataFinalReserva)) {
-                        Horario::create([
-                            'data' => $dataIteracao->toDateString(), // Usa a data da iteração atual
-                            'horario_inicio' => $horarioInfo['horario_inicio'],
-                            'horario_fim' => $horarioInfo['horario_fim'],
-                            'agenda_id' => $horarioInfo['agenda_id'],
-                            'reserva_id' => $reserva->id,
-                            'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise',
-                        ]);
-
-                        // Avança a data em 7 dias para a próxima ocorrência do mesmo dia da semana.
-                        $dataIteracao->addWeek();
-                    }
-                }
-
-                // --- FIM DA LÓGICA REFATORADA ---
-
-                // Remove gestores duplicados para evitar notificações repetidas.
-                // Usamos a função collect para facilitar a manipulação e garantir a unicidade pelo ID.
-                $gestoresUnicos = collect($gestores)->unique('id');
-
-                // 4. Atualiza o status geral da reserva com base nos horários criados.
-                if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $user->id) {
-                    // Se o único gestor for o próprio solicitante, a reserva já nasce deferida.
-                    $reserva->update(['situacao' => 'deferida']);
-                } elseif (collect($gestores)->contains(fn($g) => $g->id === $user->id)) {
-                    // Se alguns horários são do próprio usuário e outros não.
-                    $reserva->update(['situacao' => 'parcialmente_deferida']);
-                }
-
-                // 5. Notifica cada gestor sobre a nova solicitação.
-                $partesDoNome = explode(' ', $user->name);
-                $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
-
-                foreach ($gestoresUnicos as $gestor) {
-                    // Não notifica o gestor se ele for o próprio solicitante.
-                    if ($gestor->id !== $user->id) {
-                        $gestor->notify(
-                            new NotificationModel(
-                                'Nova solicitação de reserva',
-                                'O usuário ' . $doisPrimeirosNomes . ' solicitou uma reserva.',
-                                route('gestor.reservas.show', ['reserva' => $reserva->id])
-                            )
-                        );
-                    }
-                }
-
-                return $reserva;
-            });
-
-            return redirect()->route('espacos.index')->with('success', 'Reserva solicitada com sucesso! Aguarde avaliação.');
-
+            return redirect()->route('espacos.index')
+                ->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
         } catch (Exception $error) {
-            Log::error('Erro ao solicitar reserva: ' . $error->getMessage());
-            return redirect()->route('espacos.index')->with('error', 'Erro ao solicitar reserva. Tente novamente.');
+            Log::error('Erro ao despachar o job de criação de reserva: ' . $error->getMessage());
+            return redirect()->route('espacos.index')
+                ->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
         }
     }
 
@@ -285,67 +132,30 @@ class ReservaController extends Controller
     public function update(StoreReservaRequest $request, Reserva $reserva)
     {
         $this->authorize('update', $reserva);
-        $user = Auth::user(); // Obtém o usuário logado
-        // A validação já foi executada pela Form Request.
-        // Usamos uma transação para garantir que tudo seja salvo, ou nada.
+        $user = Auth::user();
+
+        // Adiciona a validação extra para os campos de edição
+        $validated = array_merge(
+            $request->validated(),
+            $request->validate([
+                'edit_scope' => ['required', 'string', Rule::in(['single', 'recurring'])],
+                'edited_week_date' => ['required_if:edit_scope,single', 'date'],
+                // Certifique-se que horarios_solicitados seja um array, mesmo que vazio
+                'horarios_solicitados' => ['present', 'array'],
+            ])
+        );
+
         try {
-            DB::transaction(function () use ($request, $reserva, $user) {
-                // 1. Atualiza os dados da reserva.
-                $reserva->update([
-                    'titulo' => $request->validated('titulo'),
-                    'descricao' => $request->validated('descricao'),
-                    'data_inicial' => $request->validated('data_inicial'),
-                    'data_final' => $request->validated('data_final'),
-                    'recorrencia' => $request->validated('recorrencia'),
-                ]);
+            // Despacha o Job para a fila com os dados necessários
+            UpdateReservaJob::dispatch($reserva, $validated, $user);
 
-                // 3. Desvincula todos os horários antigos.
-                $reserva->horarios()->delete();
+            // Retorna uma resposta imediata para o usuário
+            return redirect()->route('reservas.index')
+                ->with('success', 'Sua reserva foi enviada para atualização. O processo será concluído em segundo plano.');
 
-                // 5. Prepara e anexa os novos horários.
-                $horariosData = $request->validated('horarios_solicitados');
-                $gestores = [];
-                foreach ($horariosData as $horarioInfo) {
-                    $gestor = Agenda::whereId($horarioInfo['agenda_id'])
-                        ->with('user') // Carrega o gestor da agenda
-                        ->first()
-                        ->user;
-                    $gestores[] = $gestor; // Coleta os gestores para notificação
-                    Horario::create([
-                        'data' => $horarioInfo['data'],
-                        'horario_inicio' => $horarioInfo['horario_inicio'],
-                        'horario_fim' => $horarioInfo['horario_fim'],
-                        'reserva_id' => $reserva->id, // Vincula o horário à reserva
-                        'agenda_id' => $horarioInfo['agenda_id'],
-                        'situacao' => $gestor->id === $user->id ? 'deferida' : 'em_analise'
-                    ]);
-                }
-                $gestores = array_unique($gestores); // Remove gestores duplicados
-
-                // 6. Anexa os novos horários à reserva.
-                foreach ($gestores as $gestor) {
-                    // 4. Notifica cada gestor sobre a nova solicitação de reserva.
-                    $partesDoNome = explode(' ', Auth::user()->name);
-                    $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
-                    $resultado = implode(' ', $doisPrimeirosNomesArray);
-                    $gestor->notify(
-                        new NotificationModel(
-                            'Reserva atualizada',
-                            'O usuário ' . $resultado .
-                            ' atualizou uma reserva.',
-                            route(
-                                'gestor.reservas.show',
-                                ['reserva' => $reserva->id]
-                            )
-                        )
-                    );
-                }
-            });
-
-            return redirect()->route('reservas.index')->with('success', 'Reserva atualizada com sucesso! Aguarde nova avaliação.');
-        } catch (Exception $error) {
-            Log::error('Erro ao atualizar reserva: ' . $error->getMessage());
-            return redirect()->route('reservas.index')->with('error', 'Erro ao atualizar reserva. Tente novamente.');
+        } catch (Exception $e) {
+            Log::error("Erro ao despachar UpdateReservaJob para reserva {$reserva->id}: " . $e->getMessage());
+            return back()->with('error', 'Ocorreu um erro ao enviar a atualização para processamento.');
         }
     }
 
@@ -360,47 +170,69 @@ class ReservaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Reserva $reserva)
+    public function edit(Request $request, Reserva $reserva)
     {
+        // --- INÍCIO DA CORREÇÃO ---
+
+        // 1. Busca o primeiro horário agendado em ordem cronológica.
+        $primeiroHorario = $reserva->horarios()->orderBy('data', 'asc')->first();
+
+        // 2. Usa a data do primeiro horário como padrão. Se não houver nenhum (reserva vazia),
+        // usa a data_inicial da reserva como um fallback seguro.
+        $dataPadrao = $primeiroHorario ? $primeiroHorario->data : $reserva->data_inicial;
+
+        // 3. Usa a data padrão que acabamos de encontrar como fallback para a data de referência,
+        // caso o parâmetro 'semana' não venha na URL.
+        $dataReferencia = Carbon::parse($request->input('semana', $dataPadrao))->locale('pt_BR');
+
+        // --- FIM DA CORREÇÃO ---
+
+        $inicioSemana = $dataReferencia->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $fimSemana = $dataReferencia->copy()->endOfWeek(Carbon::SUNDAY)->format('Y-m-d');
+
+        // Carrega a reserva com os dados necessários para a tela de edição.
         $reserva->load([
             'user',
-            'horarios' => function ($query) {
-                // Ordena os horários para exibição consistente.
-                $query->orderBy('data')->orderBy('horario_inicio');
+            // Carrega APENAS os horários da semana de referência
+            'horarios' => function ($query) use ($inicioSemana, $fimSemana) {
+                $query->whereBetween('data', [$inicioSemana, $fimSemana])
+                    ->orderBy('data')->orderBy('horario_inicio')
+                    ->with('agenda'); // with() para carregar a agenda de cada horário
             },
-            // Carrega a cadeia de relacionamentos de forma aninhada.
-            'horarios.agenda.espaco'
         ]);
 
-        $espaco = $reserva->horarios->first()->agenda->espaco;
+        // Carrega o espaço relacionado para poder montar o calendário
+        $espaco = $reserva->horarios->first()->agenda->espaco ?? null;
 
-        // 1. Carrega todos os dados necessários de forma aninhada.
+        if (!$espaco) {
+            // Fallback caso a reserva não tenha horários na semana atual
+            $espaco = Espaco::whereHas('agendas.horarios.reserva', fn($q) => $q->where('id', $reserva->id))->firstOrFail();
+        }
+
+        // Carrega os dados do espaço e os horários de outras reservas na mesma semana
         $espaco->load([
-            'andar.modulo.unidade.instituicao', // Carrega a hierarquia completa
-            'agendas' => function ($query) {
+            'andar.modulo.unidade.instituicao',
+            'agendas' => function ($query) use ($inicioSemana, $fimSemana) {
                 $query->with([
-                    'user.setor', // Carrega o gestor (user) da agenda e seu setor
-                    'horarios' => function ($q) {
-                        // Carrega as reservas dos horários APROVADOS (deferidos)
+                    'user.setor',
+                    'horarios' => function ($q) use ($inicioSemana, $fimSemana) {
                         $q->where('situacao', 'deferida')
+                            ->whereBetween('data', [$inicioSemana, $fimSemana])
                             ->with(['reserva.user', 'avaliador']);
                     }
                 ]);
             }
         ]);
 
-
-        // 2. Verifica se o espaço tem pelo menos uma agenda (e, portanto, um gestor).
-        if ($espaco->agendas->isEmpty()) {
-            return redirect()->route('espacos.index')->with('error', 'Este espaço ainda não possui um gestor definido.');
-        }
-
-        // 3. Renderiza a view, passando APENAS o objeto 'espaco'.
-        // O frontend agora é responsável por processar e exibir os dados aninhados.
         return Inertia::render('Espacos/VisualizarEspacoPage', [
             'espaco' => $espaco,
             'reserva' => $reserva,
             'isEditMode' => true,
+            'semana' => [
+                'inicio' => $inicioSemana,
+                'fim' => $fimSemana,
+                'referencia' => $dataReferencia->format('Y-m-d'),
+            ]
         ]);
     }
 

@@ -18,7 +18,15 @@ class Reserva extends Model
         'data_final',
         'recorrencia',
         'observacao',
-        'user_id'
+        'user_id',
+        'validation_status',
+        'conflict_cache',
+        'cache_validated_at',
+    ];
+
+    protected $casts = [
+        'conflict_cache' => 'array',
+        'cache_validated_at' => 'datetime',
     ];
 
     public function horarios()

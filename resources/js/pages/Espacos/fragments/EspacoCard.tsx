@@ -75,10 +75,8 @@ export default function EspacoCard({
         : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
 
     return (
-        // Adicionado 'flex flex-col' para que o conteúdo possa crescer e o rodapé ficar alinhado na base
-        <Card className="flex flex-col overflow-hidden h-full">
+        <Card className="flex flex-col overflow-hidden">
             {/* --- Seção da Imagem/Carrossel --- */}
-            {/* O container da imagem agora é um 'div' separado com posicionamento relativo */}
             <div className="relative">
                 <Carousel className="w-full">
                     <CarouselContent>
@@ -125,23 +123,26 @@ export default function EspacoCard({
             {/* Adicionado 'flex-grow' para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
             <CardContent className="flex-grow">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
-                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                    <Badge
+                        variant="outline"
+                        className="flex h-auto items-start gap-1.5"
+                    >
                         <Building2 className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">
-                            {modulo && modulo.length > 30 ? `${modulo.substring(0, 15)} ...` : modulo ?? 'N/A'}
+                        <span className="whitespace-normal break-words">
+                            {modulo ?? 'N/A'}
                         </span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{espaco.andar?.nome ?? 'N/A'}</span>
+                        <span className="truncate min-w-0">{espaco.andar?.nome ?? 'N/A'}</span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
+                        <span className="truncate min-w-0">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 truncate">
+                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <Users className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">{espaco.capacidade_pessoas} pessoas</span>
+                        <span className="truncate min-w-0">{espaco.capacidade_pessoas} pessoas</span>
                     </Badge>
                 </div>
             </CardContent>
@@ -169,6 +170,5 @@ export default function EspacoCard({
                     </Button>
                 )}
             </CardFooter>
-        </Card>
-    );
+        </Card>);
 }

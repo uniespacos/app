@@ -1,10 +1,9 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import { Calendar, CheckCircle, Clock, Users } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import {  CheckCircle, Clock, Users } from 'lucide-react';
 import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';

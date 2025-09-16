@@ -5,10 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { CheckCircle, Clock, Edit, XCircle, XSquare } from 'lucide-react';
+import { CheckCircle, Clock, Edit, FileText, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
+import { format } from 'date-fns';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -63,14 +64,14 @@ export function SituacaoBadge({ situacao }: { situacao: SituacaoReserva }) {
 }
 interface ReservasListProps {
     reservaToShow?: Reserva | undefined;
-
     paginator: Paginator<Reserva>;
     fallback: React.ReactNode;
     isGestor: boolean;
     user?: UserType;
+    routeName: string;
 }
 // Componente principal da lista de reservas
-export function ReservasList({ paginator, fallback, isGestor, user, reservaToShow }: ReservasListProps) {
+export function ReservasList({ paginator, fallback, isGestor, user, reservaToShow, routeName }: ReservasListProps) {
     const { data: reservas, links } = paginator;
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
@@ -134,6 +135,35 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
         router.get(route('gestor.reservas.show', id));
     };
 
+
+    // Função para ABRIR o modal de detalhes
+    // Ela faz uma requisição para buscar os dados completos da reserva
+    const handleAbrirDetalhes = (reserva: Reserva) => {
+        router.get(route(routeName), {
+            reserva: reserva.id,
+            // Pede ao backend a semana inicial da reserva
+            semana: format(new Date(reserva.data_inicial), 'yyyy-MM-dd'),
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    // Função para FECHAR o modal de detalhes
+    // Ela remove o parâmetro 'reserva' da URL
+    const handleFecharDetalhes = () => {
+        router.get(route(routeName), {
+            // Mantém os filtros atuais da página, mas remove o filtro de 'reserva'
+            ...route().params,
+            reserva: undefined,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
     return (
         <div className="space-y-4">
             <div className="overflow-hidden rounded-md border">
@@ -177,19 +207,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
-                                        <ReservaDetalhes
-                                            key={selectedReserva?.id}
-                                            isOpen={!!selectedReserva}
-                                            onOpenChange={(open) => {
-                                                if (!open) {
-                                                    setSelectedReserva(undefined);
-                                                } else {
-                                                    setSelectedReserva(reserva);
-                                                }
-                                            }}
-                                            isGestor={isGestor}
-                                            selectedReserva={selectedReserva || reserva}
-                                            setRemoverReserva={setRemoverReserva} />
+                                        {/* ALTERADO: O botão agora chama a função handleAbrirDetalhes */}
+                                        <Button variant="outline" onClick={() => handleAbrirDetalhes(reserva)}>
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            Detalhes
+                                        </Button>
+
+
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
                                                 <Button
@@ -229,6 +253,20 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                     </TableBody>
                 </Table>
             </div>
+            {selectedReserva && (
+                <ReservaDetalhes
+                    isOpen={!!selectedReserva}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            handleFecharDetalhes();
+                        }
+                    }}
+                    isGestor={isGestor}
+                    selectedReserva={selectedReserva}
+                    setRemoverReserva={setRemoverReserva}
+                    routeName={routeName}
+                />
+            )}
             {removerReserva && (
                 <DeleteItem
                     isOpen={(open) => {

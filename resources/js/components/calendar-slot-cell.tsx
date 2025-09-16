@@ -28,7 +28,8 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <span className="text-xs text-blue-900 font-bold truncate">
-                                {slot.dadosReserva?.reserva_titulo}
+                                {slot.dadosReserva?.reserva_titulo.substring(0, 15)}
+                                {slot.dadosReserva ? slot.dadosReserva.reserva_titulo.length > 30 ? '...' : '' : null}
                             </span>
                         </TooltipTrigger>
                         <TooltipContent>
