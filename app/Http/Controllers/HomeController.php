@@ -21,6 +21,7 @@ class HomeController extends Controller
                 // OTIMIZADO: Seleciona colunas da Reserva e limita os horários para 1.
                 $reservas = Reserva::select(['id', 'titulo', 'data_inicial', 'situacao', 'user_id'])
                     ->where('user_id', $user->id)
+                    ->where('situacao', '!=', 'inativa')
                     ->with([
                         'horarios' => function ($query) {
                             $query->limit(1) // Carrega apenas 1 horário, o suficiente para o nome do espaço
@@ -54,6 +55,7 @@ class HomeController extends Controller
                 // OTIMIZADO: Mesma otimização da query de reservas.
                 $reservas = Reserva::select(['id', 'titulo', 'data_inicial', 'situacao', 'user_id'])
                     ->where('user_id', $user->id)
+                    ->where('situacao', '!=', 'inativa')
                     ->with([
                         'horarios' => function ($query) {
                             $query->limit(1)
@@ -107,6 +109,7 @@ class HomeController extends Controller
                 // OTIMIZADO: Mesma otimização da query de reservas.
                 $reservas = Reserva::select(['id', 'titulo', 'data_inicial', 'situacao', 'user_id'])
                     ->where('user_id', $user->id)
+                    ->where('situacao', '!=', 'inativa')
                     ->with([
                         'horarios' => function ($query) {
                             $query->limit(1)
