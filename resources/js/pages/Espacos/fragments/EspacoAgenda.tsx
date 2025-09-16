@@ -143,6 +143,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
 
     const irParaSemanaAnterior = () => navegarParaSemana(subWeeks(semanaVisivel, 1));
     const irParaProximaSemana = () => navegarParaSemana(addWeeks(semanaVisivel, 1));
+    const irParaSemanaAtual = () => navegarParaSemana(hoje);
 
     const limparSelecao = () => setSlotsSelecao([]);
     const isSlotSelecionado = (slot: SlotCalendario) => slotsSelecao.some(s => s.id === slot.id);
@@ -199,7 +200,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
         <div className="container mx-auto max-w-7xl space-y-4 py-4">
             {isEditMode && reserva && <AgendaEditModeAlert reserva={reserva} />}
             <AgendaHeader espaco={espaco} gestoresPorTurno={gestoresPorTurno} />
-            <AgendaNavegacao semanaAtual={semanaVisivel} onAnterior={irParaSemanaAnterior} onProxima={irParaProximaSemana} />
+            <AgendaNavegacao semanaAtual={semanaVisivel} onAnterior={irParaSemanaAnterior} onProxima={irParaProximaSemana} onReset={irParaSemanaAtual} />
 
             <div className="relative">
                 <AgendaCalendario
