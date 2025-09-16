@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Input } from "./ui/input";
 import EspacoCard from "@/pages/Espacos/fragments/EspacoCard";
 import { Search } from "lucide-react";
+import { router } from "@inertiajs/react";
 
 export default function TabsItemEspacosFavoritos({ espacosFiltrados, searchTerm, setSearchTerm, user }: { user: User, espacosFiltrados: Espaco[], searchTerm: string, setSearchTerm: (term: string) => void }) {
     return (
@@ -25,7 +26,9 @@ export default function TabsItemEspacosFavoritos({ espacosFiltrados, searchTerm,
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {espacosFiltrados.map((espaco) => (
-                        <EspacoCard key={espaco.id} espaco={espaco} userType={user.permission_type_id} />
+                        <EspacoCard key={espaco.id} espaco={espaco} userType={user.permission_type_id} handleSolicitarReserva={() =>
+                            router.get(`/espacos/${espaco.id}`)
+                        } />
                     ))}
                 </div>
             </CardContent>
