@@ -71,7 +71,7 @@ class HomeController extends Controller
                     ->get();
 
                 $espacosFavoritos = $user->favoritos()->with('andar.modulo')->get();
-                $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo'])->get();
+                $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo.unidade'])->get();
 
                 // OTIMIZADO: A view só usa `titulo`, `descricao` e `user`. Não precisamos carregar os horários.
                 $reservasPendentes = Reserva::select(['id', 'titulo', 'descricao', 'situacao', 'user_id'])
