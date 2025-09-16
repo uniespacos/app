@@ -33,8 +33,12 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                         {espaco.capacidade_pessoas} pessoas
                     </Badge>
                 </div>
+                <div className="mb-3 gap-2">
+                    <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
+                    <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{espaco.descricao}</p>
+                </div>
                 <div className="border-t pt-2">
-                    <h3 className="mb-2 text-xs font-medium">Gestores por Turno:</h3>
+                    <h3 className="mb-2 font-medium text-gray-900">Gestores por Turno:</h3>
                     <div className="mx-auto grid max-w-3xl grid-cols-1 gap-2 sm:grid-cols-3">
                         {['manha', 'tarde', 'noite'].map((turno) => (
                             <TooltipProvider key={turno}>
