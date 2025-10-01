@@ -21,6 +21,12 @@ rm -rf /var/www/storage-init
 # -----------------------------------------------------------
 php artisan migrate --force
 
+# Run Laravel StorageLink
+# -----------------------------------------------------------
+# Create symbolic links for storage if not already present.
+# -----------------------------------------------------------
+php artisan storage:link || true # Ignore errors if the link already exists
+
 # Clear and cache configurations
 # -----------------------------------------------------------
 # Improves performance by caching config and routes.
