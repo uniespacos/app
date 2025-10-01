@@ -1,11 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDebounce } from '@/lib/utils';
+import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type FiltroBuscaEspacosProps = {
     route: string;
@@ -19,7 +19,7 @@ type FiltroBuscaEspacosProps = {
         andar?: string;
         capacidade?: string;
     };
-    capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
+    capacidadeEspacos: number[]; 
 };
 
 export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
@@ -32,51 +32,66 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         capacidade: filters.capacidade || '',
     });
     const isInitialMount = useRef(true);
-    const [debouncedSearchTerm] = useDebounce(localFilters.search, 300);
-    const [filteredModulos, setFilteredModulos] = useState<Modulo[]>(modulos.filter((m) => m.unidade?.id.toString() == localFilters.unidade));
-    const [filteredAndares, setFilteredAndares] = useState<Modulo[]>(andares.filter((a) => a.modulo?.id.toString() == localFilters.modulo));
-    useEffect(() => {
-        setFilteredModulos(modulos.filter((m) => m.unidade?.id.toString() === filters.unidade));
-        setFilteredAndares(andares.filter((a) => a.modulo?.id.toString() === filters.modulo));
-    }, [andares, filters.modulo, filters.unidade, localFilters, modulos]);
+
+    const filteredModulos = useMemo(() => {
+        if (localFilters.unidade === 'all') {
+            return [];
+        }
+        const resultado = modulos.filter((m) => {
+            return m.unidade_id.toString() === localFilters.unidade
+        });
+        return resultado;
+    }, [localFilters.unidade, modulos]);
+
+    const filteredAndares = useMemo(() => {
+        if (localFilters.modulo === 'all') {
+            return [];
+        }
+        return andares.filter((a) => a.modulo_id.toString() === localFilters.modulo);
+    }, [localFilters.modulo, andares]); 
+
+
+
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
-        const allParams = {
-            ...localFilters,
-            search: debouncedSearchTerm,
-        };
-        const queryParams = Object.fromEntries(
-            Object.entries(allParams).filter(([key, value]) => {
-                if (value === null || value === '') return false;
-                if (['unidade', 'modulo', 'andar'].includes(key) && value === 'all') return false;
-                if (key === 'capacidade' && value === 'qualquer') return false;
-                return true;
-            }),
-        );
 
-        router.get(route, queryParams, {
-            preserveState: true, // Mantém o estado dos filtros na página
-            preserveScroll: true, // Não rola a página para o topo
-            replace: true,
-        });
-    }, [debouncedSearchTerm, route, localFilters]);
+        const handler = setTimeout(() => {
+            const queryParams = Object.fromEntries(
+                Object.entries(localFilters).filter(([key, value]) => {
+                    if (!value) return false;
+                    if (['unidade', 'modulo', 'andar'].includes(key) && value === 'all') return false;
+                    if (key === 'capacidade' && value === 'qualquer') return false;
+                    return true;
+                }),
+            );
+
+            router.get(route, queryParams, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            });
+        }, 400);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [localFilters, route]); 
 
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
-        setLocalFilters((prevFilters) => {
-            const newFilters = { ...prevFilters, [name]: value };
+        setLocalFilters((prev) => {
+            const newFilters = { ...prev, [name]: value };
 
             if (name === 'unidade') {
                 newFilters.modulo = 'all';
                 newFilters.andar = 'all';
-                setFilteredModulos(modulos.filter((m) => m.unidade?.id.toString() === filters.unidade));
             }
             if (name === 'modulo') {
-                setFilteredAndares(andares.filter((a) => a.modulo?.id.toString() === filters.modulo));
                 newFilters.andar = 'all';
             }
+            
             return newFilters;
         });
     };
@@ -145,7 +160,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                                 <SelectItem value="all">Todos os Andares</SelectItem>
                                 {filteredAndares.map((andar) => (
                                     <SelectItem key={andar.id} value={andar.id.toString()}>
-                                        {andar.nome}
+                                        {nivelParaLabel(nomeParaNivel(andar.nome))}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

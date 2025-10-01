@@ -123,6 +123,7 @@ export interface Modulo {
     nome: string;
     unidade?: Unidade; // Relação aninhada
     andars?: Andar[]; // Relação aninhada, array de andares
+    unidade_id: number; // Adicionado para facilitar o filtro no frontend
 }
 
 export interface Andar {
@@ -130,6 +131,7 @@ export interface Andar {
     nome: string;
     tipo_acesso: [];
     modulo?: Modulo; // Relação aninhada
+    modulo_id: number; // Adicionado para facilitar o filtro no frontend
     espacos?: Espaco[]; // Relação aninhada, array de espaços
 }
 
