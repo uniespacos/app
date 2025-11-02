@@ -5,11 +5,11 @@ namespace App\Enums\DiasSemana;
 
 enum DiasSemanaEnum: string
 {
-    case SEG = 'seg';
-    case TER = 'ter';
-    case QUA = 'qua';
-    case QUI = 'qui';
-    case SEX = 'sex';
-    case SAB = 'sab';
-    case DOM = 'dom';
+    case SEG = 'SEG';
+    case TER = 'TER';
+    case QUA = 'QUA';
+    case QUI = 'QUI';
+    case SEX = 'SEX';
+    case SAB = 'SAB';
+    case DOM = 'DOM';
 }
