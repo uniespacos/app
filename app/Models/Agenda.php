@@ -26,5 +26,9 @@ class Agenda extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function regras(): HasMany
+    {
+        return $this->hasMany(RegraReserva::class, 'agenda_id');
+    }
 
 }

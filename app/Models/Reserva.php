@@ -14,10 +14,12 @@ class Reserva extends Model
         'titulo',
         'descricao',
         'situacao',
+        'espaco_id',
         'data_inicial',
         'data_final',
         'recorrencia',
         'observacao',
+        'situacao_id',
         'user_id',
         'validation_status',
         'conflict_cache',
@@ -32,6 +34,18 @@ class Reserva extends Model
     public function horarios()
     {
         return $this->hasMany(Horario::class);
+    }
+    public function regras()
+    {
+        return $this->hasMany(RegraReserva::class);
+    }
+    public function espaco()
+    {
+        return $this->belongsTo(Espaco::class);
+    }
+    public function situacao()
+    {
+        return $this->belongsTo(SituacaoReserva::class, 'situacao');
     }
     public function user()
     {
