@@ -21,7 +21,10 @@ use Throwable;
 
 class AvaliarReservaJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     protected Reserva $reserva;
     protected array $validatedData;
@@ -60,7 +63,7 @@ class AvaliarReservaJob implements ShouldQueue
                             $statusFinal = 'indeferida';
                             $justificativaFinal = $conflitosMap->get($horarioId)->conflict_details;
                         }
-                        
+
                         Horario::where('id', $horarioId)->whereIn('agenda_id', $agendasDoGestorIds)
                             ->update([
                                 'situacao' => $statusFinal,
@@ -74,7 +77,7 @@ class AvaliarReservaJob implements ShouldQueue
 
                     // FASE 1: Lidar com as exceções. Marcar TODOS os conflitos da reserva como indeferidos.
                     if ($horariosConflitantesIds->isNotEmpty()) {
-                        foreach($horariosConflitantesIds as $id) {
+                        foreach ($horariosConflitantesIds as $id) {
                             $justificativa = $conflitosMap->get($id)->conflict_details ?? 'Conflito com outra reserva.';
                             Horario::where('id', $id)->update([
                                 'situacao' => 'indeferida',
@@ -88,15 +91,19 @@ class AvaliarReservaJob implements ShouldQueue
                     $processedPatterns = [];
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
-                        
+
                         // Pula os horários que já foram tratados como conflitos
-                        if($horariosConflitantesIds->contains($horarioId)) continue;
-                        
+                        if ($horariosConflitantesIds->contains($horarioId)) {
+                            continue;
+                        }
+
                         $horarioFonte = $this->reserva->horarios()->find($horarioId);
-                        if(!$horarioFonte) continue;
+                        if (!$horarioFonte) {
+                            continue;
+                        }
 
                         $dayOfWeek = Carbon::parse($horarioFonte->data)->dayOfWeek;
-                        
+
                         // O padrão agora inclui o horário de início, garantindo a granularidade
                         $pattern = "{$horarioFonte->agenda_id}-{$horarioFonte->horario_inicio}-{$dayOfWeek}";
 
@@ -171,11 +178,12 @@ class AvaliarReservaJob implements ShouldQueue
      */
     private function triggerConflictRevalidation(Collection $horariosAprovados): void
     {
-        $slotsOcupados = $horariosAprovados->map(fn($h) => ['data' => $h->data, 'agenda_id' => $h->agenda_id])
-            ->unique(fn($item) => $item['data'] . $item['agenda_id']);
+        $slotsOcupados = $horariosAprovados->map(fn ($h) => ['data' => $h->data, 'agenda_id' => $h->agenda_id])
+            ->unique(fn ($item) => $item['data'] . $item['agenda_id']);
 
-        if ($slotsOcupados->isEmpty())
+        if ($slotsOcupados->isEmpty()) {
             return;
+        }
 
         $reservasParaRevalidar = Reserva::query()
             ->where('id', '!=', $this->reserva->id)

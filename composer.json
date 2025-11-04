@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "fakerphp/faker": "1.24.1",
+        "jason-guru/laravel-make-repository": "^0.0.3",
         "laravel/pail": "1.2.2",
         "laravel/pint": "1.22.0",
         "laravel/sail": "1.41.1",
