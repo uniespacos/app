@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\ReservaServiceInterface;
+use App\Services\ReservaServiceV1;
+use App\Services\ReservaServiceV2;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,14 +20,18 @@ class AppServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Reserva::class => ReservaPolicy::class, // <-- ADICIONE ESTA LINHA
+        Reserva::class => ReservaPolicy::class,
     ];
     /**
      * Register any application services.
      */
     public function register(): void
     {
-        //
+        // $service = env('RESERVA_SERVICE_VERSION', 'v1') == 'v2'
+        //     ? ReservaServiceV1::class
+        //     : ReservaServiceV2::class;
+
+        $this->app->bind(ReservaServiceInterface::class, ReservaServiceV1::class);
     }
 
     /**
