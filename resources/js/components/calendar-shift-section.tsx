@@ -75,10 +75,9 @@ export default function CalendarShiftSection({
 
             {/* Renderiza cada LINHA de horário (ex: 07:30 - 08:20) */}
             {horariosDoTurno.map((horaString) => {
-                const [inicio] = horaString.split(' - ');
                 return (
                     <div key={horaString} className="grid grid-cols-[80px_repeat(7,1fr)] border-b">
-                        <div className="border-r p-2 pr-3 text-right text-xs text-muted-foreground">{inicio}</div>
+                        <div className="border-r p-2 pr-3 text-right text-xs text-muted-foreground">{horaString}</div>
 
                         {/* Para cada linha, renderiza as 7 COLUNAS (Seg a Dom) */}
                         {diasSemana.map((dia) => {

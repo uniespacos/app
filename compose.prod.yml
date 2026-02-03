@@ -13,20 +13,22 @@ services:
         volumes:
             - uniespacos-storage-production:/var/www/storage:ro
             - uniespacos-public-assets:/var/www/public/build:ro
+            - uniespacos-public-production:/var/www/public:ro 
         networks:
             - uniespacos-production
         depends_on:
             php-fpm:
-                condition: service_healthy # Wait for php-fpm health check
+                condition: service_healthy
     php-fpm:
         build:
             context: .
             dockerfile: ./docker/common/php-fpm/Dockerfile
-            target: production # Use the 'production' stage in the Dockerfile 
+            target: production 
         restart: unless-stopped
         volumes:
-            - uniespacos-public-assets:/var/www/public/build # Mount built public assets to ensure the manifest.json and hashed files match between Nginx and PHP-FPM
-            - uniespacos-storage-production:/var/www/storage # Mount the storage volume
+            - uniespacos-public-assets:/var/www/public/build 
+            - uniespacos-storage-production:/var/www/storage 
+            - uniespacos-public-production:/var/www/public 
         env_file:
             - .env
         networks:
@@ -83,3 +85,4 @@ volumes:
     postgres-data-production:
     uniespacos-storage-production:
     uniespacos-public-assets:
+    uniespacos-public-production: 

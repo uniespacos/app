@@ -113,6 +113,9 @@ COPY --from=builder /var/www /var/www
 # Set working directory
 WORKDIR /var/www
 
+# Copy the initial storage structure to the correct location
+RUN php artisan storage:link
+
 # Ensure correct permissions
 RUN chown -R www-data:www-data /var/www
 
