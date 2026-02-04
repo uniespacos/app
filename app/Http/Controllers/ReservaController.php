@@ -114,15 +114,13 @@ class ReservaController extends Controller
         try {
             $dadosValidados = $request->validated();
             $solicitante = Auth::user();
-
+                
             ProcessarCriacaoReserva::dispatch($dadosValidados, $solicitante);
 
-            return redirect()->route('espacos.index')
-                ->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
+            return redirect()->back()->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
         } catch (Exception $error) {
             Log::error('Erro ao despachar o job de criação de reserva: ' . $error->getMessage());
-            return redirect()->route('espacos.index')
-                ->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
+            return redirect()->back()->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
         }
     }
 
