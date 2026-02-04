@@ -24,3 +24,5 @@ yarn-error.log
 /.zed
 composer.lock
 package-lock.json
+*.sql
+/docker/production/nginx/*.pem
