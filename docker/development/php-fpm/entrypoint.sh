@@ -13,6 +13,31 @@ chown -R ${USER_ID}:${GROUP_ID} /var/www || echo "Some files could not be change
 echo "Clearing configurations..."
 
 cd /var/www || exit 1
+composer install --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+# Verifica se a APP_KEY está definida
+if grep -q "^APP_KEY=$" .env || ! grep -q "^APP_KEY=" .env; then
+    echo "Gerando APP_KEY..."
+    php artisan key:generate
+else
+    echo "APP_KEY já definida."
+fi
+# Run database migrations
+echo "Running database migrations..."
+php artisan migrate --force
+
+echo "Verificando se o banco precisa de seeds..."
+# Executa um comando PHP rápido para contar registros na tabela 'users' (ou outra principal)
+# O comando retorna apenas o número de registros
+RECORD_COUNT=$(php artisan tinker --execute "echo \DB::table('users')->count()")
+# Se a contagem for igual a 0, roda os seeds
+if [ "$RECORD_COUNT" -eq "0" ]; then
+    echo "Banco vazio detectado. Rodando db:seed..."
+    php artisan db:seed 
+else
+    echo "Banco já populado ($RECORD_COUNT registros encontrados). Pulando seeds."
+fi
+
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear

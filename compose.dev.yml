@@ -1,5 +1,6 @@
 services:
   web:
+    container_name: web
     image: nginx:latest
     volumes:
       - ./:/var/www
@@ -9,37 +10,36 @@ services:
     environment:
       - NGINX_HOST=localhost
     networks:
-      - laravel-development
+      - development
     depends_on:
-      php-fpm:
-        condition: service_started # Wait for php-fpm to start
+      app:
+        condition: service_started # Wait for app to start
 
-  php-fpm:
+  app:
+    container_name: app
     build:
       context: .
-      dockerfile: ./docker/common/php-fpm/Dockerfile
-      target: development
+      dockerfile: ./docker/development/php-fpm/Dockerfile
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
         XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
-        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_MODE: ${XDEBUG_MODE:-develop,coverage,debug,profile}
         XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
         XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
-        XDEBUG_LOG: /dev/stdout
-        XDEBUG_LOG_LEVEL: 0
-    env_file:
-      - .env
+        XDEBUG_LOG: ${XDEBUG_LOG:-/dev/stdout}
+        XDEBUG_LOG_LEVEL: ${XDEBUG_LOG_LEVEL:-0}
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./:/var/www
     networks:
-      - laravel-development
+      - development
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
 
   workspace:
+    container_name: workspace
     build:
       context: .
       dockerfile: ./docker/development/workspace/Dockerfile
@@ -47,38 +47,51 @@ services:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
         XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
-        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_MODE: ${XDEBUG_MODE:-develop,coverage,debug,profile}
         XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
         XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
-        XDEBUG_LOG: /dev/stdout
-        XDEBUG_LOG_LEVEL: 0
+        XDEBUG_LOG: ${XDEBUG_LOG:-/dev/stdout}
+        XDEBUG_LOG_LEVEL: ${XDEBUG_LOG_LEVEL:-0}
     ports:
       - '${VITE_PORT:-5173}:5173'
     tty: true
     stdin_open: true
-    env_file:
-      - .env
     volumes:
       - ./:/var/www
     networks:
-      - laravel-development
+      - development
 
   postgres:
     image: postgres:16
+    container_name: postgres
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
       - PGPASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD} 
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres-data-development:/var/lib/postgresql/data
     networks:
-      - laravel-development
-
+      - development
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  adminer:
+      image: adminer:5
+      restart: always
+      ports:
+        - "8080:8080"
+      depends_on:
+        - postgres
+      networks:
+        - development
+  
 networks:
-  laravel-development:
+  development:
 
 
 volumes:
