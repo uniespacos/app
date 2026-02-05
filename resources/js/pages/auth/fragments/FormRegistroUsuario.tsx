@@ -31,7 +31,6 @@ export function FormRegistroUsuario({
     processing,
     instituicaos,
     onSubmit,
-    onOpenNewInstitutionModal,
 }: FormRegistroUsuarioProps) {
     const formatPhoneNumber = (value: string) => {
         const cleaned = value.replace(/\D/g, '');

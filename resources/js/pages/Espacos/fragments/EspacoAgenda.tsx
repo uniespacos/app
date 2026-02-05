@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Espaco, OpcoesRecorrencia, Reserva, ReservaFormData, SlotCalendario, ValorOcorrenciaType } from '@/types';
+import { Espaco, OpcoesRecorrencia, Reserva, ReservaFormData, SlotCalendario } from '@/types';
 import { router, useForm } from '@inertiajs/react'; // ALTERADO: Importar useForm
 import { addDays, addMonths, addWeeks, format, parse, parseISO, subWeeks } from 'date-fns';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
@@ -82,7 +82,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     const [dialogAberto, setDialogAberto] = useState(false);
 
     // ALTERAÇÃO PRINCIPAL: Centralizando o estado do formulário com useForm
-    const { data, setData, post, patch, processing, errors, reset } = useForm<ReservaFormData>({
+    const { data, setData, post, patch, processing, reset } = useForm<ReservaFormData>({
         titulo: reserva?.titulo ?? '',
         descricao: reserva?.descricao ?? '',
         data_inicial: reserva?.data_inicial ? new Date(reserva.data_inicial) : hoje,
