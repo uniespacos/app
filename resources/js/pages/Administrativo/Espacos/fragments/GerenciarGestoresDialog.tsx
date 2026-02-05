@@ -12,7 +12,7 @@ interface GerenciarGestoresDialogProps {
     onSave: (espacoId: number, gestores: Record<string, number | null>) => void;
 }
 
-export function GerenciarGestoresDialog({ espaco, usuarios, isOpen, onClose, onSave }: GerenciarGestoresDialogProps) {
+export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: GerenciarGestoresDialogProps) {
     const [gestores, setGestores] = useState<Record<string, number | null>>({
         manha: null,
         tarde: null,
