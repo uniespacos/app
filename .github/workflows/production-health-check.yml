@@ -18,7 +18,7 @@ jobs:
 
       - name: Create Production .env for CI
         run: |
-          cp .env.prod.example .env
+          cp .env.prod .env
           # Ajusta variáveis críticas para o ambiente de CI (Docker dentro do Runner)
           sed -i 's/DB_HOST=postgres/DB_HOST=postgres/' .env
           sed -i 's/DB_PASSWORD=uniespacossecretkey/DB_PASSWORD=ci_testing_pass/' .env
