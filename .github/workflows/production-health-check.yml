@@ -18,16 +18,21 @@ jobs:
 
       - name: Create Production .env for CI
         run: |
-          cp .env.prod .env
-          # Ajusta variáveis críticas para o ambiente de CI (Docker dentro do Runner)
-          sed -i 's/DB_HOST=postgres/DB_HOST=postgres/' .env
-          sed -i 's/DB_PASSWORD=uniespacossecretkey/DB_PASSWORD=ci_testing_pass/' .env
-          sed -i 's/APP_ENV=production/APP_ENV=production/' .env
-          sed -i 's/APP_KEY=/APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=/' .env
+          # Se o .env.prod não estiver no git (o que é correto), use o .env.example
+          # Caso tenha certeza que .env.prod existe no repo, mantenha o comando original
+          if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
 
-          # Preenche variáveis vazias necessárias para o build não falhar
-          sed -i 's/PUSHER_APP_KEY=/PUSHER_APP_KEY=dummy_key/' .env
-          sed -i 's/PUSHER_APP_CLUSTER="sa1"/PUSHER_APP_CLUSTER="mt1"/' .env
+          # Ajusta variáveis críticas
+          sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
+          sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
+          sed -i 's|APP_ENV=.*|APP_ENV=production|' .env
+
+          # AQUI ESTAVA O ERRO: Trocamos '/' por '|' para não conflitar com a chave base64
+          sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
+
+          # Preenche variáveis vazias
+          sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' .env
+          sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
 
           cat .env
 
