@@ -226,6 +226,7 @@ export interface ReservaFormData {
     data_final: Date | null;
     recorrencia: ValorOcorrenciaType; // Tipo de recorrência selecionada
     horarios_solicitados: Partial<Horario>[]; // Horários que o usuário seleciona
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 

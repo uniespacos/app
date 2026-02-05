@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Agenda, Horario, Reserva, SlotCalendario } from "@/types";
 import { CalendarDays, Clock, Edit, FileText, Home, Loader2, User, XCircle } from "lucide-react"; // Adicionado Loader2
