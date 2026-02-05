@@ -46,9 +46,6 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
 
         setFilteredEspacosFavoritos(filtered);
     }, [espacosFavoritos, searchTerm]);
-    const [selectedEspaco, setSelectedEspaco] = useState<any>(null)
-    const [selectedGestor, setSelectedGestor] = useState("")
-    const [selectedTurno, setSelectedTurno] = useState("")
 
     const getTurnoLabel = (turno: string) => {
         switch (turno) {
@@ -61,10 +58,6 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
             default:
                 return turno
         }
-    }
-
-    const handleDelegarGestor = () => {
-        // Implementar lógica de delegação
     }
 
     return (
