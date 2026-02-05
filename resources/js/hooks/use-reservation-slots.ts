@@ -1,4 +1,4 @@
-import { Agenda, Reserva, SituacaoReserva, SlotCalendario, Horario } from '@/types';
+import { Reserva,  SlotCalendario, Horario } from '@/types';
 import { useMemo, useState, useEffect } from 'react';
 import { parse } from 'date-fns';
 
@@ -20,7 +20,7 @@ function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCalendari
  * @param agendas - A lista de agendas relacionadas à reserva.
  * @returns Um objeto contendo o estado dos slots e as funções para manipulá-los.
  */
-export function useReservationSlots(reserva: Reserva, agendas: Agenda[]) {
+export function useReservationSlots(reserva: Reserva) {
 
     // Calcula os slots iniciais lendo as "etiquetas" de conflito do backend.
     const initialSlots = useMemo<SlotCalendario[]>(() => {

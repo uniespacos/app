@@ -12,7 +12,6 @@ import {
     Calendar,
     Eye,
     LayoutGrid,
-    Star,
     Users,
     School,
     MapPin,
@@ -46,13 +45,6 @@ const institucionalExtras: MenuItem[] = [
     { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Grid3X3 },
     { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Briefcase },
 ];
-
-/* Rotulagem da seção extra --------------------------------------------- */
-const roleLabels: Record<PermissionId, string> = {
-    [PermissionId.COMUM]: 'Menu',
-    [PermissionId.GESTOR]: 'Gestor de Serviço',
-    [PermissionId.INSTITUCIONAL]: 'Master (Administrador)',
-};
 
 /* Mapeia ID → itens extras --------------------------------------------- */
 const roleExtrasMap: Record<PermissionId, MenuItem[]> = {

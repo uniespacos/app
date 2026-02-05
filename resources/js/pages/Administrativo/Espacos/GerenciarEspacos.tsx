@@ -38,10 +38,7 @@ export default function GerenciarEspacos() {
         capacidade: '',
     });
     const [espacoParaGerenciar, setEspacoParaGerenciar] = useState<Espaco | null>(null);
-    const { data, setData, patch, error } = useForm<{ espacoId: number | null; gestores: Record<string, number | null> }>({
-        espacoId: null,
-        gestores: {},
-    });
+    
     // Estado para a paginação
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // Defina quantos itens por página
