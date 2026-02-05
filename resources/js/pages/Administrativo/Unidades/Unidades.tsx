@@ -29,22 +29,19 @@ export default function UnidadesPage() {
     const unidadesData = unidades.data;
     const [removerUnidade, setRemoverUnidade] = useState<Unidade | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedInstituicao] = useState<Instituicao | undefined>(undefined);
     const [unidadesFilter, setUnidadesFilter] = useState<Unidade[]>(unidades.data);
 
     useEffect(() => {
-        if (!searchTerm && selectedInstituicao === undefined) {
+        if (!searchTerm) {
             setUnidadesFilter(unidadesData);
             return;
         }
         setUnidadesFilter(
             unidadesData.filter((unidade) => {
-                const matchesSearch = unidade.nome.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesInstituicao = selectedInstituicao ? unidade.instituicao?.id === selectedInstituicao.id : true;
-                return matchesSearch && matchesInstituicao;
+                return unidade.nome.toLowerCase().includes(searchTerm.toLowerCase());
             }),
         );
-    }, [searchTerm, selectedInstituicao, unidadesData]);
+    }, [searchTerm, unidadesData]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
