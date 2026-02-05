@@ -2,10 +2,7 @@ name: Production Setup Validation
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: ["main", "develop"]
   push:
-    branches: ["main"]
 
 jobs:
   validate-docker-prod:
@@ -28,7 +25,7 @@ jobs:
       - name: Generate SSL & Debug Context
         run: |
           mkdir -p docker/production/nginx/ssl/
-          
+
           # 2. Gera o certificado
           openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
             -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
@@ -41,7 +38,7 @@ jobs:
             echo "❌ ERRO FATAL: O arquivo do certificado foi criado mas está VAZIO."
             exit 1
           fi
-          
+
           echo "✅ Certificado gerado com sucesso. Primeiras linhas:"
           head -n 2 docker/production/nginx/ssl/uesb2025fullchain.pem
       - name: Create Production .env for CI
