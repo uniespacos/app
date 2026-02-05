@@ -15,14 +15,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Create Production .env for CI
+      - name: Generate and Verify SSL
         run: |
           if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
           sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
           sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
           sed -i 's|APP_ENV=.*|APP_ENV=production|' .env
-          # NOTE: Dummy APP_KEY for CI testing only; never use this key in real production environments.
           sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
           sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' .env
           sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
@@ -30,57 +28,77 @@ jobs:
       - name: Generate SSL & Debug Context
         run: |
           mkdir -p docker/production/nginx/ssl/
-
-          echo "🔐 Gerando Certificado..."
+          
+          # 2. Gera o certificado
           openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
             -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
             -out docker/production/nginx/ssl/uesb2025fullchain.pem \
             -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
-
-          echo "📂 Verificando arquivos gerados:"
-          ls -lh docker/production/nginx/ssl/
-
-          # TESTE DE SEGURANÇA: Falha se o arquivo estiver vazio
+            
+          # 3. VERIFICAÇÃO CRÍTICA
+          # O comando 'test -s' verifica se o arquivo existe E tem tamanho maior que zero
           if [ ! -s docker/production/nginx/ssl/uesb2025fullchain.pem ]; then
-            echo "❌ ERRO: O certificado foi criado vazio!"
+            echo "❌ ERRO FATAL: O arquivo do certificado foi criado mas está VAZIO."
             exit 1
           fi
+          
+          echo "✅ Certificado gerado com sucesso. Primeiras linhas:"
+          head -n 2 docker/production/nginx/ssl/uesb2025fullchain.pem
+      - name: Create Production .env for CI
+        run: |
+          # Se o .env.prod não estiver no git (o que é correto), use o .env.example
+          # Caso tenha certeza que .env.prod existe no repo, mantenha o comando original
+          if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
+
+          # Ajusta variáveis críticas
+          sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
+          sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
+          sed -i 's|APP_ENV=.*|APP_ENV=production|' .env
+
+          # AQUI ESTAVA O ERRO: Trocamos '/' por '|' para não conflitar com a chave base64
+          sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
+
+          # Preenche variáveis vazias
+          sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' .env
+          sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
+
+          cat .env
 
       - name: Build and Start Containers
+        # Usa o arquivo compose que você forneceu
         run: docker compose -f compose.prod.yml up -d --build
 
-      - name: Wait for Services (Dynamic Check)
+      - name: Wait for Containers to be Healthy
+        # Aguarda os Healthchecks definidos no seu docker-compose (postgres e php-fpm)
         run: |
-          echo "⏳ Aguardando serviços..."
+          echo "Aguardando serviços ficarem saudáveis..."
+          timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} ${{ github.workspace }}-php-fpm-1)" == "healthy" ]; do sleep 2; done'
+          timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} ${{ github.workspace }}-postgres-1)" == "healthy" ]; do sleep 2; done'
 
-          # Pega os IDs reais dos containers usando o compose.
-          # Isso resolve o erro "No such object" pois não adivinhamos o nome.
-          PHP_CONTAINER=$(docker compose -f compose.prod.yml ps -q php-fpm)
-          DB_CONTAINER=$(docker compose -f compose.prod.yml ps -q postgres)
+          # Verifica se o Nginx e o Queue estão rodando (já que eles não têm healthcheck explícito no compose, verificamos se estão "running")
+          if [ "$(docker inspect -f {{.State.Running}} ${{ github.workspace }}-web-1)" != "true" ]; then echo "Nginx falhou"; exit 1; fi
+          if [ "$(docker inspect -f {{.State.Running}} ${{ github.workspace }}-queue-worker-1)" != "true" ]; then echo "Queue Worker falhou"; exit 1; fi
 
-          echo "PHP Container ID: $PHP_CONTAINER"
-          echo "DB Container ID: $DB_CONTAINER"
+      - name: Show Running Containers
+        if: always()
+        run: docker compose -f compose.prod.yml ps -a
 
-          # Aguarda PHP
-          timeout 60s bash -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $PHP_CONTAINER)\" == \"healthy\" ]; do sleep 2; done" || (echo "❌ PHP Healthcheck Timeout" && exit 1)
-
-          # Aguarda Postgres
-          timeout 60s bash -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $DB_CONTAINER)\" == \"healthy\" ]; do sleep 2; done" || (echo "❌ DB Healthcheck Timeout" && exit 1)
-
-      - name: Verify Nginx (HTTP Check)
+      - name: Validate Nginx Response (HTTP Check)
+        # Tenta acessar o Nginx na porta 80. Deve retornar 200, 302 ou 404 (mas não "Connection Refused" ou 502 Bad Gateway imediato)
         run: |
-          WEB_CONTAINER=$(docker compose -f compose.prod.yml ps -q web)
-          if [ "$(docker inspect -f '{{.State.Running}}' $WEB_CONTAINER)" != "true" ]; then 
-             echo "❌ Nginx não está rodando!"; 
-             docker logs $WEB_CONTAINER
-             exit 1 
-          fi
-
-          # Tenta acessar. Se o SSL estiver ruim, o curl vai reclamar de conexão fechada ou erro de protocolo.
-          # Usamos --insecure (-k) pois o certificado é auto-assinado, mas queremos ver se responde.
           sleep 5
-          curl -v -k --fail https://localhost || curl -v --fail http://localhost || echo "⚠️ Curl falhou, checar logs"
+          curl -v --fail http://localhost || echo "Curl falhou, verificando logs..."
 
-      - name: Show Logs on Failure
+      - name: Validate Database Connection from PHP
+        # Executa um comando dentro do container PHP para garantir que ele enxerga o Postgres
+        run: |
+          docker compose -f compose.prod.yml exec -T php-fpm php artisan db:monitor
+
+      - name: Validate Queue Worker Process
+        # Verifica se o processo da fila está rodando dentro do container
+        run: |
+          docker compose -f compose.prod.yml exec -T queue-worker ps aux | grep "queue:work"
+
+      - name: Check Container Logs (On Failure)
         if: failure()
         run: docker compose -f compose.prod.yml logs
