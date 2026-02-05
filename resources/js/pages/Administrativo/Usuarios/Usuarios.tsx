@@ -86,8 +86,9 @@ export default function UsuariosPage() {
     };
 
     const handleEditUser = (user: User) => {
-        // Implementação futura para edição de usuário
-        toast('Funcionalidade de edição ainda não implementada. ' + user.name);
+        // TODO: Implement user editing functionality with a dedicated form/modal
+        // This should allow editing of user details like name, email, phone, etc.
+        toast('Funcionalidade de edição ainda não implementada.');
     };
 
     const handlePermissionUpdate = (userId: number, newPermissionTypeId: number, agendas?: number[]) => {
