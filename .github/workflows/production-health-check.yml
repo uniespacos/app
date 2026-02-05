@@ -15,20 +15,26 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Generate Valid Dummy SSL Certificates
+      - name: Generate and Verify SSL
         run: |
-          # Garante que a pasta existe
+          # 1. Garante que a pasta existe
           mkdir -p docker/production/nginx/ssl/
-
-          # Gera um certificado AUTO-ASSINADO com estrutura válida
-          # O Nginx vai ler isso e achar que é real, permitindo o boot.
+          
+          # 2. Gera o certificado
           openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
             -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
             -out docker/production/nginx/ssl/uesb2025fullchain.pem \
-            -subj "/C=BR/ST=Bahia/L=Vitoria da Conquista/O=UESB/CN=localhost"
+            -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
             
-          # (Opcional) Mostra que os arquivos foram criados e tem tamanho > 0
-          ls -lh docker/production/nginx/ssl/
+          # 3. VERIFICAÇÃO CRÍTICA
+          # O comando 'test -s' verifica se o arquivo existe E tem tamanho maior que zero
+          if [ ! -s docker/production/nginx/ssl/uesb2025fullchain.pem ]; then
+            echo "❌ ERRO FATAL: O arquivo do certificado foi criado mas está VAZIO."
+            exit 1
+          fi
+          
+          echo "✅ Certificado gerado com sucesso. Primeiras linhas:"
+          head -n 2 docker/production/nginx/ssl/uesb2025fullchain.pem
       - name: Create Production .env for CI
         run: |
           # Se o .env.prod não estiver no git (o que é correto), use o .env.example
