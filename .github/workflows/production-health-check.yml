@@ -22,6 +22,7 @@ jobs:
           sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
           sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
           sed -i 's|APP_ENV=.*|APP_ENV=production|' .env
+          # NOTE: Dummy APP_KEY for CI testing only; never use this key in real production environments.
           sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
           sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' .env
           sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
