@@ -3,9 +3,9 @@ name: Production Setup Validation
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   validate-docker-prod:
@@ -18,17 +18,17 @@ jobs:
 
       - name: Create Production .env for CI
         run: |
-          cp .env.example .env
+          cp .env.prod.example .env
           # Ajusta variáveis críticas para o ambiente de CI (Docker dentro do Runner)
           sed -i 's/DB_HOST=postgres/DB_HOST=postgres/' .env
           sed -i 's/DB_PASSWORD=uniespacossecretkey/DB_PASSWORD=ci_testing_pass/' .env
           sed -i 's/APP_ENV=production/APP_ENV=production/' .env
           sed -i 's/APP_KEY=/APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=/' .env
-          
+
           # Preenche variáveis vazias necessárias para o build não falhar
           sed -i 's/PUSHER_APP_KEY=/PUSHER_APP_KEY=dummy_key/' .env
           sed -i 's/PUSHER_APP_CLUSTER="sa1"/PUSHER_APP_CLUSTER="mt1"/' .env
-          
+
           cat .env
 
       - name: Build and Start Containers
@@ -41,7 +41,7 @@ jobs:
           echo "Aguardando serviços ficarem saudáveis..."
           timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} ${{ github.workspace }}-php-fpm-1)" == "healthy" ]; do sleep 2; done'
           timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} ${{ github.workspace }}-postgres-1)" == "healthy" ]; do sleep 2; done'
-          
+
           # Verifica se o Nginx e o Queue estão rodando (já que eles não têm healthcheck explícito no compose, verificamos se estão "running")
           if [ "$(docker inspect -f {{.State.Running}} ${{ github.workspace }}-web-1)" != "true" ]; then echo "Nginx falhou"; exit 1; fi
           if [ "$(docker inspect -f {{.State.Running}} ${{ github.workspace }}-queue-worker-1)" != "true" ]; then echo "Queue Worker falhou"; exit 1; fi
