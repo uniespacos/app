@@ -125,7 +125,6 @@ export default function GerenciarEspacos() {
                                 key={espacoParaGerenciar?.id}
                                 espaco={espacoParaGerenciar}
                                 usuarios={users}
-                                isOpen={!!espacoParaGerenciar}
                                 onClose={() => setEspacoParaGerenciar(null)}
                                 onSave={handleSalvarGestores}
                             />

@@ -7,7 +7,6 @@ import { UserSearchCombobox } from './UserSearchComboBox';
 interface GerenciarGestoresDialogProps {
     espaco: Espaco | null;
     usuarios: User[];
-    isOpen: boolean;
     onClose: () => void;
     onSave: (espacoId: number, gestores: Record<string, number | null>) => void;
 }
