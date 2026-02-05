@@ -15,24 +15,20 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Generate Dummy SSL Certificates
+      - name: Generate Valid Dummy SSL Certificates
         run: |
-          # Cria o diretório esperado pelo seu Dockerfile
-          # IMPORTANTE: Verifique se o caminho abaixo bate com o COPY do seu Dockerfile
-          mkdir -p /etc/ssl/certs/
-          
-          echo "Gerando certificado auto-assinado válido..."
-          
-          # Gera um certificado REAL (embora não confiável) para o Nginx não reclamar do formato
-          # Atenção aos nomes dos arquivos: O log pediu 'uesb2025fullchain.pem'
-          
-          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-            -keyout /etc/ssl/certs/uesb2025privkey.pem \
-            -out /etc/ssl/certs/uesb2025fullchain.pem \
-            -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
+          # Garante que a pasta existe
+          mkdir -p docker/production/nginx/ssl/
 
-          # Lista para conferência no log
-          ls -la /etc/ssl/certs/
+          # Gera um certificado AUTO-ASSINADO com estrutura válida
+          # O Nginx vai ler isso e achar que é real, permitindo o boot.
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
+            -out docker/production/nginx/ssl/uesb2025fullchain.pem \
+            -subj "/C=BR/ST=Bahia/L=Vitoria da Conquista/O=UESB/CN=localhost"
+            
+          # (Opcional) Mostra que os arquivos foram criados e tem tamanho > 0
+          ls -lh docker/production/nginx/ssl/
       - name: Create Production .env for CI
         run: |
           # Se o .env.prod não estiver no git (o que é correto), use o .env.example
