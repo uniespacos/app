@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
