@@ -15,8 +15,8 @@ services:
             - uniespacos-public-assets:/var/www/public/build:ro
             - uniespacos-public-production:/var/www/public:ro
             # Chaves SSL para HTTPS
-            - ./docker/production/nginx/uesb2025fullchain.pem:/etc/ssl/certs/uesb2025fullchain.pem:ro
-            - ./docker/production/nginx/uesb2025privkey.pem:/etc/ssl/private/uesb2025privkey.pem:ro
+            - ./docker/production/nginx/ssl/uesb2025fullchain.pem:/etc/ssl/certs/uesb2025fullchain.pem:ro
+            - ./docker/production/nginx/ssl/uesb2025privkey.pem:/etc/ssl/private/uesb2025privkey.pem:ro
         networks:
             - uniespacos-production
         depends_on:
