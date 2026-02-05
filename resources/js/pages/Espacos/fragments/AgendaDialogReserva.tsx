@@ -10,11 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { OpcoesRecorrencia, ReservaFormData, SlotCalendario } from '@/types';
 import { addDays, addMonths, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { type Locale } from 'date-fns/locale';
 import { Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
 import { FormEvent, useMemo } from 'react';
 
-// Tipagem das props foi atualizada
 type AgendaDialogReservaProps = {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -25,11 +24,12 @@ type AgendaDialogReservaProps = {
     isEditMode?: boolean;
     formData: ReservaFormData;
     setFormData: (key: keyof ReservaFormData, value: any) => void;
+    locale?: Locale;
 };
 
 export default function AgendaDialogReserva({
     isEditMode, isOpen, onOpenChange, onSubmit, slotsSelecao, hoje, isSubmitting,
-    formData, setFormData,
+    formData, setFormData, locale,
 }: AgendaDialogReservaProps) {
 
     const opcoesRecorrencia: OpcoesRecorrencia[] = [
@@ -40,9 +40,9 @@ export default function AgendaDialogReserva({
     ];
 
     const periodoRecorrencia = useMemo(() => ({
-        inicio: format(formData.data_inicial ?? hoje, 'dd/MM/yyyy'),
-        fim: format(formData.data_final ?? addMonths(hoje, 1), 'dd/MM/yyyy'),
-    }), [formData.data_inicial, formData.data_final, hoje]);
+        inicio: format(formData.data_inicial ?? hoje, 'dd/MM/yyyy', { locale }),
+        fim: format(formData.data_final ?? addMonths(hoje, 1), 'dd/MM/yyyy', { locale }),
+    }), [formData.data_inicial, formData.data_final, hoje, locale]);
 
     const slotsAgrupadosPorDia = useMemo(() =>
         slotsSelecao.reduce(
@@ -123,7 +123,7 @@ export default function AgendaDialogReserva({
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
-                                            <CalendarComponent mode="single" selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined} onSelect={(date) => setFormData('data_inicial', date)} initialFocus disabled={(date) => date < hoje} />
+                                            <CalendarComponent locale={locale} mode="single" selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined} onSelect={(date) => setFormData('data_inicial', date)} initialFocus disabled={(date) => date < hoje} />
                                         </PopoverContent>
                                     </Popover>
                                 </div>
@@ -137,7 +137,7 @@ export default function AgendaDialogReserva({
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
-                                            <CalendarComponent mode="single" selected={formData.data_final ? new Date(formData.data_final) : undefined} onSelect={(date) => setFormData('data_final', date)} initialFocus disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)} />
+                                            <CalendarComponent locale={locale} mode="single" selected={formData.data_final ? new Date(formData.data_final) : undefined} onSelect={(date) => setFormData('data_final', date)} initialFocus disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)} />
                                         </PopoverContent>
                                     </Popover>
                                 </div>
@@ -156,7 +156,7 @@ export default function AgendaDialogReserva({
                             <ScrollArea className="h-[150px] rounded-md border p-2">
                                 {Object.entries(slotsAgrupadosPorDia).map(([diaKey, { data, slots }]) => (
                                     <div key={diaKey} className="mb-3 last:mb-0">
-                                        <div className="mb-1 text-sm font-medium">{format(data, 'EEEE', { locale: ptBR })}</div>
+                                        <div className="mb-1 text-sm font-medium">{format(data, 'EEEE')}</div>
                                         <div>
                                             {slots.map((horario) => (
                                                 <div key={horario.id} className="text-muted-foreground py-1 text-sm">{horario.horario_inicio.substring(0, 5)} - {horario.horario_fim.substring(0, 5)}</div>

@@ -11,6 +11,7 @@ import AgendaHeader from './AgendaHeader';
 import AgendaNavegacao from './AgendaNavegacao';
 import { diasDaSemana } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { ptBR } from 'date-fns/locale';
 
 const opcoesRecorrencia: OpcoesRecorrencia[] = [
     { valor: 'unica', label: 'Apenas esta semana', descricao: 'A reserva será feita apenas para os dias selecionados nesta semana', calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6) },
@@ -231,6 +232,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
                         // Passar o objeto 'data' e a função 'setData' do useForm
                         formData={data}
                         setFormData={setData}
+                        locale={ptBR}
                     />
                     <Button variant="outline" size="sm" onClick={limparSelecao}>Limpar seleção</Button>
                 </div>
