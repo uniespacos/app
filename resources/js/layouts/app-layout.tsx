@@ -20,7 +20,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
         if (flash.error) {
             toast.error(flash.error);
         }
-    }, [flash]); // O efeito será executado sempre que o objeto 'flash' mudar
+    }, [flash]);
 
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>

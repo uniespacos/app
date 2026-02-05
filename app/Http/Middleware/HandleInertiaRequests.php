@@ -60,6 +60,7 @@ class HandleInertiaRequests extends Middleware
             'notifications' => fn() => $request->user()
                 ? $request->user()->notifications()->limit(15)->get()
                 : [],
+            'locale' => app()->getLocale(),
         ];
     }
 }
