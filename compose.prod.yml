@@ -1,5 +1,6 @@
 services:
     web:
+        container_name: web-production
         build:
             context: .
             dockerfile: ./docker/production/nginx/Dockerfile
@@ -15,17 +16,18 @@ services:
             - uniespacos-public-assets:/var/www/public/build:ro
             - uniespacos-public-production:/var/www/public:ro
             # Chaves SSL para HTTPS
-            - ./docker/production/nginx/ssl/uesb2025fullchain.pem:/etc/ssl/certs/uesb2025fullchain.pem:ro
-            - ./docker/production/nginx/ssl/uesb2025privkey.pem:/etc/ssl/private/uesb2025privkey.pem:ro
+            # - ./docker/production/nginx/uesb2025fullchain.pem:/etc/ssl/certs/uesb2025fullchain.pem:ro
+            # - ./docker/production/nginx/uesb2025privkey.pem:/etc/ssl/private/uesb2025privkey.pem:ro
         networks:
             - uniespacos-production
         depends_on:
-            php-fpm:
+            app:
                 condition: service_healthy
-    php-fpm:
+    app:
+        container_name: app-production
         build:
             context: .
-            dockerfile: ./docker/common/php-fpm/Dockerfile
+            dockerfile: ./docker/production/php-fpm/Dockerfile
             target: production
         restart: unless-stopped
         volumes:
@@ -45,9 +47,10 @@ services:
             postgres:
                 condition: service_healthy
     queue-worker:
+        container_name: queue-worker-production
         build:
             context: .
-            dockerfile: ./docker/common/php-fpm/Dockerfile
+            dockerfile: ./docker/production/php-fpm/Dockerfile
             target: production
         restart: unless-stopped
         command: php artisan queue:work --verbose --tries=3 --timeout=90
@@ -59,9 +62,10 @@ services:
             - uniespacos-production
         depends_on:
             - postgres
-            - php-fpm
+            - app
 
     postgres:
+        container_name: postgres-production
         image: postgres:16
         restart: unless-stopped
         user: postgres
@@ -81,6 +85,22 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+    
+    watchtower:
+        container_name: watchtower-production
+        image: nickfedor/watchtower:latest
+        restart: unless-stopped
+        command: --cleanup --interval 300
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            # Configuração para logar no GitHub Registry (Necessário se for privado)
+            - REPO_USER=${GITHUB_USER}
+            - REPO_PASS=${GITHUB_TOKEN} # Seu Token gerado no GitHub
+            - WATCHTOWER_POLL_INTERVAL=60 # Verifica a cada 60 segundos
+            - WATCHTOWER_CLEANUP=true # Remove imagens velhas para não encher o disco
+            - WATCHTOWER_INCLUDE_RESTARTING=true
+        
 networks:
     uniespacos-production:
 

@@ -1,0 +1,71 @@
+name: Build & Publish Docker Image
+
+on:
+    push:
+        branches: ["main"]
+
+# Permissões necessárias para o GITHUB_TOKEN escrever no registro
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    test:
+        name: 🧪 Run Tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.4"
+            - name: Install Dependencies
+              run: composer install --no-progress --prefer-dist
+            - name: Generate Key
+              run: cp .env.prod .env && php artisan key:generate
+            - name: Run Tests
+              run: php artisan test
+
+    build-and-push:
+        name: 🐳 Build & Push to GHCR
+        needs: test # Só roda se os testes passarem
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Log in to the Container registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GHCR_TOKEN }}
+
+            # 1. Build da Imagem PHP-FPM (Aplicação)
+            - name: Build and push PHP App
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./docker/production/php-fpm/Dockerfile
+                  target: production
+                  push: true
+                  # Nome da imagem: ghcr.io/usuario/repo/app:latest
+                  tags: ghcr.io/${{ github.repository }}/app:latest
+
+            # 2. Build da Imagem Nginx (Servidor Web)
+            # Importante: O Dockerfile do Nginx precisa copiar os assets buildados
+            # Se o seu Dockerfile do Nginx espera os arquivos já prontos, precisamos buildar o front antes aqui
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+            - name: Install & Build Front
+              run: npm ci && npm run build
+
+            - name: Build and push Nginx Web
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./docker/production/nginx/Dockerfile
+                  push: true
+                  tags: ghcr.io/${{ github.repository }}/web:latest
