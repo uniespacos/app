@@ -8,22 +8,32 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "test": "jest"
     },
     "devDependencies": {
+        "@babel/core": "^7.29.0",
+        "@babel/preset-env": "^7.29.0",
+        "@babel/preset-typescript": "^7.28.5",
         "@eslint/js": "9.25.1",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
         "@types/jest": "^30.0.0",
         "@types/node": "22.14.1",
         "@types/pusher-js": "^4.2.2",
+        "babel-jest": "^30.2.0",
         "eslint": "^9.39.2",
         "eslint-config-prettier": "10.1.2",
         "eslint-plugin-react": "7.37.5",
         "eslint-plugin-react-hooks": "5.2.0",
+        "jest": "^30.2.0",
+        "jest-environment-jsdom": "^30.2.0",
         "laravel-echo": "^2.3.0",
         "prettier": "3.5.3",
         "prettier-plugin-organize-imports": "4.1.0",
         "prettier-plugin-tailwindcss": "0.6.11",
         "pusher-js": "^8.4.0",
+        "ts-jest": "^29.4.6",
         "typescript-eslint": "8.31.0"
     },
     "dependencies": {
