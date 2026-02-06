@@ -4,13 +4,12 @@ on:
     push:
         branches:
             - main
-
+    workflow_dispatch: 
 jobs:
     deploy:
         name: Deploy
         runs-on: ubuntu-latest
         timeout-minutes: 20
-
         env:
             GITHUB_REF: ${{ github.ref }}
             DOCKER_REGISTRY: ghcr.io
@@ -50,7 +49,7 @@ jobs:
                   password: ${{ secrets.PORTAINER_PASSWORD }}
                   stack-name: "uniespacos"
                   stack-definition: "compose.prod.yml"
-                  template-variables: '{"username": "${{ secrets.PORTAINER_TEMPLATE_USERNAME }}", "password": "${{ secrets.PORTAINER_TEMPLATE_PASSWORD }}"}'
+                  template-variables: '{"username": "${{ secrets.PORTAINER_USERNAME }}", "password": "${{ secrets.PORTAINER_PASSWORD }}"}'
                   image: ${{ env.DOCKER_IMAGE_URI }}:${{ env.IMAGE_TAG }}
                   prune-stack: true
                   pull-image: true
