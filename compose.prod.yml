@@ -35,7 +35,7 @@ services:
             - uniespacos-storage-production:/var/www/storage
             - uniespacos-public-production:/var/www/public
         env_file:
-            - .env
+            - stack.env
         networks:
             - uniespacos-production
         healthcheck:
@@ -57,7 +57,7 @@ services:
         volumes:
             - uniespacos-storage-production:/var/www/storage
         env_file:
-            - .env
+            - stack.env
         networks:
             - uniespacos-production
         depends_on:
@@ -71,6 +71,8 @@ services:
         user: postgres
         ports:
             - "${DB_PORT:-5432}:5432"
+        env_file:
+            - stack.env
         environment:
             - PGPASSWORD=${DB_PASSWORD}
             - POSTGRES_DB=${DB_DATABASE}
@@ -85,14 +87,16 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
-    
+
     watchtower:
         container_name: watchtower-production
         image: nickfedor/watchtower:latest
         restart: unless-stopped
         command: --cleanup --interval 300
         volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
+            - /var/run/docker.sock:/var/run/docker.sock
+        env_file:
+            - stack.env
         environment:
             # Configuração para logar no GitHub Registry (Necessário se for privado)
             - REPO_USER=${GITHUB_USER}
@@ -100,7 +104,6 @@ services:
             - WATCHTOWER_POLL_INTERVAL=60 # Verifica a cada 60 segundos
             - WATCHTOWER_CLEANUP=true # Remove imagens velhas para não encher o disco
             - WATCHTOWER_INCLUDE_RESTARTING=true
-        
 networks:
     uniespacos-production:
 
