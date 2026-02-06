@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Generate and Verify SSL
         run: |
+          if [ -f .env.prod ]; then cp .env.prod stack.env; else cp .env.example stack.env; fi
           if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
           sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
           sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
@@ -21,6 +22,13 @@ jobs:
           sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
           sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' .env
           sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
+          # Repete para stack.env, já que o compose.prod.yml usa env_file: stack.env
+          sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' stack.env
+          sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' stack.env
+          sed -i 's|APP_ENV=.*|APP_ENV=production|' stack.env
+          sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' stack.env
+          sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' stack.env
+          sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' stack.env
 
       - name: Generate SSL & Debug Context
         run: |
@@ -46,13 +54,13 @@ jobs:
           # Se o .env.prod não estiver no git (o que é correto), use o .env.example
           # Caso tenha certeza que .env.prod existe no repo, mantenha o comando original
           if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
+          if [ -f .env.prod ]; then cp .env.prod stack.env; else cp .env.example stack.env; fi
 
           # Ajusta variáveis críticas
           sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
           sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
           sed -i 's|APP_ENV=.*|APP_ENV=production|' .env
 
-          # AQUI ESTAVA O ERRO: Trocamos '/' por '|' para não conflitar com a chave base64
           sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
 
           # Preenche variáveis vazias
@@ -60,6 +68,14 @@ jobs:
           sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' .env
 
           cat .env
+          # Repete para stack.env, já que o compose.prod.yml usa env_file: stack.env
+          sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' stack.env
+          sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' stack
+          sed -i 's|APP_ENV=.*|APP_ENV=production|' stack.env
+          sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' stack.env
+          sed -i 's|PUSHER_APP_KEY=.*|PUSHER_APP_KEY=dummy_key|' stack.env
+          sed -i 's|PUSHER_APP_CLUSTER=.*|PUSHER_APP_CLUSTER="mt1"|' stack.env
+          cat stack.env
 
       - name: Build and Start Containers
         # Usa o arquivo compose que você forneceu
