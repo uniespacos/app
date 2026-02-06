@@ -1,0 +1,149 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.13">
+  <diagram name="Página-1" id="zr7Giukf5XEbKwd1c2UX">
+    <mxGraphModel dx="2343" dy="601" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="tG_OEtp4I9mcc5_EWedB-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="Me4G63clnYtbElkHVwkL-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="Me4G63clnYtbElkHVwkL-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="Me4G63clnYtbElkHVwkL-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="Me4G63clnYtbElkHVwkL-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Me4G63clnYtbElkHVwkL-1" target="Me4G63clnYtbElkHVwkL-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-1" value="&lt;p class=&quot;&quot; data-end=&quot;343&quot; data-start=&quot;291&quot;&gt;&lt;strong data-end=&quot;343&quot; data-start=&quot;291&quot;&gt;Sistema Web de Gestão de Espaços Físicos da UESB&lt;/strong&gt;&lt;/p&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="725" y="20" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-19" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-190" y="340" as="targetPoint" />
+            <mxPoint x="-190" y="260.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-2" value="1. Iniciação do Projeto" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-200" y="240" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-3" value="2. Planejamento" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="90" y="240" width="170" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-4" value="3. Análise e Modelagem" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="240" width="190" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-6" value="5. Testes" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1150" y="240" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-8" value="6. Implantação" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1470" y="240" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-22" value="&lt;div&gt;1.1 Elaboração do Termo de Abertura&lt;/div&gt;&lt;div&gt;1.2 Identificação das partes interessadas&lt;/div&gt;&lt;div&gt;1.3 Definição dos requisitos iniciais do projeto&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="-180" y="275" width="270" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-29" value="&lt;div&gt;2.1 Definição do escopo detalhado&lt;/div&gt;&lt;div&gt;2.2 Elaboração da EAP&lt;/div&gt;&lt;div&gt;2.3 Planejamento das sprints&lt;/div&gt;&lt;div&gt;2.4 Definição das tecnologias&amp;nbsp;&lt;/div&gt;&lt;div&gt;2.5 Planejamento de riscos e qualidade&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="110" y="270" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-30" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="360" as="targetPoint" />
+            <mxPoint x="100" y="260.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-32" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="370" y="340" as="targetPoint" />
+            <mxPoint x="370" y="260.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-33" value="&lt;div&gt;3.1 Levantamento dos usuários e perfis de acesso&lt;/div&gt;&lt;div&gt;3.2 Mapeamento das funcionalidades por tipo de usuário&lt;/div&gt;&lt;div&gt;3.3 Documentação dos requisitos funcionais e não funcionais&lt;/div&gt;&lt;div&gt;3.4 Definição dos casos de uso&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="380" y="273" width="350" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-34" value="&lt;div style=&quot;text-align: left; text-wrap-mode: nowrap;&quot;&gt;4.2. Desenvolvimento Backend&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="731" y="425" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-35" value="&lt;span style=&quot;text-align: left; text-wrap-mode: nowrap;&quot;&gt;4.3&lt;/span&gt;&lt;span style=&quot;text-align: left; text-wrap-mode: nowrap;&quot;&gt;. Desenvolvimento Frontend&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1076" y="425" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-50" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="741" y="555" as="targetPoint" />
+            <mxPoint x="741" y="445" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-54" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2.1 Setup do projeto Laravel + banco&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.2 Autenticação de usuários&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.3 CRUD de espaços&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.4 Gestão de usuários e perfis&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.5 Módulo de reservas&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.6 Módulo de manutenção&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.7 Sistema de notificações&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.8 Histórico e relatórios&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.2&lt;/span&gt;.9 Documentação da API&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="755" y="445" width="230" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-55" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3.1 Setup inicial e estrutura base&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.2 Tela de login/cadastro&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.3 Dashboard por tipo de usuário&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.4 Listagem e filtro de espaços&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.5 Tela de solicitação de reserva&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.6 Tela de homologação/cancelamento (gestor)&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.7 Tela de manutenção&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.8 Notificações em tempo real&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;4.3&lt;/span&gt;.9 Histórico e relatórios&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1096" y="445" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-56" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1086" y="545" as="targetPoint" />
+            <mxPoint x="1086" y="445" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-59" value="&lt;div&gt;5.1 Testes unitários backend&lt;/div&gt;&lt;div&gt;5.2 Testes de integração&lt;/div&gt;&lt;div&gt;5.3 Testes funcionais frontend&lt;/div&gt;&lt;div&gt;5.4 Testes com usuários reais&lt;/div&gt;&lt;div&gt;5.5 Validação de requisitos e correções&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1170" y="260" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-60" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1160" y="330" as="targetPoint" />
+            <mxPoint x="1160" y="260.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-67" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1480" y="330" as="targetPoint" />
+            <mxPoint x="1480" y="260.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Me4G63clnYtbElkHVwkL-68" value="&lt;div&gt;6.1 Configuração do ambiente de produção&lt;/div&gt;&lt;div&gt;6.2 Deploy da aplicação&lt;/div&gt;&lt;div&gt;6.3 Treinamento para os usuários&lt;/div&gt;&lt;div&gt;6.4 Entrega final do projeto&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1490" y="260" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-1" value="4.1 Prototipação" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="376" y="425" width="190" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;shape=link;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="386" y="525" as="targetPoint" />
+            <mxPoint x="386" y="445.0000000000001" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-3" value="&lt;div&gt;4.1.1 Login/Cadastro&lt;/div&gt;&lt;div&gt;4.1.2 Dashboard por perfil&lt;/div&gt;&lt;div&gt;4.1.3 Listagem e consulta de espaços&lt;/div&gt;&lt;div&gt;4.1.4 Formulário de solicitação de reserva&lt;/div&gt;&lt;div&gt;4.1.5 Telas de gestão&amp;nbsp;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="396" y="448" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tG_OEtp4I9mcc5_EWedB-6" target="tG_OEtp4I9mcc5_EWedB-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="835" y="360" />
+              <mxPoint x="475" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tG_OEtp4I9mcc5_EWedB-6" target="Me4G63clnYtbElkHVwkL-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tG_OEtp4I9mcc5_EWedB-6" target="Me4G63clnYtbElkHVwkL-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="835" y="360" />
+              <mxPoint x="1180" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tG_OEtp4I9mcc5_EWedB-6" value="&lt;div style=&quot;text-align: left; text-wrap-mode: nowrap;&quot;&gt;4. Desenvolvimento&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="731" y="240" width="200" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
