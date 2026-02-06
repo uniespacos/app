@@ -26,5 +26,3 @@ composer.lock
 package-lock.json
 *.sql
 /docker/production/nginx/*.pem
-agents/
-GEMINI.md
