@@ -107,7 +107,6 @@ All commands below are intended to be run from the host machine unless specified
   - Run all tests: `docker compose -f compose.dev.yml exec workspace php artisan test`
   - Alternatively: `docker compose -f compose.dev.yml exec workspace ./vendor/bin/phpunit`
 
-- **Frontend:** There are currently no automated frontend tests configured.
 
 ### CI/CD Pipeline (`.github/workflows/main-pipeline.yml`)
 
