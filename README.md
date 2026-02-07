@@ -32,7 +32,7 @@ O projeto está organizado seguindo a estrutura padrão do laravel, com a adiç�
 
 ### Estrutura de pastas
 
-```
+```bash
 project-root/ 
 ├── app/ # Pasta do laravel e outras pastas de sua arquitetura
 ├── ...
