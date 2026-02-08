@@ -13,8 +13,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /var/www
+# Copy package.json and package-lock.json first to leverage Docker layer caching
+COPY package.json package-lock.json ./
+RUN npm install
+# Copy the rest of the application code
 COPY . /var/www
-RUN npm install && npm run build
+RUN npm run build
 
 # Stage 2: NGINX with HTTPS support
 FROM nginx:alpine
