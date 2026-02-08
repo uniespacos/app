@@ -213,3 +213,7 @@ obs.: Volume vai ser `app_uniespacos-public-assets`. Garanta que está excluindo
 - **Nginx**: Usado como um servidor web que vai servir a aplicação manipulando as requisições HTTP.
 - **Docker Compose**: Orquestra os serviços e facilita o processo de iniciar ou parar o ambiente.
 - **Health Checks**: Foi implementado no Docker-Compose todas as configurações para garantir que os sistemas vão estar operacionais.
+
+## Licença
+
+Este projeto é licenciado sob a [Licença Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional (CC BY-NC-SA 4.0)](LICENSE).
