@@ -2,7 +2,7 @@ name: Build & Publish Docker Image
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "develop"]
 
 # Permissões necessárias para o GITHUB_TOKEN escrever no registro
 permissions:
@@ -41,7 +41,16 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GHCR_TOKEN }}
 
-            # 1. Build da Imagem PHP-FPM (Aplicação)
+            - name: Generate Docker meta for app image
+              id: meta_app
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/${{ github.repository }}/app
+                tags: |
+                  type=ref,event=branch
+                  type=sha,prefix=sha-
+                  type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
             - name: Build and push PHP App
               uses: docker/build-push-action@v5
               with:
@@ -49,12 +58,19 @@ jobs:
                   file: ./docker/production/php-fpm/Dockerfile
                   target: production
                   push: true
-                  # Nome da imagem: ghcr.io/usuario/repo/app:latest
-                  tags: ghcr.io/${{ github.repository }}/app:latest
+                  tags: ${{ steps.meta_app.outputs.tags }}
+                  labels: ${{ steps.meta_app.outputs.labels }}
 
-            # 2. Build da Imagem Nginx (Servidor Web)
-            # Importante: O Dockerfile do Nginx precisa copiar os assets buildados
-            # Se o seu Dockerfile do Nginx espera os arquivos já prontos, precisamos buildar o front antes aqui
+            - name: Generate Docker meta for web image
+              id: meta_web
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/${{ github.repository }}/web
+                tags: |
+                  type=ref,event=branch
+                  type=sha,prefix=sha-
+                  type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
@@ -68,4 +84,5 @@ jobs:
                   context: .
                   file: ./docker/production/nginx/Dockerfile
                   push: true
-                  tags: ghcr.io/${{ github.repository }}/web:latest
+                  tags: ${{ steps.meta_web.outputs.tags }}
+                  labels: ${{ steps.meta_web.outputs.labels }}

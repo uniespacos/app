@@ -64,7 +64,7 @@ jobs:
                     -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
 
             - name: Build Containers
-              run: docker compose -f compose.prod.yml up -d --build postgres web
+              run: docker compose -f compose.prod.yml up -d postgres web
 
     # ETAPA 4: Deploy em Produção
     deploy-production:
@@ -96,8 +96,7 @@ jobs:
                       git pull origin main
 
                       echo "🐳 Reconstruindo Containers..."
-                      # --build garante que alterações no Dockerfile ou assets sejam aplicadas
-                      docker compose -f compose.prod.yml up -d --build --remove-orphans
+                      docker compose -f compose.prod.yml up -d --remove-orphans
 
                       echo "⏳ Aguardando Banco de Dados..."
                       sleep 10
