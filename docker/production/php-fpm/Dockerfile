@@ -1,5 +1,5 @@
 # Stage 1: Build environment and Composer dependencies
-FROM php:8.2-fpm AS builder
+FROM php:8.4-fpm AS builder
 
 ENV VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY
 ENV VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER
@@ -34,30 +34,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set the working directory inside the container
 WORKDIR /var/www
 
-# Copy the entire Laravel application code into the container
-# -----------------------------------------------------------
-# In Laravel, the `composer install` command often triggers
-# scripts that need access to the entire application code.
-# For example, the `post-autoload-dump` event might execute
-# Artisan commands like `php artisan package:discover`. If the
-# application code (including the `artisan` file) is not
-# present, these commands will fail, leading to build errors.
-#
-# By copying the entire application code before running
-# `composer install`, we ensure that all necessary files are
-# available, allowing these scripts to run successfully.
-# In other cases, it would be possible to copy composer files
-# first, to leverage Docker's layer caching mechanism.
-# -----------------------------------------------------------
-COPY . /var/www
+# Copy composer.json and composer.lock first to leverage Docker layer caching
+COPY composer.json composer.lock ./
 
 # Install Composer and dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
 
+# Copy the rest of the application code
+COPY . /var/www
+
 
 # Stage 2: Production environment
-FROM php:8.2.29-fpm as production
+FROM php:8.4-fpm as production
 
 # Install only runtime libraries needed in production
 # libfcgi-bin and procps are required for the php-fpm-healthcheck script
