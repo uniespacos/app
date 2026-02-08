@@ -2,7 +2,9 @@ name: CI/CD Pipeline Completa
 
 on:
     push:
-        branches: ["main", "develop"]
+        branches: 
+        - "main"
+        - "development"
     # Permite rodar manualmente na aba Actions (ótimo para rollback ou testes)
     workflow_dispatch:
 

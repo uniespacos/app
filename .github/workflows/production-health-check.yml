@@ -2,7 +2,6 @@ name: Production Setup Validation
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   validate-docker-prod:
