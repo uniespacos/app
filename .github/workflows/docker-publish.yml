@@ -1,88 +1,89 @@
 name: Build & Publish Docker Image
 
 on:
-    push:
-        branches: ["main", "develop"]
+  push:
+    branches: ["main", "develop"]
+  workflow_dispatch: # Permite disparar manualmente a workflow
 
 # Permissões necessárias para o GITHUB_TOKEN escrever no registro
 permissions:
-    contents: read
-    packages: write
+  contents: read
+  packages: write
 
 jobs:
-    test:
-        name: 🧪 Run Tests
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: "8.4"
-            - name: Install Dependencies
-              run: composer install --no-progress --prefer-dist
-            - name: Generate Key
-              run: cp .env.prod .env && php artisan key:generate
-            - name: Run Tests
-              run: php artisan test
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: Install Dependencies
+        run: composer install --no-progress --prefer-dist
+      - name: Generate Key
+        run: cp .env.prod .env && php artisan key:generate
+      - name: Run Tests
+        run: php artisan test
 
-    build-and-push:
-        name: 🐳 Build & Push to GHCR
-        needs: test # Só roda se os testes passarem
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+  build-and-push:
+    name: 🐳 Build & Push to GHCR
+    needs: test # Só roda se os testes passarem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Log in to the Container registry
-              uses: docker/login-action@v3
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GHCR_TOKEN }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
-            - name: Generate Docker meta for app image
-              id: meta_app
-              uses: docker/metadata-action@v5
-              with:
-                images: ghcr.io/${{ github.repository }}/app
-                tags: |
-                  type=ref,event=branch
-                  type=sha,prefix=sha-
-                  type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+      - name: Generate Docker meta for app image
+        id: meta_app
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-            - name: Build and push PHP App
-              uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  file: ./docker/production/php-fpm/Dockerfile
-                  target: production
-                  push: true
-                  tags: ${{ steps.meta_app.outputs.tags }}
-                  labels: ${{ steps.meta_app.outputs.labels }}
+      - name: Build and push PHP App
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/php-fpm/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
 
-            - name: Generate Docker meta for web image
-              id: meta_web
-              uses: docker/metadata-action@v5
-              with:
-                images: ghcr.io/${{ github.repository }}/web
-                tags: |
-                  type=ref,event=branch
-                  type=sha,prefix=sha-
-                  type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20"
-            - name: Install & Build Front
-              run: npm ci && npm run build
+      - name: Generate Docker meta for web image
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-            - name: Build and push Nginx Web
-              uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  file: ./docker/production/nginx/Dockerfile
-                  push: true
-                  tags: ${{ steps.meta_web.outputs.tags }}
-                  labels: ${{ steps.meta_web.outputs.labels }}
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & Build Front
+        run: npm ci && npm run build
+
+      - name: Build and push Nginx Web
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
