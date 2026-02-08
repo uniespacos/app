@@ -31,6 +31,7 @@
         // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
         "types": [
             "@types/pusher-js",
+            "jest"
             //"@types/laravel-echo"
         ] /* Specify type package names to be included without being referenced in a source file. */,
         // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
@@ -117,6 +118,7 @@
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx",
-        "resources/js/pages/auth/register copy.tsx"
+        "resources/js/pages/auth/register copy.tsx",
+        "jest.setup.js"
     ]
 }

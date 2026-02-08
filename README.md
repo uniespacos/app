@@ -1,31 +1,30 @@
-# UniEspaços 
+# UniEspaços
 
-## Sumário 
+## Sumário
 
-- [Visão geral](#visao-geral)
-- [Estrutura do projeto](#estrutura-do-projeto)
-  - [Estrutura de pastas](#estrutura-de-pastas)
-  - [Ambiente de desenvolvimento](#ambiente-de-desenvolvimento)
-  - [Ambiente de produção](#ambiente-de-produção)
-- [Iniciando o projeto](#iniciando-o-projeto)
-  - [Pré-requisitos](#pre-requisitos)
-  - [Clonando o repositorio](#clonando-o-repositorio)
-  - [Configurando o ambiente de desenvolvimento](#configurando-o-ambiente-de-desenvolvimento)
-- [Uso dos comando](#uso-basico)
-  - [Acessando o container de workspace](#acessando-o-container-de-workspace)
-  - [Rebuildando as imagens do ambiente](#rebuildando-as-imagens-do-ambiente)
-  - [Excluindo os containers](#excluindo-os-containers)
-  - [Acompanhando os logs](#acompanhando-os-logs)
-- [Deploy em Produção](#deploy-em-produção)
-  - [Subindo atualização de codigo](#subindo-atualização-de-codigo)
-  - [Detalhes tecnicos](#technical-details)
-
-
+- [UniEspaços](#uniespaços)
+  - [Sumário](#sumário)
+  - [Visão geral](#visão-geral)
+  - [Estrutura do Projeto](#estrutura-do-projeto)
+    - [Estrutura de pastas](#estrutura-de-pastas)
+    - [Ambiente de desenvolvimento](#ambiente-de-desenvolvimento)
+    - [Ambiente de produção](#ambiente-de-produção)
+  - [Iniciando o projeto](#iniciando-o-projeto)
+    - [Pré-requisitos](#pré-requisitos)
+    - [Clonando o repositorio](#clonando-o-repositorio)
+    - [Configurando o ambiente de desenvolvimento](#configurando-o-ambiente-de-desenvolvimento)
+  - [Uso básico](#uso-básico)
+    - [Acessando o container de workspace](#acessando-o-container-de-workspace)
+    - [Rebuildando as imagens do ambiente](#rebuildando-as-imagens-do-ambiente)
+    - [Excluindo os containers](#excluindo-os-containers)
+    - [Acompanhando os logs](#acompanhando-os-logs)
+  - [Deploy em Produção](#deploy-em-produção)
+    - [Subindo atualização de codigo](#subindo-atualização-de-codigo)
+    - [Detalhes técnicos](#detalhes-técnicos)
 
 ## Visão geral
 
 O **UniEspaços** é um sistema web, projetado para funcionar como um ecossistema digital para a gestão completa do ciclo de vida das reservas de Espaços.
-
 
 ## Estrutura do Projeto
 
@@ -33,7 +32,7 @@ O projeto está organizado seguindo a estrutura padrão do laravel, com a adiç�
 
 ### Estrutura de pastas
 
-```
+```bash
 project-root/ 
 ├── app/ # Pasta do laravel e outras pastas de sua arquitetura
 ├── ...
@@ -55,16 +54,15 @@ O ambiente de desenvolvimento está configurado atraves do arquivo `compose.dev.
 
 O ambiente de produção está configurado atraves do arquivo `compose.prod.yml`. Esse arquivo Docker Compose está otimizado para permformace e segurançã utilizando multiestagios de builds e runtime do docker. Utilizando o PHP-FPM como um dos instrumentos principais.
 
-
-
 ## Iniciando o projeto
 
 Siga esses passos para iniciar o projeto do **UniEspaços**:
- - Recomendação, Use linux, o ambiente docker é feito para rodar em qualquer sistema operacional compativo com o docker. Porem o docker é nativo do linux e voce vai ter menos dor de cabeça em configurar atravez dele.
+
+- Recomendação, Use linux, o ambiente docker é feito para rodar em qualquer sistema operacional compativo com o docker. Porem o docker é nativo do linux e voce vai ter menos dor de cabeça em configurar atravez dele.
 
 ### Pré-requisitos
 
-- Docker e Docker Compose. 
+- Docker e Docker Compose.
   - Caso seja necessário instalar basta seguir o guia de instação do docker.
     - [Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
     - [Linux](https://docs.docker.com/desktop/setup/install/linux/)
@@ -76,7 +74,6 @@ Siga esses passos para iniciar o projeto do **UniEspaços**:
   - Com o php instalado e configurado para aparecer em seu terminal, copiar e colar os comandos do manual do composer
   - [Site oficial do composer](https://getcomposer.org/download/)
 
-
 ### Clonando o repositorio
 
 ```bash
@@ -87,27 +84,30 @@ cd app
 ### Configurando o ambiente de desenvolvimento
 
 1. Copie o `.env.dev` para `.env`:
+
 ```bash
 cp .env.dev .env
 ```
 
-2. Rode o comando `composer install` para instalar todas dependencias
+1. Rode o comando `composer install` para instalar todas dependencias
+
 ```bash
     composer install
 ```
 
-3. Rode o comando do laravel `key:generate` para gerar a chave para aplicação
+1. Rode o comando do laravel `key:generate` para gerar a chave para aplicação
+
 ```bash
     php artisan key:generate
 ```
 
-4. Inicie os serviços com docker compose:
+1. Inicie os serviços com docker compose:
 
 ```bash
 docker compose -f compose.dev.yml up -d
 ```
 
-5. Instale as dependencias e rode a migration com os seeders:
+1. Instale as dependencias e rode a migration com os seeders:
 
 ```bash
 docker compose -f compose.dev.yml exec workspace bash
@@ -118,7 +118,7 @@ npm install
 npm run dev
 ```
 
-4. Access the Application:
+1. Access the Application:
 
 Acesse o navegador no [http://localhost](http://localhost) e a aplicação estará em execução.
 
@@ -128,32 +128,34 @@ aqui estão alguns comandos básicos para uso no desenvolvimento:
 
 ### Acessando o container de workspace
 
-O Container workspace é um container que roda em paralelo e contem o Composer, NPM e outras ferramentas necessárias para o desenvolvimento de uma aplicação laravel. 
+O Container workspace é um container que roda em paralelo e contem o Composer, NPM e outras ferramentas necessárias para o desenvolvimento de uma aplicação laravel.
 
 O comando para acessar o terminal do container é:
+
 ```bash
 docker compose -f compose.dev.yml exec workspace bash
 ```
 
-### Rebuildando as imagens do ambiente:
+### Rebuildando as imagens do ambiente
 
 ```bash
 docker compose -f compose.dev.yml up -d --build
 ```
 
-### Excluindo os containers:
+### Excluindo os containers
 
 ```bash
 docker compose -f compose.dev.yml down
 ```
 
-### Acompanhando os logs:
+### Acompanhando os logs
 
 ```bash
 docker compose -f compose.dev.yml logs -f
 ```
 
 Comando para ver o log de um container em especifico:
+
 ```bash
 docker compose -f compose.dev.yml logs -f web
 ```
@@ -165,38 +167,43 @@ A imagem de produção está configurada para ter todos os arquivos do projeto d
 ### Subindo atualização de codigo
 
 1. Para garantir a segurança vamos e integridade dos dados vamos fazer o backup do banco de dados.
+
 ```bash
   docker exec -it app-postgres-1 pg_dump -U uniespacos uniespacos > backup.sql
 ```
 
-2. Para não haver conflitos, vamos derrubar  os containers.
+1. Para não haver conflitos, vamos derrubar  os containers.
+
 ```bash
   docker compose -f compose.prod.yml down 
 ```
 
-3. Agora vamos listar os volumes do docker e pegar o nome do volume referente ao public/assets.
+1. Agora vamos listar os volumes do docker e pegar o nome do volume referente ao public/assets.
 obs.: Volume vai ser `app_uniespacos-public-assets`. Garanta que está excluindo exatamente esse.
+
 ```bash
   docker volume ls
 ```
 
-4. Excluir o volume referente ao public assets compartilhados pelo web e php-fpm
+1. Excluir o volume referente ao public assets compartilhados pelo web e php-fpm
+
 ```bash
   docker volume rm app_uniespacos-public-assets
 ```
 
-5. Agora basta rodar o comando de subir o container rebuildando a imagem
+1. Agora basta rodar o comando de subir o container rebuildando a imagem
+
 ```bash
   docker compose -f compose.prod.yml up --build -d
 ```
 
-6. Agora verificar se o sistema está rodando ok no link [https://uniespacos.uesb.br/](https://uniespacos.uesb.br)
+1. Agora verificar se o sistema está rodando ok no link [https://uniespacos.uesb.br/](https://uniespacos.uesb.br)
 
-7. Deu problema e excluiu o banco? Faça o rollback atraves do backup gerado no inicio.
+2. Deu problema e excluiu o banco? Faça o rollback atraves do backup gerado no inicio.
+
 ```bash
   docker exec -i app-postgres-1 psql -U uniespacos uniespacos < backup.sql
 ```
-
 
 ### Detalhes técnicos
 
@@ -206,4 +213,3 @@ obs.: Volume vai ser `app_uniespacos-public-assets`. Garanta que está excluindo
 - **Nginx**: Usado como um servidor web que vai servir a aplicação manipulando as requisições HTTP.
 - **Docker Compose**: Orquestra os serviços e facilita o processo de iniciar ou parar o ambiente.
 - **Health Checks**: Foi implementado no Docker-Compose todas as configurações para garantir que os sistemas vão estar operacionais.
-
