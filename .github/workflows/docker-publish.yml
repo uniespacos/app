@@ -5,6 +5,10 @@ on:
     branches:
       - "main"
       - "development"
+  pull_request:
+    branches:
+      - development
+      - main
   workflow_dispatch: # Permite disparar manualmente a workflow
 
 # Permissões necessárias para o GITHUB_TOKEN escrever no registro
