@@ -1,121 +1,125 @@
 name: CI/CD Pipeline Completa
 
 on:
-    push:
-        branches: 
-        - "main"
-        - "development"
-    # Permite rodar manualmente na aba Actions (ótimo para rollback ou testes)
-    workflow_dispatch:
+  push:
+    branches:
+      - "main"
+      - "development"
+  pull_request:
+    branches:
+      - development
+      - main
+  # Permite rodar manualmente na aba Actions (ótimo para rollback ou testes)
+  workflow_dispatch:
 
 jobs:
-    quality-check:
-        name: 🔍 Lint & Static Analysis
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: "8.4"
-            - name: Install Dependencies
-              run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-            - name: Run Pint (Code Style)
-              run: vendor/bin/pint --test
+  quality-check:
+    name: 🔍 Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Run Pint (Code Style)
+        run: vendor/bin/pint --test
 
-    # ETAPA 2: Testes de Unidade e Integração
-    tests:
-        name: 🧪 PHPUnit Tests
-        needs: quality-check # Só roda se o lint passar
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: "8.4"
-            - name: Install Dependencies
-              run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-            - name: Create .env
-              run: cp .env.example .env && php artisan key:generate
-            - name: Run Tests
-              run: php artisan test
+  # ETAPA 2: Testes de Unidade e Integração
+  tests:
+    name: 🧪 PHPUnit Tests
+    needs: quality-check # Só roda se o lint passar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Create .env
+        run: cp .env.example .env && php artisan key:generate
+      - name: Run Tests
+        run: php artisan test
 
-    # ETAPA 3: Smoke Test da Infra (Docker)
-    # Usa a lógica corrigida que criamos anteriormente
-    infrastructure-test:
-        name: 🏗️ Docker Build Check
-        needs: quality-check
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - name: Create Production .env for CI
-              run: |
-                  if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
-                  # Adaptações para o ambiente CI
-                  sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
-                  sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
-                  sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
+  # ETAPA 3: Smoke Test da Infra (Docker)
+  # Usa a lógica corrigida que criamos anteriormente
+  infrastructure-test:
+    name: 🏗️ Docker Build Check
+    needs: quality-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Production .env for CI
+        run: |
+          if [ -f .env.prod ]; then cp .env.prod .env; else cp .env.example .env; fi
+          # Adaptações para o ambiente CI
+          sed -i 's|DB_HOST=postgres|DB_HOST=postgres|' .env
+          sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
+          sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
 
-            - name: Generate SSL for Test
-              run: |
-                  mkdir -p docker/production/nginx/ssl/
-                  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                    -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
-                    -out docker/production/nginx/ssl/uesb2025fullchain.pem \
-                    -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
+      - name: Generate SSL for Test
+        run: |
+          mkdir -p docker/production/nginx/ssl/
+          openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout docker/production/nginx/ssl/uesb2025privkey.pem \
+            -out docker/production/nginx/ssl/uesb2025fullchain.pem \
+            -subj "/C=BR/ST=Bahia/L=Vitoria/O=UESB/CN=localhost"
 
-            - name: Build Containers
-              run: docker compose -f compose.prod.yml up -d postgres web
+      - name: Build Containers
+        run: docker compose -f compose.prod.yml up -d postgres web
 
-    # ETAPA 4: Deploy em Produção
-    deploy-production:
-        name: 🚀 Deploy to VPS
-        # Só roda se TUDO anterior passar. Segurança máxima.
-        needs: [tests, infrastructure-test]
-        runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main' # Só roda na branch main
+  # ETAPA 4: Deploy em Produção
+  deploy-production:
+    name: 🚀 Deploy to VPS
+    # Só roda se TUDO anterior passar. Segurança máxima.
+    needs: [tests, infrastructure-test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Só roda na branch main
 
-        steps:
-            - name: Deploy via SSH
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                  host: ${{ secrets.SSH_HOST }}
-                  username: ${{ secrets.SSH_USER }}
-                  key: ${{ secrets.SSH_PRIVATE_KEY }}
-                  port: 22
-                  script_stop: true # Para se qualquer comando falhar
-                  # Ajuste o caminho '/var/www/uniespacos' para onde seu projeto está na VPS
-                  script: |
-                      echo "📍 Iniciando Deploy..."
-                      cd /var/www/uniespacos
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true # Para se qualquer comando falhar
+          # Ajuste o caminho '/var/www/uniespacos' para onde seu projeto está na VPS
+          script: |
+            echo "📍 Iniciando Deploy..."
+            cd /var/www/uniespacos
 
-                      echo "Maintenance Mode ON..."
-                      # O '|| true' impede que o deploy falhe se o container não estiver rodando ainda
-                      docker compose -f compose.prod.yml exec -T web php artisan down || true
+            echo "Maintenance Mode ON..."
+            # O '|| true' impede que o deploy falhe se o container não estiver rodando ainda
+            docker compose -f compose.prod.yml exec -T web php artisan down || true
 
-                      echo "📥 Atualizando código..."
-                      git pull origin main
+            echo "📥 Atualizando código..."
+            git pull origin main
 
-                      echo "🐳 Reconstruindo Containers..."
-                      docker compose -f compose.prod.yml up -d --remove-orphans
+            echo "🐳 Reconstruindo Containers..."
+            docker compose -f compose.prod.yml up -d --remove-orphans
 
-                      echo "⏳ Aguardando Banco de Dados..."
-                      sleep 10
+            echo "⏳ Aguardando Banco de Dados..."
+            sleep 10
 
-                      echo "🔄 Rodando Migrations..."
-                      docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+            echo "🔄 Rodando Migrations..."
+            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
 
-                      echo "🧹 Otimizando Laravel..."
-                      docker compose -f compose.prod.yml exec -T web php artisan optimize
-                      docker compose -f compose.prod.yml exec -T web php artisan view:cache
-                      docker compose -f compose.prod.yml exec -T web php artisan config:cache
+            echo "🧹 Otimizando Laravel..."
+            docker compose -f compose.prod.yml exec -T web php artisan optimize
+            docker compose -f compose.prod.yml exec -T web php artisan view:cache
+            docker compose -f compose.prod.yml exec -T web php artisan config:cache
 
-                      # Se você usa filas, é CRÍTICO reiniciar o worker para pegar o código novo
-                      echo "🔄 Reiniciando Filas..."
-                      docker compose -f compose.prod.yml restart queue-worker
+            # Se você usa filas, é CRÍTICO reiniciar o worker para pegar o código novo
+            echo "🔄 Reiniciando Filas..."
+            docker compose -f compose.prod.yml restart queue-worker
 
-                      echo "✅ Maintenance Mode OFF..."
-                      docker compose -f compose.prod.yml exec -T web php artisan up
+            echo "✅ Maintenance Mode OFF..."
+            docker compose -f compose.prod.yml exec -T web php artisan up
 
-                      echo "🚀 Deploy Concluído com Sucesso!"
+            echo "🚀 Deploy Concluído com Sucesso!"
