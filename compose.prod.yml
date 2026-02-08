@@ -1,12 +1,7 @@
 services:
     web:
         container_name: web-production
-        build:
-            context: .
-            dockerfile: ./docker/production/nginx/Dockerfile
-            args:
-                - PUSHER_APP_KEY=${PUSHER_APP_KEY}
-                - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
+        image: ghcr.io/${GHCR_REPO_WEB}/web:latest # Using pre-built image from GHCR
         restart: unless-stopped
         env_file:
             - stack.env
@@ -27,10 +22,7 @@ services:
                 condition: service_healthy
     app:
         container_name: app-production
-        build:
-            context: .
-            dockerfile: ./docker/production/php-fpm/Dockerfile
-            target: production
+        image: ghcr.io/${GHCR_REPO_APP}/app:latest # Using pre-built image from GHCR
         restart: unless-stopped
         volumes:
             - uniespacos-public-assets:/var/www/public/build
@@ -50,10 +42,7 @@ services:
                 condition: service_healthy
     queue-worker:
         container_name: queue-worker-production
-        build:
-            context: .
-            dockerfile: ./docker/production/php-fpm/Dockerfile
-            target: production
+        image: ghcr.io/${GHCR_REPO_APP}/app:latest # Using pre-built image from GHCR
         restart: unless-stopped
         command: php artisan queue:work --verbose --tries=3 --timeout=90
         volumes:
