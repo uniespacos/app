@@ -87,14 +87,41 @@ class EspacoController extends Controller
             return redirect()->route('espacos.index')->with('error', 'Este espaço ainda não possui um gestor definido.');
         }
 
+        $espacosDoModulo = Espaco::whereHas('andar', function ($query) use ($espaco) {
+            $query->where('modulo_id', $espaco->andar->modulo_id);
+        })
+        ->orderBy('andar_id')
+        ->orderByRaw("regexp_replace(nome, '[0-9]+', ''), NULLIF(regexp_replace(nome, '[^0-9]+', ''), '')::int")
+        ->get();
+
+        $espacosIds = $espacosDoModulo->pluck('id')->toArray();
+        $currentIndex = array_search($espaco->id, $espacosIds);
+
+        $espacoAnterior = null;
+        if ($currentIndex !== false && $currentIndex > 0) {
+            $espacoAnterior = $espacosDoModulo[$currentIndex - 1];
+        }
+
+        $espacoSeguinte = null;
+        if ($currentIndex !== false && $currentIndex < count($espacosIds) - 1) {
+            $espacoSeguinte = $espacosDoModulo[$currentIndex + 1];
+        }
+
+
         return Inertia::render('Espacos/VisualizarEspacoPage', [
             'espaco' => $espaco,
+            'navegacao' => [
+                'anterior' => $espacoAnterior,
+                'seguinte' => $espacoSeguinte,
+            ],
             // Passa as informações da semana para o frontend
             'semana' => [
                 'inicio' => $inicioSemana,
                 'fim' => $fimSemana,
                 'referencia' => $dataReferencia->format('Y-m-d'),
-            ]
+            ],
+            'debug_espacos' => $espacosDoModulo,
+            'debug_currentIndex' => $currentIndex,
         ]);
     }
     // ... (métodos favoritar e desfavoritar permanecem iguais)
