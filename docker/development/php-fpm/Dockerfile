@@ -24,13 +24,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use ARG to define environment variables passed from the Docker build command or Docker Compose.
-ARG XDEBUG_ENABLED=true
-ARG XDEBUG_MODE=develop,coverage,debug,profile
+ARG XDEBUG_ENABLED=false
+ARG XDEBUG_MODE=develop,debug
 ARG XDEBUG_HOST=host.docker.internal
 ARG XDEBUG_IDE_KEY=DOCKER
 ARG XDEBUG_LOG=/dev/stdout
 ARG XDEBUG_LOG_LEVEL=0
-
+ARG ENTRYPOINT_URI=./docker/development/php-fpm/entrypoint.sh
+ENV ENTRYPOINT_URI_ENV=${ENTRYPOINT_URI}
 USER root
 
 # Configure Xdebug if enabled
@@ -42,7 +43,7 @@ RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
     echo "xdebug.log=${XDEBUG_LOG}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     echo "xdebug.log_level=${XDEBUG_LOG_LEVEL}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     echo "xdebug.client_host=${XDEBUG_HOST}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ; \
-    echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ; \
+    echo "xdebug.start_with_request=trigger" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini ; \
     fi
 
 # Install only runtime libraries needed 
@@ -79,7 +80,7 @@ RUN sed -i "s/user = www-data/user = www/g" /usr/local/etc/php-fpm.d/www.conf &&
 WORKDIR /var/www
 
 # Copy the entrypoint script
-COPY ./docker/development/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ${ENTRYPOINT_URI_ENV} /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch back to the non-privileged user to run the application

@@ -5,15 +5,23 @@ set -e
 USER_ID=${UID:-1000}
 GROUP_ID=${GID:-1000}
 
-# Fix file ownership and permissions using the passed UID and GID
-echo "Fixing file permissions with UID=${USER_ID} and GID=${GROUP_ID}..."
-chown -R ${USER_ID}:${GROUP_ID} /var/www || echo "Some files could not be changed"
+# Fix file ownership and permissions - SKIP for performance in dev
+# chown -R on bind mounts is extremely slow. 
+# echo "Fixing file permissions with UID=${USER_ID} and GID=${GROUP_ID}..."
+# chown -R ${USER_ID}:${GROUP_ID} /var/www || echo "Some files could not be changed"
 
 # Clear configurations to avoid caching issues in development
 echo "Clearing configurations..."
 
 cd /var/www || exit 1
-composer install --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+# Optimize Composer: Only run if vendor missing to speed up boot
+if [ ! -d "vendor" ]; then
+    echo "Vendor directory missing. Running composer install..."
+    composer install --optimize-autoloader --no-interaction --no-progress --prefer-dist
+else
+    echo "Vendor directory exists. Skipping composer install."
+fi
 
 # Verifica se a APP_KEY está definida
 if grep -q "^APP_KEY=$" .env || ! grep -q "^APP_KEY=" .env; then
