@@ -37,6 +37,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  queue-worker:
+    container_name: queue-worker-development
+    build:
+      context: .
+      dockerfile: ./docker/development/php-fpm/Dockerfile    
+    restart: unless-stopped
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    volumes:
+      - ./:/var/www
+    networks:
+      - development
+    depends_on:
+      - postgres
+      - app
 
   workspace:
     container_name: workspace
@@ -81,15 +95,15 @@ services:
       timeout: 5s
       retries: 5
   adminer:
-      image: adminer:5
-      restart: always
-      ports:
-        - "8080:8080"
-      depends_on:
-        - postgres
-      networks:
-        - development
-  
+    image: adminer:5
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - development
+
 networks:
   development:
 
