@@ -63,6 +63,23 @@ jobs:
           sed -i 's|DB_PASSWORD=.*|DB_PASSWORD=ci_testing_pass|' .env
           sed -i 's|APP_KEY=.*|APP_KEY=base64:2fl+Ktvkfl+Fuz4Qp/yWci8eGBzDM/fciRCvmbL/zqM=|' .env
 
+      - name: Create stack.env for Docker Compose
+        run: |
+          echo "DB_HOST=postgres" >> stack.env
+          echo "DB_PORT=5432" >> stack.env
+          echo "DB_DATABASE=uniespacos" >> stack.env
+          echo "DB_USERNAME=uniespacos" >> stack.env
+          echo "DB_PASSWORD=ci_testing_pass" >> stack.env
+
+          echo "GHCR_REPO_APP=${{ github.repository }}" >> stack.env
+          echo "GHCR_REPO_WEB=${{ github.repository }}" >> stack.env
+
+          echo "GITHUB_USER=ci_user" >> stack.env
+          echo "GITHUB_TOKEN=ci_token" >> stack.env
+
+          echo "WEB_PORT=80" >> stack.env
+          echo "WEB_PORT_SSL=443" >> stack.env
+
       - name: Generate SSL for Test
         run: |
           mkdir -p docker/production/nginx/ssl/
