@@ -30,46 +30,22 @@ jobs:
   # ETAPA 2: Testes de Unidade e Integração
   tests:
     name: 🧪 PHPUnit Tests
-    needs: quality-check # Só roda se o lint passar
+    needs: quality-check
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: uniespacos
-          POSTGRES_USER: uniespacos
-          POSTGRES_PASSWORD: uniespacossecretkey
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.4"
-      - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Create .env
-        run: |
-          cp .env.example .env
-          echo "DB_CONNECTION=pgsql" >> .env
-          echo "DB_HOST=postgres" >> .env # This will resolve to the service 'postgres'
-          echo "DB_PORT=5432" >> .env
-          echo "DB_DATABASE=uniespacos" >> .env
-          echo "DB_USERNAME=uniespacos" >> .env
-          echo "DB_PASSWORD=uniespacossecretkey" >> .env
-          php artisan key:generate
-      - name: Wait for PostgreSQL
-        run: sleep 10 # Give PostgreSQL some time to start up
+      - name: Build and Run Services (Postgres, Workspace)
+        run: docker compose -f docker-compose.test.yml up --build -d
+      - name: Install PHP Dependencies
+        run: docker compose -f docker-compose.test.yml exec -T workspace composer install --no-interaction --no-progress --prefer-dist
       - name: Run Migrations and Seed
-        run: php artisan migrate --seed --force
+        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
       - name: Run Tests
-        run: php artisan test
+        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+      - name: Stop Services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
+
 
   # ETAPA 3: Smoke Test da Infra (Docker)
   # Usa a lógica corrigida que criamos anteriormente
