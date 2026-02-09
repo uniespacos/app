@@ -1,16 +1,20 @@
-import { Reserva,  SlotCalendario, Horario } from '@/types';
-import { useMemo, useState, useEffect } from 'react';
+import { Horario, Reserva, SlotCalendario } from '@/types';
 import { parse } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
  * Mapeia o status do Horario (backend) para o status do SlotCalendario (frontend).
  */
 function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCalendario['status'] {
     switch (status) {
-        case 'em_analise': return 'solicitado';
-        case 'deferida': return 'deferida';
-        case 'indeferida': return 'indeferida';
-        default: return 'reservado'; // 'inativa' ou outros casos
+        case 'em_analise':
+            return 'solicitado';
+        case 'deferida':
+            return 'deferida';
+        case 'indeferida':
+            return 'indeferida';
+        default:
+            return 'reservado'; // 'inativa' ou outros casos
     }
 }
 
@@ -21,11 +25,9 @@ function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCalendari
  * @returns Um objeto contendo o estado dos slots e as funções para manipulá-los.
  */
 export function useReservationSlots(reserva: Reserva) {
-
     // Calcula os slots iniciais lendo as "etiquetas" de conflito do backend.
     const initialSlots = useMemo<SlotCalendario[]>(() => {
         return reserva.horarios.map((horario) => {
-
             // A lógica de conflito agora é uma simples leitura da prop.
             const isConflicted = horario.is_conflicted === true;
 

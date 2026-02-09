@@ -40,7 +40,7 @@ export default function EvaluationForm({
     slotsSelecao,
     onDecisaoChange,
     onSubmit,
-    isReavaliacao
+    isReavaliacao,
 }: EvaluationFormProps) {
     const showMotivoField = decisao === 'indeferida' || slotsSelecao.some((slot) => slot.status === 'indeferida');
 
@@ -57,9 +57,8 @@ export default function EvaluationForm({
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Atenção: Reavaliação de Reserva</AlertTitle>
                             <AlertDescription>
-                                Esta reserva já possui horários avaliados. Suas novas decisões podem
-                                sobrescrever avaliações anteriores. Se aplicar para "Toda a recorrência",
-                                a avaliação será replicada para todos os horários correspondentes no período.
+                                Esta reserva já possui horários avaliados. Suas novas decisões podem sobrescrever avaliações anteriores. Se aplicar
+                                para "Toda a recorrência", a avaliação será replicada para todos os horários correspondentes no período.
                             </AlertDescription>
                         </Alert>
                     )}
@@ -88,14 +87,14 @@ export default function EvaluationForm({
                     <div className="space-y-2">
                         <Label className="font-medium">Decisão Global</Label>
                         <RadioGroup value={decisao} onValueChange={onDecisaoChange} disabled={isRadioGroupDisabled}>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:bg-green-50 has-[:checked]:border-green-300">
+                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-green-300 has-[:checked]:bg-green-50">
                                 <RadioGroupItem value="deferida" id="deferida" />
                                 <Label htmlFor="deferida" className="flex w-full cursor-pointer items-center gap-2">
                                     <CheckCircle className="h-4 w-4 text-green-600" />
                                     Deferir todos os horários visíveis
                                 </Label>
                             </div>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:bg-red-50 has-[:checked]:border-red-300">
+                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
                                 <RadioGroupItem value="indeferida" id="indeferida" />
                                 <Label htmlFor="indeferida" className="flex w-full cursor-pointer items-center gap-2">
                                     <XCircle className="h-4 w-4 text-red-600" />
@@ -103,7 +102,9 @@ export default function EvaluationForm({
                                 </Label>
                             </div>
                         </RadioGroup>
-                        {isRadioGroupDisabled && <p className="text-xs text-muted-foreground">Para avaliação global, todos os horários devem ter a mesma decisão.</p>}
+                        {isRadioGroupDisabled && (
+                            <p className="text-muted-foreground text-xs">Para avaliação global, todos os horários devem ter a mesma decisão.</p>
+                        )}
                     </div>
 
                     {showMotivoField && (
@@ -136,11 +137,7 @@ export default function EvaluationForm({
                     </div>
 
                     <div className="flex gap-3 border-t pt-4">
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="flex-1"
-                        >
+                        <Button type="submit" disabled={isSubmitting} className="flex-1">
                             {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
                         </Button>
                         <Button type="button" variant="outline" className="px-8" onClick={() => router.get(route('gestor.reservas.index'))}>

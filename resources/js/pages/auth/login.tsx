@@ -2,12 +2,12 @@ import { router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
+import AppLogoIcon from '@/components/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLogoIcon from '@/components/app-logo-icon';
 
 type LoginForm = {
     email: string;
@@ -36,9 +36,9 @@ export default function Login() {
                 <Card className="w-full">
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-center text-2xl font-bold">
-                            <div className='flex justify-center mb-2'>
-                                <AppLogoIcon className="size-34 text-white dark:text-black " />
-                            </div >
+                            <div className="mb-2 flex justify-center">
+                                <AppLogoIcon className="size-34 text-white dark:text-black" />
+                            </div>
                             Bem-vindo ao UniEspaços
                         </CardTitle>
                         <CardDescription className="text-muted-foreground text-center">
@@ -94,7 +94,7 @@ export default function Login() {
                                 {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
                             </div>
 
-                            <div className="flex items-center py-4 space-x-2">
+                            <div className="flex items-center space-x-2 py-4">
                                 <Checkbox
                                     id="remember"
                                     checked={data.remember}
@@ -119,7 +119,6 @@ export default function Login() {
                                 )}
                             </Button>
 
-                            
                             <div className="text-muted-foreground text-center text-sm">
                                 Não tem uma conta?{' '}
                                 <button

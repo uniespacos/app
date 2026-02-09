@@ -38,7 +38,7 @@ export default function GerenciarEspacos() {
         capacidade: '',
     });
     const [espacoParaGerenciar, setEspacoParaGerenciar] = useState<Espaco | null>(null);
-    
+
     // Estado para a paginação
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // Defina quantos itens por página
@@ -97,7 +97,7 @@ export default function GerenciarEspacos() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
             <div className="flex">
-                <div className="flex-1 w-[100vh] container mx-auto space-y-6 py-6">
+                <div className="container mx-auto w-[100vh] flex-1 space-y-6 py-6">
                     <div className="container mx-auto space-y-6 p-6">
                         {/* Cabeçalho */}
                         <GenericHeader

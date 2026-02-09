@@ -2,13 +2,7 @@ import espacoImage from '@/assets/espaco.png';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
 import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
@@ -70,9 +64,10 @@ export default function EspacoCard({
             );
         }
     };
-    const imageSources = (espaco.imagens && espaco.imagens.length > 0)
-        ? espaco.imagens.map(img => `/storage/${img}`) // Assumindo que '/storage/' é o caminho correto
-        : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
+    const imageSources =
+        espaco.imagens && espaco.imagens.length > 0
+            ? espaco.imagens.map((img) => `/storage/${img}`) // Assumindo que '/storage/' é o caminho correto
+            : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
 
     return (
         <Card className="flex flex-col overflow-hidden">
@@ -82,12 +77,16 @@ export default function EspacoCard({
                     <CarouselContent>
                         {imageSources.map((src, index) => (
                             <CarouselItem key={index}>
-                                <div className="aspect-video"> {/* Proporção 16:9 para consistência */}
+                                <div className="aspect-video">
+                                    {' '}
+                                    {/* Proporção 16:9 para consistência */}
                                     <img
                                         src={src}
                                         alt={`Imagem ${index + 1} de ${espaco.nome}`}
                                         className="h-full w-full object-cover"
-                                        onError={(e) => { e.currentTarget.src = espacoImage; }} // Fallback para imagem quebrada
+                                        onError={(e) => {
+                                            e.currentTarget.src = espacoImage;
+                                        }} // Fallback para imagem quebrada
                                     />
                                 </div>
                             </CarouselItem>
@@ -96,26 +95,28 @@ export default function EspacoCard({
                     {/* Mostra os botões de navegação apenas se houver mais de uma imagem */}
                     {imageSources.length > 1 && (
                         <>
-                            <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2" />
-                            <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2" />
+                            <CarouselPrevious className="absolute top-1/2 left-3 -translate-y-1/2" />
+                            <CarouselNext className="absolute top-1/2 right-3 -translate-y-1/2" />
                         </>
                     )}
                 </Carousel>
 
                 {/* Botão de Favoritar posicionado sobre a imagem */}
-                {showFavoritar && <button
-                    onClick={handleFavoritarEspaco}
-                    disabled={processing}
-                    className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-all duration-200 ${isFavorited ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-700 hover:bg-gray-100'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
-                    title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
-                >
-                    <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
-                </button>}
+                {showFavoritar && (
+                    <button
+                        onClick={handleFavoritarEspaco}
+                        disabled={processing}
+                        className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-all duration-200 ${isFavorited ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-white text-gray-700 hover:bg-gray-100'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
+                        title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
+                    >
+                        <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
+                    </button>
+                )}
             </div>
 
             {/* O CardHeader agora contém apenas o título, como é o padrão */}
             <CardHeader>
-                <CardTitle className="text-xl truncate" title={espaco.nome}>
+                <CardTitle className="truncate text-xl" title={espaco.nome}>
                     {espaco.nome}
                 </CardTitle>
             </CardHeader>
@@ -123,26 +124,21 @@ export default function EspacoCard({
             {/* Adicionado 'flex-grow' para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
             <CardContent className="flex-grow">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
-                    <Badge
-                        variant="outline"
-                        className="flex h-auto items-start gap-1.5"
-                    >
+                    <Badge variant="outline" className="flex h-auto items-start gap-1.5">
                         <Building2 className="h-4 w-4 flex-shrink-0" />
-                        <span className="whitespace-normal break-words">
-                            {modulo ?? 'N/A'}
-                        </span>
+                        <span className="break-words whitespace-normal">{modulo ?? 'N/A'}</span>
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate min-w-0">{espaco.andar?.nome ?? 'N/A'}</span>
+                        <span className="min-w-0 truncate">{espaco.andar?.nome ?? 'N/A'}</span>
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate min-w-0">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
+                        <span className="min-w-0 truncate">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
                         <Users className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate min-w-0">{espaco.capacidade_pessoas} pessoas</span>
+                        <span className="min-w-0 truncate">{espaco.capacidade_pessoas} pessoas</span>
                     </Badge>
                 </div>
             </CardContent>
@@ -151,7 +147,13 @@ export default function EspacoCard({
             <CardFooter className="flex flex-wrap gap-2 pt-4">
                 {isGerenciarEspacos && userType === 1 ? (
                     <>
-                        <Button variant="outline" size="sm" onClick={() => { /* Lógica para ver detalhes */ }}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                /* Lógica para ver detalhes */
+                            }}
+                        >
                             Ver Detalhes
                         </Button>
                         <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
@@ -170,5 +172,6 @@ export default function EspacoCard({
                     </Button>
                 )}
             </CardFooter>
-        </Card>);
+        </Card>
+    );
 }

@@ -1,9 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Espaco, Reserva, User } from "@/types";
-import { useEffect, useState } from "react";
-import { TabsProps } from "@radix-ui/react-tabs";
-import TabsItemReserva from "./tabs-item-reserva";
-import TabsItemEspacosFavoritos from "./tabs-item-espacos-favoritos";
+import { Espaco, Reserva, User } from '@/types';
+import { TabsProps } from '@radix-ui/react-tabs';
+import { useEffect, useState } from 'react';
+import TabsItemEspacosFavoritos from './tabs-item-espacos-favoritos';
+import TabsItemReserva from './tabs-item-reserva';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 export type TabsItens = {
     tabHeader: {
@@ -13,8 +13,8 @@ export type TabsItens = {
     tabContent: {
         title: string;
         description: string;
-    }
-}
+    };
+};
 
 type TabsContentDashboardProps = {
     reservas: Reserva[];
@@ -34,21 +34,26 @@ export default function TabsContentDashboard({ reservas, espacosFavoritos, user,
         }
 
         const lowerSearchTerm = searchTerm.toLowerCase();
-        const filtered = espacosFavoritos.filter((espaco) =>
-            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
-            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
-            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        const filtered = espacosFavoritos.filter(
+            (espaco) =>
+                espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+                espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '' ||
+                espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '',
         );
 
         setFilteredEspacosFavoritos(filtered);
     }, [espacosFavoritos, searchTerm]);
 
     return (
-        <Tabs {...props} defaultValue={defaultValue || "reservas"} className="space-y-4">
+        <Tabs {...props} defaultValue={defaultValue || 'reservas'} className="space-y-4">
             <TabsList>
-                {itens.map((item) =>
-                    <TabsTrigger key={item.tabHeader.value} value={item.tabHeader.value}>{item.tabHeader.textDescription}</TabsTrigger>
-                )}
+                {itens.map((item) => (
+                    <TabsTrigger key={item.tabHeader.value} value={item.tabHeader.value}>
+                        {item.tabHeader.textDescription}
+                    </TabsTrigger>
+                ))}
             </TabsList>
 
             <TabsContent value="reservas" className="space-y-4">
@@ -56,7 +61,12 @@ export default function TabsContentDashboard({ reservas, espacosFavoritos, user,
             </TabsContent>
 
             <TabsContent value="favoritos" className="space-y-4">
-                <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                <TabsItemEspacosFavoritos
+                    espacosFiltrados={filteredEspacosFavoritos}
+                    user={user}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                />
             </TabsContent>
         </Tabs>
     );

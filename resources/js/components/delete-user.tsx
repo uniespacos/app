@@ -32,11 +32,8 @@ export default function DeleteUser() {
 
     return (
         <div className="space-y-6">
-            <HeadingSmall 
-                title="Excluir conta" 
-                description="Exclua sua conta e todos os seus recursos" 
-            />
-            
+            <HeadingSmall title="Excluir conta" description="Exclua sua conta e todos os seus recursos" />
+
             <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
                 <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
                     <p className="font-medium">Aviso</p>
@@ -47,15 +44,15 @@ export default function DeleteUser() {
                     <DialogTrigger asChild>
                         <Button variant="destructive">Excluir conta</Button>
                     </DialogTrigger>
-                    
+
                     <DialogContent>
                         <DialogTitle>Tem certeza que deseja excluir sua conta?</DialogTitle>
-                        
+
                         <DialogDescription>
-                            Uma vez que sua conta for excluída, todos os seus recursos e dados serão permanentemente removidos. 
-                            Por favor, digite sua senha para confirmar que deseja excluir permanentemente sua conta.
+                            Uma vez que sua conta for excluída, todos os seus recursos e dados serão permanentemente removidos. Por favor, digite sua
+                            senha para confirmar que deseja excluir permanentemente sua conta.
                         </DialogDescription>
-                        
+
                         <form className="space-y-6" onSubmit={deleteUser}>
                             <div className="grid gap-2">
                                 <Label htmlFor="password" className="sr-only">

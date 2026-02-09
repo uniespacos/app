@@ -19,7 +19,7 @@ type FiltroBuscaEspacosProps = {
         andar?: string;
         capacidade?: string;
     };
-    capacidadeEspacos: number[]; 
+    capacidadeEspacos: number[];
 };
 
 export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
@@ -38,7 +38,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             return [];
         }
         const resultado = modulos.filter((m) => {
-            return m.unidade_id.toString() === localFilters.unidade
+            return m.unidade_id.toString() === localFilters.unidade;
         });
         return resultado;
     }, [localFilters.unidade, modulos]);
@@ -48,9 +48,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             return [];
         }
         return andares.filter((a) => a.modulo_id.toString() === localFilters.modulo);
-    }, [localFilters.modulo, andares]); 
-
-
+    }, [localFilters.modulo, andares]);
 
     useEffect(() => {
         if (isInitialMount.current) {
@@ -78,7 +76,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         return () => {
             clearTimeout(handler);
         };
-    }, [localFilters, route]); 
+    }, [localFilters, route]);
 
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
         setLocalFilters((prev) => {
@@ -91,7 +89,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             if (name === 'modulo') {
                 newFilters.andar = 'all';
             }
-            
+
             return newFilters;
         });
     };
@@ -100,7 +98,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         <>
             {/* Filtros e Busca */}
             <Card className="mb-6">
-                <CardContent >
+                <CardContent>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {/* Busca */}
                         <div className="relative sm:col-span-4 lg:col-span-4">
@@ -174,7 +172,11 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             <SelectContent>
                                 <SelectItem value="qualquer">Qualquer</SelectItem>
                                 {capacidadeEspacos.map((capacidade) => {
-                                    return <SelectItem key={capacidade} value={capacidade.toString()}>{capacidade} Lugares</SelectItem>
+                                    return (
+                                        <SelectItem key={capacidade} value={capacidade.toString()}>
+                                            {capacidade} Lugares
+                                        </SelectItem>
+                                    );
                                 })}
                             </SelectContent>
                         </Select>

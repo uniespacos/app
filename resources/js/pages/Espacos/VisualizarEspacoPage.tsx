@@ -3,15 +3,22 @@ import AgendaEspaço from '@/pages/Espacos/fragments/EspacoAgenda';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function VisualizarEspaço({ espaco, reserva, isEditMode, semana }: {
-    espaco: Espaco; reserva?: Reserva; isEditMode?: boolean, semana: { // A página agora espera receber a prop 'semana'
+export default function VisualizarEspaço({
+    espaco,
+    reserva,
+    isEditMode,
+    semana,
+}: {
+    espaco: Espaco;
+    reserva?: Reserva;
+    isEditMode?: boolean;
+    semana: {
+        // A página agora espera receber a prop 'semana'
         inicio: string;
         fim: string;
         referencia: string;
-    }
+    };
 }) {
-
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: isEditMode ? 'Reservas' : 'Espaços',
