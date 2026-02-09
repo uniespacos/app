@@ -6,18 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import AppLogo from './app-logo';
 
 /* Ícones ---------------------------------------------------------------- */
-import {
-    BookOpen,
-    Building,
-    Calendar,
-    Eye,
-    LayoutGrid,
-    Users,
-    School,
-    MapPin,
-    Grid3X3,
-    Briefcase
-} from 'lucide-react';
+import { BookOpen, Briefcase, Building, Calendar, Eye, Grid3X3, LayoutGrid, MapPin, School, Users } from 'lucide-react';
 
 /* ------------- Tipo local de item de menu (não exportado) ------------- */
 import type { LucideIcon } from 'lucide-react';
@@ -78,10 +67,10 @@ export function AppSidebar() {
             {/* Conteúdo -------------------------------------------------------- */}
             <SidebarContent>
                 {/* Itens comuns */}
-                {<NavMain label='Painel' items={commonNav} />}
+                {<NavMain label="Painel" items={commonNav} />}
 
                 {/* Seção do cargo */}
-                {extraItems.length > 0 && <NavMain label='Gerir' items={extraItems} />}
+                {extraItems.length > 0 && <NavMain label="Gerir" items={extraItems} />}
             </SidebarContent>
 
             {/* Rodapé ---------------------------------------------------------- */}

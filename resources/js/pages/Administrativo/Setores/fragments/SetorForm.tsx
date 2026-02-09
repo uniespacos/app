@@ -89,7 +89,7 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
             {/* Seleção de Unidade */}
             <div className="space-y-2">
                 <Label>Unidade *</Label>
-                <Select value={unidadeId} onValueChange={setUnidadeId} >
+                <Select value={unidadeId} onValueChange={setUnidadeId}>
                     <SelectTrigger>
                         <SelectValue placeholder="Selecione uma unidade" />
                     </SelectTrigger>

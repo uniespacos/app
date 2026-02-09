@@ -136,7 +136,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
                         />
                     </div>
                     <div className="flex items-end justify-end space-x-2">
-                        <Button onClick={handleLimparFiltros} className='flex-1'>
+                        <Button onClick={handleLimparFiltros} className="flex-1">
                             <Search className="mr-2 h-4 w-4" />
                             Aplicar Filtros
                         </Button>

@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export function getCookie(name: string): string | undefined {
-    if (typeof document === "undefined") return undefined;
+    if (typeof document === 'undefined') return undefined;
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift();
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
     return undefined;
 }
 
@@ -52,10 +52,10 @@ export const formatDate = (dateString: string | Date) => {
     if (!dateString) return 'Data inválida';
     try {
         const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
-        return format(date, "dd/MM/yyyy", { locale: ptBR });
+        return format(date, 'dd/MM/yyyy', { locale: ptBR });
     } catch (error) {
-        console.error("Erro ao formatar data:", dateString, error);
-        return "Data inválida";
+        console.error('Erro ao formatar data:', dateString, error);
+        return 'Data inválida';
     }
 };
 
@@ -128,7 +128,6 @@ export function useDebounce(value: string, delay: number) {
     return debouncedValue;
 }
 
-
 export function getPrimeirosDoisNomes(nomeCompleto: string | undefined): string {
     // 1. Verifica se o nome não é nulo ou vazio
     if (!nomeCompleto) {
@@ -139,7 +138,6 @@ export function getPrimeirosDoisNomes(nomeCompleto: string | undefined): string 
     const palavras = nomeCompleto.trim().split(' ');
     return palavras.slice(0, 2).join(' ');
 }
-
 
 export function diasDaSemana(dataReferencia: Date, hoje: Date) {
     const inicioDaSemana = startOfWeek(dataReferencia, { weekStartsOn: 1 }); // 1 = Segunda-feira

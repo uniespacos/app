@@ -3,12 +3,12 @@ import AppLayout from '@/layouts/app-layout';
 import { useDebounce } from '@/lib/utils';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { format } from 'date-fns';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { ReservasEmpty } from '../fragments/ReservasEmpty';
 import { ReservasFilters } from '../fragments/ReservasFilters';
 import { ReservasList } from '../fragments/ReservasList';
 import { ReservasLoading } from '../fragments/reservasLoading';
-import { format } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +17,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function MinhasReservas({ reservas: paginator, filters, user, reservaToShow, semana }: {
+export default function MinhasReservas({
+    reservas: paginator,
+    filters,
+    user,
+    reservaToShow,
+    semana,
+}: {
     user: User;
     reservas: Paginator<Reserva>;
     filters: { search?: string; situacao?: string };
@@ -27,7 +33,7 @@ export default function MinhasReservas({ reservas: paginator, filters, user, res
     // 2. O estado dos filtros agora "mora" aqui, no componente pai
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedSituacao, setSelectedSituacao] = useState(filters.situacao || '');
-    const [data, setData] = useState<Date | undefined>(new Date(semana.referencia + 'T12:00:00'));    // 3. Debounce para o campo de busca
+    const [data, setData] = useState<Date | undefined>(new Date(semana.referencia + 'T12:00:00')); // 3. Debounce para o campo de busca
     const [debouncedSearch] = useDebounce(searchTerm, 500);
     // 4. useEffect para buscar os dados quando os filtros mudam
     const isInitialMount = useRef(true);

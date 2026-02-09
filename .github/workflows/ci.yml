@@ -71,7 +71,15 @@ jobs:
           elapsed_seconds=0
           echo "Waiting for workspace service to become healthy..."
           while [ "$elapsed_seconds" -lt "$timeout_seconds" ]; do
-            workspace_status=$(docker compose -f docker-compose.test.yml ps -q workspace | xargs docker inspect --format='{{.State.Health.Status}}' 2>/dev/null)
+            container_id=$(docker compose -f docker-compose.test.yml ps -q workspace)
+            if [ -z "$container_id" ]; then
+              echo "Workspace container not found. Waiting..."
+              sleep 5
+              elapsed_seconds=$((elapsed_seconds + 5))
+              continue
+            fi
+          
+            workspace_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null)
             if [ "$workspace_status" == "healthy" ]; then
               echo "Workspace service is healthy!"
               break

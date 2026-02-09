@@ -1,9 +1,9 @@
-import { SituacaoBadge } from "@/pages/Reservas/fragments/ReservasList";
-import { Button } from "./ui/button";
-import { CheckCircle } from "lucide-react";
-import { router } from "@inertiajs/react";
-import { Reserva } from "@/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { SituacaoBadge } from '@/pages/Reservas/fragments/ReservasList';
+import { Reserva } from '@/types';
+import { router } from '@inertiajs/react';
+import { CheckCircle } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
     return (
@@ -17,32 +17,30 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                     {reservas.map((reserva) => {
                         const espaco = reserva.horarios[0]?.agenda?.espaco;
                         return (
-                            <div key={reserva.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div key={reserva.id} className="flex items-center justify-between rounded-lg border p-4">
                                 <div className="space-y-1">
                                     <h4 className="font-medium">{reserva.titulo}</h4>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         {espaco?.nome} - {espaco?.andar?.nome}, {espaco?.andar?.modulo?.nome}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {new Date(reserva.data_inicial).toLocaleDateString("pt-BR")}
-                                    </p>
+                                    <p className="text-muted-foreground text-xs">{new Date(reserva.data_inicial).toLocaleDateString('pt-BR')}</p>
                                 </div>
-                                <div className="flex-col ">
+                                <div className="flex-col">
                                     <SituacaoBadge situacao={reserva.situacao} />
                                     <Button
                                         size="sm"
                                         onClick={() => router.get(route('reservas.index', { reserva: reserva.id }))}
-                                        className="bg-blue-600 hover:bg-blue-700 mt-5"
+                                        className="mt-5 bg-blue-600 hover:bg-blue-700"
                                     >
                                         <CheckCircle className="mr-1 h-4 w-4" />
                                         Ver detalhes
                                     </Button>
                                 </div>
                             </div>
-                        )
+                        );
                     })}
                 </div>
             </CardContent>
         </Card>
-    )
+    );
 }

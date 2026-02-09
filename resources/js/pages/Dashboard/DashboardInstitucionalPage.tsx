@@ -16,16 +16,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ estatisticasPainel, espacos, user, gestores, unidades, espacosFavoritos, reservas }: {
+export default function Dashboard({
+    estatisticasPainel,
+    espacos,
+    user,
+    gestores,
+    unidades,
+    espacosFavoritos,
+    reservas,
+}: {
     user: User;
     users: User[];
     estatisticasPainel: {
         total_espacos: number;
         total_gestores: number;
         reservas_mes: number;
-    }; espacos: Espaco[]
+    };
+    espacos: Espaco[];
     gestores: User[];
-    unidades: Unidade[]
+    unidades: Unidade[];
     espacosFavoritos: Espaco[];
     reservas: Reserva[];
 }) {
@@ -38,10 +47,13 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
         }
 
         const lowerSearchTerm = searchTerm.toLowerCase();
-        const filtered = espacosFavoritos.filter((espaco) =>
-            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
-            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
-            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        const filtered = espacosFavoritos.filter(
+            (espaco) =>
+                espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+                espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '' ||
+                espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '',
         );
 
         setFilteredEspacosFavoritos(filtered);
@@ -49,16 +61,16 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
 
     const getTurnoLabel = (turno: string) => {
         switch (turno) {
-            case "manha":
-                return "Manhã"
-            case "tarde":
-                return "Tarde"
-            case "noite":
-                return "Noite"
+            case 'manha':
+                return 'Manhã';
+            case 'tarde':
+                return 'Tarde';
+            case 'noite':
+                return 'Noite';
             default:
-                return turno
+                return turno;
         }
-    }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -84,33 +96,33 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total de Espaços</CardTitle>
-                                <Building className="h-4 w-4 text-muted-foreground" />
+                                <Building className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{estatisticasPainel.total_espacos}</div>
-                                <p className="text-xs text-muted-foreground">Espaços cadastrados</p>
+                                <p className="text-muted-foreground text-xs">Espaços cadastrados</p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Gestores Ativos</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <Users className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{estatisticasPainel.total_gestores}</div>
-                                <p className="text-xs text-muted-foreground">Gestores delegados</p>
+                                <p className="text-muted-foreground text-xs">Gestores delegados</p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Reservas do Mês</CardTitle>
-                                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                                <BarChart3 className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{estatisticasPainel.reservas_mes}</div>
-                                <p className="text-xs text-muted-foreground">Total de reservas</p>
+                                <p className="text-muted-foreground text-xs">Total de reservas</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -118,8 +130,8 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                     {/* Main Content */}
                     <Tabs defaultValue="reservas" className="space-y-4">
                         <TabsList>
-                            <TabsTrigger value="reservas" > Ultimas 5 reservas solicitadas </TabsTrigger>
-                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
+                            <TabsTrigger value="reservas"> Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos">Espaços Favoritos </TabsTrigger>
                             <TabsTrigger value="espacos">Gerenciar Espaços</TabsTrigger>
                             <TabsTrigger value="gestores">Delegar Gestores</TabsTrigger>
                             <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
@@ -130,7 +142,12 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                         </TabsContent>
 
                         <TabsContent value="favoritos" className="space-y-4">
-                            <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                            <TabsItemEspacosFavoritos
+                                espacosFiltrados={filteredEspacosFavoritos}
+                                user={user}
+                                searchTerm={searchTerm}
+                                setSearchTerm={setSearchTerm}
+                            />
                         </TabsContent>
 
                         <TabsContent value="espacos" className="space-y-4">
@@ -141,12 +158,14 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                 <CardContent>
                                     <div className="space-y-4">
                                         {espacos.map((espaco) => (
-                                            <div key={espaco.id} className="border rounded-lg p-4">
-                                                <div className="flex items-start justify-between mb-4">
+                                            <div key={espaco.id} className="rounded-lg border p-4">
+                                                <div className="mb-4 flex items-start justify-between">
                                                     <div className="space-y-1">
                                                         <h4 className="font-medium">{espaco.nome}</h4>
-                                                        <p className="text-sm text-muted-foreground">Capacidade: {espaco.capacidade_pessoas} pessoas</p>
-                                                        <p className="text-xs text-muted-foreground">
+                                                        <p className="text-muted-foreground text-sm">
+                                                            Capacidade: {espaco.capacidade_pessoas} pessoas
+                                                        </p>
+                                                        <p className="text-muted-foreground text-xs">
                                                             {espaco.andar?.nome} - {espaco.andar?.modulo?.nome}, {espaco.andar?.modulo?.unidade?.nome}
                                                         </p>
                                                     </div>
@@ -154,7 +173,7 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                                         size="sm"
                                                         variant="outline"
                                                         onClick={() => {
-                                                            router.get(route('institucional.espacos.index'))
+                                                            router.get(route('institucional.espacos.index'));
                                                         }}
                                                     >
                                                         <Settings className="mr-1 h-4 w-4" />
@@ -164,18 +183,18 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
 
                                                 <div className="space-y-2">
                                                     <h5 className="text-sm font-medium">Gestores por turno:</h5>
-                                                    <div className="flex gap-2 flex-wrap">
+                                                    <div className="flex flex-wrap gap-2">
                                                         {espaco.agendas?.map((agenda) => (
                                                             <div key={agenda.id} className="flex items-center gap-2">
                                                                 <Badge variant="outline">{getTurnoLabel(agenda.turno)}</Badge>
                                                                 {agenda.user ? (
-                                                                    <span className="text-sm text-muted-foreground">{agenda.user.name}</span>
+                                                                    <span className="text-muted-foreground text-sm">{agenda.user.name}</span>
                                                                 ) : (
                                                                     <Button
                                                                         size="sm"
                                                                         variant="ghost"
                                                                         onClick={() => {
-                                                                            router.get(route('institucional.espacos.index'))
+                                                                            router.get(route('institucional.espacos.index'));
                                                                         }}
                                                                     >
                                                                         <UserCheck className="mr-1 h-3 w-3" />
@@ -206,14 +225,19 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                                 <CardContent className="p-4">
                                                     <div className="space-y-2">
                                                         <h4 className="font-medium">{gestor.name}</h4>
-                                                        <p className="text-sm text-muted-foreground">{gestor.email}</p>
-                                                        <p className="text-xs text-muted-foreground">{gestor.setor?.nome}</p>
+                                                        <p className="text-muted-foreground text-sm">{gestor.email}</p>
+                                                        <p className="text-muted-foreground text-xs">{gestor.setor?.nome}</p>
                                                         <Badge variant="secondary">
                                                             <Users className="mr-1 h-3 w-3" />
                                                             Gestor
                                                         </Badge>
                                                     </div>
-                                                    <Button size="sm" className="w-full mt-3 bg-transparent" variant="outline" onClick={() => router.get(route('institucional.usuarios.index'))}>
+                                                    <Button
+                                                        size="sm"
+                                                        className="mt-3 w-full bg-transparent"
+                                                        variant="outline"
+                                                        onClick={() => router.get(route('institucional.usuarios.index'))}
+                                                    >
                                                         <Calendar className="mr-2 h-4 w-4" />
                                                         Ver Delegações
                                                     </Button>
@@ -240,7 +264,7 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                             <CardContent>
                                                 <div className="space-y-2">
                                                     {unidades.map((unidade) => (
-                                                        <div key={unidade.id} className="flex justify-between items-center">
+                                                        <div key={unidade.id} className="flex items-center justify-between">
                                                             <span className="text-sm">{unidade.nome}</span>
                                                             <Badge variant="outline">{Math.floor(Math.random() * 40 + 60)}%</Badge>
                                                         </div>
@@ -255,15 +279,15 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                                             </CardHeader>
                                             <CardContent>
                                                 <div className="space-y-2">
-                                                    <div className="flex justify-between items-center">
+                                                    <div className="flex items-center justify-between">
                                                         <span className="text-sm">Manhã</span>
                                                         <Badge variant="outline">45%</Badge>
                                                     </div>
-                                                    <div className="flex justify-between items-center">
+                                                    <div className="flex items-center justify-between">
                                                         <span className="text-sm">Tarde</span>
                                                         <Badge variant="outline">35%</Badge>
                                                     </div>
-                                                    <div className="flex justify-between items-center">
+                                                    <div className="flex items-center justify-between">
                                                         <span className="text-sm">Noite</span>
                                                         <Badge variant="outline">20%</Badge>
                                                     </div>
@@ -278,5 +302,5 @@ export default function Dashboard({ estatisticasPainel, espacos, user, gestores,
                 </div>
             </div>
         </AppLayout>
-    )
+    );
 }

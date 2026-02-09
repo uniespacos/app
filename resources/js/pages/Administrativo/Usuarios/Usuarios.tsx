@@ -145,7 +145,9 @@ export default function UsuariosPage() {
                                         <SelectContent>
                                             <SelectItem value="all">Todas</SelectItem>
                                             {setores.map((setor) => (
-                                                <SelectItem key={setor.id} value={setor.id.toString()}>{setor.sigla}</SelectItem>
+                                                <SelectItem key={setor.id} value={setor.id.toString()}>
+                                                    {setor.sigla}
+                                                </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
