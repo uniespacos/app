@@ -104,8 +104,11 @@ jobs:
             exit 1
           fi
 
+      - name: Fix Permissions
+        run: docker compose -f docker-compose.test.yml exec -T --user=root workspace chown -R 1000:1000 /var/www/storage /var/www/bootstrap/cache
+
       - name: Install PHP Dependencies
-        run: docker compose -f docker-compose.test.yml exec -T --user root workspace composer install --no-interaction --no-progress --prefer-dist
+        run: docker compose -f docker-compose.test.yml exec -T --user=1000 workspace composer install --no-interaction --no-progress --prefer-dist
 
       - name: Create dummy Vite manifest
         run: |
