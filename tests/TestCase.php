@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Database\Seeders\DatabaseSeeder;
 
 abstract class TestCase extends BaseTestCase
 {

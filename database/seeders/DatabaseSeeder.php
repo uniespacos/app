@@ -12,10 +12,8 @@ use App\Models\Reserva;
 use App\Models\Setor;
 use App\Models\Unidade;
 use App\Models\User;
-use App\Models\Modulo;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
