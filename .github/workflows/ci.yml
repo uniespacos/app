@@ -44,8 +44,8 @@ jobs:
       - name: Run ESLint (Frontend Linting)
         run: npm run lint
 
-      - name: Check Formatting (Frontend)
-        run: npm run format:check
+      - name: Fix and Check Formatting (Frontend)
+        run: npm run format
 
   test:
     name: 🧪 Run Tests
