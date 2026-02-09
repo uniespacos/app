@@ -8,6 +8,18 @@ services:
         GID: 1000
     volumes:
       - ./:/var/www
+    environment:
+      - APP_ENV=testing
+      - BCRYPT_ROUNDS=4
+      - CACHE_STORE=array
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_DATABASE=uniespacos
+      - DB_USERNAME=uniespacos
+      - DB_PASSWORD=uniespacossecretkey
+      - MAIL_MAILER=array
+      - QUEUE_CONNECTION=sync
+      - SESSION_DRIVER=file
     networks:
       - test
     depends_on:
