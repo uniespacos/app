@@ -1,7 +1,7 @@
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
 import { Andar, Espaco, FiltrosEspacosType, Modulo, Unidade, User } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { FiltrosEspacos } from './fragments/FiltrosEspacos';

@@ -1,7 +1,7 @@
 import { User } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { Bell, MailCheck } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
