@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
 import TabsItemReserva from '@/components/tabs-item-reserva';
-import EspacoCard from '../Espacos/fragments/EspacoCard';
+import TabsItemEspacosGerenciados from '@/components/tabs-item-espacos-gerenciados';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -169,19 +169,7 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                         </TabsContent>
 
                         <TabsContent value="espacos" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Espaços Sob Sua Gestão</CardTitle>
-                                    <CardDescription>Espaços que você gerencia por turno</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                        {espacosUnicos?.map((espaco) => (
-                                            <EspacoCard showFavoritar={false} key={espaco?.id} espaco={espaco} userType={user.permission_type_id} handleSolicitarReserva={() => router.get(route("espacos.show", espaco.id))} />
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <TabsItemEspacosGerenciados espacos={espacosUnicos} user={user} />
                         </TabsContent>
                     </Tabs>
                 </div>
