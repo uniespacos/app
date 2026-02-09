@@ -26,8 +26,10 @@ This document outlines the development roadmap for the UniEspaços project, trac
     *   Enhance the calendar view for space reservations with more interactive features.
 *   **Feature: Admin Dashboard**
     *   Improve the admin dashboard with more detailed analytics and management tools.
-*   **Bug: Reservation Conflict Notification**
-    *   Investigate and fix any remaining issues with reservation conflict notifications.
+*   **Infrastructure: Implement CI/CD flow**
+    *   Set up and refine continuous integration and continuous deployment pipelines.
+*   **Maintenance: Bug Fixes and Stability Improvements**
+    *   Address various bugs across the application and improve overall system stability.
 
 ---
-*This roadmap was last updated on February 6, 2026.*
+*This roadmap was last updated on February 9, 2026.*
