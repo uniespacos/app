@@ -1,0 +1,206 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - "main"
+      - "development"
+  pull_request:
+    branches:
+      - development
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    name: 🔍 Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          npm ci
+
+      - name: Run Pint (PHP Code Style)
+        run: vendor/bin/pint --test
+        
+      - name: Run ESLint (Frontend Linting)
+        run: npm run lint
+
+      - name: Check Formatting (Frontend)
+        run: npm run format:check
+
+  test:
+    name: 🧪 Run Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Run Services
+        run: docker compose -f docker-compose.test.yml up --build -d
+
+      - name: Wait for database to be ready
+        run: |
+          echo "Waiting for postgres..."
+          until docker compose -f docker-compose.test.yml exec postgres pg_isready -U uniespacos -d uniespacos; do
+            sleep 2
+          done
+          echo "Postgres is ready!"
+
+      - name: Install PHP Dependencies
+        run: docker compose -f docker-compose.test.yml exec -T workspace composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Create dummy Vite manifest
+        run: |
+          mkdir -p public/build
+          echo '{}' > public/build/manifest.json
+
+      - name: Run Migrations and Seed
+        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
+
+      - name: Run Backend Tests (PHPUnit)
+        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+      
+      # Add this step once frontend tests are configured
+      # - name: Run Frontend Tests
+      #   run: npm test
+
+      - name: Stop Services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
+
+  build-and-push:
+    name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker meta for app image
+        id: meta_app
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Generate Docker meta for web image
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & Build Frontend
+        run: npm ci && npm run build
+
+      - name: Build and push PHP App Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/php-fpm/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
+
+      - name: Build and push Nginx Web Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
+
+  deploy:
+    name: 🚀 Deploy to Production
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            echo "📍 Starting Deploy..."
+            cd /var/www/uniespacos # ADJUST THIS PATH IF NEEDED
+
+            echo "🔒 Maintenance Mode ON"
+            docker compose -f compose.prod.yml exec -T web php artisan down || true
+
+            echo "📥 Pulling latest code"
+            git pull origin main
+            
+            echo "DOCKER_USER=${{ github.actor }}" > .env.gh
+            echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
+
+            echo "🔐 Logging into GHCR"
+            cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            echo "🐳 Pulling latest images"
+            docker compose -f compose.prod.yml pull
+
+            echo "🚀 Launching new containers"
+            docker compose -f compose.prod.yml up -d --remove-orphans
+
+            echo "⏳ Waiting for services..."
+            sleep 15
+
+            echo "🔄 Running Migrations"
+            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+
+            echo "🧹 Optimizing Application"
+            docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
+            docker compose -f compose.prod.yml exec -T web php artisan optimize
+            docker compose -f compose.prod.yml exec -T web php artisan view:cache
+            docker compose -f compose.prod.yml exec -T web php artisan config:cache
+
+            echo "🔄 Restarting Queue Worker"
+            docker compose -f compose.prod.yml restart queue-worker
+
+            echo "✅ Maintenance Mode OFF"
+            docker compose -f compose.prod.yml exec -T web php artisan up
+
+            echo "🎉 Deploy finished successfully!"
