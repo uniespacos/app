@@ -195,39 +195,24 @@ export default function AgendaDialogReserva({
                                                 )}
                                             </Button>
                                         </PopoverTrigger>
-                                                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                                                    <CalendarComponent
-                                                                                        mode="single"
-                                                                                        selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
-                                                                                        onSelect={(date) => {
-                                                                                            if (date) {
-                                                                                                const handleDateChange = (date: Date) => {
-                                                                                                    const today = new Date();
-                                                                                                    today.setHours(0, 0, 0, 0);
-                                        
-                                                                                                    if (date < today) {
-                                                                                                        setFormData('data_inicial', today);
-                                                                                                        if (formData.data_final && today > formData.data_final) {
-                                                                                                            setFormData('data_final', today);
-                                                                                                        }
-                                                                                                        return;
-                                                                                                    }
-                                        
-                                                                                                    setFormData('data_inicial', date);
-                                        
-                                                                                                    if (formData.data_final && date > formData.data_final) {
-                                                                                                        setFormData('data_final', date);
-                                                                                                    }
-                                                                                                };
-                                                                                                handleDateChange(date);
-                                                                                            } else {
-                                                                                                setFormData('data_inicial', null);
-                                                                                            }
-                                                                                        }}
-                                                                                        initialFocus
-                                                                                        disabled={(date) => date < hoje}
-                                                                                    />
-                                                                                </PopoverContent>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                            mode="single"
+                                            selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
+                                            onSelect={(date) => {
+                                                if (date) {
+                                                    setFormData('data_inicial', date);
+                                                    if (formData.data_final && date > new Date(formData.data_final)) {
+                                                        setFormData('data_final', date);
+                                                    }
+                                                } else {
+                                                    setFormData('data_inicial', null);
+                                                }
+                                            }}
+                                            initialFocus
+                                            disabled={(date) => date < hoje}
+                                        />
+                                    </PopoverContent>
                                                                             </Popover>
                                                                         </div>
                                                                         <div className="space-y-2">
@@ -247,14 +232,15 @@ export default function AgendaDialogReserva({
                                                                                         {formData.data_final ? format(new Date(formData.data_final), 'dd/MM/yyyy') : <span>Selecione</span>}
                                                                                     </Button>
                                                                                 </PopoverTrigger>
-                                                                                <PopoverContent className="w-auto p-0" align="start">
-                                                                                    <CalendarComponent
-                                                                                        mode="single"
-                                                                                        selected={formData.data_final ? new Date(formData.data_final) : undefined}
-                                                                                        onSelect={(date) => setFormData('data_final', date)}
-                                                                                        initialFocus
-                                                                                        disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
-                                                                                    />                                        </PopoverContent>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                            mode="single"
+                                            selected={formData.data_final ? new Date(formData.data_final) : undefined}
+                                            onSelect={(date) => setFormData('data_final', date)}
+                                            initialFocus
+                                            disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
+                                        />
+                                    </PopoverContent>
                                     </Popover>
                                 </div>
                             </div>
