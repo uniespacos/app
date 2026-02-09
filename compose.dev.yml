@@ -44,6 +44,11 @@ services:
       dockerfile: ./docker/development/php-fpm/Dockerfile
     restart: unless-stopped
     command: php artisan queue:work --verbose --tries=3 --timeout=90
+    healthcheck:
+      test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
       - ./:/var/www/
     env_file:
