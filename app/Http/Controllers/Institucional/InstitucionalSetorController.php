@@ -23,10 +23,11 @@ class InstitucionalSetorController extends Controller
     {
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao->load(['unidades']);
+
         return Inertia::render('Administrativo/Setores/Setores', [
             'instituicao' => $instituicao,
             'unidades' => Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao', 'setors'])->get(), // Carrega unidades com instituições e setores
-            'setores' => Setor::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao->id))->with(['unidade.instituicao'])->get(),
+            'setores' => Setor::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao->id))->with(['unidade.instituicao'])->get(),
             'usuarios' => User::with(['setor'])->get(), // Carrega setores com unidade e instituição
         ]);
     }
@@ -59,7 +60,7 @@ class InstitucionalSetorController extends Controller
                 ->with('success', 'Setor cadastrado com sucesso!');
         } catch (\Exception $e) {
             return back()
-                ->with(['error' => 'Erro ao cadastrar setor: ' . $e->getMessage()])->withInput();
+                ->with(['error' => 'Erro ao cadastrar setor: '.$e->getMessage()])->withInput();
         }
     }
 
@@ -90,16 +91,17 @@ class InstitucionalSetorController extends Controller
             foreach ($setor->users as $user) {
                 $user->notify(new NotificationModel(
                     'Setor Atualizado',
-                    'O setor ' . $setor->nome . ' foi atualizado.',
+                    'O setor '.$setor->nome.' foi atualizado.',
                     route('institucional.setors.show', $setor->id) // Redireciona para a página do setor atualizado
                 ));
             }
+
             return redirect()
                 ->route('institucional.setors.index')
                 ->with('success', 'Setor atualizado com sucesso!');
         } catch (\Exception $e) {
             return back()
-                ->with(['error' => 'Erro ao atualizar setor: ' . $e->getMessage()])->withInput();
+                ->with(['error' => 'Erro ao atualizar setor: '.$e->getMessage()])->withInput();
         }
     }
 
@@ -120,12 +122,13 @@ class InstitucionalSetorController extends Controller
         }
         try {
             $setor->delete();
+
             return redirect()
                 ->route('institucional.setors.index')
                 ->with('success', 'Setor removido com sucesso!');
         } catch (\Exception $e) {
             return back()
-                ->withErrors(['error' => 'Erro ao remover setor: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Erro ao remover setor: '.$e->getMessage()]);
         }
     }
 }

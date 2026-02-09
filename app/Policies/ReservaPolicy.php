@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Reserva;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ReservaPolicy
 {
@@ -42,8 +41,9 @@ class ReservaPolicy
     public function update(User $user, Reserva $reserva): bool
     {
         // REGRA 1: O usuário pode alterar a reserva caso ainda esteja em análise.
-        if ($user->id === $reserva->user_id && $reserva->situacao === 'em_analise')
+        if ($user->id === $reserva->user_id && $reserva->situacao === 'em_analise') {
             return true;
+        }
 
         // REGRA 2: O Gestor pode avaliar (atualizar) a reserva.
         // Verificamos se existe ('exists') algum horário nesta reserva que satisfaça
@@ -54,8 +54,9 @@ class ReservaPolicy
                     $query->where('user_id', $user->id);
                 })
                 ->exists()
-        )
+        ) {
             return true;
+        }
 
         return false;
     }

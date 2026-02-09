@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\User;
 use DateTime;
+use Illuminate\Database\Seeder;
 
 class AgendaSeeder extends Seeder
 {
@@ -22,7 +21,7 @@ class AgendaSeeder extends Seeder
             $agenda_manha = Agenda::create([
                 'turno' => 'manha',
                 'espaco_id' => $i,
-                'user_id' => User::pluck('id')->random()
+                'user_id' => User::pluck('id')->random(),
             ]);
             $reservas_manha = $this->gerarHorariosParaAgenda($agenda_manha->id, $dataDeInicioDaSemana, 'manha');
             if ($reservas_manha > 0) {
@@ -32,7 +31,7 @@ class AgendaSeeder extends Seeder
             $agenda_tarde = Agenda::create([
                 'turno' => 'tarde',
                 'espaco_id' => $i,
-                'user_id' => User::pluck('id')->random()
+                'user_id' => User::pluck('id')->random(),
             ]);
             $reservas_tarde = $this->gerarHorariosParaAgenda($agenda_tarde->id, $dataDeInicioDaSemana, 'tarde');
             if ($reservas_tarde > 0) {
@@ -42,7 +41,7 @@ class AgendaSeeder extends Seeder
             $agenda_noite = Agenda::create([
                 'turno' => 'noite',
                 'espaco_id' => $i,
-                'user_id' => User::pluck('id')->random()
+                'user_id' => User::pluck('id')->random(),
             ]);
             $reservas_noite = $this->gerarHorariosParaAgenda($agenda_noite->id, $dataDeInicioDaSemana, 'noite');
             if ($reservas_noite > 0) {
@@ -51,7 +50,6 @@ class AgendaSeeder extends Seeder
             }
         }
     }
-
 
     // Exemplo de como usar a função:
     // É importante definir o timezone para consistência com DateTime,
@@ -85,12 +83,12 @@ class AgendaSeeder extends Seeder
      * A função itera sobre todos os horários possíveis dentro de um período,
      * mas só cria um registro de horário se ele for aleatoriamente definido como 'ocupado'.
      *
-     * @param int $agendaId O ID da agenda (foreignId 'agenda_id').
-     * @param DateTime $semanaInicio O dia de início para a geração dos horários.
+     * @param  int  $agendaId  O ID da agenda (foreignId 'agenda_id').
+     * @param  DateTime  $semanaInicio  O dia de início para a geração dos horários.
      * @return array Uma lista de arrays, cada um representando um horário
-     * pronto para ser inserido na tabela 'horarios'.
+     *               pronto para ser inserido na tabela 'horarios'.
      */
-    function gerarHorariosParaAgenda(int $agendaId, DateTime $semanaInicio, string $turno): array
+    public function gerarHorariosParaAgenda(int $agendaId, DateTime $semanaInicio, string $turno): array
     {
         $horariosParaInserir = [];
         switch ($turno) {
@@ -127,10 +125,9 @@ class AgendaSeeder extends Seeder
 
                     if ($criarEsteHorario) {
                         // Formato HH:MM:SS para o tipo TIME do banco de dados
-                        $horarioInicioParaBanco = str_pad((string)$hora, 2, '0', STR_PAD_LEFT) . ':00';
+                        $horarioInicioParaBanco = str_pad((string) $hora, 2, '0', STR_PAD_LEFT).':00';
                         // Assumindo que cada slot dura 50 minutos, como no exemplo original
-                        $horarioFimParaBanco = str_pad((string)$hora, 2, '0', STR_PAD_LEFT) . ':50';
-
+                        $horarioFimParaBanco = str_pad((string) $hora, 2, '0', STR_PAD_LEFT).':50';
 
                         $horariosParaInserir[] = [
                             'agenda_id' => $agendaId,

@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Setor;
 
 class User extends Authenticatable
 {
@@ -25,7 +24,7 @@ class User extends Authenticatable
         'telefone',
         'profile_pic',
         'permission_type_id',
-        'setor_id'
+        'setor_id',
     ];
 
     /**
@@ -50,18 +49,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function setor()
     {
         return $this->belongsTo(Setor::class);
     }
+
     public function agendas()
     {
         return $this->hasMany(Agenda::class);
     }
+
     public function reservas()
     {
         return $this->hasMany(Reserva::class);
     }
+
     public function favoritos()
     {
         return $this->belongsToMany(Espaco::class, 'espaco_user', 'user_id', 'espaco_id');
@@ -71,14 +74,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Horario::class, 'user_id');
     }
+
     /**
      * Define o canal de broadcast privado para as notificações do usuário.
      * Isso garante que o nome do canal seja consistente em toda a aplicação.
-     *
-     * @return string
      */
     public function receivesBroadcastNotificationsOn(): string
     {
-        return 'App.Models.User.' . $this->getKey();
+        return 'App.Models.User.'.$this->getKey();
     }
 }

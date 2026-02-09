@@ -12,6 +12,7 @@ class UpdateSetorRequest extends StoreSetorRequest
     public function rules(): array
     {
         $rules = parent::rules();
+
         return $rules;
     }
 

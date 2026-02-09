@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Unidade;
 
 class Setor extends Model
 {
@@ -14,9 +13,8 @@ class Setor extends Model
     protected $fillable = [
         'nome',
         'sigla',
-        'unidade_id'
+        'unidade_id',
     ];
-
 
     public function users()
     {

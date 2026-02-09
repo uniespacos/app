@@ -2,7 +2,6 @@
 
 namespace App\Enums\DiasSemana;
 
-
 enum DiasSemanaEnum: string
 {
     case SEG = 'seg';

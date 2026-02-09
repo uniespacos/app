@@ -18,7 +18,7 @@ class Espaco extends Model
         'imagens',
         'main_image_index',
         'andar_id',
-        'user_id'
+        'user_id',
     ];
 
     /**
@@ -27,24 +27,26 @@ class Espaco extends Model
      * @var array
      */
     protected $casts = [
-        'imagens' => 'array'
+        'imagens' => 'array',
     ];
 
     protected $appends = ['is_favorited_by_user']; // Adicione este atributo
-
 
     public function agendas()
     {
         return $this->hasMany(Agenda::class);
     }
+
     public function andar()
     {
         return $this->belongsTo(Andar::class);
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function favoritadoPor()
     {
         return $this->belongsToMany(User::class, 'espaco_user', 'espaco_id', 'user_id');
@@ -54,7 +56,7 @@ class Espaco extends Model
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 

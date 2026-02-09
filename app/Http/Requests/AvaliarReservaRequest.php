@@ -12,7 +12,7 @@ class AvaliarReservaRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
-    {   
+    {
         return Auth::user()->permission_type_id == 2; // Permite que qualquer usuário autenticado tente criar
     }
 
@@ -30,11 +30,12 @@ class AvaliarReservaRequest extends FormRequest
             'horarios_avaliados' => 'required|array', // Garante que seja um array
             'horarios_avaliados.*.status' => 'required', // Verifica se cada ID de horário é válido
             'horarios_avaliados.*.id' => 'required',
-            //'horarios_avaliados.*.dadosReserva.horarioDB' => 'required',
-            //'horarios_avaliados.*.dadosReserva.horarioDB.id' => 'required',
+            // 'horarios_avaliados.*.dadosReserva.horarioDB' => 'required',
+            // 'horarios_avaliados.*.dadosReserva.horarioDB.id' => 'required',
             'evaluation_scope' => ['required', 'string', Rule::in(['recurring', 'single'])],
         ];
     }
+
     /**
      * Prepare the data for validation.
      */
@@ -47,10 +48,11 @@ class AvaliarReservaRequest extends FormRequest
                 if (isset($item['dadosReserva']['horarioDB']['id'])) {
                     $item['dadosReserva'] = [
                         'horarioDB' => [
-                            'id' => $item['dadosReserva']['horarioDB']['id']
-                        ]
+                            'id' => $item['dadosReserva']['horarioDB']['id'],
+                        ],
                     ];
                 }
+
                 return $item;
             }, $horariosAvaliados);
 

@@ -2,21 +2,21 @@
 
 namespace App\Services;
 
-
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\User;
 use App\Notifications\NotificationModel;
 use Illuminate\Support\Facades\DB;
 
-
 class GestaoAgendaService
 {
-
     // Definindo as permissões como constantes para clareza
     const INSTITUCIONAL_PERMISSION_ID = 1;
+
     const GESTOR_PERMISSION_ID = 2;
+
     const COMUM_PERMISSION_ID = 3;
+
     /**
      * Atualiza as permissões de um usuário e gerencia suas agendas.
      * Chamado a partir do UserController.
@@ -38,12 +38,12 @@ class GestaoAgendaService
 
                 // 2. Desvincula as agendas que não estão mais na lista
                 $agendasToUnlink = array_diff($currentAgendaIds, $agendaIds);
-                if (!empty($agendasToUnlink)) {
+                if (! empty($agendasToUnlink)) {
                     Agenda::whereIn('id', $agendasToUnlink)->update(['user_id' => null]);
                 }
 
                 // 3. Vincula as novas agendas ao usuário
-                if (!empty($agendaIds)) {
+                if (! empty($agendaIds)) {
                     Agenda::whereIn('id', $agendaIds)->update(['user_id' => $user->id]);
                 }
                 $user->notify(new NotificationModel(
@@ -78,7 +78,7 @@ class GestaoAgendaService
             foreach ($gestoresPorTurno as $turno => $userId) {
                 $agenda = $espaco->agendas()->where('turno', $turno)->first();
 
-                if (!$agenda) {
+                if (! $agenda) {
                     continue; // Pula se não encontrar a agenda para o turno
                 }
 
@@ -100,8 +100,8 @@ class GestaoAgendaService
                         $newUser->save();
                         $newUser->notify(new NotificationModel(
                             'Gestão de Espaços',
-                            'Você foi designado como gestor do espaço: ' . $espaco->nome
-                                . ' Turno: ' . $turno,
+                            'Você foi designado como gestor do espaço: '.$espaco->nome
+                                .' Turno: '.$turno,
                             route('espacos.show', $espaco->id)
                         ));
                     }
@@ -113,13 +113,13 @@ class GestaoAgendaService
                 // automaticamente, pois ele pode ser gestor de outros espaços.
                 if ($oldUserId) {
                     $oldUser = User::find($oldUserId);
-                    if ($oldUser && !Agenda::where('user_id', $oldUserId)->exists()) {
+                    if ($oldUser && ! Agenda::where('user_id', $oldUserId)->exists()) {
                         $oldUser->permission_type_id = 3; // Ex: Rebaixar para tipo padrão
                         $oldUser->save();
                         $oldUser->notify(new NotificationModel(
                             'Gestão de Espaços',
-                            'Você foi removido como gestor do espaço: ' . $espaco->nome
-                                . ' Turno: ' . $turno,
+                            'Você foi removido como gestor do espaço: '.$espaco->nome
+                                .' Turno: '.$turno,
                             route('espacos.show', $espaco->id)
                         ));
                     }

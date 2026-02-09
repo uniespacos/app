@@ -4,21 +4,16 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agenda;
-use App\Models\Andar;
-use App\Models\Espaco;
 use App\Models\Instituicao;
-use App\Models\Modulo;
 use App\Models\PermissionType;
 use App\Models\Setor;
-use App\Models\Unidade;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\User; // Importar o modelo User para buscar o usuário
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; // Importar o modelo User para buscar o usuário
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule; // Importar Rule para validações
-
+use Illuminate\Validation\Rule;
+use Inertia\Inertia; // Importar Rule para validações
 
 class InstitucionalUsuarioController extends Controller
 {
@@ -29,9 +24,9 @@ class InstitucionalUsuarioController extends Controller
     {
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
-        $users = User::whereHas('setor.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with([
+        $users = User::whereHas('setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with([
             'setor.unidade.instituicao',
-            'agendas.espaco.andar.modulo.unidade.instituicao'
+            'agendas.espaco.andar.modulo.unidade.instituicao',
         ])->get();
 
         $permissionTypes = PermissionType::all()->map(function ($type) {
@@ -46,17 +41,15 @@ class InstitucionalUsuarioController extends Controller
             'users' => $users,
             'permissionTypes' => $permissionTypes,
             'instituicoes' => Instituicao::with([
-                'unidades.modulos.andars.espacos.agendas'
+                'unidades.modulos.andars.espacos.agendas',
             ])->get(),
             'setores' => Setor::with([
                 'unidade.instituicao',
-                'users.agendas.espaco.andar.modulo.unidade.instituicao'
+                'users.agendas.espaco.andar.modulo.unidade.instituicao',
             ])->get(),
 
         ]);
     }
-
-
 
     public function updatePermissions(Request $request, User $user)
     {
@@ -88,14 +81,15 @@ class InstitucionalUsuarioController extends Controller
                 }
             });
             DB::commit();
+
             return redirect()->route('institucional.usuarios.index')->with('success', 'Permissões atualizadas com sucesso.');
         } catch (\Throwable $th) {
             DB::rollBack();
+
             // Captura qualquer erro e retorna uma resposta de erro
-            return redirect()->route('institucional.usuarios.index')->with('error', 'Erro ao atualizar permissões: ' . $th->getMessage());
+            return redirect()->route('institucional.usuarios.index')->with('error', 'Erro ao atualizar permissões: '.$th->getMessage());
         }
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -106,6 +100,7 @@ class InstitucionalUsuarioController extends Controller
         // Você pode passar listas de roles e statuses disponíveis
         $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
         $statuses = ['active', 'inactive', 'suspended']; // Exemplo de status
+
         return Inertia::render('Editar/UserController', [
             'roles' => $roles,
             'statuses' => $statuses,
@@ -144,6 +139,7 @@ class InstitucionalUsuarioController extends Controller
         // Geralmente, a tela de "show" exibe os detalhes de um usuário.
         // Você pode renderizar um componente React para isso, ou usar os dados diretamente.
         $user = User::findOrFail($id);
+
         return Inertia::render('Editar/UserDetail', [
             'user' => $user,
         ]);

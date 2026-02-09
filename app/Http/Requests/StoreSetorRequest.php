@@ -60,7 +60,6 @@ class StoreSetorRequest extends FormRequest
             'sigla.max' => 'A sigla do setor não pode ter mais de 255 caracteres.',
             'sigla.min' => 'A sigla do setor deve ter pelo menos 2 caracteres.',
 
-
             'unidade_id.required' => 'A unidade é obrigatória.',
             'unidade_id.integer' => 'A unidade deve ser um número válido.',
             'unidade_id.exists' => 'A unidade selecionada não existe.',

@@ -21,8 +21,11 @@ class UpdateReservaJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected Reserva $reserva;
+
     protected array $validatedData;
+
     protected User $user;
+
     public int $tries = 3;
 
     /**
@@ -62,7 +65,7 @@ class UpdateReservaJob implements ShouldQueue
                     $idsSolicitadosNaSemana = $horariosSolicitados->whereNotNull('id')->pluck('id');
 
                     foreach ($horariosAtuaisNaSemana as $horarioAtual) {
-                        if (!$idsSolicitadosNaSemana->contains($horarioAtual->id)) {
+                        if (! $idsSolicitadosNaSemana->contains($horarioAtual->id)) {
                             $horarioAtual->delete();
                         }
                     }
@@ -99,7 +102,7 @@ class UpdateReservaJob implements ShouldQueue
             ));
 
         } catch (Exception $e) {
-            Log::error("Falha no Job UpdateReservaJob para reserva {$this->reserva->id}: " . $e->getMessage());
+            Log::error("Falha no Job UpdateReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
             $this->fail($e);
         }
     }
