@@ -104,6 +104,9 @@ jobs:
             exit 1
           fi
 
+      - name: Set permissions for workspace directory
+        run: docker compose -f docker-compose.test.yml exec -T workspace chown -R www:www /var/www
+
       - name: Install PHP Dependencies
         run: docker compose -f docker-compose.test.yml exec -T workspace composer install --no-interaction --no-progress --prefer-dist
 
