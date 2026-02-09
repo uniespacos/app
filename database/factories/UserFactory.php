@@ -2,12 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Setor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use App\Models\Setor;
-use App\Enums\TipoUsuario\TipoUsuarioEnum;
-use App\Models\PermissionType;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -32,7 +30,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'telefone' => fake()->phoneNumber(),
-            'profile_pic' => '[https://placehold.co/400x400/000000/FFFFFF?text=](https://placehold.co/400x400/000000/FFFFFF?text=)' . fake()->lexify('??'),
+            'profile_pic' => '[https://placehold.co/400x400/000000/FFFFFF?text=](https://placehold.co/400x400/000000/FFFFFF?text=)'.fake()->lexify('??'),
             'permission_type_id' => 3, // Seleciona um tipo de permissão aleatório
             'setor_id' => null, // Por padrão, o usuário não tem setor.
             'remember_token' => Str::random(10),
@@ -44,16 +42,17 @@ class UserFactory extends Factory
      */
     public function withSetor(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'setor_id' => Setor::factory(),
         ]);
     }
+
     /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

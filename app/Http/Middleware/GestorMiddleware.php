@@ -16,8 +16,9 @@ class GestorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->permission_type_id !== 2)
+        if (Auth::user()->permission_type_id !== 2) {
             return redirect()->route('dashboard')->with('error', 'Você não tem permissão para acessar esta área.');
+        }
 
         return $next($request);
     }

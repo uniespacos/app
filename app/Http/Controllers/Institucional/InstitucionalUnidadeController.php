@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
-use App\Models\Instituicao;
 use App\Models\Unidade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +33,7 @@ class InstitucionalUnidadeController extends Controller
     {
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
+
         return Inertia::render('Administrativo/Unidades/CadastrarUnidade', [
             'instituicao' => $instituicao,
         ]);
@@ -51,9 +51,10 @@ class InstitucionalUnidadeController extends Controller
         ]);
         try {
             Unidade::create($validated);
+
             return redirect()->route('institucional.unidades.index')->with('success', 'Unidade criada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao criar o unidade: ' . $th->getMessage());
+            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao criar o unidade: '.$th->getMessage());
         }
     }
 
@@ -64,6 +65,7 @@ class InstitucionalUnidadeController extends Controller
     {
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
+
         return Inertia::render('Administrativo/Unidades/EditarUnidade', [
             'instituicao' => $instituicao,
             'unidade' => $unidade,
@@ -92,7 +94,7 @@ class InstitucionalUnidadeController extends Controller
 
             return redirect()->route('institucional.unidades.index')->with('success', 'Unidade atualizada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao atualizar a unidade: ' . $th->getMessage());
+            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao atualizar a unidade: '.$th->getMessage());
         }
     }
 
@@ -116,7 +118,7 @@ class InstitucionalUnidadeController extends Controller
 
             return back()->with('success', 'Unidade excluída com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao deletar o unidade: ' . $th->getMessage());
+            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao deletar o unidade: '.$th->getMessage());
         }
     }
 }

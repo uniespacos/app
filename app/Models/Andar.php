@@ -13,7 +13,7 @@ class Andar extends Model
     protected $fillable = [
         'nome',
         'tipo_acesso',
-        'modulo_id'
+        'modulo_id',
     ];
 
     /**
@@ -22,13 +22,14 @@ class Andar extends Model
      * @var array
      */
     protected $casts = [
-        'tipo_acesso' => 'array'
+        'tipo_acesso' => 'array',
     ];
 
     public function modulo()
     {
         return $this->belongsTo(Modulo::class);
     }
+
     public function espacos()
     {
         return $this->hasMany(Espaco::class);

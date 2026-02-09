@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Gestor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AvaliarReservaRequest;
 use App\Jobs\AvaliarReservaJob;
-use App\Models\Horario;
 use App\Models\Reserva;
 use App\Services\ConflictDetectionService;
 use Carbon\Carbon;
@@ -13,16 +12,16 @@ use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+
 class GestorReservaController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
-     *
      */
     public function index(Request $request)
     {
@@ -36,20 +35,20 @@ class GestorReservaController extends Controller
 
         $reservasParaAvaliar = Reserva::query()
             ->select(['id', 'titulo', 'descricao', 'situacao', 'user_id', 'data_inicial', 'data_final'])
-            ->whereHas('horarios', fn($q) => $q->whereIn('agenda_id', $agendasDoGestorIds))
+            ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendasDoGestorIds))
             ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where(fn($q) => $q->where('titulo', 'like', "%{$search}%")->orWhere('descricao', 'like', "%{$search}%"));
+                $query->where(fn ($q) => $q->where('titulo', 'like', "%{$search}%")->orWhere('descricao', 'like', "%{$search}%"));
             })
-            ->when($filters['situacao'] ?? null, fn($q, $s) => $q->where('situacao', $s), fn($q) => $q->where('situacao', '!=', 'inativa'))
+            ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s), fn ($q) => $q->where('situacao', '!=', 'inativa'))
             ->with([
                 'user:id,name',
                 'horarios' => function ($query) use ($agendasDoGestorIds) {
                     $query->whereIn('agenda_id', $agendasDoGestorIds)->limit(1)->with([
                         // CORREÇÃO: Adicionado 'turno' ao select da agenda
                         'agenda:id,espaco_id,turno',
-                        'agenda.espaco:id,nome'
+                        'agenda.espaco:id,nome',
                     ]);
-                }
+                },
             ])
             ->latest()
             ->paginate(10)
@@ -69,7 +68,7 @@ class GestorReservaController extends Controller
                                 $agendaQuery->select('id', 'espaco_id', 'turno', 'user_id') // Seleciona colunas de agenda
                                     ->with('espaco.andar.modulo'); // E seus relacionamentos
                             },
-                            'avaliador'
+                            'avaliador',
                         ]);
                 },
             ])->find($filters['reserva']);
@@ -79,7 +78,7 @@ class GestorReservaController extends Controller
             'reservas' => $reservasParaAvaliar,
             'filters' => $filters,
             'reservaToShow' => $reservaToShow,
-            'semana' => ['inicio' => $inicioSemana, 'fim' => $fimSemana, 'referencia' => $dataReferencia->format('Y-m-d')]
+            'semana' => ['inicio' => $inicioSemana, 'fim' => $fimSemana, 'referencia' => $dataReferencia->format('Y-m-d')],
         ]);
     }
 
@@ -130,6 +129,7 @@ class GestorReservaController extends Controller
             'todosOsConflitos' => $conflitosMap,
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      */
@@ -147,9 +147,9 @@ class GestorReservaController extends Controller
                 ->with('success', 'Avaliação enviada para processamento em segundo plano. Você será notificado quando concluir.');
 
         } catch (Exception $e) {
-            Log::error("Erro ao despachar AvaliarReservaJob para reserva {$reserva->id}: " . $e->getMessage());
+            Log::error("Erro ao despachar AvaliarReservaJob para reserva {$reserva->id}: ".$e->getMessage());
+
             return back()->with('error', 'Ocorreu um erro ao enviar a avaliação para processamento.');
         }
     }
-
 }

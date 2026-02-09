@@ -8,7 +8,6 @@ use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Instituicao;
-use App\Models\PermissionType;
 use App\Models\Reserva;
 use App\Models\Setor;
 use App\Models\Unidade;
@@ -17,15 +16,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
      */
-
-
     public function run(): void
     {
         // Desativa a verificação de chaves estrangeiras para limpeza
@@ -42,7 +38,6 @@ class DatabaseSeeder extends Seeder
 
         DB::statement("SET session_replication_role = 'origin';");
 
-
         echo "Tabelas limpas.\n";
 
         $this->call([
@@ -54,19 +49,19 @@ class DatabaseSeeder extends Seeder
             'nome' => 'Universidade Estadual do Sudoeste da Bahia',
             'sigla' => 'UESB',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('instituicaos')->insert([
             'nome' => 'Outra Instituição',
             'sigla' => 'outra',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('instituicaos')->insert([
             'nome' => 'Nenhuma',
             'sigla' => 'nenhuma',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('unidades')->insert([
             'nome' => 'Campus Jequié',
@@ -89,7 +84,7 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'REITORIA',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -97,21 +92,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'PROAD',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Administração',
             'sigla' => 'PROAD',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Administração',
             'sigla' => 'PROAD',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -119,21 +114,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'PROEX',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Extensão e Assuntos Comunitários',
             'sigla' => 'PROEX',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Extensão e Assuntos Comunitários',
             'sigla' => 'PROEX',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -141,21 +136,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'PROGRAD',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Graduação',
             'sigla' => 'PROGRAD',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Graduação',
             'sigla' => 'PROGRAD',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -163,21 +158,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'PPG',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Pesquisa e Pós-Graduação',
             'sigla' => 'PPG',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Pró-Reitoria de Pesquisa e Pós-Graduação',
             'sigla' => 'PPG',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -185,21 +180,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'ASCOM',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria de Comunicação',
             'sigla' => 'ASCOM',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria de Comunicação',
             'sigla' => 'ASCOM',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -207,21 +202,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'AGP',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Especial de Gestão de Pessoas',
             'sigla' => 'AGP',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Especial de Gestão de Pessoas',
             'sigla' => 'AGP',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -229,21 +224,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'AGESPI',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria na Gestão de Projetos e Convênios Institucionais',
             'sigla' => 'AGESPI',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria na Gestão de Projetos e Convênios Institucionais',
             'sigla' => 'AGESPI',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -251,21 +246,21 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'ASPLAN',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Técnica de Finanças e Planejamento',
             'sigla' => 'ASPLAN',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Técnica de Finanças e Planejamento',
             'sigla' => 'ASPLAN',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         DB::table('setors')->insert([
@@ -273,142 +268,141 @@ class DatabaseSeeder extends Seeder
             'sigla' => 'AAPA',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Especial de Acesso, Permanência Estudantil e Ações Afirmativas',
             'sigla' => 'AAPA',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Assessoria Especial de Acesso, Permanência Estudantil e Ações Afirmativas',
             'sigla' => 'AAPA',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
-
 
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Exatas e Naturais',
             'sigla' => 'DCEN',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Humanas, Educação e Linguagem',
             'sigla' => 'DCHEL',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Tecnologia Rural e Animal',
             'sigla' => 'DTRA',
             'unidade_id' => '3',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Biológicas',
             'sigla' => 'DCB',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Humanas e Letras',
             'sigla' => 'DCHL',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Tecnológicas',
             'sigla' => 'DCT',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Saúde I',
             'sigla' => 'DS I',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Saúde II',
             'sigla' => 'DS II',
             'unidade_id' => '1',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Exatas e Tecnológicas',
             'sigla' => 'DCET',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Naturais',
             'sigla' => 'DCN',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Ciências Sociais Aplicadas',
             'sigla' => 'DCSA',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Engenharia Agrícola e Solos',
             'sigla' => 'DEAS',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Estudos Linguísticos e Literários',
             'sigla' => 'DELL',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Filosofia e Ciências Humanas',
             'sigla' => 'DFCH',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Fitotecnia e Zootecnia',
             'sigla' => 'DFZ',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de Geografia',
             'sigla' => 'DG',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('setors')->insert([
             'nome' => 'Departamento de História',
             'sigla' => 'DH',
             'unidade_id' => '2',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::commit();
 
@@ -426,14 +420,11 @@ class DatabaseSeeder extends Seeder
         echo "Criando Espaços, Agendas e Horários...\n";
         Espaco::factory()->count(5)->create();
 
-
-
         echo "Infraestrutura criada com sucesso.\n";
 
         // --- ETAPA 2: Criar as Reservas e vincular aos Horários ---
 
         echo "Criando reservas e vinculando aos horários...\n";
-
 
         // Para cada usuário, cria uma ou duas reservas
         foreach ($users as $user) {
@@ -453,7 +444,7 @@ class DatabaseSeeder extends Seeder
                 $reserva = Reserva::factory()->create([
                     'user_id' => $user->id,
                     'data_inicial' => $dataAtual->format('Y-m-d'),
-                    'data_final' =>  (clone $dataAtual)->addWeek()->format('Y-m-d'),
+                    'data_final' => (clone $dataAtual)->addWeek()->format('Y-m-d'),
                 ]);
                 foreach ($horarios as $inicio) {
                     Horario::factory()->create([
@@ -469,7 +460,7 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        echo "Atribuindo setores aos usuarios";
+        echo 'Atribuindo setores aos usuarios';
         DB::transaction(function () {
             // 1. Pega todos os IDs dos setores disponíveis.
             // Usar `pluck('id')` é muito mais eficiente do que `all()`
@@ -480,6 +471,7 @@ class DatabaseSeeder extends Seeder
             // Se não houver setores, exibe um aviso e interrompe o seeder.
             if ($setoresIds->isEmpty()) {
                 $this->command->warn('Nenhum setor encontrado. Nenhum usuário foi atualizado.');
+
                 return;
             }
 

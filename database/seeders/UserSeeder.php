@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\PermissionType;
 use App\Models\Setor;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -26,7 +24,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123123123'),
             'setor_id' => Setor::pluck('id')->random(),
             'remember_token' => Str::random(10),
-            'permission_type_id' => 3
+            'permission_type_id' => 3,
         ]);
     }
 }

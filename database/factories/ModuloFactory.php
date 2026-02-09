@@ -18,7 +18,7 @@ class ModuloFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => 'Módulo ' . $this->faker->randomElement(['Acadêmico', 'Administrativo', 'Laboratórios']),
+            'nome' => 'Módulo '.$this->faker->randomElement(['Acadêmico', 'Administrativo', 'Laboratórios']),
             'unidade_id' => Unidade::pluck('id')->random(),
         ];
     }

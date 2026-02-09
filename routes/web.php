@@ -1,9 +1,5 @@
 <?php
 
-use App\Events\ReservaEvent;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\EspacoController;
 use App\Http\Controllers\Gestor\GestorReservaController;
 use App\Http\Controllers\HomeController;
@@ -17,7 +13,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Middleware\GestorMiddleware;
 use App\Http\Middleware\InstitucionalMiddleware;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Página inicial: redireciona para dashboard se autenticado, senão para login
 Route::get('/', function () {
@@ -25,7 +23,6 @@ Route::get('/', function () {
         ? redirect()->route('dashboard')
         : redirect()->route('login');
 })->name('home');
-
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -68,14 +65,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware([InstitucionalMiddleware::class])->prefix('institucional')->name('institucional.')->group(function () {
 
         Route::get('/', function () {
-            return Inertia::render('Administrativo/Dashboard',);
+            return Inertia::render('Administrativo/Dashboard');
         })->name('dashboard');
 
         // Usuários
         Route::resource('usuarios', InstitucionalUsuarioController::class);
         Route::put('usuarios/{user}/edit-permissions', [InstitucionalUsuarioController::class, 'updatePermissions'])
             ->name('usuarios.updatepermissions');
-
 
         // Instituições
         Route::resource('instituicoes', InstitucionalInstituicaoController::class)->except(['show']);
@@ -86,7 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Módulos
         Route::resource('modulos', InstitucionalModuloController::class);
 
-        //Setores
+        // Setores
         Route::resource('setors', InstitucionalSetorController::class);
 
         // Espaços
@@ -97,5 +93,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

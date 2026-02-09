@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Enums\Agenda;
 
 enum AgendaEnum: string

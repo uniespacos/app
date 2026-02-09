@@ -17,7 +17,7 @@ class InstituicaoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => $this->faker->company() . ' ' . $this->faker->companySuffix(),
+            'nome' => $this->faker->company().' '.$this->faker->companySuffix(),
             'sigla' => $this->faker->unique()->lexify('???'),
             'endereco' => $this->faker->address(),
         ];

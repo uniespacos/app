@@ -4,10 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Agenda;
 use App\Models\Espaco;
-use App\Models\Horario;
-use App\Models\Reserva;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -30,5 +27,4 @@ class AgendaFactory extends Factory
             'user_id' => User::pluck('id')->random(), // Se não houver usuários, será null
         ];
     }
-  
 }

@@ -2,13 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Agenda;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Espaco;
 use App\Models\User;
-use App\Models\Horario;
-use App\models\Reserva;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Reserva>

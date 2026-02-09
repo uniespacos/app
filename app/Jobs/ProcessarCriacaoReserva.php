@@ -24,6 +24,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
 
     // Propriedades para guardar os dados necessários para o Job
     protected array $dadosRequisicao;
+
     protected User $solicitante;
 
     /**
@@ -39,8 +40,8 @@ class ProcessarCriacaoReserva implements ShouldQueue
     /**
      * Cria uma nova instância do Job.
      *
-     * @param array $dadosRequisicao Dados validados do StoreReservaRequest.
-     * @param \App\Models\User $solicitante O usuário que fez a solicitação.
+     * @param  array  $dadosRequisicao  Dados validados do StoreReservaRequest.
+     * @param  \App\Models\User  $solicitante  O usuário que fez a solicitação.
      */
     public function __construct(array $dadosRequisicao, User $solicitante)
     {
@@ -95,7 +96,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
 
                 if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
                     $reserva->update(['situacao' => 'deferida']);
-                } elseif (collect($gestores)->contains(fn($g) => $g->id === $this->solicitante->id)) {
+                } elseif (collect($gestores)->contains(fn ($g) => $g->id === $this->solicitante->id)) {
                     $reserva->update(['situacao' => 'parcialmente_deferida']);
                 }
 
@@ -107,7 +108,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                         $gestor->notify(
                             new NotificationModel(
                                 'Nova solicitação de reserva',
-                                'O usuário ' . $doisPrimeirosNomes . ' solicitou uma reserva.',
+                                'O usuário '.$doisPrimeirosNomes.' solicitou uma reserva.',
                                 route('gestor.reservas.show', ['reserva' => $reserva->id])
                             )
                         );
@@ -123,7 +124,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
             $this->solicitante->notify(
                 new NotificationModel(
                     'Sua reserva foi criada!',
-                    'Sua solicitação de reserva para "' . $reserva->titulo . '" foi processada com sucesso.',
+                    'Sua solicitação de reserva para "'.$reserva->titulo.'" foi processada com sucesso.',
                     route('reservas.show', ['reserva' => $reserva->id])
                 )
             );
@@ -131,7 +132,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
         } catch (Exception $e) {
             // Se algo der errado, jogue a exceção novamente para que o Laravel
             // saiba que o job falhou e possa tentar novamente mais tarde.
-            Log::error('Falha no Job ProcessarCriacaoReserva: ' . $e->getMessage());
+            Log::error('Falha no Job ProcessarCriacaoReserva: '.$e->getMessage());
             $this->fail($e); // Marca o Job como falho
         }
     }
@@ -146,7 +147,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
         $this->solicitante->notify(
             new NotificationModel(
                 'Falha na sua solicitação de reserva',
-                'Houve um erro ao processar sua solicitação para "' . $this->dadosRequisicao['titulo'] . '". Por favor, tente novamente ou contate o suporte.',
+                'Houve um erro ao processar sua solicitação para "'.$this->dadosRequisicao['titulo'].'". Por favor, tente novamente ou contate o suporte.',
                 route('reservas.index') // Link para a página de reservas
             )
         );

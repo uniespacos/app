@@ -13,26 +13,25 @@ use App\Models\Modulo;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Notifications\NotificationModel;
-use App\Rules\UsuarioDaMesmaInstituicaoDaAgenda;
 use App\Services\GestaoAgendaService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class InstitucionalEspacoController extends Controller
 {
-
     protected $gestaoAgendaService;
 
     public function __construct(GestaoAgendaService $gestaoAgendaService)
     {
         $this->gestaoAgendaService = $gestaoAgendaService;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -45,25 +44,26 @@ class InstitucionalEspacoController extends Controller
 
         $unidades = Unidade::where('instituicao_id', $instituicao_id)->with('modulos.andars')->get();
 
-        $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
+        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
 
-        $andares = Andar::whereHas('modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
+        $andares = Andar::whereHas('modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
 
-        $users = User::whereHas('setor.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))
+        $users = User::whereHas('setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))
             ->with(['agendas', 'setor'])
             ->get();
+
         return Inertia::render('Administrativo/Espacos/GerenciarEspacos', [
             'espacos' => Espaco::whereHas(
                 'andar.modulo.unidade.instituicao',
-                fn($q) => $q->where('instituicao_id', $instituicao_id)
+                fn ($q) => $q->where('instituicao_id', $instituicao_id)
             )->with([
-                        'andar.modulo.unidade.instituicao',
-                        'agendas.user'
-                    ])->get(), // Agora é um objeto paginador
+                'andar.modulo.unidade.instituicao',
+                'agendas.user',
+            ])->get(), // Agora é um objeto paginador
             'andares' => $andares, // Ainda precisa de todos para popular os selects
             'modulos' => $modulos,
             'unidades' => $unidades,
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -77,9 +77,9 @@ class InstitucionalEspacoController extends Controller
 
         $unidades = Unidade::where('instituicao_id', $instituicao_id)->with('modulos.andars')->get();
 
-        $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
+        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['unidade', 'andars'])->get();
 
-        $andares = Andar::whereHas('modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
+        $andares = Andar::whereHas('modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['modulo', 'espacos'])->get();
 
         return Inertia::render('Administrativo/Espacos/CadastroEspaco', compact('unidades', 'modulos', 'andares'));
     }
@@ -108,7 +108,7 @@ class InstitucionalEspacoController extends Controller
                             $mainImagePath = $path;
                         }
                     }
-                    if (!$mainImagePath && !empty($storedImagePaths)) {
+                    if (! $mainImagePath && ! empty($storedImagePaths)) {
                         $mainImagePath = $storedImagePaths[0];
                     }
                 }
@@ -135,7 +135,8 @@ class InstitucionalEspacoController extends Controller
 
             return redirect()->route('institucional.espacos.index')->with('success', 'Espaço cadastrado com sucesso!');
         } catch (\Exception $e) {
-            Log::error("Erro ao criar espaço: " . $e->getMessage());
+            Log::error('Erro ao criar espaço: '.$e->getMessage());
+
             return redirect()->back()->with('error', 'Ocorreu um erro inesperado ao criar o espaço.')->withInput();
         }
     }
@@ -160,7 +161,7 @@ class InstitucionalEspacoController extends Controller
                         'nome' => $user->first()->name,
                         'email' => $user->first()->email,
                         'setor' => $user->first()->setor()->get()->first()->nome,
-                        'agenda_id' => $agenda->id
+                        'agenda_id' => $agenda->id,
                     ];
                 }
                 // Busca horarios reservados da agenda
@@ -171,11 +172,12 @@ class InstitucionalEspacoController extends Controller
                         array_push($horarios_reservados[$agenda->turno], ['horario' => $horario, 'autor' => $user_name->name]);
                     }
                 }
-                ;
+
             }
             if (count($gestores_espaco) <= 0) {
-                throw new Exception();
+                throw new Exception;
             }
+
             return Inertia::render('Espacos/VisualizarEspacoPage', compact('espaco', 'agendas', 'modulo', 'andar', 'gestores_espaco', 'horarios_reservados'));
         } catch (Exception $th) {
             return redirect()->route('espacos.index')->with('error', 'Espaço sem gestor cadastrado - Aguardando cadastro');
@@ -191,13 +193,13 @@ class InstitucionalEspacoController extends Controller
         $unidades = Unidade::all();
         $modulos = Modulo::with('unidade')->get();
         $andares = Andar::with('modulo.unidade')->get();
+
         return inertia('Administrativo/Espacos/CadastroEspaco', compact('espaco', 'unidades', 'modulos', 'andares'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-
     public function update(UpdateEspacoRequest $request, Espaco $espaco)
     {
 
@@ -208,7 +210,7 @@ class InstitucionalEspacoController extends Controller
                 $currentImagePaths = $espaco->imagens ?? [];
 
                 // 2. Remove imagens marcadas para exclusão
-                if (!empty($validated['images_to_delete'])) {
+                if (! empty($validated['images_to_delete'])) {
                     // Deleta os arquivos do storage
                     Storage::disk('public')->delete($validated['images_to_delete']);
 
@@ -234,7 +236,7 @@ class InstitucionalEspacoController extends Controller
                 // O frontend envia o índice baseado na lista combinada (antigas + novas)
                 if (isset($validated['main_image_index']) && isset($allImagePaths[$validated['main_image_index']])) {
                     $mainImagePath = $allImagePaths[$validated['main_image_index']];
-                } elseif (!empty($allImagePaths)) {
+                } elseif (! empty($allImagePaths)) {
                     // Fallback: se o índice não for válido ou a imagem principal foi removida,
                     // usa a primeira imagem da lista como principal.
                     $mainImagePath = $allImagePaths[0];
@@ -251,17 +253,19 @@ class InstitucionalEspacoController extends Controller
                 ]);
             });
             foreach ($espaco->agendas as $agenda) {
-                if ($agenda->user)
+                if ($agenda->user) {
                     $agenda->user->notify(new NotificationModel(
                         'Gestão de Espaços',
-                        'O espaço ' . $espaco->nome . ' foi atualizado.',
+                        'O espaço '.$espaco->nome.' foi atualizado.',
                         route('espacos.show', $espaco->id)
                     ));
+                }
             }
 
             return redirect()->route('institucional.espacos.index')->with('success', 'Espaço atualizado com sucesso!');
         } catch (\Exception $e) {
-            Log::error("Erro ao atualizar espaço: " . $e->getMessage());
+            Log::error('Erro ao atualizar espaço: '.$e->getMessage());
+
             return redirect()->back()->with('error', 'Ocorreu um erro inesperado ao atualizar o espaço.')->withInput();
         }
     }
@@ -278,12 +282,13 @@ class InstitucionalEspacoController extends Controller
         $user = Auth::user(); // Obtém o usuário logado
 
         // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
         try {
 
             $espaco->delete();
+
             return redirect()->route('institucional.espacos.index')->with('success', 'Espaço excluído com sucesso!');
         } catch (Exception $error) {
             return redirect()->back()->with('error', 'Erro ao excluir, favor tentar novamente');
@@ -299,9 +304,11 @@ class InstitucionalEspacoController extends Controller
         $validated = $request->validated();
         try {
             $this->gestaoAgendaService->updateEspacoGestores($espaco, $validated);
+
             return redirect()->route('institucional.espacos.index')->with('success', 'Gestores atualizados com sucesso!');
         } catch (Exception $e) {
-            Log::error("Erro ao atualizar gestores do espaço: " . $e->getMessage());
+            Log::error('Erro ao atualizar gestores do espaço: '.$e->getMessage());
+
             return redirect()->back()->with('error', 'Ocorreu um erro ao atualizar os gestores do espaço.');
         }
     }

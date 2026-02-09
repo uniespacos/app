@@ -28,15 +28,15 @@ class EspacoController extends Controller
             })
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('nome', 'like', '%' . $search . '%')
-                        ->orWhereHas('andar', fn($q) => $q->where('nome', 'like', '%' . $search . '%'))
-                        ->orWhereHas('andar.modulo', fn($q) => $q->where('nome', 'like', '%' . $search . '%'));
+                    $q->where('nome', 'like', '%'.$search.'%')
+                        ->orWhereHas('andar', fn ($q) => $q->where('nome', 'like', '%'.$search.'%'))
+                        ->orWhereHas('andar.modulo', fn ($q) => $q->where('nome', 'like', '%'.$search.'%'));
                 });
             })
-            ->when($filters['unidade'] ?? null, fn($q, $unidade) => $q->whereHas('andar.modulo', fn($q) => $q->where('unidade_id', $unidade)))
-            ->when($filters['modulo'] ?? null, fn($q, $modulo) => $q->whereHas('andar', fn($q) => $q->where('modulo_id', $modulo)))
-            ->when($filters['andar'] ?? null, fn($q, $andar) => $q->where('andar_id', $andar))
-            ->when($filters['capacidade'] ?? null, fn($q, $capacidade) => $q->where('capacidade_pessoas', '>=', $capacidade))
+            ->when($filters['unidade'] ?? null, fn ($q, $unidade) => $q->whereHas('andar.modulo', fn ($q) => $q->where('unidade_id', $unidade)))
+            ->when($filters['modulo'] ?? null, fn ($q, $modulo) => $q->whereHas('andar', fn ($q) => $q->where('modulo_id', $modulo)))
+            ->when($filters['andar'] ?? null, fn ($q, $andar) => $q->where('andar_id', $andar))
+            ->when($filters['capacidade'] ?? null, fn ($q, $capacidade) => $q->where('capacidade_pessoas', '>=', $capacidade))
             ->with([
                 'andar:id,nome,modulo_id',
                 'andar.modulo:id,nome,unidade_id',
@@ -47,10 +47,10 @@ class EspacoController extends Controller
             ->withQueryString();
 
         $unidades = Unidade::where('instituicao_id', $instituicao_id)->get(['id', 'nome', 'sigla']);
-        $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'unidade_id']);
-        $andares = Andar::whereHas('modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'modulo_id']);
+        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'unidade_id']);
+        $andares = Andar::whereHas('modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'modulo_id']);
         $capacidadeEspacos = Espaco::query()
-            ->whereHas('andar.modulo.unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))
+            ->whereHas('andar.modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))
             ->select('capacidade_pessoas')
             ->distinct()
             ->orderBy('capacidade_pessoas')
@@ -78,9 +78,9 @@ class EspacoController extends Controller
                         $q->where('situacao', 'deferida')
                             ->whereBetween('data', [$inicioSemana, $fimSemana])
                             ->with(['reserva.user', 'avaliador']);
-                    }
+                    },
                 ]);
-            }
+            },
         ]);
 
         if ($espaco->agendas()->whereNotNull('user_id')->count() === 0) {
@@ -94,22 +94,24 @@ class EspacoController extends Controller
                 'inicio' => $inicioSemana,
                 'fim' => $fimSemana,
                 'referencia' => $dataReferencia->format('Y-m-d'),
-            ]
+            ],
         ]);
     }
+
     // ... (métodos favoritar e desfavoritar permanecem iguais)
     public function favoritar(Espaco $espaco)
     {
         Auth::user()->favoritos()->attach($espaco->id);
+
         return redirect()->back()->with('success', 'Espaço adicionado aos favoritos!');
     }
 
     public function desfavoritar(Espaco $espaco)
     {
         Auth::user()->favoritos()->detach($espaco->id);
+
         return redirect()->back()->with('success', 'Espaço removido dos favoritos!');
     }
-
 
     public function meusFavoritos()
     {

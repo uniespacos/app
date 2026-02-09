@@ -10,8 +10,11 @@ use Illuminate\Notifications\Notification;
 class NotificationModel extends Notification
 {
     use Queueable;
+
     public $titulo; // A solicitação de reserva
+
     public $descricao; // Descrição da solicitação
+
     public $url;
 
     public function __construct($titulo, $descricao, $url)
@@ -57,6 +60,7 @@ class NotificationModel extends Notification
             'url' => $this->url,
         ];
     }
+
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

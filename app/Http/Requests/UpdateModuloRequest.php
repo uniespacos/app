@@ -12,6 +12,7 @@ class UpdateModuloRequest extends StoreModuloRequest
     public function rules(): array
     {
         $rules = parent::rules();
+
         return $rules;
     }
 

@@ -17,21 +17,21 @@ class UnidadeSeeder extends Seeder
             'sigla' => 'JQ',
             'instituicao_id' => 1,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('unidades')->insert([
             'nome' => 'Campus Vitória da Conquista',
             'sigla' => 'VCA',
             'instituicao_id' => 1,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
         DB::table('unidades')->insert([
             'nome' => 'Campus Itapetinga',
             'sigla' => 'ITA',
             'instituicao_id' => 1,
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
     }
 }
