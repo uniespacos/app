@@ -54,6 +54,10 @@ jobs:
           fi
       - name: Install PHP Dependencies
         run: docker compose -f docker-compose.test.yml exec -T workspace composer install --no-interaction --no-progress --prefer-dist
+      - name: Create dummy Vite manifest
+        run: |
+          mkdir -p public/build
+          echo '{"resources/js/app.tsx":{"file":"resources/js/app.js","src":"resources/js/app.tsx"},"resources/css/app.css":{"file":"resources/css/app.css","src":"resources/css/app.css"},"resources/js/pages/auth/login.tsx":{"file":"resources/js/pages/auth/login.js","src":"resources/js/pages/auth/login.tsx"},"resources/js/pages/auth/verify-email.tsx":{"file":"resources/js/pages/auth/verify-email.js","src":"resources/js/pages/auth/verify-email.tsx"},"resources/js/pages/auth/confirm-password.tsx":{"file":"resources/js/pages/auth/confirm-password.js","src":"resources/js/pages/auth/confirm-password.tsx"},"resources/js/pages/auth/forgot-password.tsx":{"file":"resources/js/pages/auth/forgot-password.js","src":"resources/js/pages/auth/forgot-password.tsx"},"resources/js/pages/auth/reset-password.tsx":{"file":"resources/js/pages/auth/reset-password.js","src":"resources/js/pages/auth/reset-password.tsx"},"resources/js/pages/auth/register.tsx":{"file":"resources/js/pages/auth/register.js","src":"resources/js/pages/auth/register.tsx"},"resources/js/pages/settings/profile.tsx":{"file":"resources/js/pages/settings/profile.js","src":"resources/js/pages/settings/profile.tsx"}}' > public/build/manifest.json
       - name: Run Migrations and Seed
         run: docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
       - name: Run Tests

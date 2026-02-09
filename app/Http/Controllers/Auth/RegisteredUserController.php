@@ -43,6 +43,8 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone' => 'required|string|max:20',
+            'setor_id' => 'required|exists:setors,id',
         ]);
 
         $user = User::create([
@@ -51,7 +53,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'telefone' => $request->phone,
             'profile_pic' => 'aushaushuahsas', // temporario
-            'setor_id' => Setor::pluck('id')->random(),
+            'setor_id' => $request->setor_id,
             'permission_type_id' => 3, // Usuario default
         ]);
 
