@@ -66,12 +66,7 @@ jobs:
           echo "Postgres is ready!"
 
       - name: Wait for workspace to be ready
-        run: |
-          echo "Waiting for workspace..."
-          until docker compose -f docker-compose.test.yml exec workspace php -v; do
-            sleep 2
-          done
-          echo "Workspace is ready!"
+        run: docker compose -f docker-compose.test.yml wait workspace
 
       - name: Install PHP Dependencies
         run: docker compose -f docker-compose.test.yml exec -T workspace composer install --no-interaction --no-progress --prefer-dist
