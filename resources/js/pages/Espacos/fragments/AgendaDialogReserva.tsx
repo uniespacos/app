@@ -189,7 +189,7 @@ export default function AgendaDialogReserva({
                                             >
                                                 <Calendar className="mr-2 h-4 w-4" />
                                                 {formData.data_inicial ? (
-                                                    format(new Date(formData.data_inicial), 'dd/MM/yyyy')
+                                                    format(formData.data_inicial, 'dd/MM/yyyy')
                                                 ) : (
                                                     <span>Selecione</span>
                                                 )}
@@ -198,11 +198,11 @@ export default function AgendaDialogReserva({
                                     <PopoverContent className="w-auto p-0" align="start">
                                         <CalendarComponent
                                             mode="single"
-                                            selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
+                                            selected={formData.data_inicial ?? undefined}
                                             onSelect={(date) => {
                                                 if (date) {
                                                     setFormData('data_inicial', date);
-                                                    if (formData.data_final && date > new Date(formData.data_final)) {
+                                                    if (formData.data_final && date > formData.data_final) {
                                                         setFormData('data_final', date);
                                                     }
                                                 } else {
@@ -229,16 +229,16 @@ export default function AgendaDialogReserva({
                                                                                         )}
                                                                                     >
                                                                                         <Calendar className="mr-2 h-4 w-4" />
-                                                                                        {formData.data_final ? format(new Date(formData.data_final), 'dd/MM/yyyy') : <span>Selecione</span>}
+                                                                                        {formData.data_final ? format(formData.data_final, 'dd/MM/yyyy') : <span>Selecione</span>}
                                                                                     </Button>
                                                                                 </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
                                         <CalendarComponent
                                             mode="single"
-                                            selected={formData.data_final ? new Date(formData.data_final) : undefined}
-                                            onSelect={(date) => setFormData('data_final', date)}
+                                            selected={formData.data_final ?? undefined}
+                                            onSelect={(date) => setFormData('data_final', date ?? null)}
                                             initialFocus
-                                            disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
+                                            disabled={(date) => (formData.data_inicial ? date < formData.data_inicial : date < hoje)}
                                         />
                                     </PopoverContent>
                                     </Popover>

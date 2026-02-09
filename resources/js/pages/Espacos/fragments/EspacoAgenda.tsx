@@ -131,6 +131,11 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
 
     // Efeito para calcular as datas de início e fim com base na seleção e recorrência
     useEffect(() => {
+        // Quando o período é personalizado, as datas são definidas manualmente pelo usuário.
+        if (data.recorrencia === 'personalizado') {
+            return;
+        }
+
         if (slotsSelecao.length === 0) return;
 
         const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === data.recorrencia);
@@ -138,20 +143,17 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
 
         const dataInicialCalculada = new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())));
 
-        let dataFinalCalculada: Date | null = data.data_final;
-        if (data.recorrencia !== 'personalizado') {
-            dataFinalCalculada =
-                data.recorrencia === 'unica'
-                    ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                    : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada);
-        }
+        const dataFinalCalculada =
+            data.recorrencia === 'unica'
+                ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada);
 
         setData((prevData) => ({
             ...prevData,
             data_inicial: dataInicialCalculada,
             data_final: dataFinalCalculada,
         }));
-    }, [data.recorrencia, slotsSelecao, setData, data.data_final]);
+    }, [data.recorrencia, slotsSelecao, setData]);
 
     const diasSemana = useMemo(() => diasDaSemana(semanaVisivel, hoje), [semanaVisivel, hoje]);
 

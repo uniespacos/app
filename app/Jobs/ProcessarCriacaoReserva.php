@@ -71,13 +71,28 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 // --- LÓGICA DE CRIAÇÃO DOS HORÁRIOS (A PARTE LENTA) ---
                 $horariosData = $this->dadosRequisicao['horarios_solicitados'];
                 $gestores = [];
+                $dataInicialReserva = Carbon::parse($reserva->data_inicial);
                 $dataFinalReserva = Carbon::parse($reserva->data_final);
 
                 foreach ($horariosData as $horarioInfo) {
                     $gestor = Agenda::findOrFail($horarioInfo['agenda_id'])->user;
                     $gestores[] = $gestor;
-                    $dataIteracao = Carbon::parse($horarioInfo['data']);
 
+                    // A data do horário original nos diz o "dia da semana" que queremos repetir.
+                    $diaDaSemanaOriginal = Carbon::parse($horarioInfo['data'])->dayOfWeek;
+
+                    // A iteração começa na data de início GERAL da reserva.
+                    $dataIteracao = $dataInicialReserva->copy();
+
+                    // Se a data de iteração já não for o dia da semana correto,
+                    // avançamos para a próxima ocorrência desse dia da semana.
+                    // O ->is(dia) verifica se já é o dia certo antes de avançar.
+                    if (!$dataIteracao->is($diaDaSemanaOriginal)) {
+                        $dataIteracao->next($diaDaSemanaOriginal);
+                    }
+
+                    // Agora $dataIteracao está no primeiro dia correto para criar a reserva.
+                    // O loop continua a partir daí.
                     while ($dataIteracao->lte($dataFinalReserva)) {
                         Horario::create([
                             'data' => $dataIteracao->toDateString(),
