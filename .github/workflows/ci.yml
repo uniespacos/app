@@ -98,14 +98,14 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/sh -c "
             set -e
-            echo 'Fixing permissions...'
-            chown -R 1000:1000 /var/www
+            echo 'Creating and setting permissions for writable directories...'
+            mkdir -p storage bootstrap/cache public/build vendor
+            chown -R 1000:1000 storage bootstrap/cache public/build vendor
             
             echo 'Installing PHP dependencies...'
             gosu 1000 composer install --no-interaction --no-progress --prefer-dist
             
             echo 'Creating dummy Vite manifest...'
-            gosu 1000 mkdir -p public/build
             gosu 1000 echo '{}' > public/build/manifest.json
             
             echo 'Running migrations and seeding...'
