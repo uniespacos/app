@@ -24,7 +24,8 @@ RUN npm run build
 FROM nginx:alpine
 
 # Substitui a configuração padrão do NGINX com o nosso default.conf
-COPY ./docker/production/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/production/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/production/nginx/default.ssl.conf /etc/nginx/conf.d/default.ssl.conf
 
 # Copia os assets gerados no builder
 COPY --from=builder /var/www/public /var/www/public
