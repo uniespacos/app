@@ -101,7 +101,10 @@ jobs:
 
       - name: Run Setup & Tests
         run: |
-          docker compose -f docker-compose.test.yml exec -T workspace /bin/sh -c "
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+
             set -e
             echo 'Installing PHP dependencies...'
             composer install --no-interaction --no-progress --prefer-dist
