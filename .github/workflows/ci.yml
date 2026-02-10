@@ -119,6 +119,12 @@ jobs:
             
             echo 'Running migrations and seeding...'
             php artisan migrate --seed --force
+
+            echo 'Installing Node dependencies...'
+            npm ci
+
+            echo 'Running frontend tests...'
+            npm test
             
             echo 'Running backend tests...'
             php artisan test
@@ -134,7 +140,6 @@ jobs:
 
   build-and-push:
     name: 🐳 Build & Push to GHCR
-    if: github.event_name == 'push'
     needs: test
     runs-on: ubuntu-latest
     steps:
