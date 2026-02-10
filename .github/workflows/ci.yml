@@ -94,22 +94,26 @@ jobs:
             exit 1
           fi
 
-      - name: Fix Permissions
-        run: docker compose -f docker-compose.test.yml exec -T --user=root workspace chown -R 1000:1000 /var/www
-
-      - name: Install PHP Dependencies
-        run: docker compose -f docker-compose.test.yml exec -T --user=1000 workspace composer install --no-interaction --no-progress --prefer-dist
-
-      - name: Create dummy Vite manifest
+      - name: Run Setup & Tests
         run: |
-          mkdir -p public/build
-          echo '{}' > public/build/manifest.json
-
-      - name: Run Migrations and Seed
-        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
-
-      - name: Run Backend Tests (PHPUnit)
-        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/sh -c "
+            set -e
+            echo 'Fixing permissions...'
+            chown -R 1000:1000 /var/www
+            
+            echo 'Installing PHP dependencies...'
+            gosu 1000 composer install --no-interaction --no-progress --prefer-dist
+            
+            echo 'Creating dummy Vite manifest...'
+            gosu 1000 mkdir -p public/build
+            gosu 1000 echo '{}' > public/build/manifest.json
+            
+            echo 'Running migrations and seeding...'
+            gosu 1000 php artisan migrate --seed --force
+            
+            echo 'Running backend tests...'
+            gosu 1000 php artisan test
+          "
       
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
@@ -181,11 +185,13 @@ jobs:
           tags: ${{ steps.meta_web.outputs.tags }}
           labels: ${{ steps.meta_web.outputs.labels }}
 
-  deploy:
-    name: 🚀 Deploy to Production
-    if: github.ref == 'refs/heads/main'
+  deploy_staging:
+    name: 🚀 Deploy to Staging
+    if: github.ref == 'refs/heads/development'
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment:
+      name: staging
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -196,13 +202,71 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            echo "📍 Starting Deploy..."
+            echo "📍 Starting Deploy to Staging..."
+            cd /var/www/uniespacos-staging # ADJUST THIS PATH IF NEEDED
+
+            echo "🔒 Maintenance Mode ON"
+            docker compose -f compose.prod.yml exec -T web php artisan down || true
+
+            echo "📥 Pulling latest code from development branch"
+            git pull origin development
+            
+            echo "DOCKER_USER=${{ github.actor }}" > .env.gh
+            echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
+
+            echo "🔐 Logging into GHCR"
+            cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            echo "🐳 Pulling latest images"
+            docker compose -f compose.prod.yml pull
+
+            echo "🚀 Launching new containers"
+            docker compose -f compose.prod.yml up -d --remove-orphans
+
+            echo "⏳ Waiting for services..."
+            sleep 15
+
+            echo "🔄 Running Migrations"
+            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+
+            echo "🧹 Optimizing Application"
+            docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
+            docker compose -f compose.prod.yml exec -T web php artisan optimize
+            docker compose -f compose.prod.yml exec -T web php artisan view:cache
+            docker compose -f compose.prod.yml exec -T web php artisan config:cache
+
+            echo "🔄 Restarting Queue Worker"
+            docker compose -f compose.prod.yml restart queue-worker
+
+            echo "✅ Maintenance Mode OFF"
+            docker compose -f compose.prod.yml exec -T web php artisan up
+
+            echo "🎉 Deploy to Staging finished successfully!"
+
+  deploy_production:
+    name: 🚀 Deploy to Production
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            echo "📍 Starting Deploy to Production..."
             cd /var/www/uniespacos # ADJUST THIS PATH IF NEEDED
 
             echo "🔒 Maintenance Mode ON"
             docker compose -f compose.prod.yml exec -T web php artisan down || true
 
-            echo "📥 Pulling latest code"
+            echo "📥 Pulling latest code from main branch"
             git pull origin main
             
             echo "DOCKER_USER=${{ github.actor }}" > .env.gh
@@ -235,4 +299,4 @@ jobs:
             echo "✅ Maintenance Mode OFF"
             docker compose -f compose.prod.yml exec -T web php artisan up
 
-            echo "🎉 Deploy finished successfully!"
+            echo "🎉 Deploy to Production finished successfully!"
