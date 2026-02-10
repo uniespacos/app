@@ -34,6 +34,7 @@ class FixStuckReservationsValidation extends Command
 
         if ($reservasParaValidar->isEmpty()) {
             $this->info('Nenhuma reserva com validação pendente foi encontrada. Tudo certo!');
+
             return 0;
         }
 

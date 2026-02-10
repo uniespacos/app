@@ -10,7 +10,7 @@ import { initializeTheme } from './hooks/use-appearance';
 window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globalmente
 
 window.Echo = new Echo({
-     broadcaster: 'pusher',
+    broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY as string,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER as string,
     forceTLS: true,

@@ -63,10 +63,7 @@ export default function UnidadesPage() {
                         />
                         <Card>
                             <CardContent>
-                                <UnidadeFilters
-                                    searchTerm={searchTerm}
-                                    onSearchTermChange={setSearchTerm}
-                                />
+                                <UnidadeFilters searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
                             </CardContent>
                         </Card>
                         <Card>

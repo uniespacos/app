@@ -5,11 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Link, router } from '@inertiajs/react';
+import { format } from 'date-fns';
 import { CheckCircle, Clock, Edit, FileText, XCircle, XSquare } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
-import { format } from 'date-fns';
 
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
@@ -118,11 +118,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
 
                 return reserva;
             });
-            setReservasFiltradas(reservasParaExibir.sort((a, b) => {
-                if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-                if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
-                return 0;
-            }));
+            setReservasFiltradas(
+                reservasParaExibir.sort((a, b) => {
+                    if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
+                    if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
+                    return 0;
+                }),
+            );
         } else {
             setReservasFiltradas(reservas);
         }
@@ -135,33 +137,40 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
         router.get(route('gestor.reservas.show', id));
     };
 
-
     // Função para ABRIR o modal de detalhes
     // Ela faz uma requisição para buscar os dados completos da reserva
     const handleAbrirDetalhes = (reserva: Reserva) => {
-        router.get(route(routeName), {
-            reserva: reserva.id,
-            // Pede ao backend a semana inicial da reserva
-            semana: format(new Date(reserva.data_inicial), 'yyyy-MM-dd'),
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        router.get(
+            route(routeName),
+            {
+                reserva: reserva.id,
+                // Pede ao backend a semana inicial da reserva
+                semana: format(new Date(reserva.data_inicial), 'yyyy-MM-dd'),
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
     };
 
     // Função para FECHAR o modal de detalhes
     // Ela remove o parâmetro 'reserva' da URL
     const handleFecharDetalhes = () => {
-        router.get(route(routeName), {
-            // Mantém os filtros atuais da página, mas remove o filtro de 'reserva'
-            ...route().params,
-            reserva: undefined,
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        router.get(
+            route(routeName),
+            {
+                // Mantém os filtros atuais da página, mas remove o filtro de 'reserva'
+                ...route().params,
+                reserva: undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
     };
 
     return (
@@ -193,13 +202,13 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
 
                                 <TableCell className="hidden md:table-cell">
                                     <div>
-                                        <p>
-                                            {reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
-                                        </p>
+                                        <p>{reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}</p>
                                     </div>
                                 </TableCell>
 
-                                <TableCell className="hidden lg:table-cell">{formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}</TableCell>
+                                <TableCell className="hidden lg:table-cell">
+                                    {formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}
+                                </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                     <div>
                                         <SituacaoBadge situacao={reserva.situacao} />
@@ -213,13 +222,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                             Detalhes
                                         </Button>
 
-
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
-                                                <Button
-                                                    onClick={() => handleAvaliarButton(reserva.id)}
-                                                    variant="outline"
-                                                >
+                                                <Button onClick={() => handleAvaliarButton(reserva.id)} variant="outline">
                                                     <Edit className="h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
@@ -236,10 +241,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                                             Editar
                                                         </Button>
                                                     )}
-                                                    <Button
-                                                        onClick={() => setRemoverReserva(reserva)}
-                                                        variant="destructive"
-                                                    >
+                                                    <Button onClick={() => setRemoverReserva(reserva)} variant="destructive">
                                                         <XCircle className="text-white" />
                                                         Cancelar
                                                     </Button>
@@ -279,8 +281,6 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                 />
             )}
 
-
-
             <div className="mt-4 flex justify-center">
                 <div className="flex flex-wrap justify-center gap-1">
                     {links.map((link, index) =>
@@ -290,8 +290,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 key={index}
                                 href={link.url}
                                 preserveScroll
-                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
-                                    }`}
+                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${
+                                    link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
+                                }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ) : (

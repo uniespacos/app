@@ -87,7 +87,6 @@ export interface ConflictInfo {
     conflito_user_name: string;
 }
 
-
 // =============================================================================
 // 2. TIPOS DA HIERARQUIA DE LOCALIZAÇÃO (MODELOS DO LARAVEL)
 // Estrutura física da instituição, em ordem hierárquica.
@@ -185,7 +184,7 @@ export interface Horario {
     is_conflicted?: boolean;
     conflict_details?: string;
 
-        // --- NOVOS CAMPOS VINDOS DO BACKEND ---
+    // --- NOVOS CAMPOS VINDOS DO BACKEND ---
     validation_status: ValidationStatus;
     // O cache é um objeto onde a chave é o ID do horário (string) e o valor são os detalhes do conflito
     conflict_cache: Record<string, ConflictInfo> | null;
@@ -262,7 +261,7 @@ export interface SlotCalendario {
     isLocked?: boolean;
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
     agenda_id?: number;
-    isShowReservation?: boolean
+    isShowReservation?: boolean;
 }
 
 export interface OpcoesRecorrencia {
@@ -273,9 +272,6 @@ export interface OpcoesRecorrencia {
 }
 
 export type ValorOcorrenciaType = 'unica' | '15dias' | '1mes' | 'personalizado';
-
-
-
 
 // Define a estrutura de um único link da paginação do Laravel
 interface PaginatorLink {
@@ -304,15 +300,15 @@ interface Paginator<T> {
 
 export interface ImageWithPreview {
     preview: string; // URL para visualização (blob: ou /storage/...)
-    file?: File;      // Objeto File para novas imagens
-    path?: string;    // Path relativo para imagens existentes
+    file?: File; // Objeto File para novas imagens
+    path?: string; // Path relativo para imagens existentes
 }
 
 export type AgendaGestoresPorTurnoType = {
     nome: string;
     email: string;
     departamento: string;
-    agenda_id: number
+    agenda_id: number;
 };
 
 export type AgendaDiasSemanaType = {
@@ -322,22 +318,22 @@ export type AgendaDiasSemanaType = {
     diaMes: string;
     valor: string;
     ehHoje: boolean;
-}
+};
 
-export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>
+export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>;
 export interface PermissionType {
-    id: number
-    name: "institucional" | "gestor" | "comum"
-    label: string
+    id: number;
+    name: 'institucional' | 'gestor' | 'comum';
+    label: string;
 }
 
 export interface SelectedAgenda {
-    agenda: Agenda
-    espaco: Espaco
-    andar: Andar
-    modulo: Modulo
-    unidade: Unidade
-    instituicao: Instituicao
+    agenda: Agenda;
+    espaco: Espaco;
+    andar: Andar;
+    modulo: Modulo;
+    unidade: Unidade;
+    instituicao: Instituicao;
 }
 
 export interface FiltrosEspacosType {

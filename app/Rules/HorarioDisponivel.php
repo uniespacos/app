@@ -3,27 +3,30 @@
 namespace App\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\DB;
 
 // Implementamos a ValidationRule (padrão Laravel 11) e a DataAwareRule (para acesso aos dados)
-class HorarioDisponivel implements ValidationRule, DataAwareRule
+class HorarioDisponivel implements DataAwareRule, ValidationRule
 {
     /**
      * Todos os dados da requisição.
+     *
      * @var array
      */
     protected $data = [];
 
     /**
      * Define os dados da requisição para a regra.
+     *
      * @param  array  $data
      * @return $this
      */
     public function setData($data)
     {
         $this->data = $data;
+
         return $this;
     }
 
@@ -31,8 +34,6 @@ class HorarioDisponivel implements ValidationRule, DataAwareRule
      * Executa a regra de validação.
      * Este é o método padrão do Laravel 11.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void

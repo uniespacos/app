@@ -12,8 +12,7 @@ class ConflictDetectionService
      * Encontra todos os horários conflitantes para uma dada reserva.
      * Retorna uma coleção de conflitos mapeada pelo ID do horário original.
      *
-     * @param Reserva $reserva
-     * @return Collection
+     * @param  Reserva  $reserva
      */
     public function findConflictsFor(int $reservaId): Collection
     {

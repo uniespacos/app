@@ -2,10 +2,4 @@
 
 namespace App\Services;
 
-class EspacoService
-{
-
-    
-
-
-}
+class EspacoService {}

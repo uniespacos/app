@@ -1,0 +1,51 @@
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: ./docker/development/workspace/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/var/www
+    environment:
+      - APP_ENV=testing
+      - BCRYPT_ROUNDS=4
+      - CACHE_STORE=array
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_DATABASE=uniespacos
+      - DB_USERNAME=uniespacos
+      - DB_PASSWORD=uniespacossecretkey
+      - MAIL_MAILER=array
+      - QUEUE_CONNECTION=sync
+      - SESSION_DRIVER=file
+    networks:
+      - test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "php -v" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: tail -f /dev/null
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: uniespacos
+      POSTGRES_USER: uniespacos
+      POSTGRES_PASSWORD: uniespacossecretkey
+    networks:
+      - test
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U uniespacos -d uniespacos" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  test:

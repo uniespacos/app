@@ -3,17 +3,16 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Broadcast;
 
 class ReservaAvaliadaNotification extends Notification
 {
     use Queueable;
 
     public $reserva;
+
     public $statusAvaliacao; // 'aprovada', 'parcialmente_aprovada', 'rejeitada'
 
     public function __construct($reserva, $statusAvaliacao)
@@ -57,6 +56,7 @@ class ReservaAvaliadaNotification extends Notification
             'mensagem' => "Sua reserva para '{$this->reserva->nome}' foi {$this->statusAvaliacao}.",
         ];
     }
+
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         // Dados para serem enviados via Pusher

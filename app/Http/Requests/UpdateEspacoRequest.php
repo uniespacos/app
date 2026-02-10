@@ -2,19 +2,17 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class UpdateEspacoRequest extends StoreEspacoRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
         $rules = parent::rules();
+
         return $rules;
     }
 

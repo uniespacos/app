@@ -16,8 +16,9 @@ class InstitucionalMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user()->permission_type_id !== 1)
+        if (Auth::user()->permission_type_id !== 1) {
             return redirect()->route('dashboard')->with('error', 'Você não tem permissão para acessar esta área.');
+        }
 
         return $next($request);
     }

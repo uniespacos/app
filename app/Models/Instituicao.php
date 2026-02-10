@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Unidade;
 
 class Instituicao extends Model
 {
@@ -14,7 +13,7 @@ class Instituicao extends Model
     protected $fillable = [
         'nome',
         'sigla',
-        'endereco'
+        'endereco',
     ];
 
     public function unidades()

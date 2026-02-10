@@ -19,7 +19,7 @@ export default function EspacosPage() {
         user: { permission_type_id },
         espacos: { data: espacos, links },
         filters,
-        capacidadeEspacos
+        capacidadeEspacos,
     } = usePage<{
         espacos: {
             data: Espaco[];

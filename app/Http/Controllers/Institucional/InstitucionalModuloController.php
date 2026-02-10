@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreModuloRequest;
-use App\Http\Requests\UpdateEspacoRequest;
 use App\Http\Requests\UpdateModuloRequest;
-use App\Models\Instituicao;
 use App\Models\Modulo;
 use App\Models\Unidade;
 use Illuminate\Http\Request;
@@ -25,7 +23,7 @@ class InstitucionalModuloController extends Controller
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
 
-        $modulos = Modulo::whereHas('unidade', fn($q) => $q->where('instituicao_id', $instituicao_id))->with(['andars', 'unidade.instituicao'])->latest()->paginate(10);
+        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['andars', 'unidade.instituicao'])->latest()->paginate(10);
 
         return Inertia::render('Administrativo/Modulos/Modulos', [
             'modulos' => $modulos,
@@ -40,6 +38,7 @@ class InstitucionalModuloController extends Controller
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
         $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
+
         return Inertia::render('Administrativo/Modulos/CadastrarModulo', [
             'instituicao' => $instituicao,
             'unidades' => $unidades,
@@ -78,7 +77,7 @@ class InstitucionalModuloController extends Controller
             DB::rollBack();
 
             return back()
-                ->with(['error' => 'Erro ao cadastrar módulo: ' . $e->getMessage()])->withInput();
+                ->with(['error' => 'Erro ao cadastrar módulo: '.$e->getMessage()])->withInput();
         }
     }
 
@@ -91,7 +90,6 @@ class InstitucionalModuloController extends Controller
         $instituicao = $user->setor->unidade->instituicao;
         $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
         $modulo->load(['andars', 'unidade.instituicao']); // Carrega a unidade e a instituição associada ao módulo
-
 
         return Inertia::render('Administrativo/Modulos/EditarModulo', [
             'instituicao' => $instituicao,
@@ -159,8 +157,9 @@ class InstitucionalModuloController extends Controller
                 ->with('success', 'Módulo atualizado com sucesso!');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()
-                ->with(['error' => 'Erro ao atualizar módulo: ' . $e->getMessage()])
+                ->with(['error' => 'Erro ao atualizar módulo: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -198,7 +197,7 @@ class InstitucionalModuloController extends Controller
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Erro ao remover módulo: ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Erro ao remover módulo: '.$e->getMessage()]);
         }
     }
 }

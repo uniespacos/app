@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -18,6 +17,7 @@ class NovaSolicitacaoReservaNotification extends Notification
     {
         $this->solicitacao = $solicitacao;
     }
+
     /**
      * Get the notification's delivery channels.
      *
@@ -44,7 +44,6 @@ class NovaSolicitacaoReservaNotification extends Notification
      *
      * @return array<string, mixed>
      */
-
     public function toArray(object $notifiable): array
     {
         return [
@@ -60,7 +59,7 @@ class NovaSolicitacaoReservaNotification extends Notification
             'solicitacao_id' => $this->solicitacao->id,
             'usuario_nome' => $this->solicitacao->user->name,
             'mensagem' => "Nova solicitação de reserva de '{$this->solicitacao->user->name}' para '{$this->solicitacao->nome}'.",
-            'url' => route('gestor.reservas.index',), // Exemplo de URL para o gestor
+            'url' => route('gestor.reservas.index'), // Exemplo de URL para o gestor
         ]);
     }
 }

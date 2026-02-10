@@ -7,7 +7,6 @@ use App\Models\Espaco;
 use App\Models\Reserva;
 use App\Models\Unidade;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -32,7 +31,7 @@ class HomeController extends Controller
                                     'agenda.espaco.andar:id,nome,modulo_id',
                                     'agenda.espaco.andar.modulo:id,nome',
                                 ]);
-                        }
+                        },
                     ])
                     ->latest()
                     ->take(5)
@@ -66,7 +65,7 @@ class HomeController extends Controller
                                     'agenda.espaco.andar:id,nome,modulo_id',
                                     'agenda.espaco.andar.modulo:id,nome',
                                 ]);
-                        }
+                        },
                     ])
                     ->latest()
                     ->take(5)
@@ -120,7 +119,7 @@ class HomeController extends Controller
                                     'agenda.espaco.andar:id,nome,modulo_id',
                                     'agenda.espaco.andar.modulo:id,nome',
                                 ]);
-                        }
+                        },
                     ])
                     ->latest()
                     ->take(5)

@@ -39,8 +39,8 @@ class StoreReservaRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:agendas,id', // Garante que a agenda existe no banco
-                new HorarioDisponivel($this->input('horarios_solicitados.*.data'), $this->input('horarios_solicitados.*.horario_inicio'))
-            ]
+                new HorarioDisponivel($this->input('horarios_solicitados.*.data'), $this->input('horarios_solicitados.*.horario_inicio')),
+            ],
         ];
     }
 }

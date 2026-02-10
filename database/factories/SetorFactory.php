@@ -18,7 +18,7 @@ class SetorFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => 'Setor de ' . $this->faker->jobTitle(),
+            'nome' => 'Setor de '.$this->faker->jobTitle(),
             'sigla' => $this->faker->unique()->lexify('???'),
             'unidade_id' => Unidade::factory(),
         ];

@@ -32,7 +32,6 @@ class MakeServiceCommand extends Command
         $this->files = $files;
     }
 
-
     /**
      * Execute the console command.
      */
@@ -48,6 +47,7 @@ class MakeServiceCommand extends Command
 
         if ($this->files->exists($path)) {
             $this->error('Serviço já existe!');
+
             return 1;
         }
 
@@ -59,6 +59,7 @@ class MakeServiceCommand extends Command
 
         return 0;
     }
+
     protected function getStub(): string
     {
         return <<<EOT

@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Horario extends Model
 {
-
     use HasFactory;
+
     protected $fillable = [
         'agenda_id',
         'reserva_id',
@@ -24,12 +24,14 @@ class Horario extends Model
     {
         return $this->belongsTo(Reserva::class);
     }
+
     public function agenda()
     {
         return $this->belongsTo(Agenda::class);
     }
 
-    public function avaliador() {
+    public function avaliador()
+    {
         return $this->belongsTo(User::class);
     }
 }

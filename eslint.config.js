@@ -41,4 +41,16 @@ export default [
         ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
+    {
+        files: ['jest.setup.js'],
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+                ...globals.node,
+            },
+        },
+        rules: {
+            '@typescript-eslint/no-require-imports': 'off',
+        },
+    },
 ];

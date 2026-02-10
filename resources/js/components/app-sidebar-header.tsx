@@ -10,7 +10,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-                 <NotificationDropdown />
+                <NotificationDropdown />
             </div>
         </header>
     );
