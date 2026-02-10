@@ -113,8 +113,9 @@ jobs:
             php artisan key:generate
 
             echo 'Creating dummy Vite manifest...'
-            mkdir -p public/build
-            echo '{}' > public/build/manifest.json
+            mkdir -p public/build/assets
+            touch public/build/assets/app.js
+            echo '{"resources/js/app.tsx": {"file": "assets/app.js", "src": "resources/js/app.tsx", "isEntry": true}}' > public/build/manifest.json
             
             echo 'Running migrations and seeding...'
             php artisan migrate --seed --force
