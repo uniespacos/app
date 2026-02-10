@@ -13,6 +13,11 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        if (method_exists($this, 'withoutVite')) {
+            $this->withoutVite();
+        }
+
         $this->seed(DatabaseSeeder::class);
     }
 }
