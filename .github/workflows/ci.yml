@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Pint (PHP Code Style)
         run: vendor/bin/pint --test
-        
+
       - name: Run ESLint (Frontend Linting)
         run: npm run lint
 
@@ -83,7 +83,7 @@ jobs:
               elapsed_seconds=$((elapsed_seconds + 5))
               continue
             fi
-          
+
             workspace_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null)
             if [ "$workspace_status" == "healthy" ]; then
               echo "Workspace service is healthy!"
@@ -129,7 +129,7 @@ jobs:
             echo 'Running backend tests...'
             php artisan test
           "
-      
+
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
       #   run: npm test
@@ -224,13 +224,13 @@ jobs:
 
             echo "📥 Pulling latest code from development branch"
             git pull origin development
-            
+
             echo "DOCKER_USER=${{ github.actor }}" > .env.gh
             echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
 
             echo "🔐 Logging into GHCR"
             cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
+
             echo "🐳 Pulling latest images"
             docker compose -f compose.prod.yml pull
 
@@ -263,7 +263,7 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: "production"
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -282,13 +282,13 @@ jobs:
 
             echo "📥 Pulling latest code from main branch"
             git pull origin main
-            
+
             echo "DOCKER_USER=${{ github.actor }}" > .env.gh
             echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
 
             echo "🔐 Logging into GHCR"
             cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
+
             echo "🐳 Pulling latest images"
             docker compose -f compose.prod.yml pull
 
