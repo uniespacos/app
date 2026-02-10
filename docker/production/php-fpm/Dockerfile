@@ -1,12 +1,8 @@
 # Stage 1: Build environment and Composer dependencies
 FROM php:8.4-fpm AS builder
 
-ENV VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY
-ENV VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER
-
 # Install system dependencies and PHP extensions required for Laravel + MySQL/PostgreSQL support
 # Some dependencies are required for PHP extensions only in the build stage
-# We don't need to install Node.js or build assets, as it was done in the Nginx image
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     unzip \
@@ -30,7 +26,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-enable redis \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
 # Set the working directory inside the container
 WORKDIR /var/www
 
@@ -39,10 +34,13 @@ COPY composer.json composer.lock ./
 
 # Install Composer and dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+    && composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist --no-scripts
 
 # Copy the rest of the application code
 COPY . /var/www
+
+# Generate autoloader and run scripts now that application code is present
+RUN composer dump-autoload --optimize
 
 
 # Stage 2: Production environment
