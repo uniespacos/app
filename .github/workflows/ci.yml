@@ -210,6 +210,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
       - name: Install cloudflared
         run: |
@@ -235,9 +238,6 @@ jobs:
           chmod 600 ~/.ssh/config
 
       - name: Deploy to Staging
-        env:
-          CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           ssh -vvv ${{ secrets.SSH_HOST }} 'bash -s' << 'EOF'
             set -e
