@@ -263,28 +263,28 @@ jobs:
             cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo "🐳 Pulling latest images"
-            docker compose -f compose.prod.yml pull
+            IMAGE_TAG=development docker compose -f compose.prod.yml pull
 
             echo "🚀 Launching new containers"
-            docker compose -f compose.prod.yml up -d --remove-orphans
+            IMAGE_TAG=development docker compose -f compose.prod.yml up -d --remove-orphans
 
             echo "⏳ Waiting for services..."
             sleep 15
 
             echo "🔄 Running Migrations"
-            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan migrate --force
 
             echo "🧹 Optimizing Application"
-            docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
-            docker compose -f compose.prod.yml exec -T web php artisan optimize
-            docker compose -f compose.prod.yml exec -T web php artisan view:cache
-            docker compose -f compose.prod.yml exec -T web php artisan config:cache
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan optimize
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan view:cache
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan config:cache
 
             echo "🔄 Restarting Queue Worker"
-            docker compose -f compose.prod.yml restart queue-worker
+            IMAGE_TAG=development docker compose -f compose.prod.yml restart queue-worker
 
             echo "✅ Maintenance Mode OFF"
-            docker compose -f compose.prod.yml exec -T web php artisan up
+            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan up
 
             echo "🎉 Deploy to Staging finished successfully!"
           EOF
