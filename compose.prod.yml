@@ -1,7 +1,7 @@
 services:
     web:
         container_name: web-production
-        image: ghcr.io/${GHCR_REPO_WEB}/web:latest # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_WEB}/web:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
         restart: unless-stopped
         env_file:
             - stack.env
@@ -15,11 +15,10 @@ services:
         networks:
             - uniespacos-production
         depends_on:
-            app:
-                condition: service_healthy
+            - app
     app:
         container_name: app-production
-        image: ghcr.io/${GHCR_REPO_APP}/app:latest # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_APP}/app:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
         restart: unless-stopped
         volumes:
             - uniespacos-public-assets:/var/www/public/build
@@ -29,17 +28,17 @@ services:
             - stack.env
         networks:
             - uniespacos-production
-        healthcheck:
-            test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
-            interval: 10s
-            timeout: 5s
-            retries: 3
+        # healthcheck:
+        #     test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
+        #     interval: 10s
+        #     timeout: 5s
+        #     retries: 3
         depends_on:
             postgres:
                 condition: service_healthy
     queue-worker:
         container_name: queue-worker-production
-        image: ghcr.io/${GHCR_REPO_APP}/app:latest # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_APP}/app:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
         restart: unless-stopped
         command: php artisan queue:work --verbose --tries=3 --timeout=90
         volumes:

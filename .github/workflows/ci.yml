@@ -214,6 +214,9 @@ jobs:
       CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install cloudflared
         run: |
           curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
@@ -224,70 +227,32 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          
-          # Configure SSH to use cloudflared as a proxy
-          # We don't specify a port here because the Cloudflare Tunnel handles the mapping to the destination port (54222) on the server side.
-          # cloudflared will pick up CF_ID and CF_SECRET from the environment
           echo "Host ${{ secrets.SSH_HOST }}
             User ${{ secrets.SSH_USER }}
             IdentityFile ~/.ssh/id_ed25519
             ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null" > ~/.ssh/config
-            
           chmod 600 ~/.ssh/config
 
-      - name: Deploy to Staging
+      - name: Deploy to Staging via SSH
         run: |
-          ssh -vvv ${{ secrets.SSH_HOST }} 'bash -s' << 'EOF'
+          STAGING_PATH="/var/www/uniespacos-staging"
+          # Securely copy the new deployment script to the server
+          scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
+          
+          # Execute the script on the remote server
+          ssh ${{ secrets.SSH_HOST }} "
             set -e
-            echo "📍 Starting Deploy to Staging..."
-            cd /var/www/uniespacos-staging
+            cd ${STAGING_PATH}
+            chmod +x deploy.sh
+            
+            # Log into GHCR on the remote server to pull images
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            echo "🗄️ Performing database backup..."
-            mkdir -p backups
-            BACKUP_FILE="backups/backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
-            docker compose -f compose.prod.yml exec -T postgres pg_dump -U uniespacos uniespacos > $BACKUP_FILE
-            echo "✅ Database backup successful: $BACKUP_FILE"
-
-            echo "🔒 Maintenance Mode ON"
-            docker compose -f compose.prod.yml exec -T web php artisan down || true
-
-            echo "📥 Pulling latest code from development branch"
-            git pull origin development
-
-            echo "DOCKER_USER=${{ github.actor }}" > .env.gh
-            echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
-
-            echo "🔐 Logging into GHCR"
-            cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            echo "🐳 Pulling latest images"
-            docker compose -f compose.prod.yml pull
-
-            echo "🚀 Launching new containers"
-            docker compose -f compose.prod.yml up -d --remove-orphans
-
-            echo "⏳ Waiting for services..."
-            sleep 15
-
-            echo "🔄 Running Migrations"
-            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
-
-            echo "🧹 Optimizing Application"
-            docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
-            docker compose -f compose.prod.yml exec -T web php artisan optimize
-            docker compose -f compose.prod.yml exec -T web php artisan view:cache
-            docker compose -f compose.prod.yml exec -T web php artisan config:cache
-
-            echo "🔄 Restarting Queue Worker"
-            docker compose -f compose.prod.yml restart queue-worker
-
-            echo "✅ Maintenance Mode OFF"
-            docker compose -f compose.prod.yml exec -T web php artisan up
-
-            echo "🎉 Deploy to Staging finished successfully!"
-          EOF
+            # Run the deployment script, passing the branch name as the image tag
+            ./deploy.sh development
+          "
 
   deploy_production:
     name: 🚀 Deploy to Production
@@ -296,60 +261,46 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: "production"
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script_stop: true
-          script: |
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "Host ${{ secrets.SSH_HOST }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy to Production via SSH
+        run: |
+          PRODUCTION_PATH="/var/www/uniespacos-production"
+          # Securely copy the new deployment script to the server
+          scp ./scripts/deploy-production.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${PRODUCTION_PATH}/deploy.sh
+          
+          # Execute the script on the remote server
+          ssh ${{ secrets.SSH_HOST }} "
             set -e
-            echo "📍 Starting Deploy to Production..."
-            cd /var/www/uniespacos # ADJUST THIS PATH IF NEEDED
+            cd ${PRODUCTION_PATH}
+            chmod +x deploy.sh
+            
+            # Log into GHCR on the remote server to pull images
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            echo "📥 Pulling latest code from main branch"
-            git pull origin main
-
-            echo "🗄️ Performing database backup..."
-            mkdir -p backups
-            BACKUP_FILE="backups/backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T postgres pg_dump -U uniespacos uniespacos > $BACKUP_FILE
-            echo "✅ Database backup successful: $BACKUP_FILE"
-
-            echo "🔒 Maintenance Mode ON"
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan down || true
-
-            echo "DOCKER_USER=${{ github.actor }}" > .env.gh
-            echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
-
-            echo "🔐 Logging into GHCR"
-            cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            echo "🐳 Pulling latest images"
-            docker compose -f compose.prod.yml -f compose.override.yml pull
-
-            echo "🚀 Launching new containers"
-            docker compose -f compose.prod.yml -f compose.override.yml up -d --remove-orphans
-
-            echo "⏳ Waiting for services..."
-            sleep 15
-
-            echo "🔄 Running Migrations"
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan migrate --force
-
-            echo "🧹 Optimizing Application"
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan optimize:clear
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan optimize
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan view:cache
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan config:cache
-
-            echo "🔄 Restarting Queue Worker"
-            docker compose -f compose.prod.yml -f compose.override.yml restart queue-worker
-
-            echo "✅ Maintenance Mode OFF"
-            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan up
-
-            echo "🎉 Deploy to Production finished successfully!"
+            # Run the deployment script, passing 'main' as the image tag
+            ./deploy.sh main
+          "
