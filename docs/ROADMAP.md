@@ -26,6 +26,8 @@ This document outlines the development roadmap for the UniEspaços project, trac
     *   Enhance the calendar view for space reservations with more interactive features.
 *   **Feature: Admin Dashboard**
     *   Improve the admin dashboard with more detailed analytics and management tools.
+*   **Feature: Add Application Version Footer**
+    *   Create a footer component that displays the current application version from `package.json`.
 *   **Infrastructure: Implement CI/CD flow**
     *   Set up and refine continuous integration and continuous deployment pipelines.
 *   **Maintenance: Bug Fixes and Stability Improvements**
