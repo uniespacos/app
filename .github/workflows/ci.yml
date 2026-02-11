@@ -143,6 +143,7 @@ jobs:
 
   build-and-push:
     name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -223,16 +224,20 @@ jobs:
           
           # Configure SSH to use cloudflared as a proxy
           # We don't specify a port here because the Cloudflare Tunnel handles the mapping to the destination port (54222) on the server side.
+          # cloudflared will pick up CF_ID and CF_SECRET from the environment
           echo "Host ${{ secrets.SSH_HOST }}
             User ${{ secrets.SSH_USER }}
             IdentityFile ~/.ssh/id_rsa
-            ProxyCommand cloudflared access ssh --hostname %h --id ${{ secrets.CF_ACCESS_CLIENT_ID }} --secret ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+            ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null" > ~/.ssh/config
             
           chmod 600 ~/.ssh/config
 
       - name: Deploy to Staging
+        env:
+          CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           ssh ${{ secrets.SSH_HOST }} 'bash -s' << 'EOF'
             set -e
