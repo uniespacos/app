@@ -239,6 +239,12 @@ jobs:
             echo "📍 Starting Deploy to Staging..."
             cd /var/www/uniespacos-staging
 
+            echo "🗄️ Performing database backup..."
+            mkdir -p backups
+            BACKUP_FILE="backups/backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
+            docker compose -f compose.prod.yml exec -T postgres pg_dump -U uniespacos uniespacos > $BACKUP_FILE
+            echo "✅ Database backup successful: $BACKUP_FILE"
+
             echo "🔒 Maintenance Mode ON"
             docker compose -f compose.prod.yml exec -T web php artisan down || true
 
@@ -295,14 +301,21 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
+            set -e
             echo "📍 Starting Deploy to Production..."
             cd /var/www/uniespacos # ADJUST THIS PATH IF NEEDED
 
-            echo "🔒 Maintenance Mode ON"
-            docker compose -f compose.prod.yml exec -T web php artisan down || true
-
             echo "📥 Pulling latest code from main branch"
             git pull origin main
+
+            echo "🗄️ Performing database backup..."
+            mkdir -p backups
+            BACKUP_FILE="backups/backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T postgres pg_dump -U uniespacos uniespacos > $BACKUP_FILE
+            echo "✅ Database backup successful: $BACKUP_FILE"
+
+            echo "🔒 Maintenance Mode ON"
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan down || true
 
             echo "DOCKER_USER=${{ github.actor }}" > .env.gh
             echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
@@ -311,27 +324,27 @@ jobs:
             cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo "🐳 Pulling latest images"
-            docker compose -f compose.prod.yml pull
+            docker compose -f compose.prod.yml -f compose.override.yml pull
 
             echo "🚀 Launching new containers"
-            docker compose -f compose.prod.yml up -d --remove-orphans
+            docker compose -f compose.prod.yml -f compose.override.yml up -d --remove-orphans
 
             echo "⏳ Waiting for services..."
             sleep 15
 
             echo "🔄 Running Migrations"
-            docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan migrate --force
 
             echo "🧹 Optimizing Application"
-            docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
-            docker compose -f compose.prod.yml exec -T web php artisan optimize
-            docker compose -f compose.prod.yml exec -T web php artisan view:cache
-            docker compose -f compose.prod.yml exec -T web php artisan config:cache
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan optimize:clear
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan optimize
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan view:cache
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan config:cache
 
             echo "🔄 Restarting Queue Worker"
-            docker compose -f compose.prod.yml restart queue-worker
+            docker compose -f compose.prod.yml -f compose.override.yml restart queue-worker
 
             echo "✅ Maintenance Mode OFF"
-            docker compose -f compose.prod.yml exec -T web php artisan up
+            docker compose -f compose.prod.yml -f compose.override.yml exec -T web php artisan up
 
             echo "🎉 Deploy to Production finished successfully!"
