@@ -143,6 +143,7 @@ jobs:
 
   build-and-push:
     name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
     needs: test
     runs-on: ubuntu-latest
     steps:
