@@ -56,12 +56,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Adiciona o repositório do Node.js (estamos usando a versão 22.x LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-
-# Instala o Node.js, npm e outras dependências
-RUN apt-get install -y nodejs
-
 # Download and install php-fpm health check script
 RUN curl -o /usr/local/bin/php-fpm-healthcheck \
     https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
