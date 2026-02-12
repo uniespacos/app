@@ -36,7 +36,7 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm ci
+          npm ci --no-optional
 
       - name: Run Pint (PHP Code Style)
         run: vendor/bin/pint --test
@@ -48,6 +48,7 @@ jobs:
     name: 🧪 Run Tests
     needs: lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -99,7 +100,7 @@ jobs:
             exit 1
           fi
 
-      - name: Run Setup & Tests
+      - name: Setup Environment
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
             export NVM_DIR=\"\$HOME/.nvm\"
@@ -118,20 +119,35 @@ jobs:
             echo 'Creating dummy Vite manifest...'
             mkdir -p public/build/assets
             touch public/build/assets/app.js
-            echo '{"resources/js/app.tsx": {"file": "assets/app.js", "src": "resources/js/app.tsx", "isEntry": true}}' > public/build/manifest.json
-            
-            echo 'Running migrations and seeding...'
-            php artisan migrate --seed --force
-
-            echo 'Installing Node dependencies...'
-            npm ci
-
-            echo 'Running frontend tests...'
-            npm test
-            
-            echo 'Running backend tests...'
-            php artisan test
+            echo '{\"resources/js/app.tsx\": {\"file\": \"assets/app.js\", \"src\": \"resources/js/app.tsx\", \"isEntry\": true}}' > public/build/manifest.json
           "
+
+      - name: Run Migrations
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
+
+      - name: Install Node Dependencies
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm config set fetch-timeout 600000
+            npm ci --verbose
+          "
+
+      - name: Run Frontend Tests
+        env:
+            NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm test
+           "
+
+      - name: Run Backend Tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
 
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests

@@ -1,7 +1,7 @@
 services:
     web:
         container_name: web-production
-        image: ghcr.io/${GHCR_REPO_WEB}/web:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_WEB:-uniespacos/app/web}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         env_file:
             - stack.env
@@ -9,8 +9,6 @@ services:
             - "80:80"
         volumes:
             - uniespacos-storage-production:/var/www/storage:ro
-            - uniespacos-public-assets:/var/www/public/build:ro
-            - uniespacos-public-production:/var/www/public:ro
             - ./docker/production/nginx/prod.http-redirect.conf:/etc/nginx/conf.d/default.conf:ro
         networks:
             - uniespacos-production
@@ -18,27 +16,20 @@ services:
             - app
     app:
         container_name: app-production
-        image: ghcr.io/${GHCR_REPO_APP}/app:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         volumes:
-            - uniespacos-public-assets:/var/www/public/build
             - uniespacos-storage-production:/var/www/storage
-            - uniespacos-public-production:/var/www/public
         env_file:
             - stack.env
         networks:
             - uniespacos-production
-        # healthcheck:
-        #     test: [ "CMD-SHELL", "php-fpm-healthcheck || exit 1" ]
-        #     interval: 10s
-        #     timeout: 5s
-        #     retries: 3
         depends_on:
             postgres:
                 condition: service_healthy
     queue-worker:
         container_name: queue-worker-production
-        image: ghcr.io/${GHCR_REPO_APP}/app:${IMAGE_TAG:-latest} # Using pre-built image from GHCR
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         command: php artisan queue:work --verbose --tries=3 --timeout=90
         volumes:
@@ -48,7 +39,7 @@ services:
         networks:
             - uniespacos-production
         depends_on:
-            - postgres
+            postgres
             - app
 
     postgres:
@@ -85,11 +76,10 @@ services:
         env_file:
             - stack.env
         environment:
-            # Configuração para logar no GitHub Registry (Necessário se for privado)
             - REPO_USER=${GITHUB_USER}
-            - REPO_PASS=${GITHUB_TOKEN} # Seu Token gerado no GitHub
-            - WATCHTOWER_POLL_INTERVAL=60 # Verifica a cada 60 segundos
-            - WATCHTOWER_CLEANUP=true # Remove imagens velhas para não encher o disco
+            - REPO_PASS=${GITHUB_TOKEN}
+            - WATCHTOWER_POLL_INTERVAL=60
+            - WATCHTOWER_CLEANUP=true
             - WATCHTOWER_INCLUDE_RESTARTING=true
 networks:
     uniespacos-production:
@@ -98,5 +88,3 @@ networks:
 volumes:
     postgres-data-production:
     uniespacos-storage-production:
-    uniespacos-public-assets:
-    uniespacos-public-production:

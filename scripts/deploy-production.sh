@@ -55,7 +55,7 @@ fi
 # 2. Put the application in maintenance mode using the currently running version.
 log "Enabling maintenance mode."
 export IMAGE_TAG=$IMAGE_TAG_OLD
-docker compose -f compose.prod.yml exec -T web php artisan down || true
+docker compose -f compose.prod.yml exec -T app php artisan down || true
 
 # 3. Pull the new Docker images from the registry.
 log "Pulling new Docker images for tag: $IMAGE_TAG_NEW"
@@ -71,15 +71,15 @@ sleep 15
 
 # 5. Run database migrations and application optimizations.
 log "Running database migrations..."
-docker compose -f compose.prod.yml exec -T web php artisan migrate --force
+docker compose -f compose.prod.yml exec -T app php artisan migrate --force
 
 log "Optimizing application..."
-docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
-docker compose -f compose.prod.yml exec -T web php artisan optimize
+docker compose -f compose.prod.yml exec -T app php artisan optimize:clear
+docker compose -f compose.prod.yml exec -T app php artisan optimize
 
 # 6. Bring the application back online.
 log "Disabling maintenance mode."
-docker compose -f compose.prod.yml exec -T web php artisan up
+docker compose -f compose.prod.yml exec -T app php artisan up
 
 # 7. On success, update the state file with the new version tag.
 log "Deployment successful. Updating state file to $IMAGE_TAG_NEW."

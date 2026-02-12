@@ -1,37 +1,48 @@
-# UniEspaços Project Roadmap
+# UniEspaços Roadmap
 
-This document outlines the development roadmap for the UniEspaços project, tracking completed tasks and future goals.
+This document outlines the strategic development plan for UniEspaços, organized by version milestones.
 
-## Completed Tasks
+## 🎯 v1.x: Stabilization & Pilot Consolidation
+*Focus: Turning the MVP into a robust, reliable product for the initial campus pilot.*
 
-*   **Feature: Jest Testing for Frontend**
-    *   Added Jest and React Testing Library for frontend testing.
-    *   Created a `jest.setup.js` file to mock browser features.
-    *   Established a convention for test files (`.test.tsx`).
-*   **Fix: Sidebar Component Tests**
-    *   Fixed failing tests for the sidebar component related to cookie handling and initial state.
-    *   Refactored the sidebar component to be more robust in a testing environment.
-*   **Refactor: Jest Configuration**
-    *   Resolved a `ts-jest` deprecation warning by moving the `isolatedModules` option to `tsconfig.json`.
-*   **Chore: Dependency Updates**
-    *   Updated npm dependencies.
+*   **🛡️ Stability & Quality**
+    *   [ ] **Bug Squashing Campaign:** Prioritize and fix reported bugs to ensure a smooth user experience.
+    *   [ ] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
+    *   [ ] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
 
-## Remaining Tasks
+*   **⚡ Performance**
+    *   [ ] **Database Optimization:** Review slow queries and add missing indexes (Foreign Keys, search columns).
 
-*   **Feature: Full Frontend Test Coverage**
-    *   Expand test coverage for all React components.
-*   **Feature: User Profile Page**
-    *   Implement a user profile page where users can view and edit their information.
-*   **Feature: Space Reservation Calendar**
-    *   Enhance the calendar view for space reservations with more interactive features.
-*   **Feature: Admin Dashboard**
-    *   Improve the admin dashboard with more detailed analytics and management tools.
-*   **Feature: Add Application Version Footer**
-    *   Create a footer component that displays the current application version from `package.json`.
-*   **Infrastructure: Implement CI/CD flow**
-    *   Set up and refine continuous integration and continuous deployment pipelines.
-*   **Maintenance: Bug Fixes and Stability Improvements**
-    *   Address various bugs across the application and improve overall system stability.
+*   **👥 User Experience**
+    *   [ ] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers (better tables, filters, quick actions).
+    *   [ ] **UX Refinements:** Improve the reservation flow, calendar interaction, and feedback messages.
 
 ---
-*This roadmap was last updated on February 9, 2026.*
+
+## 🚀 v2.x: Expansion & Intelligence
+*Focus: Integrating with the ecosystem and providing data-driven insights.*
+
+*   **🔌 Integration & API**
+    *   [ ] **RESTful API:** Build a secure API to expose space/reservation data to other university systems (Academic, HR).
+    *   [ ] **Calendar Sync:** Integration with Google Calendar and Outlook for personal schedule synchronization.
+
+*   **📊 Data & Analytics**
+    *   [ ] **Manager Analytics:** Dashboards showing occupancy rates, idle times, and peak usage hours.
+    *   [ ] **Data Model Refactoring:** Optimize the database schema based on v1 learnings to support scale.
+
+---
+
+## 🔭 v3.x: Innovation & Automation
+*Focus: Advanced features and intelligent resource management.*
+
+*   **🧠 Intelligent Allocation**
+    *   [ ] **Smart Distribution:** Automatically suggest or allocate spaces based on sector needs (class hours, capacity) and rules.
+
+*   **📱 Mobile Experience**
+    *   [ ] **Mobile App (PWA/Native):** Dedicated mobile interface for quick reservations and checking schedules.
+
+*   **🔮 Predictive Modeling**
+    *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize planning.
+
+---
+*Last updated: February 11, 2026*
