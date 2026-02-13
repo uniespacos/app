@@ -40,6 +40,12 @@ trap 'rollback' ERR
 
 log "Starting staging deployment..."
 
+# Ensure .env exists for variable substitution in docker-compose
+if [ -f "stack.env" ]; then
+  cp stack.env .env
+  log "Copied stack.env to .env for variable substitution."
+fi
+
 # 1. Determine the current and new versions.
 # Read the last successful version from our state file. Default to 'initial' if it doesn't exist.
 IMAGE_TAG_OLD=$(cat "$STATE_FILE" || echo "initial")
