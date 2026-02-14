@@ -129,6 +129,8 @@ jobs:
       - name: Install Node Dependencies
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -lc "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
             npm config set fetch-timeout 600000
             npm ci --verbose
           "
