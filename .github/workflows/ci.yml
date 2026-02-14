@@ -131,20 +131,6 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
             export NVM_DIR=\"\$HOME/.nvm\"
             [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-            
-            if ! command -v npm &> /dev/null; then
-                echo 'npm not found. Debugging info:'
-                echo \"User: \$(whoami)\"
-                echo \"Home: \$HOME\"
-                echo \"/etc/passwd entry for www:\"
-                grep www /etc/passwd || echo 'User www not found in passwd'
-                echo \"Contents of .bashrc:\"
-                cat \$HOME/.bashrc || echo 'No .bashrc'
-                echo \"Recursive list of HOME:\"
-                ls -R \$HOME || echo 'Cannot list HOME'
-                exit 1
-            fi
-
             npm config set fetch-timeout 600000
             npm ci --verbose
           "

@@ -66,41 +66,20 @@ RUN if [ "${UID}" -ne "0" ]; then \
     fi
 
 # Switch to the non-root user to install NVM and Node.js
-RUN if [ "${UID}" -ne "0" ]; then \
-    user_to_switch="www"; \
-    else \
-    user_to_switch="root"; \
-    fi
-USER ${user_to_switch}
-
+USER www
 
 # Install NVM (Node Version Manager) as the www user
-RUN if [ "${UID}" -ne "0" ]; then \
-        export NVM_DIR="$HOME/.nvm" && \
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
-        nvm install ${NODE_VERSION} && \
-        nvm alias default ${NODE_VERSION} && \
-        nvm use default; \
-    else \
-        export NVM_DIR="/root/.nvm" && \
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
-        nvm install ${NODE_VERSION} && \
-        nvm alias default ${NODE_VERSION} && \
-        nvm use default; \
-    fi
+RUN export NVM_DIR="$HOME/.nvm" && \
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    nvm install ${NODE_VERSION} && \
+    nvm alias default ${NODE_VERSION} && \
+    nvm use default
 
 # Ensure NVM is available for all future shells
-RUN if [ "${UID}" -ne "0" ]; then \
-        echo 'export NVM_DIR="$HOME/.nvm"' >> /home/www/.bashrc && \
-        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/www/.bashrc && \
-        echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/www/.bashrc; \
-    else \
-        echo 'export NVM_DIR="/root/.nvm"' >> /root/.bashrc && \
-        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /root/.bashrc && \
-        echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /root/.bashrc; \
-    fi
+RUN echo 'export NVM_DIR="$HOME/.nvm"' >> /home/www/.bashrc && \
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/www/.bashrc && \
+    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/www/.bashrc
 
 
 # Set the working directory
