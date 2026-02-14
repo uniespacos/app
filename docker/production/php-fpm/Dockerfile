@@ -1,23 +1,4 @@
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /var/www
-
-# Copy only necessary files for npm install to leverage Docker layer caching
-COPY package.json package-lock.json ./
-RUN npm ci
-
-# Copy the rest of the frontend-related source code
-COPY vite.config.ts .
-COPY tsconfig.json .
-COPY tailwind.config.js .
-COPY eslint.config.js .
-COPY resources/ ./resources
-
-# Build the frontend assets
-RUN npm run build
-
-# Stage 2: Build environment and Composer dependencies
+# Stage 1: Build environment and Composer dependencies
 FROM php:8.4-fpm AS builder
 
 # Install system dependencies and PHP extensions required for Laravel + MySQL/PostgreSQL support
@@ -62,7 +43,7 @@ COPY . /var/www
 RUN composer dump-autoload --optimize
 
 
-# Stage 3: Production environment
+# Stage 2: Production environment
 FROM php:8.4-fpm as production
 
 # Install only runtime libraries needed in production
@@ -108,9 +89,6 @@ RUN sed -i '/^\[www\]$/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-d
 
 # Copy the application code and dependencies from the build stage
 COPY --from=builder /var/www /var/www
-
-# Copy compiled frontend assets (manifest.json, etc.)
-COPY --from=frontend-builder /var/www/public/build /var/www/public/build
 
 # Set working directory
 WORKDIR /var/www
