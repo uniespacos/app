@@ -1,30 +1,4 @@
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS builder
-
-# Set build arguments for Vite
-ARG PUSHER_APP_KEY
-ARG PUSHER_APP_CLUSTER
-ENV VITE_PUSHER_APP_KEY=$PUSHER_APP_KEY
-ENV VITE_PUSHER_APP_CLUSTER=$PUSHER_APP_CLUSTER
-
-WORKDIR /var/www
-
-# Copy only necessary files for npm install to leverage Docker layer caching
-COPY package.json package-lock.json ./
-RUN npm ci
-
-# Copy the rest of the frontend-related source code
-COPY vite.config.ts .
-COPY tsconfig.json .
-
-COPY tailwind.config.js .
-COPY eslint.config.js .
-COPY resources/ ./resources
-
-# Build the frontend assets
-RUN npm run build
-
-# Stage 2: Production NGINX server
+# Production NGINX server
 FROM nginx:alpine
 
 # Copy the custom Nginx configuration files
@@ -34,8 +8,8 @@ COPY ./docker/production/nginx/default.ssl.conf /etc/nginx/conf.d/default.ssl.co
 # Copy the application's entrypoint
 COPY public/index.php /var/www/public/index.php
 
-# Copy the built assets from the builder stage
-COPY --from=builder /var/www/public /var/www/public
+# Copy the built assets directly from the build context (assumes npm run build ran before docker build)
+COPY public/build /var/www/public/build
 
 # Set the working directory
 WORKDIR /var/www/public
@@ -54,4 +28,3 @@ EXPOSE 443
 
 # Start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
-
