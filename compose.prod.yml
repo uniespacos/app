@@ -4,7 +4,7 @@ services:
         image: ghcr.io/${GHCR_REPO_WEB:-uniespacos/app/web}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         env_file:
-            - stack.env
+            - .env
         ports:
             - "80:80"
         volumes:
@@ -22,7 +22,7 @@ services:
         volumes:
             - uniespacos-storage-production:/var/www/storage
         env_file:
-            - stack.env
+            - .env
         networks:
             - uniespacos-production
         depends_on:
@@ -36,7 +36,7 @@ services:
         volumes:
             - uniespacos-storage-production:/var/www/storage
         env_file:
-            - stack.env
+            - .env
         networks:
             - uniespacos-production
         depends_on:
@@ -51,7 +51,7 @@ services:
         ports:
             - "${DB_PORT:-5432}:5432"
         env_file:
-            - stack.env
+            - .env
         environment:
             - PGPASSWORD=${DB_PASSWORD}
             - POSTGRES_DB=${DB_DATABASE}
@@ -75,7 +75,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         env_file:
-            - stack.env
+            - .env
         environment:
             - REPO_USER=${GITHUB_USER}
             - REPO_PASS=${GITHUB_TOKEN}

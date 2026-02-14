@@ -27,3 +27,4 @@ package-lock.json
 *.sql
 /docker/production/nginx/*.pem
 .secrets
+.act.secrets
