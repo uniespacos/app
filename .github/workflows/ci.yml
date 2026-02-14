@@ -256,7 +256,7 @@ jobs:
           STAGING_PATH="/var/www/uniespacos-staging"
           # Securely copy the configuration files
           scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
-          scp ./stack.env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/stack.env
+          scp ./.env.staging ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/.env
           
           # Create nginx config directory and copy default.conf
           ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
