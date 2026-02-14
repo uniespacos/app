@@ -40,6 +40,11 @@ WORKDIR /var/www/public
 # Ensure the nginx user owns the web root files
 RUN chown -R nginx:nginx /var/www/public
 
+# Create the storage symlink so Nginx can serve user uploads
+# We create the parent directory structure to ensure the link can be created
+RUN mkdir -p /var/www/storage/app/public && \
+    ln -s /var/www/storage/app/public /var/www/public/storage
+
 # Expose HTTP and HTTPS ports
 EXPOSE 80
 EXPOSE 443

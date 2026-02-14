@@ -302,7 +302,6 @@ class DatabaseSeeder extends Seeder
         echo "Criando usuários...\n";
         $users = User::factory()->count(10)->create([
             'password' => Hash::make('123123123'), // Senha padrão para todos os usuários
-            'setor_id' => Setor::pluck('id')->random(),
         ]);
 
         // Ao criar o Espaco, o EspacoFactory cria as Agendas,

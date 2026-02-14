@@ -52,14 +52,18 @@ RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
     fi
 
 # If the group already exists, use it; otherwise, create the 'www' group
-RUN if getent group ${GID}; then \
-    useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
+RUN if [ "${UID}" -ne "0" ]; then \
+        if getent group ${GID}; then \
+            useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
+        else \
+            groupadd -g ${GID} www && \
+            useradd -m -u ${UID} -g www -s /bin/bash www; \
+        fi && \
+        usermod -aG sudo www && \
+        echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
     else \
-    groupadd -g ${GID} www && \
-    useradd -m -u ${UID} -g www -s /bin/bash www; \
-    fi && \
-    usermod -aG sudo www && \
-    echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+        apt-get update && apt-get install -y sudo; \
+    fi
 
 # Switch to the non-root user to install NVM and Node.js
 USER www
@@ -67,7 +71,7 @@ USER www
 # Install NVM (Node Version Manager) as the www user
 RUN export NVM_DIR="$HOME/.nvm" && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
     nvm install ${NODE_VERSION} && \
     nvm alias default ${NODE_VERSION} && \
     nvm use default
@@ -76,6 +80,7 @@ RUN export NVM_DIR="$HOME/.nvm" && \
 RUN echo 'export NVM_DIR="$HOME/.nvm"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/www/.bashrc
+
 
 # Set the working directory
 WORKDIR /var/www

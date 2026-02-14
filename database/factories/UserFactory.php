@@ -24,6 +24,11 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        // Garante que existe pelo menos um setor antes de tentar buscar um ID aleatório.
+        if (Setor::count() === 0) {
+            Setor::factory()->create();
+        }
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
@@ -31,8 +36,8 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'telefone' => fake()->phoneNumber(),
             'profile_pic' => '[https://placehold.co/400x400/000000/FFFFFF?text=](https://placehold.co/400x400/000000/FFFFFF?text=)'.fake()->lexify('??'),
-            'permission_type_id' => 3, // Seleciona um tipo de permissão aleatório
-            'setor_id' => null, // Por padrão, o usuário não tem setor.
+            'permission_type_id' => 3, // Default permission
+            'setor_id' => Setor::pluck('id')->random(), // Assign a random setor
             'remember_token' => Str::random(10),
         ];
     }

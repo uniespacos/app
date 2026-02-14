@@ -36,7 +36,7 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm ci
+          npm ci --no-optional
 
       - name: Run Pint (PHP Code Style)
         run: vendor/bin/pint --test
@@ -48,6 +48,7 @@ jobs:
     name: 🧪 Run Tests
     needs: lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -99,7 +100,7 @@ jobs:
             exit 1
           fi
 
-      - name: Run Setup & Tests
+      - name: Setup Environment
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
             export NVM_DIR=\"\$HOME/.nvm\"
@@ -118,20 +119,35 @@ jobs:
             echo 'Creating dummy Vite manifest...'
             mkdir -p public/build/assets
             touch public/build/assets/app.js
-            echo '{"resources/js/app.tsx": {"file": "assets/app.js", "src": "resources/js/app.tsx", "isEntry": true}}' > public/build/manifest.json
-            
-            echo 'Running migrations and seeding...'
-            php artisan migrate --seed --force
-
-            echo 'Installing Node dependencies...'
-            npm ci
-
-            echo 'Running frontend tests...'
-            npm test
-            
-            echo 'Running backend tests...'
-            php artisan test
+            echo '{\"resources/js/app.tsx\": {\"file\": \"assets/app.js\", \"src\": \"resources/js/app.tsx\", \"isEntry\": true}}' > public/build/manifest.json
           "
+
+      - name: Run Migrations
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
+
+      - name: Install Node Dependencies
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm config set fetch-timeout 600000
+            npm ci --verbose
+          "
+
+      - name: Run Frontend Tests
+        env:
+            NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm test
+           "
+
+      - name: Run Backend Tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
 
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
@@ -238,6 +254,14 @@ jobs:
       - name: Deploy to Staging via SSH
         run: |
           STAGING_PATH="/var/www/uniespacos-staging"
+          # Securely copy the configuration files
+          scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
+          scp ./stack.env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/stack.env
+          
+          # Create nginx config directory and copy default.conf
+          ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
+          scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/docker/production/nginx/default.conf
+
           # Securely copy the new deployment script to the server
           scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
           
@@ -252,55 +276,4 @@ jobs:
 
             # Run the deployment script, passing the branch name as the image tag
             ./deploy.sh development
-          "
-
-  deploy_production:
-    name: 🚀 Deploy to Production
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment:
-      name: "production"
-    env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install cloudflared
-        run: |
-          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared.deb
-
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo "Host ${{ secrets.SSH_HOST }}
-            User ${{ secrets.SSH_USER }}
-            IdentityFile ~/.ssh/id_ed25519
-            ProxyCommand cloudflared access ssh --hostname %h
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null" > ~/.ssh/config
-          chmod 600 ~/.ssh/config
-
-      - name: Deploy to Production via SSH
-        run: |
-          PRODUCTION_PATH="/var/www/uniespacos-production"
-          # Securely copy the new deployment script to the server
-          scp ./scripts/deploy-production.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${PRODUCTION_PATH}/deploy.sh
-          
-          # Execute the script on the remote server
-          ssh ${{ secrets.SSH_HOST }} "
-            set -e
-            cd ${PRODUCTION_PATH}
-            chmod +x deploy.sh
-            
-            # Log into GHCR on the remote server to pull images
-            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
-
-            # Run the deployment script, passing 'main' as the image tag
-            ./deploy.sh main
           "
