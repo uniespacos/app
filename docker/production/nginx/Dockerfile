@@ -31,6 +31,9 @@ FROM nginx:alpine
 COPY ./docker/production/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY ./docker/production/nginx/default.ssl.conf /etc/nginx/conf.d/default.ssl.conf
 
+# Copy the application's entrypoint
+COPY public/index.php /var/www/public/index.php
+
 # Copy the built assets from the builder stage
 COPY --from=builder /var/www/public /var/www/public
 
@@ -51,3 +54,4 @@ EXPOSE 443
 
 # Start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
+
