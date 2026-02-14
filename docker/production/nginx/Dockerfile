@@ -16,7 +16,7 @@ RUN npm ci
 # Copy the rest of the frontend-related source code
 COPY vite.config.ts .
 COPY tsconfig.json .
-COPY postcss.config.js .
+
 COPY tailwind.config.js .
 COPY eslint.config.js .
 COPY resources/ ./resources
