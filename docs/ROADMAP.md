@@ -7,14 +7,14 @@ This document outlines the strategic development plan for UniEspaços, organized
 
 *   **🛡️ Stability & Quality**
     *   [ ] **Bug Squashing Campaign:** Prioritize and fix reported bugs to ensure a smooth user experience.
-    *   [ ] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
-    *   [ ] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
+    *   [/] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
+    *   [x] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
 
 *   **⚡ Performance**
-    *   [ ] **Database Optimization:** Review slow queries and add missing indexes (Foreign Keys, search columns).
+    *   [x] **Database Optimization:** Review slow queries and add missing indexes (Foreign Keys, search columns).
 
 *   **👥 User Experience**
-    *   [ ] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers (better tables, filters, quick actions).
+    *   [/] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers (better tables, filters, quick actions).
     *   [ ] **UX Refinements:** Improve the reservation flow, calendar interaction, and feedback messages.
 
 ---
@@ -27,7 +27,7 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Calendar Sync:** Integration with Google Calendar and Outlook for personal schedule synchronization.
 
 *   **📊 Data & Analytics**
-    *   [ ] **Manager Analytics:** Dashboards showing occupancy rates, idle times, and peak usage hours.
+    *   [/] **Manager Analytics:** Dashboards showing occupancy rates, idle times, and peak usage hours.
     *   [ ] **Data Model Refactoring:** Optimize the database schema based on v1 learnings to support scale.
 
 ---
@@ -45,4 +45,4 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize planning.
 
 ---
-*Last updated: February 11, 2026*
+*Last updated: February 16, 2026*
