@@ -6,5 +6,13 @@ declare global {
     interface Window {
         Pusher: typeof Pusher;
         Echo: Echo;
+        Uniespacos: {
+            reverb: {
+                app_key: string;
+                host: string;
+                port: string;
+                scheme: string;
+            };
+        };
     }
 }
