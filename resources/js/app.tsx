@@ -11,11 +11,11 @@ window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globa
 
 window.Echo = new Echo({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY as string,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: 443,
-    wssPort: 443,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    key: window.Uniespacos.reverb.app_key,
+    wsHost: window.Uniespacos.reverb.host,
+    wsPort: Number(window.Uniespacos.reverb.port) ?? 80,
+    wssPort: Number(window.Uniespacos.reverb.port) ?? 443,
+    forceTLS: (window.Uniespacos.reverb.scheme ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
 

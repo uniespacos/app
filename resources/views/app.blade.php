@@ -39,6 +39,16 @@
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead
+        <script>
+            window.Uniespacos = {
+                reverb: {
+                    app_key: '{{ config('broadcasting.connections.reverb.key') }}',
+                    host: '{{ config('broadcasting.connections.reverb.options.host') }}',
+                    port: '{{ config('broadcasting.connections.reverb.options.port') }}',
+                    scheme: '{{ config('broadcasting.connections.reverb.options.scheme') }}',
+                }
+            };
+        </script>
     </head>
     <body class="font-sans antialiased">
         @inertia
