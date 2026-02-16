@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bcmath \
     soap \
     && pecl install redis \
-    && docker-php-ext-enable redis \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-enable redis pcntl \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Use ARG to define environment variables passed from the Docker build command or Docker Compose.
