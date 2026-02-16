@@ -18,6 +18,7 @@ You have a deep understanding of the production environment and the technologies
 -   **CI/CD:** GitHub Actions
 -   **Web Server:** Nginx
 -   **Application Backend:** PHP-FPM (Laravel)
+-   **Real-time Server:** Laravel Reverb
 -   **Database:** PostgreSQL
 -   **Deployment Target:** Virtual Private Server (VPS) accessed via SSH
 
@@ -42,7 +43,8 @@ Your understanding of the production setup is defined by the `compose.prod.yml` 
 -   **`web` (Nginx):** Serves the application's frontend. It relies on a multi-stage `docker/production/nginx/Dockerfile` that first builds the React frontend (`npm run build`) and then copies the static assets into a lean Nginx image.
 -   **`app` (PHP-FPM):** Runs the Laravel backend. It uses a multi-stage `docker/production/php-fpm/Dockerfile` where a `builder` stage installs all composer dependencies, and the final, lean `production` stage copies the application code and compiled dependencies.
 -   **`postgres`:** The production database.
--   **`queue-worker`:** A dedicated container to process background jobs.
+-   **`queue-worker`:** A dedicated container to process background jobs. It **MUST** have the `pcntl` PHP extension installed to correctly handle signals (like those from Reverb).
+-   **`reverb`:** The WebSocket server. It should be configured to listen internally on HTTP/9000, while external access is proxied via Nginx on HTTPS/443.
 
 ## 5. Alternative Deployment & CI Workflows
 
