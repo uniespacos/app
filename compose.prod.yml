@@ -47,6 +47,21 @@ services:
             - postgres
             - app
 
+    reverb:
+        container_name: reverb-production
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
+        restart: unless-stopped
+        command: php artisan reverb:start --host=0.0.0.0 --port=9000
+        ports:
+            - "9000:9000"
+        env_file:
+            - .env
+        networks:
+            - uniespacos-production
+        depends_on:
+            - postgres
+            - app
+
     postgres:
         container_name: postgres-production
         image: postgres:16
