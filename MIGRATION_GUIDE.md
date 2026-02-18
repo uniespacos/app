@@ -23,38 +23,24 @@ Your `.env.prod` file has been updated with new keys. You **MUST** review and up
 
 The project has switched to a Docker Image-based deployment (pulling from GitHub Container Registry).
 
-### Option A: Use Pre-built Images (Standard)
-If you have set up CI/CD to push images to GHCR:
-1. Ensure `compose.prod.yml` references the correct image tags.
-2. Run:
-   ```bash
-   docker compose -f compose.prod.yml pull
-   docker compose -f compose.prod.yml up -d
-   ```
+### Simplified Deployment (Recommended)
 
-### Option B: Build Locally (Manual Migration)
-If you do not have images on GHCR, use the newly created `compose.prod.build.yml` to build locally on the server.
+To deploy a new version of the application, use the `deploy.sh` script. This script will handle database backups, pull the new images, and restart the application.
 
-1. **Build Frontend Assets:**
-   ```bash
-   npm ci
-   npm run build
-   ```
+1.  **Run the Deployment Script:**
+    ```bash
+    ./scripts/deploy.sh <image-tag>
+    ```
+    Replace `<image-tag>` with the specific version you want to deploy (e.g., `sha-20384df`).
 
-2. **Build and Start Containers:**
-   ```bash
-   docker compose -f compose.prod.build.yml up -d --build
-   ```
+### Rollback
 
-3. **Run Migrations:**
-   ```bash
-   docker compose -f compose.prod.build.yml exec app php artisan migrate --force
-   ```
+If you need to revert to the previous version, use the `rollback.sh` script. This will restore the previous Docker images and the database.
 
-4. **Optimize:**
-   ```bash
-   docker compose -f compose.prod.build.yml exec app php artisan optimize
-   ```
+1.  **Run the Rollback Script:**
+    ```bash
+    ./scripts/rollback.sh
+    ```
 
 ## 3. Troubleshooting
 - If Nginx fails to start, check `SSL_CERT_PATH` in `.env.prod`.
