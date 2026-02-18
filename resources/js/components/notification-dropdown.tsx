@@ -1,6 +1,6 @@
 import { User } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Bell, MailCheck } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
+import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
@@ -123,6 +123,8 @@ export function NotificationDropdown() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
+                {/*
+                // TODO: Implementar paginação/infinite scroll se necessário no futuro 
                 <div className="flex items-center justify-between p-4">
                     <h4 className="text-lg font-semibold">Notificações</h4>
                     {unreadCount > 0 && (
@@ -137,6 +139,7 @@ export function NotificationDropdown() {
                         </Button>
                     )}
                 </div>
+                */}
                 <Separator />
                 <ScrollArea className="h-[300px]">
                     <div className="p-4">
@@ -168,9 +171,15 @@ export function NotificationDropdown() {
                 </ScrollArea>
                 <Separator />
                 <div className="p-4 text-center">
-                    <a href={route('notifications.index')} className="text-primary text-sm hover:underline">
-                        Ver todas as notificações
-                    </a>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={markAllAsRead}
+                        disabled={isLoading || unreadCount === 0}
+                        className="text-muted-foreground hover:text-primary"
+                    >
+                        Marcar como lidos todas as notificações
+                    </Button>
                 </div>
             </PopoverContent>
         </Popover>

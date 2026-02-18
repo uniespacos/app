@@ -9,6 +9,7 @@ UniEspaços is a full-stack web application designed for managing space reservat
 - **Backend:** A robust API built with **Laravel (PHP 12.x)**.
 - **Frontend:** A modern, single-page application (SPA) using **React (v18)** and **Inertia.js**.
 - **Database:** **PostgreSQL (v16)** is the primary data store.
+- **Real-time:** **Laravel Reverb** handles WebSockets for real-time notifications.
 - **Development Environment:** The entire stack is containerized using **Docker** and orchestrated with **Docker Compose**.
 - **Frontend Tooling:** **Vite** is used for fast frontend development and bundling, with **Tailwind CSS** for styling.
 - **CI/CD:** The project uses **GitHub Actions** for automated linting, testing, and deployment.
@@ -67,6 +68,8 @@ The project is designed to run within a Dockerized environment.
     php artisan storage:link
     php artisan migrate --seed
     ```
+    
+    *Note: Ensure `REVERB_APP_ID`, `REVERB_APP_KEY`, and `REVERB_APP_SECRET` are set in `.env` for real-time features.*
 
 7. **Run the Dev Server:** Start the Vite development server for hot-reloading.
 
@@ -75,7 +78,7 @@ The project is designed to run within a Dockerized environment.
     npm run dev
     ```
 
-The application should now be accessible at `http://localhost`. The Adminer database interface is at `http://localhost:8080`.
+The application should now be accessible at `https://localhost` (via Nginx proxy). The Adminer database interface is at `http://localhost:9080`.
 
 ## Key Commands
 
@@ -87,6 +90,22 @@ All commands below are intended to be run from the host machine unless specified
 - **Run Artisan Commands:** `docker compose -f compose.dev.yml exec workspace php artisan <command>`
 - **Run Composer:** `docker compose -f compose.dev.yml exec workspace composer <command>`
 - **Run NPM/Vite:** `docker compose -f compose.dev.yml exec workspace npm <command>`
+- **Check Queue Logs:** `docker compose -f compose.dev.yml logs -f queue-worker`
+
+## Real-time Configuration (Laravel Reverb)
+
+The project uses Laravel Reverb for WebSockets. The configuration decouples internal Docker communication from external browser access:
+
+*   **Internal (Backend -> Reverb):** Uses **HTTP** on port **9000**.
+    *   `REVERB_HOST="reverb"`
+    *   `REVERB_PORT=9000`
+    *   `REVERB_SCHEME=http`
+*   **External (Browser -> Nginx -> Reverb):** Uses **HTTPS** (WSS) on port **443**.
+    *   `VITE_REVERB_HOST="localhost"`
+    *   `VITE_REVERB_PORT=443`
+    *   `VITE_REVERB_SCHEME=https`
+
+**Note:** The `queue-worker` container must have the `pcntl` PHP extension installed to handle Reverb signals correctly.
 
 ## Development Conventions
 

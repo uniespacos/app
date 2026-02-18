@@ -10,10 +10,13 @@ import { initializeTheme } from './hooks/use-appearance';
 window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globalmente
 
 window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY as string,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER as string,
-    forceTLS: true,
+    broadcaster: 'reverb',
+    key: window.Uniespacos.reverb.app_key,
+    wsHost: window.Uniespacos.reverb.host,
+    wsPort: Number(window.Uniespacos.reverb.port),
+    wssPort: Number(window.Uniespacos.reverb.port),
+    forceTLS: (window.Uniespacos.reverb.scheme ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
 });
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

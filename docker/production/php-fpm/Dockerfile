@@ -1,4 +1,23 @@
-# Stage 1: Build environment and Composer dependencies
+# Stage 1: Build frontend assets
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /var/www
+
+# Copy only necessary files for npm install to leverage Docker layer caching
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy the rest of the frontend-related source code
+COPY vite.config.ts .
+COPY tsconfig.json .
+COPY tailwind.config.js .
+COPY eslint.config.js .
+COPY resources/ ./resources
+
+# Build the frontend assets
+RUN npm run build
+
+# Stage 2: Build environment and Composer dependencies
 FROM php:8.4-fpm AS builder
 
 # Install system dependencies and PHP extensions required for Laravel + MySQL/PostgreSQL support
@@ -22,6 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     bcmath \
     soap \
+    pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -43,7 +63,7 @@ COPY . /var/www
 RUN composer dump-autoload --optimize
 
 
-# Stage 2: Production environment
+# Stage 3: Production environment
 FROM php:8.4-fpm as production
 
 # Install only runtime libraries needed in production
@@ -55,12 +75,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfcgi-bin \
     procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Adiciona o repositório do Node.js (estamos usando a versão 22.x LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-
-# Instala o Node.js, npm e outras dependências
-RUN apt-get install -y nodejs
 
 # Download and install php-fpm health check script
 RUN curl -o /usr/local/bin/php-fpm-healthcheck \
@@ -88,13 +102,11 @@ COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
 # -----------------------------------------------------------
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Enable PHP-FPM status page by modifying zz-docker.conf with sed
-RUN sed -i '/\[www\]/a pm.status_path = /status' /usr/local/etc/php-fpm.d/zz-docker.conf
-# Update the variables_order to include E (for ENV)
-#RUN sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' "$PHP_INI_DIR/php.ini"
-
 # Copy the application code and dependencies from the build stage
 COPY --from=builder /var/www /var/www
+
+# Copy compiled frontend assets (manifest.json, etc.)
+COPY --from=frontend-builder /var/www/public/build /var/www/public/build
 
 # Set working directory
 WORKDIR /var/www

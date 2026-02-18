@@ -1,37 +1,30 @@
-# Stage 1: Build assets
-FROM debian AS builder
-
-ARG PUSHER_APP_KEY
-ARG PUSHER_APP_CLUSTER
-ENV VITE_PUSHER_APP_KEY=$PUSHER_APP_KEY
-ENV VITE_PUSHER_APP_CLUSTER=$PUSHER_APP_CLUSTER
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    nodejs \
-    npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-WORKDIR /var/www
-# Copy package.json and package-lock.json first to leverage Docker layer caching
-COPY package.json package-lock.json ./
-RUN npm install
-# Copy the rest of the application code
-COPY . /var/www
-RUN npm run build
-
-# Stage 2: NGINX with HTTPS support
+# Production NGINX server
 FROM nginx:alpine
 
-# Substitui a configuração padrão do NGINX com o nosso default.conf
+# Copy the custom Nginx configuration files
 COPY ./docker/production/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY ./docker/production/nginx/default.ssl.conf /etc/nginx/conf.d/default.ssl.conf
 
-# Copia os assets gerados no builder
-COPY --from=builder /var/www/public /var/www/public
+# Copy the application's entrypoint
+COPY public/index.php /var/www/public/index.php
 
+# Copy the built assets directly from the build context (assumes npm run build ran before docker build)
+COPY public/build /var/www/public/build
+
+# Set the working directory
 WORKDIR /var/www/public
 
+# Ensure the nginx user owns the web root files
+RUN chown -R nginx:nginx /var/www/public
+
+# Create the storage symlink so Nginx can serve user uploads
+# We create the parent directory structure to ensure the link can be created
+RUN mkdir -p /var/www/storage/app/public && \
+    ln -s /var/www/storage/app/public /var/www/public/storage
+
+# Expose HTTP and HTTPS ports
 EXPOSE 80
 EXPOSE 443
+
+# Start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]

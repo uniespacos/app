@@ -5,6 +5,7 @@ on:
     branches:
       - "main"
       - "development"
+      - "deploy_development_production"
   pull_request:
     branches:
       - development
@@ -36,7 +37,7 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm ci
+          npm ci --no-optional
 
       - name: Run Pint (PHP Code Style)
         run: vendor/bin/pint --test
@@ -48,6 +49,7 @@ jobs:
     name: 🧪 Run Tests
     needs: lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -99,7 +101,7 @@ jobs:
             exit 1
           fi
 
-      - name: Run Setup & Tests
+      - name: Setup Environment
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
             export NVM_DIR=\"\$HOME/.nvm\"
@@ -118,20 +120,35 @@ jobs:
             echo 'Creating dummy Vite manifest...'
             mkdir -p public/build/assets
             touch public/build/assets/app.js
-            echo '{"resources/js/app.tsx": {"file": "assets/app.js", "src": "resources/js/app.tsx", "isEntry": true}}' > public/build/manifest.json
-            
-            echo 'Running migrations and seeding...'
-            php artisan migrate --seed --force
-
-            echo 'Installing Node dependencies...'
-            npm ci
-
-            echo 'Running frontend tests...'
-            npm test
-            
-            echo 'Running backend tests...'
-            php artisan test
+            echo '{\"resources/js/app.tsx\": {\"file\": \"assets/app.js\", \"src\": \"resources/js/app.tsx\", \"isEntry\": true}}' > public/build/manifest.json
           "
+
+      - name: Run Migrations
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
+
+      - name: Install Node Dependencies
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm config set fetch-timeout 600000
+            npm ci --verbose
+          "
+
+      - name: Run Frontend Tests
+        env:
+            NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm test
+           "
+
+      - name: Run Backend Tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
 
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
@@ -154,7 +171,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate Docker meta for app image
@@ -214,6 +231,9 @@ jobs:
       CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install cloudflared
         run: |
           curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
@@ -224,78 +244,37 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          
-          # Configure SSH to use cloudflared as a proxy
-          # We don't specify a port here because the Cloudflare Tunnel handles the mapping to the destination port (54222) on the server side.
-          # cloudflared will pick up CF_ID and CF_SECRET from the environment
           echo "Host ${{ secrets.SSH_HOST }}
             User ${{ secrets.SSH_USER }}
             IdentityFile ~/.ssh/id_ed25519
             ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null" > ~/.ssh/config
-            
           chmod 600 ~/.ssh/config
 
-      - name: Deploy to Staging
+      - name: Deploy to Staging via SSH
         run: |
-          ssh -vvv ${{ secrets.SSH_HOST }} 'bash -s' << 'EOF'
+          STAGING_PATH="/var/www/uniespacos-staging"
+          # Securely copy the configuration files
+          scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
+          scp ./.env.staging ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/.env
+          
+          # Create nginx config directory and copy default.conf
+          ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
+          scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/docker/production/nginx/default.conf
+
+          # Securely copy the new deployment script to the server
+          scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
+          
+          # Execute the script on the remote server
+          ssh ${{ secrets.SSH_HOST }} "
             set -e
-            echo "📍 Starting Deploy to Staging..."
-            cd /var/www/uniespacos-staging
+            cd ${STAGING_PATH}
+            chmod +x deploy.sh
+            
+            # Log into GHCR on the remote server to pull images
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            echo "🗄️ Performing database backup..."
-            mkdir -p backups
-            BACKUP_FILE="backups/backup_$(date +%Y-%m-%d_%H-%M-%S).sql"
-            docker compose -f compose.prod.yml exec -T postgres pg_dump -U uniespacos uniespacos > $BACKUP_FILE
-            echo "✅ Database backup successful: $BACKUP_FILE"
-
-            echo "🔒 Maintenance Mode ON"
-            docker compose -f compose.prod.yml exec -T web php artisan down || true
-
-            echo "📥 Pulling latest code from development branch"
-            git pull origin development
-
-            echo "DOCKER_USER=${{ github.actor }}" > .env.gh
-            echo "DOCKER_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env.gh
-
-            echo "🔐 Logging into GHCR"
-            cat .env.gh | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            echo "🐳 Pulling latest images"
-            IMAGE_TAG=development docker compose -f compose.prod.yml pull
-
-            echo "🚀 Launching new containers"
-            IMAGE_TAG=development docker compose -f compose.prod.yml up -d --remove-orphans
-
-            echo "⏳ Waiting for services..."
-            sleep 15
-
-            echo "🔄 Running Migrations"
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan migrate --force
-
-            echo "🧹 Optimizing Application"
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan optimize:clear
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan optimize
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan view:cache
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan config:cache
-
-            echo "🔄 Restarting Queue Worker"
-            IMAGE_TAG=development docker compose -f compose.prod.yml restart queue-worker
-
-            echo "✅ Maintenance Mode OFF"
-            IMAGE_TAG=development docker compose -f compose.prod.yml exec -T web php artisan up
-
-            echo "🎉 Deploy to Staging finished successfully!"
-          EOF
-
-  deploy_portainer:
-    name: 🚀 Deploy to Production (Portainer)
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment:
-      name: "production"
-    steps:
-      - name: Trigger Portainer Webhook
-        run: curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+            # Run the deployment script, passing the branch name as the image tag
+            ./deploy.sh development
+          "

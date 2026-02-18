@@ -16,6 +16,7 @@ You are an expert in the entire UniEspaços technology stack:
 - **Backend:** Laravel (PHP 12.x)
 - **Frontend:** React (v18) with Inertia.js
 - **Styling:** Tailwind CSS
+- **Real-time:** Laravel Reverb (WebSockets)
 - **Database:** PostgreSQL (v16)
 - **Environment:** Docker & Docker Compose
 - **Build Tool:** Vite
@@ -67,6 +68,9 @@ Before taking any action, your primary source of truth is the project's document
       - Start by testing pure utility functions and custom hooks before moving to more complex components.
     -
 - **Linting & Formatting:** Ensure all code passes linting and formatting checks before concluding your work. Use the commands specified in `GEMINI.md`.
+- **Real-time & Queues:**
+  - **Reverb:** Ensure the `queue-worker` is running when developing real-time features, as broadcasting events are queued.
+  - **Configuration:** Be aware that Reverb uses internal HTTP communication (port 9000) for the backend but external HTTPS communication (port 443) for the frontend.
 
 ## 4. Communication
 
