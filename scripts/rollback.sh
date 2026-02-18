@@ -23,7 +23,7 @@ IMAGE_TAG=$PREVIOUS_TAG docker compose -f compose.prod.yml up -d
 # 4. Restaura o banco de dados
 echo "Restoring database from latest backup..."
 LATEST_BACKUP=$(ls -t $BACKUP_DIR/backup_*.sql | head -n 1)
-docker compose -f compose.prod.yml exec -T postgres psql -U "${DB_USERNAME}" -d "${DB_DATABASE}" < $LATEST_BACKUP
+docker compose exec -T postgres-production psql -U "${DB_USERNAME}" -d "${DB_DATABASE}" < $LATEST_BACKUP
 
 # 5. Atualiza o arquivo de versões
 CURRENT_TAG=$(grep "CURRENT_TAG" $VERSION_FILE | cut -d'=' -f2)
