@@ -42,10 +42,10 @@
         <script>
             window.Uniespacos = {
                 reverb: {
-                    app_key: '{{ config('broadcasting.connections.reverb.key') }}',
-                    host: '{{ config('broadcasting.connections.reverb.options.host') }}',
-                    port: '{{ config('broadcasting.connections.reverb.options.port') }}',
-                    scheme: '{{ config('broadcasting.connections.reverb.options.scheme') }}',
+                    app_key: '{{ env('VITE_REVERB_APP_KEY') }}',
+                    host: '{{ env('VITE_REVERB_HOST') }}',
+                    port: '{{ env('VITE_REVERB_PORT') }}',
+                    scheme: '{{ env('VITE_REVERB_SCHEME') }}',
                 }
             };
         </script>
