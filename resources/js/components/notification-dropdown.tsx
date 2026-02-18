@@ -1,6 +1,6 @@
 import { User } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Bell, MailCheck } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
+import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
