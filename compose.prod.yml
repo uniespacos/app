@@ -7,12 +7,15 @@ services:
             - .env
         ports:
             - "80:80"
+            - "443:443"
         volumes:
             - uniespacos-storage-production:/var/www/storage:ro
             - uniespacos-public-assets-v2:/var/www/public/build:ro
             - uniespacos-public-production-v2:/var/www/public:ro
             - ./docker/production/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-            - /dev/null:/etc/nginx/conf.d/default.ssl.conf:ro
+            - ./docker/production/nginx/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf:ro
+            - ./docker/production/nginx/uesb2025fullchain.pem:/etc/nginx/certs/uesb2025fullchain.pem:ro
+            - ./docker/production/nginx/uesb2025privkey.pem:/etc/nginx/certs/uesb2025privkey.pem:ro
         networks:
             - uniespacos-production
         depends_on:
