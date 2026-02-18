@@ -68,6 +68,7 @@ RUN if [ "${UID}" -ne "0" ]; then \
 
 # Switch to the non-root user to install NVM and Node.js
 USER www
+ENV HOME=/home/www
 
 # Install NVM (Node Version Manager) as the www user
 RUN export NVM_DIR="$HOME/.nvm" && \

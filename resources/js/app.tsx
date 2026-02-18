@@ -13,8 +13,8 @@ window.Echo = new Echo({
     broadcaster: 'reverb',
     key: window.Uniespacos.reverb.app_key,
     wsHost: window.Uniespacos.reverb.host,
-    wsPort: Number(window.Uniespacos.reverb.port) ?? 80,
-    wssPort: Number(window.Uniespacos.reverb.port) ?? 443,
+    wsPort: Number(window.Uniespacos.reverb.port),
+    wssPort: Number(window.Uniespacos.reverb.port),
     forceTLS: (window.Uniespacos.reverb.scheme ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
