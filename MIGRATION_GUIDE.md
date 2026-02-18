@@ -1,47 +1,58 @@
-# Manual Migration Guide to Latest Development
+# Automated Deployment Guide
 
-You have successfully merged the latest changes from `development` into the `deploy_development_production` branch.
+The project is configured for automated deployments to both staging and production environments via GitHub Actions.
 
-## 1. Environment Configuration (.env.prod)
+## Environments
 
-Your `.env.prod` file has been updated with new keys. You **MUST** review and update the following values:
+-   **Staging:** Deployed automatically when code is pushed to the `development` branch.
+-   **Production:** Deployed automatically when code is pushed to the `main` branch.
 
-- **Reverb Configuration (Replaces Pusher):**
-  - `REVERB_APP_ID`, `REVERB_APP_KEY`, `REVERB_APP_SECRET`: Generate new credentials or set arbitrary values if running locally.
-  - `BROADCAST_CONNECTION=reverb`
-  - `BROADCAST_DRIVER=reverb`
+## Deployment Process
 
-- **GitHub/Watchtower (Optional):**
-  - `GITHUB_USER`, `GITHUB_TOKEN`: Required if you use `watchtower` to auto-update images from GHCR.
+The CI/CD pipeline, defined in `.github/workflows/ci.yml`, handles all the steps:
 
-- **Web Server:**
-  - `WEB_PORT`: Default 80.
-  - `WEB_PORT_SSL`: Default 443.
-  - `SSL_CERT_PATH`, `SSL_KEY_PATH`: Path to your SSL certificates on the host machine.
+1.  **Lint & Test:** The code is first linted and tested.
+2.  **Build & Push:** Docker images for the application and web server are built and pushed to the GitHub Container Registry (GHCR).
+3.  **Deploy:** The appropriate deployment job (staging or production) is triggered. It connects to the server via SSH and executes the corresponding deployment script (`deploy-staging.sh` or `deploy-production.sh`).
 
-## 2. Deployment Method
+The deployment script (`deploy.sh` on the server, which is a copy of the script from the repo) handles the following:
 
-The project has switched to a Docker Image-based deployment (pulling from GitHub Container Registry).
+-   Backing up the database.
+-   Pulling the new Docker images from GHCR.
+-   Restarting the application containers with the new images.
+-   Running database migrations.
 
-### Simplified Deployment (Recommended)
+## Rollback
 
-To deploy a new version of the application, use the `deploy.sh` script. This script will handle database backups, pull the new images, and restart the application.
+A manual rollback can be performed by SSH'ing into the server and running the `rollback.sh` script. This will revert to the previous Docker images and restore the database from the backup.
 
-1.  **Run the Deployment Script:**
+1.  **SSH into the server:**
     ```bash
-    ./scripts/deploy.sh <image-tag>
+    ssh <user>@<host>
     ```
-    Replace `<image-tag>` with the specific version you want to deploy (e.g., `sha-20384df`).
-
-### Rollback
-
-If you need to revert to the previous version, use the `rollback.sh` script. This will restore the previous Docker images and the database.
-
-1.  **Run the Rollback Script:**
+2.  **Navigate to the app directory:**
+    ```bash
+    cd /home/operador/app
+    ```
+3.  **Run the Rollback Script:**
     ```bash
     ./scripts/rollback.sh
     ```
 
-## 3. Troubleshooting
-- If Nginx fails to start, check `SSL_CERT_PATH` in `.env.prod`.
-- If Reverb fails, ensure port `9000` is open and keys are set.
+## Required GitHub Secrets
+
+For the automated deployment to work, the following secrets must be configured in the GitHub repository settings under `Settings > Secrets and variables > Actions`:
+
+### Staging Environment Secrets
+-   `CF_ACCESS_CLIENT_ID`
+-   `CF_ACCESS_CLIENT_SECRET`
+-   `SSH_HOST`
+-   `SSH_USER`
+-   `SSH_PRIVATE_KEY`
+
+### Production Environment Secrets
+-   `CF_ACCESS_CLIENT_ID_PRODUCTION`
+-   `CF_ACCESS_CLIENT_SECRET_PRODUCTION`
+-   `SSH_HOST_PRODUCTION`
+-   `SSH_USER_PRODUCTION`
+-   `SSH_PRIVATE_KEY_PRODUCTION`
