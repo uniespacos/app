@@ -12,7 +12,7 @@ VERSION_FILE="docker/production/versions.txt"
 
 # 1. Faz o backup do banco de dados
 echo "Creating database backup..."
-docker compose -f compose.prod.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "storage/backups/backup_$(date +%F_%H-%M-%S).sql"
+docker compose -f compose.prod.yml exec -T postgres_production pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "storage/backups/backup_$(date +%F_%H-%M-%S).sql"
 
 # 2. Salva a tag da imagem atual para o rollback
 CURRENT_TAG=$(grep "CURRENT_TAG" $VERSION_FILE | cut -d'=' -f2)
@@ -29,6 +29,6 @@ IMAGE_TAG=$NEW_TAG docker compose -f compose.prod.yml up -d
 
 # 5. Roda as migrations
 echo "Running database migrations..."
-docker compose -f compose.prod.yml exec -T app php artisan migrate --force
+docker compose -f compose.prod.yml exec -T app_production php artisan migrate --force
 
 echo "Deployment finished successfully!"
