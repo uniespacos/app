@@ -3,13 +3,13 @@ import AppLayout from '@/layouts/app-layout';
 import { useDebounce } from '@/lib/utils';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { format } from 'date-fns';
 import { PlusCircle } from 'lucide-react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { ReservasEmpty } from './fragments/ReservasEmpty';
 import { ReservasFilters } from './fragments/ReservasFilters';
 import { ReservasList } from './fragments/ReservasList';
 import { ReservasLoading } from './fragments/reservasLoading';
-import { format } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,7 +18,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function MinhasReservas({ reservas: paginator, filters, reservaToShow, semana }: {
+export default function MinhasReservas({
+    reservas: paginator,
+    filters,
+    reservaToShow,
+    semana,
+}: {
     user: User;
     reservas: Paginator<Reserva>;
     filters: { search?: string; situacao?: string };
@@ -40,7 +45,8 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
             isInitialMount.current = false;
             return;
         }
-        const params: { search?: string; situacao?: string; semana?: string } = { // <-- Tipagem dos params
+        const params: { search?: string; situacao?: string; semana?: string } = {
+            // <-- Tipagem dos params
             search: debouncedSearch || undefined,
             situacao: selectedSituacao || undefined,
             // Adiciona o parâmetro 'semana' à requisição!
@@ -56,9 +62,9 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Minhas Reservas" />
-            <div className='flex'>
-                <div className="flex-1 w-[100vh] container mx-auto space-y-6 py-6">
-                    <div className=" space-y-6 p-6">
+            <div className="flex">
+                <div className="container mx-auto w-[100vh] flex-1 space-y-6 py-6">
+                    <div className="space-y-6 p-6">
                         <GenericHeader
                             titulo="Minhas Reservas"
                             descricao="Gerencie suas solicitações de reservas de espaços acadêmicos"
@@ -76,11 +82,17 @@ export default function MinhasReservas({ reservas: paginator, filters, reservaTo
                             onDateChange={setData}
                         />
                         <Suspense fallback={<ReservasLoading />}>
-                            <ReservasList fallback={<ReservasEmpty />} paginator={paginator} isGestor={false} reservaToShow={reservaToShow} routeName={"reservas.index"} />
+                            <ReservasList
+                                fallback={<ReservasEmpty />}
+                                paginator={paginator}
+                                isGestor={false}
+                                reservaToShow={reservaToShow}
+                                routeName={'reservas.index'}
+                            />
                         </Suspense>
                     </div>
                 </div>
             </div>
-        </AppLayout >
+        </AppLayout>
     );
 }

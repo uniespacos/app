@@ -16,9 +16,7 @@ class ValidateReservationConflictsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Reserva $reserva)
-    {
-    }
+    public function __construct(public Reserva $reserva) {}
 
     public function handle(ConflictDetectionService $conflictService): void
     {
@@ -36,7 +34,7 @@ class ValidateReservationConflictsJob implements ShouldQueue
             ]);
 
         } catch (Throwable $e) {
-            Log::error("Falha ao validar conflitos para reserva ID {$this->reserva->id}: " . $e->getMessage());
+            Log::error("Falha ao validar conflitos para reserva ID {$this->reserva->id}: ".$e->getMessage());
             $this->reserva->update(['validation_status' => 'failed']);
             $this->fail($e);
         }

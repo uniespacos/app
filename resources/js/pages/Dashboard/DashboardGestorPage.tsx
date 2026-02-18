@@ -1,15 +1,15 @@
+import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/components/tabs-item-reserva';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import {  CheckCircle, Clock, Users } from 'lucide-react';
-import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CheckCircle, Clock, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import TabsItemEspacosFavoritos from '@/components/tabs-item-espacos-favoritos';
-import TabsItemReserva from '@/components/tabs-item-reserva';
 import EspacoCard from '../Espacos/fragments/EspacoCard';
+import { SituacaoBadge } from '../Reservas/fragments/ReservasList';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -17,15 +17,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
-
-export default function Dashboard({ user, reservasPendentes, statusDasReservas, agendas, espacosFavoritos, reservas }: {
-    user: User; espacos: Espaco[]; reservasPendentes: Reserva[], statusDasReservas: {
-        pendentes: number
-        avaliadas_hoje: number
-        total_espacos: number
-    }, agendas: Agenda[]
-    , espacosFavoritos: Espaco[], reservas: Reserva[]
+export default function Dashboard({
+    user,
+    reservasPendentes,
+    statusDasReservas,
+    agendas,
+    espacosFavoritos,
+    reservas,
+}: {
+    user: User;
+    espacos: Espaco[];
+    reservasPendentes: Reserva[];
+    statusDasReservas: {
+        pendentes: number;
+        avaliadas_hoje: number;
+        total_espacos: number;
+    };
+    agendas: Agenda[];
+    espacosFavoritos: Espaco[];
+    reservas: Reserva[];
 }) {
     const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -36,10 +46,13 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
         }
 
         const lowerSearchTerm = searchTerm.toLowerCase();
-        const filtered = espacosFavoritos.filter((espaco) =>
-            espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
-            (espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) || '') ||
-            (espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) || '')
+        const filtered = espacosFavoritos.filter(
+            (espaco) =>
+                espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
+                espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '' ||
+                espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                '',
         );
 
         setFilteredEspacosFavoritos(filtered);
@@ -63,12 +76,13 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
 
         // 4. Converte os valores do Map (que são os objetos Espaco únicos) em um array.
         return Array.from(espacosMap.values());
-    }
+    };
     const espacosUnicos = getUniqueEspacosFromAgendas(agendas);
 
-
     return (
-        <AppLayout breadcrumbs={breadcrumbs}> <Head title="Dashboard" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            {' '}
+            <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-y-6">
                     {/* Header */}
@@ -77,7 +91,6 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                             <h1 className="text-3xl font-bold">Painel do Gestor</h1>
                             <p className="text-muted-foreground">Olá, {user.name} - Gerencie as reservas dos seus espaços</p>
                         </div>
-
                     </div>
 
                     {/* Stats Cards */}
@@ -85,32 +98,32 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
-                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <Clock className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{statusDasReservas.pendentes}</div>
-                                <p className="text-xs text-muted-foreground">Aguardando sua análise</p>
+                                <p className="text-muted-foreground text-xs">Aguardando sua análise</p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Avaliadas Hoje</CardTitle>
-                                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                                <CheckCircle className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{statusDasReservas.avaliadas_hoje}</div>
-                                <p className="text-xs text-muted-foreground">Reservas Avaliadas hoje</p>
+                                <p className="text-muted-foreground text-xs">Reservas Avaliadas hoje</p>
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Espaços Gerenciados</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <Users className="text-muted-foreground h-4 w-4" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">{statusDasReservas.total_espacos}</div>
-                                <p className="text-xs text-muted-foreground">Sob sua responsabilidade</p>
+                                <p className="text-muted-foreground text-xs">Sob sua responsabilidade</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -120,8 +133,8 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                         <TabsList>
                             <TabsTrigger value="pendentes">Reservas Pendente Analise</TabsTrigger>
                             <TabsTrigger value="espacos">Espaços que gerencio</TabsTrigger>
-                            <TabsTrigger value="reservas" >  Ultimas 5 reservas solicitadas </TabsTrigger>
-                            <TabsTrigger value="favoritos" >Espaços Favoritos </TabsTrigger>
+                            <TabsTrigger value="reservas"> Ultimas 5 reservas solicitadas </TabsTrigger>
+                            <TabsTrigger value="favoritos">Espaços Favoritos </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="reservas" className="space-y-4">
@@ -129,7 +142,12 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                         </TabsContent>
 
                         <TabsContent value="favoritos" className="space-y-4">
-                            <TabsItemEspacosFavoritos espacosFiltrados={filteredEspacosFavoritos} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                            <TabsItemEspacosFavoritos
+                                espacosFiltrados={filteredEspacosFavoritos}
+                                user={user}
+                                searchTerm={searchTerm}
+                                setSearchTerm={setSearchTerm}
+                            />
                         </TabsContent>
                         <TabsContent value="pendentes" className="space-y-4">
                             <Card>
@@ -140,21 +158,21 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                                 <CardContent>
                                     <div className="space-y-4">
                                         {reservasPendentes.map((reserva) => (
-                                            <div key={reserva.id} className="border rounded-lg p-4">
-                                                <div className="flex items-start justify-between mb-4">
+                                            <div key={reserva.id} className="rounded-lg border p-4">
+                                                <div className="mb-4 flex items-start justify-between">
                                                     <div className="space-y-1">
                                                         <h4 className="font-medium">{reserva.titulo}</h4>
-                                                        <p className="text-sm text-muted-foreground">{reserva.descricao}</p>
-                                                        <p className="text-xs text-muted-foreground">
+                                                        <p className="text-muted-foreground text-sm">{reserva.descricao}</p>
+                                                        <p className="text-muted-foreground text-xs">
                                                             Solicitante: {reserva.user?.name} ({reserva.user?.setor?.nome})
                                                         </p>
                                                     </div>
-                                                    <div className="flex-col ">
+                                                    <div className="flex-col">
                                                         <SituacaoBadge situacao={reserva.situacao} />
                                                         <Button
                                                             size="sm"
                                                             onClick={() => router.get(route('gestor.reservas.show', reserva.id))}
-                                                            className="bg-blue-600 hover:bg-blue-700 mt-5"
+                                                            className="mt-5 bg-blue-600 hover:bg-blue-700"
                                                         >
                                                             <CheckCircle className="mr-1 h-4 w-4" />
                                                             Avaliar
@@ -177,7 +195,13 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                                 <CardContent>
                                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                         {espacosUnicos?.map((espaco) => (
-                                            <EspacoCard showFavoritar={false} key={espaco?.id} espaco={espaco} userType={user.permission_type_id} handleSolicitarReserva={() => router.get(route("espacos.show", espaco.id))} />
+                                            <EspacoCard
+                                                showFavoritar={false}
+                                                key={espaco?.id}
+                                                espaco={espaco}
+                                                userType={user.permission_type_id}
+                                                handleSolicitarReserva={() => router.get(route('espacos.show', espaco.id))}
+                                            />
                                         ))}
                                     </div>
                                 </CardContent>
@@ -187,5 +211,5 @@ export default function Dashboard({ user, reservasPendentes, statusDasReservas, 
                 </div>
             </div>
         </AppLayout>
-    )
+    );
 }

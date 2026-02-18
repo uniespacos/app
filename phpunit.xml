@@ -23,13 +23,13 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="pgsql"/>
-        <env name="DB_DATABASE" value="uniespaco"/>
-        <env name="DB_USERNAME" value="postgres"/>
-        <env name="DB_PASSWORD" value="root"/>
+        <env name="DB_DATABASE" value="uniespacos"/>
+        <env name="DB_USERNAME" value="uniespacos"/>
+        <env name="DB_PASSWORD" value="uniespacossecretkey"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
+        <env name="SESSION_DRIVER" value="file"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
 </phpunit>

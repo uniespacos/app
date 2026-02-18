@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class StoreModuloRequest extends FormRequest
 {
@@ -203,7 +202,7 @@ class StoreModuloRequest extends FormRequest
         $andares = $this->input('andares', []);
         $nomes = array_column($andares, 'nome');
 
-        if (!in_array('terreo', $nomes)) {
+        if (! in_array('terreo', $nomes)) {
             $validator->errors()->add('andares', 'O térreo é obrigatório e deve estar presente.');
         }
     }
@@ -226,21 +225,21 @@ class StoreModuloRequest extends FormRequest
                 // Verificar se tem o andar inferior
                 if ($nivel === 1) {
                     // 1º andar precisa do térreo
-                    if (!in_array('terreo', $nomes)) {
+                    if (! in_array('terreo', $nomes)) {
                         $validator->errors()->add('andares', 'Para ter o 1º andar, é necessário ter o térreo.');
                     }
                 } else {
                     // Outros andares precisam do andar imediatamente inferior
-                    $andarInferior = 'andar-' . ($nivel - 1);
-                    if (!in_array($andarInferior, $nomes)) {
-                        $validator->errors()->add('andares', "Para ter o {$nivel}º andar, é necessário ter o " . ($nivel - 1) . "º andar.");
+                    $andarInferior = 'andar-'.($nivel - 1);
+                    if (! in_array($andarInferior, $nomes)) {
+                        $validator->errors()->add('andares', "Para ter o {$nivel}º andar, é necessário ter o ".($nivel - 1).'º andar.');
                     }
                 }
             }
         }
 
         // Verificar subsolos
-        if (in_array('subsolo-2', $nomes) && !in_array('subsolo-1', $nomes)) {
+        if (in_array('subsolo-2', $nomes) && ! in_array('subsolo-1', $nomes)) {
             $validator->errors()->add('andares', 'Para ter o 2º subsolo, é necessário ter o subsolo.');
         }
     }
@@ -275,7 +274,7 @@ class StoreModuloRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Garantir que andares seja sempre um array
-        if (!$this->has('andares') || !is_array($this->input('andares'))) {
+        if (! $this->has('andares') || ! is_array($this->input('andares'))) {
             $this->merge(['andares' => []]);
         }
 

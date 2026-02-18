@@ -21,18 +21,9 @@ interface FormRegistroUsuarioProps {
     processing: boolean;
     instituicaos: Instituicao[];
     onSubmit: (e: React.FormEvent) => void;
-    onOpenNewInstitutionModal: () => void;
 }
 
-export function FormRegistroUsuario({
-    data,
-    onInputChange,
-    errors,
-    processing,
-    instituicaos,
-    onSubmit,
-    onOpenNewInstitutionModal,
-}: FormRegistroUsuarioProps) {
+export function FormRegistroUsuario({ data, onInputChange, errors, processing, instituicaos, onSubmit }: FormRegistroUsuarioProps) {
     const formatPhoneNumber = (value: string) => {
         const cleaned = value.replace(/\D/g, '');
         const limited = cleaned.slice(0, 11);

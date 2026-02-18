@@ -18,7 +18,7 @@ const breadcrumbs = [
 ];
 
 export default function UnidadesPage() {
-    const { unidades, instituicoes } = usePage<{
+    const { unidades } = usePage<{
         unidades: {
             data: Unidade[];
             links: { url: string | null; label: string; active: boolean }[];
@@ -29,7 +29,7 @@ export default function UnidadesPage() {
     const unidadesData = unidades.data;
     const [removerUnidade, setRemoverUnidade] = useState<Unidade | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedInstituicao, setSelectedInstituicao] = useState<Instituicao | undefined>(undefined);
+    const [selectedInstituicao] = useState<Instituicao | undefined>(undefined);
     const [unidadesFilter, setUnidadesFilter] = useState<Unidade[]>(unidades.data);
 
     useEffect(() => {
@@ -63,10 +63,7 @@ export default function UnidadesPage() {
                         />
                         <Card>
                             <CardContent>
-                                <UnidadeFilters
-                                    searchTerm={searchTerm}
-                                    onSearchTermChange={setSearchTerm}
-                                />
+                                <UnidadeFilters searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
                             </CardContent>
                         </Card>
                         <Card>

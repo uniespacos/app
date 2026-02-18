@@ -5,14 +5,11 @@ namespace App\Http\Requests;
 use App\Rules\UsuarioDaMesmaInstituicaoDaAgenda;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class AlterarGestoresEspacoRequest extends FormRequest
 {
     /**
      * Determina se o usuário está autorizado a fazer esta requisição.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -28,6 +25,7 @@ class AlterarGestoresEspacoRequest extends FormRequest
     {
         // Pega o ID do espaço da rota (ex: /espacos/{espaco})
         $espacoId = $this->route('espaco')->id;
+
         return [
             'gestores' => 'required',
             'gestores.turno.*' => 'required|string|in:manha,tarde,noite',

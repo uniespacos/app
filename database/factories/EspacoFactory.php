@@ -21,7 +21,7 @@ class EspacoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => 'Sala ' . $this->faker->unique()->numberBetween(101, 599),
+            'nome' => 'Sala '.$this->faker->unique()->numberBetween(101, 599),
             'capacidade_pessoas' => $this->faker->numberBetween(10, 100),
             'descricao' => $this->faker->sentence(),
             'imagens' => null, // Pode ser preenchido com URLs de imagem se necessário
@@ -29,6 +29,7 @@ class EspacoFactory extends Factory
             'andar_id' => Andar::factory(),
         ];
     }
+
     public function configure()
     {
         return $this->afterCreating(function (Espaco $espaco) {
@@ -45,8 +46,9 @@ class EspacoFactory extends Factory
                     'user_id' => $gestor, // Inicia sem usuário responsável
                 ]);
                 $user = User::where('id', $gestor)->first();
-                if ($user->permission_type_id != 2)
-                    $user->update(['permission_type_id' => 2]); // Define o tipo de permissão como gestor
+                if ($user->permission_type_id != 2) {
+                    $user->update(['permission_type_id' => 2]);
+                } // Define o tipo de permissão como gestor
             }
 
         });

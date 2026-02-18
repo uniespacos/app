@@ -1,19 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useReservationSlots } from '@/hooks/use-reservation-slots';
 import AppLayout from '@/layouts/app-layout';
 import { diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react'; // Removido usePage
+import { addWeeks, endOfWeek, format, isAfter, isBefore, parse, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, Loader2, User, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
-import { addWeeks, endOfWeek, format, isAfter, isBefore, parse, parseISO, startOfWeek, subWeeks } from 'date-fns';
-import EvaluationForm from './fragments/EvaluationForm';
 import AgendaNavegacao from './fragments/AgendaNavegacao';
-import { useReservationSlots } from '@/hooks/use-reservation-slots';
-
+import EvaluationForm from './fragments/EvaluationForm';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
@@ -23,42 +23,51 @@ const breadcrumbs: BreadcrumbItem[] = [
 type FormAvaliacaoType = {
     situacao: SituacaoReserva;
     motivo: string;
-    horarios_avaliados: { id: number; status: string; }[];
+    horarios_avaliados: { id: number; status: string }[];
     observacao: string;
     evaluation_scope: 'single' | 'recurring';
 };
 
 const getSituacaoIcon = (situacao: string) => {
     switch (situacao) {
-        case 'deferida': return <CheckCircle className="h-4 w-4 text-green-600" />;
-        case 'indeferida': return <XCircle className="h-4 w-4 text-red-600" />;
-        default: return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+        case 'deferida':
+            return <CheckCircle className="h-4 w-4 text-green-600" />;
+        case 'indeferida':
+            return <XCircle className="h-4 w-4 text-red-600" />;
+        default:
+            return <AlertCircle className="h-4 w-4 text-yellow-600" />;
     }
 };
 
 const verificarStatusReserva = (slots: SlotCalendario[]): SituacaoReserva => {
     if (slots.length === 0) return 'em_analise';
-    const slotsAvaliáveis = slots.filter(slot => !slot.isLocked);
+    const slotsAvaliáveis = slots.filter((slot) => !slot.isLocked);
     if (slotsAvaliáveis.length === 0) return 'em_analise';
-    const todosIndeferidos = slotsAvaliáveis.every(slot => slot.status === 'indeferida');
+    const todosIndeferidos = slotsAvaliáveis.every((slot) => slot.status === 'indeferida');
     if (todosIndeferidos) return 'indeferida';
-    const todosDeferidos = slotsAvaliáveis.every(slot => slot.status === 'deferida');
+    const todosDeferidos = slotsAvaliáveis.every((slot) => slot.status === 'deferida');
     if (todosDeferidos) return 'deferida';
-    const temDeferidos = slotsAvaliáveis.some(slot => slot.status === 'deferida');
+    const temDeferidos = slotsAvaliáveis.some((slot) => slot.status === 'deferida');
     if (temDeferidos) return 'parcialmente_deferida';
     return 'em_analise';
 };
 
-export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
-    reserva: Reserva, auth: { user: UserType }, semana: { referencia: string },
-    todosOsConflitos: Record<string, any> // O tipo pode ser mais específico se desejar
+export default function AvaliarReserva({
+    reserva,
+    semana,
+    todosOsConflitos,
+}: {
+    reserva: Reserva;
+    auth: { user: UserType };
+    semana: { referencia: string };
+    todosOsConflitos: Record<string, any>; // O tipo pode ser mais específico se desejar
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const [semanaVisivel, setSemanaVisivel] = useState(() => parseISO(semana.referencia));
 
     const isReavaliacao = useMemo(() => {
         // A reserva já foi avaliada se algum de seus horários já está 'deferida' ou 'indeferida'
-        return reserva.horarios.some(h => h.situacao === 'deferida' || h.situacao === 'indeferida');
+        return reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
     }, [reserva.horarios]);
 
     // HOOK useEffect para sincronizar a semana visível com as props
@@ -70,7 +79,7 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
         return reserva.horarios
             .map((horario) => horario.agenda)
             .filter((agenda): agenda is Agenda => agenda !== undefined)
-            .reduce((acc: Agenda[], agenda) => acc.find(item => item.id === agenda.id) ? acc : [...acc, agenda], []);
+            .reduce((acc: Agenda[], agenda) => (acc.find((item) => item.id === agenda.id) ? acc : [...acc, agenda]), []);
     }, [reserva.horarios]);
 
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
@@ -80,7 +89,7 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
 
     const { data, setData, patch, processing } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
-        motivo: reserva.horarios.find(h => h.justificativa)?.justificativa || '',
+        motivo: reserva.horarios.find((h) => h.justificativa)?.justificativa || '',
         observacao: reserva.observacao || '',
         horarios_avaliados: [],
         evaluation_scope: 'recurring',
@@ -93,7 +102,7 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
         // 2. Se houver conflitos, formata a mensagem de justificativa.
         if (conflitos.length > 0) {
             // Precisamos dos horários originais para pegar a data e hora
-            const horariosOriginaisMap = new Map(reserva.horarios.map(h => [h.id, h]));
+            const horariosOriginaisMap = new Map(reserva.horarios.map((h) => [h.id, h]));
 
             const motivoConflitos = conflitos
                 .map((conflito) => {
@@ -118,16 +127,15 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
         // A dependência agora é a prop 'todosOsConflitos'.
     }, [setData, reserva.horarios, todosOsConflitos]);
 
-
     useEffect(() => {
         const horariosParaEnviar = slotsSelecao
-            .filter(slot => slot.dadosReserva?.horarioDB?.id)
-            .map(slot => ({
+            .filter((slot) => slot.dadosReserva?.horarioDB?.id)
+            .map((slot) => ({
                 id: slot.dadosReserva!.horarioDB.id,
                 status: slot.status,
             }));
 
-        setData(prevData => ({
+        setData((prevData) => ({
             ...prevData,
             situacao: verificarStatusReserva(slotsSelecao),
             horarios_avaliados: horariosParaEnviar,
@@ -137,15 +145,15 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
 
     const isRadioGroupDisabled = useMemo(() => {
-        const statusUnicos = new Set(slotsSelecao.filter(slot => !slot.isLocked).map(slot => slot.status));
+        const statusUnicos = new Set(slotsSelecao.filter((slot) => !slot.isLocked).map((slot) => slot.status));
         return statusUnicos.size > 1;
     }, [slotsSelecao]);
 
     useEffect(() => {
-        const slotsAvaliáveis = slotsSelecao.filter(slot => !slot.isLocked);
+        const slotsAvaliáveis = slotsSelecao.filter((slot) => !slot.isLocked);
         if (slotsAvaliáveis.length > 0) {
             const primeiroStatus = slotsAvaliáveis[0].status;
-            const todosComMesmoStatus = slotsAvaliáveis.every(s => s.status === primeiroStatus);
+            const todosComMesmoStatus = slotsAvaliáveis.every((s) => s.status === primeiroStatus);
             setDecisao(todosComMesmoStatus ? (primeiroStatus as SituacaoReserva) : 'em_analise');
         } else {
             setDecisao('em_analise');
@@ -155,14 +163,24 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
     const dataInicialReserva = useMemo(() => new Date(reserva.data_inicial), [reserva.data_inicial]);
     const dataFinalReserva = useMemo(() => new Date(reserva.data_final), [reserva.data_final]);
 
-    const podeVoltar = useMemo(() => isAfter(startOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataInicialReserva), [semanaVisivel, dataInicialReserva]);
+    const podeVoltar = useMemo(
+        () => isAfter(startOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataInicialReserva),
+        [semanaVisivel, dataInicialReserva],
+    );
     const podeAvancar = useMemo(() => isBefore(endOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataFinalReserva), [semanaVisivel, dataFinalReserva]);
 
     const navegarParaSemana = (novaData: Date) => {
-        router.get(route('gestor.reservas.show', { reserva: reserva.id }), { semana: format(novaData, 'yyyy-MM-dd') }, {
-            preserveState: true, preserveScroll: true, replace: true,
-            onStart: () => setIsLoading(true), onFinish: () => setIsLoading(false),
-        });
+        router.get(
+            route('gestor.reservas.show', { reserva: reserva.id }),
+            { semana: format(novaData, 'yyyy-MM-dd') },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                onStart: () => setIsLoading(true),
+                onFinish: () => setIsLoading(false),
+            },
+        );
     };
     const irParaSemanaAnterior = () => podeVoltar && navegarParaSemana(subWeeks(semanaVisivel, 1));
     const irParaProximaSemana = () => podeAvancar && navegarParaSemana(addWeeks(semanaVisivel, 1));
@@ -187,10 +205,12 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
     const situacaoHeader = verificarStatusReserva(slotsSelecao);
     if (reserva.validation_status === 'processing' || reserva.validation_status === 'pending') {
         return (
-            <div className="flex flex-col items-center justify-center h-full">
-                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <div className="flex h-full flex-col items-center justify-center">
+                <Loader2 className="text-primary mb-4 h-12 w-12 animate-spin" />
                 <h2 className="text-xl font-semibold">Processando Conflitos...</h2>
-                <p className="text-muted-foreground">A validação para esta reserva grande está sendo executada em segundo plano. A página será atualizada automaticamente.</p>
+                <p className="text-muted-foreground">
+                    A validação para esta reserva grande está sendo executada em segundo plano. A página será atualizada automaticamente.
+                </p>
             </div>
         );
     }
@@ -215,8 +235,14 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />{reserva.titulo}</CardTitle>
-                                <CardDescription className="flex items-center gap-2"><User className="h-4 w-4" />Solicitado por: {reserva.user?.name}</CardDescription>
+                                <CardTitle className="flex items-center gap-2">
+                                    <FileText className="h-5 w-5" />
+                                    {reserva.titulo}
+                                </CardTitle>
+                                <CardDescription className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    Solicitado por: {reserva.user?.name}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
@@ -228,12 +254,17 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
                                     <CalendarDays className="h-4 w-4 text-gray-500" />
                                     <div>
                                         <p className="text-sm text-gray-500">Período</p>
-                                        <p className="font-medium">{formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}</p>
+                                        <p className="font-medium">
+                                            {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
+                                        </p>
                                     </div>
                                 </div>
                                 <Separator />
                                 <div>
-                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900"><Clock className="h-4 w-4" />Horários Solicitados</h4>
+                                    <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
+                                        <Clock className="h-4 w-4" />
+                                        Horários Solicitados
+                                    </h4>
                                     <AgendaNavegacao
                                         semanaAtual={semanaVisivel}
                                         onAnterior={irParaSemanaAnterior}
@@ -250,7 +281,7 @@ export default function AvaliarReserva({ reserva, semana, todosOsConflitos }: {
                                         />
                                         {isLoading && (
                                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
-                                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                <Loader2 className="text-primary h-8 w-8 animate-spin" />
                                             </div>
                                         )}
                                     </div>

@@ -109,7 +109,7 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
                                         </TableCell>
                                     </TableRow>
                                     {removerEspaco && removerEspaco.id === espaco.id && (
-                                        <TableRow key={`delete-${espaco.id}`} >
+                                        <TableRow key={`delete-${espaco.id}`}>
                                             <TableCell style={{ alignItems: 'flex-end' }}>
                                                 <DeleteItem
                                                     showHeading={false}

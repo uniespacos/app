@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -87,7 +87,7 @@ export default function UsuariosPage() {
 
     const handleEditUser = (user: User) => {
         // Implementação futura para edição de usuário
-        toast('Funcionalidade de edição ainda não implementada.');
+        toast('Funcionalidade de edição ainda não implementada. ' + user.name);
     };
 
     const handlePermissionUpdate = (userId: number, newPermissionTypeId: number, agendas?: number[]) => {
@@ -145,7 +145,9 @@ export default function UsuariosPage() {
                                         <SelectContent>
                                             <SelectItem value="all">Todas</SelectItem>
                                             {setores.map((setor) => (
-                                                <SelectItem key={setor.id} value={setor.id.toString()}>{setor.sigla}</SelectItem>
+                                                <SelectItem key={setor.id} value={setor.id.toString()}>
+                                                    {setor.sigla}
+                                                </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>

@@ -1,0 +1,135 @@
+Table users {
+  id integer [primary key, increment]
+  name varchar
+  email varchar [unique]
+  email_verified_at timestamp [nullable]
+  password varchar
+  telefone varchar
+  profile_pic varchar
+  permission_type_id integer
+  setor_id integer [nullable]
+  remember_token varchar [nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table setors {
+  id integer [primary key, increment]
+  nome varchar
+  sigla varchar
+  unidade_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table espacos {
+  id integer [primary key, increment]
+  nome varchar
+  capacidade_pessoas integer
+  descricao varchar
+  imagens json [nullable]
+  main_image_index varchar [nullable]
+  andar_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table agendas {
+  id integer [primary key, increment]
+  turno varchar
+  espaco_id integer [nullable]
+  user_id integer [nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table reservas {
+  id integer [primary key, increment]
+  titulo varchar
+  descricao text
+  situacao varchar
+  data_inicial datetime
+  data_final datetime
+  recorrencia varchar
+  observacao text [nullable]
+  user_id integer [nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table horarios {
+  id integer [primary key, increment]
+  agenda_id integer
+  reserva_id integer
+  horario_inicio time
+  horario_fim time
+  data date
+  situacao varchar
+  justificativa text [nullable]
+  user_id integer [nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table espaco_user {
+  espaco_id integer
+  user_id integer
+}
+
+Table andars {
+  id integer [primary key, increment]
+  nome varchar
+  tipo_acesso json [nullable]
+  modulo_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table instituicaos {
+  id integer [primary key, increment]
+  nome varchar
+  sigla varchar
+  endereco varchar [nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table modulos {
+  id integer [primary key, increment]
+  nome varchar
+  unidade_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table permission_types {
+  id integer [primary key]
+  nome varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table unidades {
+  id integer [primary key, increment]
+  nome varchar
+  sigla varchar [nullable]
+  instituicao_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Ref: "users"."permission_type_id" < "permission_types"."id"
+Ref: "users"."setor_id" < "setors"."id"
+Ref: "setors"."unidade_id" < "unidades"."id"
+Ref: "espacos"."andar_id" < "andars"."id"
+Ref: "agendas"."espaco_id" < "espacos"."id"
+Ref: "agendas"."user_id" < "users"."id"
+Ref: "reservas"."user_id" < "users"."id"
+Ref: "horarios"."agenda_id" < "agendas"."id"
+Ref: "horarios"."reserva_id" < "reservas"."id"
+Ref: "horarios"."user_id" < "users"."id"
+Ref: "espaco_user"."espaco_id" > "espacos"."id"
+Ref: "espaco_user"."user_id" > "users"."id"
+Ref: "andars"."modulo_id" < "modulos"."id"
+Ref: "modulos"."unidade_id" < "unidades"."id"
+Ref: "unidades"."instituicao_id" < "instituicaos"."id"

@@ -20,11 +20,12 @@ class UnidadeFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => 'Unidade ' . $this->faker->city(),
+            'nome' => 'Unidade '.$this->faker->city(),
             'sigla' => $this->faker->unique()->lexify('??'),
             'instituicao_id' => Instituicao::factory(),
         ];
     }
+
     public function configure()
     {
         return $this->afterCreating(function (Unidade $unidade) {

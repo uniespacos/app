@@ -5,13 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReservaRequest;
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Jobs\UpdateReservaJob;
-use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Notifications\NotificationModel;
-use App\Notifications\NovaSolicitacaoReservaNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -26,6 +24,7 @@ use Inertia\Inertia;
 class ReservaController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -52,7 +51,7 @@ class ReservaController extends Controller
                     ->where('data_final', '>=', $inicioSemana);
             })
             ->when($filters['search'] ?? null, function ($query, $search) { // Filtro de busca
-                $query->where('titulo', 'like', '%' . $search . '%');
+                $query->where('titulo', 'like', '%'.$search.'%');
             })
             ->when($filters['situacao'] ?? null, function ($query, $situacao) { // Filtro de situação
                 $query->where('situacao', $situacao);
@@ -64,7 +63,7 @@ class ReservaController extends Controller
                         ->orderBy('data')->orderBy('horario_inicio')
                         ->with(['agenda.espaco']); // Eager load necessário para a lista
                 },
-                'user:id,name'
+                'user:id,name',
             ])
             ->latest()
             ->paginate(10)
@@ -94,7 +93,7 @@ class ReservaController extends Controller
                 'inicio' => $inicioSemana,
                 'fim' => $fimSemana,
                 'referencia' => $dataReferencia->format('Y-m-d'),
-            ]
+            ],
         ]);
     }
 
@@ -114,13 +113,16 @@ class ReservaController extends Controller
         try {
             $dadosValidados = $request->validated();
             $solicitante = Auth::user();
-                
+
             ProcessarCriacaoReserva::dispatch($dadosValidados, $solicitante);
 
-            return redirect()->back()->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
+            return redirect()->route('espacos.index')
+                ->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
         } catch (Exception $error) {
-            Log::error('Erro ao despachar o job de criação de reserva: ' . $error->getMessage());
-            return redirect()->back()->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
+            Log::error('Erro ao despachar o job de criação de reserva: '.$error->getMessage());
+
+            return redirect()->route('espacos.index')
+                ->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
         }
     }
 
@@ -152,7 +154,8 @@ class ReservaController extends Controller
                 ->with('success', 'Sua reserva foi enviada para atualização. O processo será concluído em segundo plano.');
 
         } catch (Exception $e) {
-            Log::error("Erro ao despachar UpdateReservaJob para reserva {$reserva->id}: " . $e->getMessage());
+            Log::error("Erro ao despachar UpdateReservaJob para reserva {$reserva->id}: ".$e->getMessage());
+
             return back()->with('error', 'Ocorreu um erro ao enviar a atualização para processamento.');
         }
     }
@@ -202,9 +205,9 @@ class ReservaController extends Controller
         // Carrega o espaço relacionado para poder montar o calendário
         $espaco = $reserva->horarios->first()->agenda->espaco ?? null;
 
-        if (!$espaco) {
+        if (! $espaco) {
             // Fallback caso a reserva não tenha horários na semana atual
-            $espaco = Espaco::whereHas('agendas.horarios.reserva', fn($q) => $q->where('id', $reserva->id))->firstOrFail();
+            $espaco = Espaco::whereHas('agendas.horarios.reserva', fn ($q) => $q->where('id', $reserva->id))->firstOrFail();
         }
 
         // Carrega os dados do espaço e os horários de outras reservas na mesma semana
@@ -217,9 +220,9 @@ class ReservaController extends Controller
                         $q->where('situacao', 'deferida')
                             ->whereBetween('data', [$inicioSemana, $fimSemana])
                             ->with(['reserva.user', 'avaliador']);
-                    }
+                    },
                 ]);
-            }
+            },
         ]);
 
         return Inertia::render('Espacos/VisualizarEspacoPage', [
@@ -230,7 +233,7 @@ class ReservaController extends Controller
                 'inicio' => $inicioSemana,
                 'fim' => $fimSemana,
                 'referencia' => $dataReferencia->format('Y-m-d'),
-            ]
+            ],
         ]);
     }
 
@@ -247,7 +250,7 @@ class ReservaController extends Controller
         $user = Auth::user(); // Obtém o usuário logado
 
         // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
 
@@ -263,7 +266,7 @@ class ReservaController extends Controller
                         ->user;
                     $gestores[] = $gestor; // Coleta os gestores para notificação
                     $reserva->horarios()->update([
-                        'situacao' => 'inativa'
+                        'situacao' => 'inativa',
                     ]);
                 }
                 $gestores = array_unique($gestores); // Remove gestores duplicados
@@ -276,7 +279,7 @@ class ReservaController extends Controller
                     $gestor->notify(
                         new NotificationModel(
                             'Reserva cancelada',
-                            'O usuário ' . $resultado .
+                            'O usuário '.$resultado.
                             ' cancelou uma reserva.',
                             route('gestor.reservas.index')
                         )
@@ -288,9 +291,9 @@ class ReservaController extends Controller
 
             return back()->with('success', 'Reserva cancelada com sucesso!');
         } catch (Exception $error) {
-            Log::error('Erro ao cancelar (inativar) reserva: ' . $error->getMessage(), [
+            Log::error('Erro ao cancelar (inativar) reserva: '.$error->getMessage(), [
                 'reserva_id' => $reserva->id,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
             return back()->with('error', 'Erro ao cancelar a reserva. Por favor, tente novamente.');

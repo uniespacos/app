@@ -1,7 +1,7 @@
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
 import { Andar, Espaco, FiltrosEspacosType, Modulo, Unidade, User } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { FiltrosEspacos } from './fragments/FiltrosEspacos';
@@ -38,10 +38,7 @@ export default function GerenciarEspacos() {
         capacidade: '',
     });
     const [espacoParaGerenciar, setEspacoParaGerenciar] = useState<Espaco | null>(null);
-    const { data, setData, patch, error } = useForm<{ espacoId: number | null; gestores: Record<string, number | null> }>({
-        espacoId: null,
-        gestores: {},
-    });
+
     // Estado para a paginação
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // Defina quantos itens por página
@@ -100,7 +97,7 @@ export default function GerenciarEspacos() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
             <div className="flex">
-                <div className="flex-1 w-[100vh] container mx-auto space-y-6 py-6">
+                <div className="container mx-auto w-[100vh] flex-1 space-y-6 py-6">
                     <div className="container mx-auto space-y-6 p-6">
                         {/* Cabeçalho */}
                         <GenericHeader

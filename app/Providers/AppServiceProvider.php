@@ -5,12 +5,13 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
-
     /**
      * The model to policy mappings for the application.
      *
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
     protected $policies = [
         Reserva::class => ReservaPolicy::class, // <-- ADICIONE ESTA LINHA
     ];
+
     /**
      * Register any application services.
      */
@@ -32,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         DB::listen(function ($query) {
             Log::info(
                 $query->sql, // A consulta SQL executada
@@ -48,8 +54,12 @@ class AppServiceProvider extends ServiceProvider
                         // Você pode adicionar mais dados do usuário aqui se precisar
                     ]);
                 }
+
                 return null;
             },
         ]);
+        if ($this->app->environment('testing')) {
+            Vite::macro('shouldBeIgnored', fn () => true);
+        }
     }
 }

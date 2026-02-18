@@ -1,0 +1,279 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - "main"
+      - "development"
+  pull_request:
+    branches:
+      - development
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    name: 🔍 Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          npm ci --no-optional
+
+      - name: Run Pint (PHP Code Style)
+        run: vendor/bin/pint --test
+
+      - name: Run ESLint (Frontend Linting)
+        run: npm run lint
+
+  test:
+    name: 🧪 Run Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Expose UID and GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: Build Services
+        run: UID=${{ env.UID }} GID=${{ env.GID }} docker compose -f docker-compose.test.yml build
+
+      - name: Start Services
+        run: UID=${{ env.UID }} GID=${{ env.GID }} docker compose -f docker-compose.test.yml up -d
+
+      - name: Wait for database to be ready
+        run: |
+          echo "Waiting for postgres..."
+          until docker compose -f docker-compose.test.yml exec postgres pg_isready -U uniespacos -d uniespacos; do
+            sleep 2
+          done
+          echo "Postgres is ready!"
+
+      - name: Wait for workspace to be ready
+        run: |
+          timeout_seconds=300
+          elapsed_seconds=0
+          echo "Waiting for workspace service to become healthy..."
+          while [ "$elapsed_seconds" -lt "$timeout_seconds" ]; do
+            container_id=$(docker compose -f docker-compose.test.yml ps -q workspace)
+            if [ -z "$container_id" ]; then
+              echo "Workspace container not found. Waiting..."
+              sleep 5
+              elapsed_seconds=$((elapsed_seconds + 5))
+              continue
+            fi
+
+            workspace_status=$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null)
+            if [ "$workspace_status" == "healthy" ]; then
+              echo "Workspace service is healthy!"
+              break
+            fi
+            echo "Waiting for workspace service (current status: ${workspace_status})... ${elapsed_seconds}s/${timeout_seconds}s"
+            sleep 5
+            elapsed_seconds=$((elapsed_seconds + 5))
+          done
+
+          if [ "$workspace_status" != "healthy" ]; then
+            echo "Error: Workspace service did not become healthy within ${timeout_seconds} seconds."
+            exit 1
+          fi
+
+      - name: Setup Environment
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+
+            set -e
+            echo 'Installing PHP dependencies...'
+            composer install --no-interaction --no-progress --prefer-dist
+            
+            echo 'Copying .env file...'
+            cp .env.testing .env
+
+            echo 'Generating app key...'
+            php artisan key:generate
+
+            echo 'Creating dummy Vite manifest...'
+            mkdir -p public/build/assets
+            touch public/build/assets/app.js
+            echo '{\"resources/js/app.tsx\": {\"file\": \"assets/app.js\", \"src\": \"resources/js/app.tsx\", \"isEntry\": true}}' > public/build/manifest.json
+          "
+
+      - name: Run Migrations
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan migrate --seed --force
+
+      - name: Install Node Dependencies
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm config set fetch-timeout 600000
+            npm ci --verbose
+          "
+
+      - name: Run Frontend Tests
+        env:
+            NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            export NVM_DIR=\"\$HOME/.nvm\"
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            npm test
+           "
+
+      - name: Run Backend Tests
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+
+      # Add this step once frontend tests are configured
+      # - name: Run Frontend Tests
+      #   run: npm test
+
+      - name: Stop Services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
+
+  build-and-push:
+    name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker meta for app image
+        id: meta_app
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Generate Docker meta for web image
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & Build Frontend
+        run: npm ci && npm run build
+
+      - name: Build and push PHP App Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/php-fpm/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
+
+      - name: Build and push Nginx Web Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
+
+  deploy_staging:
+    name: 🚀 Deploy to Staging
+    if: github.ref == 'refs/heads/development'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "Host ${{ secrets.SSH_HOST }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy to Staging via SSH
+        run: |
+          STAGING_PATH="/var/www/uniespacos-staging"
+          # Securely copy the configuration files
+          scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
+          scp ./.env.staging ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/.env
+          
+          # Create nginx config directory and copy default.conf
+          ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
+          scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/docker/production/nginx/default.conf
+
+          # Securely copy the new deployment script to the server
+          scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
+          
+          # Execute the script on the remote server
+          ssh ${{ secrets.SSH_HOST }} "
+            set -e
+            cd ${STAGING_PATH}
+            chmod +x deploy.sh
+            
+            # Log into GHCR on the remote server to pull images
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+
+            # Run the deployment script, passing the branch name as the image tag
+            ./deploy.sh development
+          "

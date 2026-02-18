@@ -20,7 +20,6 @@ export default function AgendaNavegacao({ semanaAtual, onAnterior, onProxima, on
     const textoIntervalo = `${format(inicioDaSemana, 'dd/MM', { locale: ptBR })} - ${format(fimDaSemana, 'dd/MM', { locale: ptBR })}`;
     // --- FIM DA LÓGICA ---
 
-
     return (
         <div className="flex items-center justify-between">
             <Button variant="outline" size="sm" onClick={onAnterior}>
@@ -28,10 +27,8 @@ export default function AgendaNavegacao({ semanaAtual, onAnterior, onProxima, on
                 <span className="hidden sm:inline">Semana Anterior</span>
                 <span className="sm:hidden">Anterior</span>
             </Button>
-            <div className='flex justify-center items-center gap-4'>
-                <h2 className="text-sm font-medium sm:text-base">
-                    {textoIntervalo}
-                </h2>
+            <div className="flex items-center justify-center gap-4">
+                <h2 className="text-sm font-medium sm:text-base">{textoIntervalo}</h2>
                 <Button variant="outline" size="sm" onClick={onReset}>
                     <span className="hidden sm:inline">Voltar para semana atual</span>
                     <span className="sm:hidden">Voltar</span>

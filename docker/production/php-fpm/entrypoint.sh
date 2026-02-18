@@ -1,6 +1,18 @@
 #!/bin/sh
 set -e
 
+# Function to check if the database is ready
+is_db_ready() {
+    php artisan db:monitor --quiet
+}
+
+# Wait for the database
+echo "Waiting for database to be ready..."
+while ! is_db_ready; do
+  sleep 2
+done
+echo "Database is ready."
+
 # Initialize storage directory if empty
 # -----------------------------------------------------------
 # If the storage directory is empty, copy the initial contents
@@ -14,19 +26,6 @@ fi
 
 # Remove storage-init directory
 rm -rf /var/www/storage-init
-
-# Run Laravel migrations
-# -----------------------------------------------------------
-# Ensure the database schema is up to date.
-# -----------------------------------------------------------
-php artisan migrate --force
-
-# Clear and cache configurations
-# -----------------------------------------------------------
-# Improves performance by caching config and routes.
-# -----------------------------------------------------------
-php artisan config:cache
-php artisan route:cache
 
 # Run the default command
 exec "$@"

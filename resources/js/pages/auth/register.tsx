@@ -87,7 +87,6 @@ export default function Register() {
                                 processing={processing}
                                 instituicaos={instituicaos}
                                 onSubmit={handleSubmit}
-                                onOpenNewInstitutionModal={() => setShowModal(true)}
                             />
 
                             <div className="mt-6 border-t border-gray-200 pt-6">

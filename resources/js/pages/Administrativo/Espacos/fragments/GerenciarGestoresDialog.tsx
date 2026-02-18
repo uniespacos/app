@@ -12,7 +12,7 @@ interface GerenciarGestoresDialogProps {
     onSave: (espacoId: number, gestores: Record<string, number | null>) => void;
 }
 
-export function GerenciarGestoresDialog({ espaco, usuarios, isOpen, onClose, onSave }: GerenciarGestoresDialogProps) {
+export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: GerenciarGestoresDialogProps) {
     const [gestores, setGestores] = useState<Record<string, number | null>>({
         manha: null,
         tarde: null,
@@ -72,37 +72,37 @@ export function GerenciarGestoresDialog({ espaco, usuarios, isOpen, onClose, onS
     if (!espaco) return null;
 
     return (
-        <Card className="w-full  mx-auto">
+        <Card className="mx-auto w-full">
             <CardHeader>
-            <CardTitle>Gerenciar Gestores - {espaco.nome}</CardTitle>
+                <CardTitle>Gerenciar Gestores - {espaco.nome}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-            <div className="text-muted-foreground text-sm">
-                Selecione os gestores responsáveis por cada turno. Você pode buscar por nome ou email.
-            </div>
-
-            <div className="space-y-4">
-                {Object.entries(turnos).map(([turno, label]) => (
-                <div key={turno} className="space-y-2">
-                    <label className="block text-sm font-medium">{label}</label>
-                        <UserSearchCombobox
-                    usuarios={usuarios}
-                    value={gestores[turno]}
-                    onValueChange={(value) => handleGestorChange(turno, value)}
-                    placeholder={`Buscar gestor para o turno da ${label.toLowerCase()}...`}
-                    />
+                <div className="text-muted-foreground text-sm">
+                    Selecione os gestores responsáveis por cada turno. Você pode buscar por nome ou email.
                 </div>
-                ))}
-            </div>
 
-            <div className="flex justify-end gap-2 border-t pt-4">
-                <Button variant="outline" onClick={onClose} type="button">
-                Cancelar
-                </Button>
-                <Button onClick={handleSalvar} disabled={!hasChanges} type="button">
-                {hasChanges ? 'Salvar Alterações' : 'Nenhuma Alteração'}
-                </Button>
-            </div>
+                <div className="space-y-4">
+                    {Object.entries(turnos).map(([turno, label]) => (
+                        <div key={turno} className="space-y-2">
+                            <label className="block text-sm font-medium">{label}</label>
+                            <UserSearchCombobox
+                                usuarios={usuarios}
+                                value={gestores[turno]}
+                                onValueChange={(value) => handleGestorChange(turno, value)}
+                                placeholder={`Buscar gestor para o turno da ${label.toLowerCase()}...`}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex justify-end gap-2 border-t pt-4">
+                    <Button variant="outline" onClick={onClose} type="button">
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleSalvar} disabled={!hasChanges} type="button">
+                        {hasChanges ? 'Salvar Alterações' : 'Nenhuma Alteração'}
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     );

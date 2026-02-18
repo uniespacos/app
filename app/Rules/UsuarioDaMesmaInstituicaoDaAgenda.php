@@ -28,14 +28,15 @@ class UsuarioDaMesmaInstituicaoDaAgenda implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$value) { // Permite user_id nulo
+        if (! $value) { // Permite user_id nulo
             return;
         }
 
         $user = User::find($value);
 
-        if (!$user || !$this->espaco) {
+        if (! $user || ! $this->espaco) {
             $fail('O espaço ou usuário informado é inválido.');
+
             return;
         }
 
