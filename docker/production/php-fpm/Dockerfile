@@ -3,6 +3,18 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /var/www
 
+# Accept build arguments for environment variables
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_PORT
+ARG VITE_REVERB_SCHEME
+
+# Set environment variables for the build process
+ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY
+ENV VITE_REVERB_HOST=$VITE_REVERB_HOST
+ENV VITE_REVERB_PORT=$VITE_REVERB_PORT
+ENV VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
+
 # Copy only necessary files for npm install to leverage Docker layer caching
 COPY package.json package-lock.json ./
 RUN npm ci
