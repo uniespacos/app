@@ -199,6 +199,8 @@ jobs:
         with:
           node-version: "20"
       - name: Install & Build Frontend
+        env:
+          VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
         run: npm ci && npm run build
 
       - name: Build and push PHP App Image
@@ -210,6 +212,11 @@ jobs:
           push: true
           tags: ${{ steps.meta_app.outputs.tags }}
           labels: ${{ steps.meta_app.outputs.labels }}
+          build-args: |
+            VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}
+            VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
+            VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
+            VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
       - name: Build and push Nginx Web Image
         uses: docker/build-push-action@v5
@@ -316,7 +323,7 @@ jobs:
           PRODUCTION_PATH="/home/operador/app"
           
           # Securely copy the new deployment script to the server
-          scp ./scripts/deploy-production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
+          scp ./scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
           
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "

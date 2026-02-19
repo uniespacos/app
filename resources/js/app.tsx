@@ -11,12 +11,13 @@ window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globa
 
 window.Echo = new Echo({
     broadcaster: 'reverb',
-    key: window.Uniespacos.reverb.app_key,
-    wsHost: window.Uniespacos.reverb.host,
-    wsPort: Number(window.Uniespacos.reverb.port),
-    wssPort: Number(window.Uniespacos.reverb.port),
-    forceTLS: (window.Uniespacos.reverb.scheme ?? 'https') === 'https',
+    key: window.Uniespacos?.reverb?.app_key,
+    wsHost: window.Uniespacos?.reverb?.host,
+    wsPort: Number(window.Uniespacos?.reverb?.port ?? 443),
+    wssPort: Number(window.Uniespacos?.reverb?.port ?? 443),
+    forceTLS: (window.Uniespacos?.reverb?.scheme ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
+    disableStats: true,
 });
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
