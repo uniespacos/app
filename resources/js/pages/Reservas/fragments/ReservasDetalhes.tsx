@@ -193,7 +193,7 @@ export default function ReservaDetalhes({
                         </Button>
                     ) : (
                         <div className="flex gap-2">
-                            {selectedReserva.situacao === 'em_analise' && (
+                            {selectedReserva.can_update && (
                                 <Button variant="outline" onClick={() => router.get(route('reservas.edit', selectedReserva.id))}>
                                     <Edit className="mr-1 h-4 w-4" /> Editar
                                 </Button>

@@ -69,6 +69,13 @@ class ReservaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Adiciona a flag 'can_update' para cada reserva no paginador
+        $reservas->getCollection()->transform(function ($reserva) use ($user) {
+            $reserva->can_update = $user->can('update', $reserva);
+
+            return $reserva;
+        });
+
         // 5. Query para a reserva específica que será exibida no modal (reservaToShow)
         $reservaToShow = null;
         if ($filters['reserva'] ?? null) {
@@ -81,6 +88,10 @@ class ReservaController extends Controller
                         ->with(['agenda.espaco.andar.modulo.unidade', 'avaliador']);
                 },
             ])->find($filters['reserva']);
+
+            if ($reservaToShow) {
+                $reservaToShow->can_update = $user->can('update', $reservaToShow);
+            }
         }
 
         return Inertia::render('Reservas/ReservasPage', [

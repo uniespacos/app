@@ -123,6 +123,9 @@ class GestorReservaController extends Controller
         $reserva->load(['user']);
         $reserva->setRelation('horarios', $horariosDaSemana);
 
+        // Busca uma justificativa existente em qualquer horário da reserva para hidratar o formulário corretamente
+        $reserva->existing_justification = $reserva->horarios()->whereNotNull('justificativa')->where('justificativa', '!=', '')->value('justificativa');
+
         return Inertia::render('Reservas/Gestor/AvaliarReservaPage', [
             'reserva' => $reserva,
             'semana' => ['referencia' => $dataReferencia->format('Y-m-d')],

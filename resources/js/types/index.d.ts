@@ -208,6 +208,7 @@ export interface Reserva {
     updated_at: string;
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
+    can_update?: boolean; // Permissão de edição dinâmica
 }
 
 // =============================================================================
