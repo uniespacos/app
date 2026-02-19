@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Reserva;
+use App\Policies\ReservaPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
@@ -12,15 +15,6 @@ use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
-    protected $policies = [
-        Reserva::class => ReservaPolicy::class, // <-- ADICIONE ESTA LINHA
-    ];
-
     /**
      * Register any application services.
      */
@@ -34,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Reserva::class, ReservaPolicy::class);
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }

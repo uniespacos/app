@@ -55,19 +55,6 @@ class ReservaPolicy
             return true;
         }
 
-        // REGRA 2: O Gestor pode avaliar (atualizar) a reserva.
-        // Verificamos se existe ('exists') algum horário nesta reserva que satisfaça
-        // a condição de ter uma agenda cujo gestor_id seja o id do usuário atual.
-        if (
-            $reserva->horarios()
-                ->whereHas('agenda', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })
-                ->exists()
-        ) {
-            return true;
-        }
-
         return false;
     }
 

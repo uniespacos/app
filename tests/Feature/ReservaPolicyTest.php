@@ -19,13 +19,13 @@ class ReservaPolicyTest extends TestCase
         $user = User::factory()->create();
         $agenda = Agenda::factory()->create();
         $reserva = Reserva::factory()->create([
-            'user_id' => $user->id, 
+            'user_id' => $user->id,
             'situacao' => 'em_analise',
             'data_inicial' => now()->toDateString(),
             'data_final' => now()->toDateString(),
             'recorrencia' => 'unica',
         ]);
-        
+
         // Slot 1: Evaluated (Deferida)
         Horario::factory()->create([
             'reserva_id' => $reserva->id,
@@ -62,13 +62,102 @@ class ReservaPolicyTest extends TestCase
                         'horario_inicio' => '11:00:00',
                         'horario_fim' => '12:00:00',
                         'agenda_id' => $agenda->id,
-                    ]
+                    ],
                 ],
                 // Add other required fields from StoreReservaRequest rules if any
                 'descricao' => 'Updated Description', // Assuming required?
             ]);
 
         // We expect 403 Forbidden
+        $response->assertForbidden();
+    }
+
+    public function test_user_cannot_edit_reservation_if_status_is_parcialmente_deferida()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $otherUser->id]); // Different user
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'situacao' => 'parcialmente_deferida', // Directly set status
+            'data_inicial' => now()->toDateString(),
+            'data_final' => now()->toDateString(),
+            'recorrencia' => 'unica',
+        ]);
+
+        // Even without slots, the status alone should block it.
+        // But let's add slots to be realistic
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'deferida',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->patch(route('reservas.update', $reserva), [
+                'titulo' => 'Updated Title',
+                'data_inicial' => now()->toDateString(),
+                'data_final' => now()->toDateString(),
+                'recorrencia' => 'unica',
+                'edit_scope' => 'single',
+                'edited_week_date' => now()->toDateString(),
+                'horarios_solicitados' => [
+                    [
+                        'data' => now()->toDateString(),
+                        'horario_inicio' => '11:00:00',
+                        'horario_fim' => '12:00:00',
+                        'agenda_id' => $agenda->id,
+                    ],
+                ],
+                'descricao' => 'Updated Description',
+            ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_gestor_cannot_edit_details_of_own_reservation_if_partially_evaluated()
+    {
+        // Arrange: User is a Gestor (permission_type_id = 2 usually, but here we just need them to own the agenda)
+        // Actually, Rule 2 checked if user owns the agenda.
+        $gestor = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $gestor->id]); // Gestor owns agenda
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $gestor->id, // Gestor made the reservation
+            'situacao' => 'parcialmente_deferida',
+            'data_inicial' => now()->toDateString(),
+            'data_final' => now()->toDateString(),
+            'recorrencia' => 'unica',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'deferida',
+        ]);
+
+        // Act
+        $response = $this->actingAs($gestor)
+            ->patch(route('reservas.update', $reserva), [
+                'titulo' => 'Updated Title',
+                'data_inicial' => now()->toDateString(),
+                'data_final' => now()->toDateString(),
+                'recorrencia' => 'unica',
+                'edit_scope' => 'single',
+                'edited_week_date' => now()->toDateString(),
+                'horarios_solicitados' => [
+                    [
+                        'data' => now()->toDateString(),
+                        'horario_inicio' => '11:00:00',
+                        'horario_fim' => '12:00:00',
+                        'agenda_id' => $agenda->id,
+                    ],
+                ],
+                'descricao' => 'Updated Description',
+            ]);
+
+        // Assert: Should be forbidden now that Rule 2 is removed.
         $response->assertForbidden();
     }
 }

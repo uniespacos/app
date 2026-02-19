@@ -230,7 +230,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                                 </Button>
                                             ) : (
                                                 <>
-                                                    {(reserva as any).can_update && (
+                                                    {reserva.can_update && (
                                                         <Button
                                                             onClick={() => {
                                                                 router.get(`reservas/${reserva.id}/edit`);

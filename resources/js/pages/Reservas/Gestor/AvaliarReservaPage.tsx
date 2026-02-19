@@ -89,7 +89,7 @@ export default function AvaliarReserva({
 
     const { data, setData, patch, processing } = useForm<FormAvaliacaoType>({
         situacao: reserva.situacao,
-        motivo: reserva.horarios.find((h) => h.justificativa)?.justificativa || '',
+        motivo: (reserva as any).existing_justification || '',
         observacao: reserva.observacao || '',
         horarios_avaliados: [],
         evaluation_scope: 'recurring',
@@ -121,8 +121,6 @@ export default function AvaliarReserva({
 
             // 3. Atualiza o estado do formulário com a justificativa completa.
             setData('motivo', motivoConflitos);
-        } else {
-            setData('motivo', '');
         }
         // A dependência agora é a prop 'todosOsConflitos'.
     }, [setData, reserva.horarios, todosOsConflitos]);

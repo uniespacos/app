@@ -4,13 +4,11 @@ namespace Tests\Feature;
 
 use App\Jobs\AvaliarReservaJob;
 use App\Models\Agenda;
-use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
 use App\Services\ConflictDetectionService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AvaliarReservaJobTest extends TestCase
@@ -23,7 +21,7 @@ class AvaliarReservaJobTest extends TestCase
         $manager = User::factory()->create();
         $agenda = Agenda::factory()->create(['user_id' => $manager->id]); // Manager owns agenda
         $reserva = Reserva::factory()->create(['user_id' => $manager->id]);
-        
+
         $horario = Horario::factory()->create([
             'reserva_id' => $reserva->id,
             'agenda_id' => $agenda->id,
@@ -40,19 +38,19 @@ class AvaliarReservaJobTest extends TestCase
                 [
                     'id' => $horario->id,
                     'status' => 'solicitado', // This is the problematic status from frontend
-                ]
+                ],
             ],
             'observacao' => 'Test observation',
         ];
 
         $job = new AvaliarReservaJob($reserva, $validatedData, $manager);
-        $conflictService = new ConflictDetectionService();
+        $conflictService = new ConflictDetectionService;
 
         // Act
         try {
             $job->handle($conflictService);
         } catch (\Exception $e) {
-             $this->fail('Job failed with exception: ' . $e->getMessage());
+            $this->fail('Job failed with exception: '.$e->getMessage());
         }
 
         // Assert
@@ -68,7 +66,7 @@ class AvaliarReservaJobTest extends TestCase
         $manager = User::factory()->create();
         $agenda = Agenda::factory()->create(['user_id' => $manager->id]);
         $reserva = Reserva::factory()->create(['situacao' => 'em_analise']);
-        
+
         $horario1 = Horario::factory()->create([
             'reserva_id' => $reserva->id,
             'agenda_id' => $agenda->id,
@@ -91,13 +89,13 @@ class AvaliarReservaJobTest extends TestCase
                 [
                     'id' => $horario1->id,
                     'status' => 'deferida',
-                ]
+                ],
             ],
             'observacao' => 'Test observation',
         ];
 
         $job = new AvaliarReservaJob($reserva, $validatedData, $manager);
-        $job->handle(new ConflictDetectionService());
+        $job->handle(new ConflictDetectionService);
 
         // Assert
         $reserva->refresh();
@@ -112,7 +110,7 @@ class AvaliarReservaJobTest extends TestCase
         $manager = User::factory()->create();
         $agenda = Agenda::factory()->create(['user_id' => $manager->id]);
         $reserva = Reserva::factory()->create(['situacao' => 'em_analise']);
-        
+
         $horario1 = Horario::factory()->create(['reserva_id' => $reserva->id, 'agenda_id' => $agenda->id, 'situacao' => 'em_analise']);
         $horario2 = Horario::factory()->create(['reserva_id' => $reserva->id, 'agenda_id' => $agenda->id, 'situacao' => 'em_analise']);
 
@@ -128,13 +126,13 @@ class AvaliarReservaJobTest extends TestCase
                 [
                     'id' => $horario2->id,
                     'status' => 'indeferida',
-                ]
+                ],
             ],
             'observacao' => 'Test observation',
         ];
 
         $job = new AvaliarReservaJob($reserva, $validatedData, $manager);
-        $job->handle(new ConflictDetectionService());
+        $job->handle(new ConflictDetectionService);
 
         // Assert
         $reserva->refresh();

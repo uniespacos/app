@@ -72,6 +72,7 @@ class ReservaController extends Controller
         // Adiciona a flag 'can_update' para cada reserva no paginador
         $reservas->getCollection()->transform(function ($reserva) use ($user) {
             $reserva->can_update = $user->can('update', $reserva);
+
             return $reserva;
         });
 
