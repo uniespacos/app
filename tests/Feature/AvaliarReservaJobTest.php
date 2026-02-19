@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class AvaliarReservaJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    // use DatabaseTransactions; // Removed as it is now in TestCase
 
     public function test_avaliar_reserva_job_handles_solicitado_status()
     {

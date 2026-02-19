@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ReservaPolicyTest extends TestCase
 {
-    use DatabaseTransactions;
+    // use DatabaseTransactions; // Removed as it is now in TestCase
 
     public function test_user_cannot_edit_reservation_if_partially_evaluated()
     {
