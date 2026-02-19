@@ -55,7 +55,7 @@ class AvaliarReservaJob implements ShouldQueue
                     // --- LÓGICA PARA 'APENAS ESTA SEMANA' (JÁ ESTAVA CORRETA) ---
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
-                        $statusDoGestor = $avaliacao['status'];
+                        $statusDoGestor = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
                         $justificativaFinal = $motivoDoGestor;
                         $statusFinal = $statusDoGestor;
 
@@ -111,7 +111,7 @@ class AvaliarReservaJob implements ShouldQueue
                             continue; // Já processamos este padrão (ex: outra Quarta às 10h na mesma semana)
                         }
 
-                        $statusParaReplicar = $avaliacao['status'];
+                        $statusParaReplicar = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
                         $justificativaParaReplicar = $statusParaReplicar === 'indeferida' ? $motivoDoGestor : null;
 
                         // Atualiza todos os horários que correspondem a este padrão,
@@ -220,11 +220,15 @@ class AvaliarReservaJob implements ShouldQueue
         }
         $deferidosCount = $statusCounts->get('deferida', 0);
         $indeferidosCount = $statusCounts->get('indeferida', 0);
+        $emAnaliseCount = $statusCounts->get('em_analise', 0);
+
         $novaSituacaoGeral = 'em_analise';
         if ($deferidosCount === $totalHorarios) {
             $novaSituacaoGeral = 'deferida';
         } elseif ($indeferidosCount === $totalHorarios) {
             $novaSituacaoGeral = 'indeferida';
+        } elseif ($emAnaliseCount > 0) {
+            $novaSituacaoGeral = 'em_analise';
         } elseif (($deferidosCount + $indeferidosCount) > 0) {
             $novaSituacaoGeral = 'parcialmente_deferida';
         }
