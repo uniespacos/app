@@ -26,15 +26,23 @@ CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2)
 echo "PREVIOUS_TAG=$CURRENT_TAG" > "$VERSION_FILE"
 echo "CURRENT_TAG=$NEW_TAG" >> "$VERSION_FILE"
 
-# 3. Faz o pull da nova imagem
+# 3. Para a aplicação para limpar os volumes de assets
+echo "Stopping application to clear asset volumes..."
+docker compose -f compose.prod.yml down
+
+# 4. Remove os volumes de assets antigos para garantir uma atualização limpa
+echo "Removing old asset volumes..."
+docker volume rm app_uniespacos-public-assets-v2 app_uniespacos-public-production-v2 || true
+
+# 5. Faz o pull da nova imagem
 echo "Pulling new images with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f compose.prod.yml pull
 
-# 4. Sobe a aplicação com a nova tag
+# 6. Sobe a aplicação com a nova tag
 echo "Starting application with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f compose.prod.yml up -d
 
-# 5. Roda as migrations
+# 7. Roda as migrations
 echo "Running database migrations..."
 docker compose -f compose.prod.yml exec -T app php artisan migrate --force
 

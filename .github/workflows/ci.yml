@@ -323,7 +323,7 @@ jobs:
           PRODUCTION_PATH="/home/operador/app"
           
           # Securely copy the new deployment script to the server
-          scp ./scripts/deploy-production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
+          scp ./scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
           
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
