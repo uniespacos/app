@@ -28,7 +28,7 @@ echo "CURRENT_TAG=$NEW_TAG" >> "$VERSION_FILE"
 
 # 3. Para a aplicação para limpar os volumes de assets
 echo "Stopping application to clear asset volumes..."
-docker compose -f compose.prod.yml down
+docker compose -f compose.prod.yml down --timeout 30
 
 # 4. Remove os volumes de assets antigos para garantir uma atualização limpa
 echo "Removing old asset volumes..."
