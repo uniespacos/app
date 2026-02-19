@@ -151,7 +151,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             data_inicial: dataInicialCalculada,
             data_final: dataFinalCalculada,
         }));
-    }, [data.recorrencia, slotsSelecao, setData, data.data_final]);
+    }, [data.recorrencia, slotsSelecao, setData]);
 
     const diasSemana = useMemo(() => diasDaSemana(semanaVisivel, hoje), [semanaVisivel, hoje]);
 
