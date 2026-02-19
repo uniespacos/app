@@ -42,6 +42,16 @@ class ReservaPolicy
     {
         // REGRA 1: O usuário pode alterar a reserva caso ainda esteja em análise.
         if ($user->id === $reserva->user_id && $reserva->situacao === 'em_analise') {
+            // Só permite edição se NENHUM slot foi avaliado ainda (todos devem ser 'em_analise')
+            // Se houver qualquer slot 'deferida' ou 'indeferida', bloqueia a edição.
+            $hasProcessedSlots = $reserva->horarios()
+                ->whereIn('situacao', ['deferida', 'indeferida'])
+                ->exists();
+
+            if ($hasProcessedSlots) {
+                return false;
+            }
+
             return true;
         }
 
