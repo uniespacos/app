@@ -2,20 +2,22 @@
 
 This document outlines the strategic development plan for UniEspaços, organized by version milestones.
 
+## ✅ Completed (v1.x)
+*   **Real-time Notifications:** Migrated from Pusher to Laravel Reverb for self-hosted WebSockets.
+*   **Automated CI/CD:** Implemented a full GitHub Actions pipeline for linting, testing, and automated deployments to staging and production.
+*   **Deployment Reliability:** Stabilized the deployment process by introducing health checks, graceful shutdowns, and automated clearing of stale assets.
+*   **Database Optimization:** Added necessary indexes to improve query performance.
+*   **Core MVP Functionality:** Delivered the initial product for pilot testing.
+
 ## 🎯 v1.x: Stabilization & Pilot Consolidation
-*Focus: Turning the MVP into a robust, reliable product for the initial campus pilot.*
+*Focus: Turning the MVP into a robust, reliable product for the initial campus pilot and gathering user feedback.*
 
-*   **🛡️ Stability & Quality**
-    *   [ ] **Bug Squashing Campaign:** Prioritize and fix reported bugs to ensure a smooth user experience.
-    *   [/] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
-    *   [x] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
-
-*   **⚡ Performance**
-    *   [x] **Database Optimization:** Review slow queries and add missing indexes (Foreign Keys, search columns).
-
-*   **👥 User Experience**
-    *   [/] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers (better tables, filters, quick actions).
+*   **🛡️ Quality & User Experience**
+    *   [ ] **Bug Squashing Campaign:** Prioritize and fix bugs reported from the pilot test.
+    *   [/] **Test Coverage:** Continue improving frontend (Jest/RTL) and backend (PHPUnit) test coverage.
+    *   [/] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers based on feedback (better tables, filters, quick actions).
     *   [ ] **UX Refinements:** Improve the reservation flow, calendar interaction, and feedback messages.
+    *   [ ] **Comprehensive Documentation:** Finalize user and administrator guides.
 
 ---
 
@@ -27,8 +29,8 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Calendar Sync:** Integration with Google Calendar and Outlook for personal schedule synchronization.
 
 *   **📊 Data & Analytics**
-    *   [/] **Manager Analytics:** Dashboards showing occupancy rates, idle times, and peak usage hours.
-    *   [ ] **Data Model Refactoring:** Optimize the database schema based on v1 learnings to support scale.
+    *   [/] **Manager Analytics:** Create dashboards showing occupancy rates, idle times, and peak usage hours to inform resource allocation.
+    *   [ ] **Data Model Refactoring:** Optimize the database schema based on v1 learnings to support scale and new features.
 
 ---
 
@@ -36,13 +38,13 @@ This document outlines the strategic development plan for UniEspaços, organized
 *Focus: Advanced features and intelligent resource management.*
 
 *   **🧠 Intelligent Allocation**
-    *   [ ] **Smart Distribution:** Automatically suggest or allocate spaces based on sector needs (class hours, capacity) and rules.
+    *   [ ] **Smart Distribution:** Automatically suggest or allocate spaces based on sector needs (class hours, capacity) and defined rules.
 
 *   **📱 Mobile Experience**
-    *   [ ] **Mobile App (PWA/Native):** Dedicated mobile interface for quick reservations and checking schedules.
+    *   [ ] **Mobile App (PWA/Native):** A dedicated mobile interface for quick reservations and checking schedules on the go.
 
 *   **🔮 Predictive Modeling**
-    *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize planning.
+    *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize long-term planning.
 
 ---
-*Last updated: February 16, 2026*
+*Last updated: February 18, 2026*

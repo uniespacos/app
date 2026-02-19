@@ -4,38 +4,38 @@
 
 ## 🎓 Project Origin & Context
 
-Born from a Software Engineering course project, UniEspaços addresses a real-world problem: university spaces are often managed in a decentralized manner, where each sector controls its own rooms, leading to inefficiencies and lack of visibility.
+Born from a Software Engineering course project, UniEspaços addresses a real-world problem: university spaces are often managed in a decentralized manner, leading to inefficiencies and a lack of visibility.
 
 **The Goal:** Create a unified platform where:
 *   **Sectors** maintain autonomy over their specific spaces.
 *   **University Management** gains a centralized, macro view of all resources.
-*   **Efficiency** is maximized through better allocation and data visibility.
+*   **Efficiency** is maximized through better allocation and data-driven insights.
 
-Currently, the project is in the **MVP (Minimum Viable Product)** phase, being prepared for a pilot test in a single campus.
-
-## 🚀 Key Features (Current & Planned)
+## 🚀 Key Features
 
 *   **Centralized Dashboard:** View and manage spaces across different sectors.
 *   **Sector Autonomy:** Granular permissions for sector managers.
-*   **Reservation System:** Conflict detection and approval workflows.
-*   **Future Vision:**
-    *   Advanced Analytics for usage optimization.
-    *   RESTful API for integration with other university systems.
-    *   Calendar Synchronization (Google/Outlook).
-    *   Intelligent/Automatic Allocation based on demand.
+*   **Real-time Notifications:** Instant updates on reservation statuses via WebSockets.
+*   **Automated Deployment:** CI/CD pipeline for reliable, zero-downtime deployments.
+*   **Future Vision:** Check out our detailed [Roadmap](docs/ROADMAP.md).
 
 ## 🛠️ Tech Stack
 
-*   **Backend:** Laravel 12.x (PHP 8.2+)
-*   **Frontend:** React 18 with Inertia.js
-*   **Styling:** Tailwind CSS
-*   **Database:** PostgreSQL 16
-*   **Infrastructure:** Docker & Docker Compose
-*   **CI/CD:** GitHub Actions
+*   **Backend:** Laravel 12.x (PHP 8.4) with Laravel Reverb for WebSockets.
+*   **Frontend:** React 18 with Inertia.js & TypeScript.
+*   **Styling:** Tailwind CSS.
+*   **Database:** PostgreSQL 16.
+*   **Infrastructure:** Docker & Docker Compose.
+*   **CI/CD:** GitHub Actions for automated testing and deployment.
+*   **Deployment:** Secure SSH deployments orchestrated via Cloudflare Tunnel.
 
-## 🏁 Getting Started
+## 🏛️ System Architecture
 
-The entire development environment is containerized.
+The entire stack is containerized for portability and scalability. For a visual representation of the services and request flow, see our **[Architecture & Deployment Diagrams](docs/diagrams.md)**.
+
+## 🏁 Getting Started (Development)
+
+The development environment is fully containerized.
 
 ### Prerequisites
 *   Docker & Docker Compose
@@ -59,7 +59,7 @@ The entire development environment is containerized.
     docker compose -f compose.dev.yml up -d
     ```
 
-4.  **Install dependencies & setup database:**
+4.  **Install dependencies & setup the application:**
     Enter the workspace container:
     ```bash
     docker compose -f compose.dev.yml exec workspace bash
@@ -73,23 +73,50 @@ The entire development environment is containerized.
     php artisan migrate --seed
     ```
 
-5.  **Run the development server:**
+5.  **Run the Vite development server:**
     ```bash
     npm run dev
     ```
 
-Access the application at `http://localhost`.
+The application is now accessible at `https://localhost` (the environment is configured for SSL by default).
 
-## 🗺️ Roadmap
+## 🚀 Deployment (CI/CD)
 
-We have a clear vision for the future of UniEspaços. Check out our [Roadmap](docs/ROADMAP.md) to see what we are working on (v1.x Stabilization) and what's coming next (v2.x Expansion & v3.x Innovation).
+Deployment is fully automated using GitHub Actions.
+
+### Deployment Triggers
+*   **Staging:** A push to the `development` branch deploys to the staging environment.
+*   **Production:** A push or merge to the `main` branch deploys to the production server.
+
+### The Pipeline
+The CI/CD pipeline performs the following steps automatically:
+1.  **Lint & Static Analysis:** Checks PHP and JavaScript code for style issues.
+2.  **Run Tests:** Executes the full PHPUnit and Jest test suites.
+3.  **Build Images:** Builds and pushes versioned Docker images for the `app` (PHP-FPM) and `web` (Nginx) services to GitHub Container Registry.
+4.  **Deploy:** Connects to the production server via a secure **Cloudflare Tunnel** and runs the `deploy.sh` script.
+
+### Deployment Script (`deploy.sh`)
+The remote script handles the final steps:
+1.  Creates a database backup.
+2.  Stops the running application and removes old frontend asset volumes to prevent stale-asset issues.
+3.  Pulls the new Docker images from the registry.
+4.  Starts the application with the new images.
+5.  Runs database migrations.
+
+### Required GitHub Secrets
+For CI/CD to function, the following secrets must be configured in the GitHub repository settings:
+
+*   `SSH_PRIVATE_KEY_PRODUCTION`: Private SSH key to access the production server.
+*   `SSH_HOST_PRODUCTION`: The hostname of the production server.
+*   `SSH_USER_PRODUCTION`: The user for the SSH connection.
+*   `CF_ACCESS_CLIENT_ID_PRODUCTION`: Cloudflare Access client ID.
+*   `CF_ACCESS_CLIENT_SECRET_PRODUCTION`: Cloudflare Access client secret.
+*   `VITE_REVERB_APP_KEY`, `VITE_REVERB_HOST`, `VITE_REVERB_PORT`, `VITE_REVERB_SCHEME`: Reverb configuration passed to the frontend build.
 
 ## 🤝 Contributing
 
-We welcome contributions! Whether you're a student, a developer, or just interested in the project, check out our [Contributing Guide](CONTRIBUTING.md) to get started.
+We welcome contributions! Please check out our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 ## 📄 License
 
-This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
-
-You are free to use, adapt, and share this software for **non-commercial purposes only**, provided you give appropriate credit and distribute your contributions under the same license. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **CC BY-NC-SA 4.0**. See the [LICENSE](LICENSE) file for details.
