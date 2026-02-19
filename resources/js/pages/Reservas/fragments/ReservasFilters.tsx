@@ -64,7 +64,7 @@ export function ReservasFilters({
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={selectedDate} onSelect={onDateChange} locale={ptBR} initialFocus />
+                        <Calendar mode="single" selected={selectedDate} onSelect={onDateChange} initialFocus />
                     </PopoverContent>
                 </Popover>
             </div>
