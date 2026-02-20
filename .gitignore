@@ -28,3 +28,6 @@ package-lock.json
 /docker/production/nginx/*.pem
 .secrets
 .act.secrets
+
+#.gemini/
+gha-creds-*.json
