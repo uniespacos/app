@@ -135,6 +135,9 @@ The pipeline automates quality checks and deployment:
 3. **Docker Build Check:** Ensures the production Docker image builds successfully.
 4. **Deploy to Production:** On a push to the `main` branch, automatically deploys the application to the production server via SSH.
 
-## Don't forget
+i### Don't forget
 
-- Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+Triggers who dont can forget:
+
+1. **Context7 MCP**
+   - Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
