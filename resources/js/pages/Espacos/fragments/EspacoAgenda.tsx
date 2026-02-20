@@ -120,38 +120,57 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     // Efeito para sincronizar os slots selecionados com o formulário do Inertia
     useEffect(() => {
         const horariosParaEnviar = slotsSelecao.map((s) => ({
-            // Para o backend, não precisamos de todos os dados do SlotCalendario
             data: format(s.data, 'yyyy-MM-dd'),
             horario_inicio: s.horario_inicio,
             horario_fim: s.horario_fim,
             agenda_id: s.agenda_id,
         }));
-        setData((prevData) => ({ ...prevData, horarios_solicitados: horariosParaEnviar }));
-    }, [slotsSelecao, setData]);
+        
+        setData((prevData) => {
+            // Se os horários solicitados mudaram (mudança na seleção do calendário),
+            // recalculamos as datas iniciais e finais sugeridas.
+            const novaDataInicial = slotsSelecao.length > 0 
+                ? new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())))
+                : prevData.data_inicial;
+            
+            let novaDataFinal = prevData.data_final;
+            if (slotsSelecao.length > 0 && prevData.recorrencia !== 'personalizado') {
+                const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === prevData.recorrencia);
+                if (opcaoRecorrencia) {
+                    novaDataFinal = prevData.recorrencia === 'unica'
+                        ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                        : opcaoRecorrencia.calcularDataFinal(novaDataInicial);
+                }
+            }
 
-    // Efeito para calcular as datas de início e fim com base na seleção e recorrência
+            return { 
+                ...prevData, 
+                horarios_solicitados: horariosParaEnviar,
+                // Só atualizamos as datas se for uma mudança real na seleção de slots
+                // para não sobrescrever mudanças manuais feitas no modal.
+                data_inicial: novaDataInicial,
+                data_final: novaDataFinal
+            };
+        });
+    }, [slotsSelecao]); // Removemos data.recorrencia e setData como dependências diretas
+
+    // Efeito para reagir apenas à mudança de recorrência
     useEffect(() => {
         if (slotsSelecao.length === 0) return;
 
-        const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === data.recorrencia);
-        if (!opcaoRecorrencia) return;
+        setData((prevData) => {
+            if (prevData.recorrencia === 'personalizado') return prevData;
 
-        const dataInicialCalculada = new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())));
+            const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === prevData.recorrencia);
+            if (!opcaoRecorrencia) return prevData;
 
-        let dataFinalCalculada: Date | null = data.data_final;
-        if (data.recorrencia !== 'personalizado') {
-            dataFinalCalculada =
-                data.recorrencia === 'unica'
-                    ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                    : opcaoRecorrencia.calcularDataFinal(dataInicialCalculada);
-        }
+            const novaDataFinal = prevData.recorrencia === 'unica'
+                ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                : opcaoRecorrencia.calcularDataFinal(prevData.data_inicial);
 
-        setData((prevData) => ({
-            ...prevData,
-            data_inicial: dataInicialCalculada,
-            data_final: dataFinalCalculada,
-        }));
-    }, [data.recorrencia, slotsSelecao, setData]);
+            return { ...prevData, data_final: novaDataFinal };
+        });
+    }, [data.recorrencia]);
 
     const diasSemana = useMemo(() => diasDaSemana(semanaVisivel, hoje), [semanaVisivel, hoje]);
 
@@ -179,10 +198,37 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     const isSlotSelecionado = (slot: SlotCalendario) => slotsSelecao.some((s) => s.id === slot.id);
 
     const alternarSelecaoSlot = (slot: SlotCalendario) => {
-        if (slot.status === 'reservado') return;
-        const novaSelecao = isSlotSelecionado(slot)
-            ? slotsSelecao.filter((s) => s.id !== slot.id)
-            : [...slotsSelecao, slot].sort((a, b) => a.data.getTime() - b.data.getTime() || a.horario_inicio.localeCompare(b.horario_inicio));
+        if (slot.status === 'reservado') {
+            return;
+        }
+
+        // Determina o slot alvo: o slot original ou um novo slot deslocado para o futuro.
+        let targetSlot = slot;
+        const isPast = slot.data < hoje;
+        if (isPast) {
+            const novaData = addWeeks(slot.data, 1);
+            targetSlot = {
+                ...slot,
+                data: novaData,
+                id: `${format(novaData, 'yyyy-MM-dd')}|${slot.horario_inicio}`,
+            };
+            toast.info(`O horário de ${format(slot.data, 'EEEE', { locale: ptBR })} foi movido para o dia ${format(novaData, 'dd/MM/yyyy')}.`);
+        }
+
+        // Verifica se o slot alvo (possivelmente deslocado) já está na seleção.
+        const isCurrentlySelected = slotsSelecao.some((s) => s.id === targetSlot.id);
+
+        let novaSelecao;
+        if (isCurrentlySelected) {
+            // Remove o slot alvo se já estiver selecionado.
+            novaSelecao = slotsSelecao.filter((s) => s.id !== targetSlot.id);
+        } else {
+            // Adiciona o slot alvo se não estiver selecionado.
+            novaSelecao = [...slotsSelecao, targetSlot].sort(
+                (a, b) => a.data.getTime() - b.data.getTime() || a.horario_inicio.localeCompare(b.horario_inicio),
+            );
+        }
+
         setSlotsSelecao(novaSelecao);
     };
 
@@ -267,9 +313,11 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
                         hoje={hoje}
                         isSubmitting={processing} // Usar o 'processing' do useForm
                         isEditMode={isEditMode}
+                        espaco={espaco}
                         // Passar o objeto 'data' e a função 'setData' do useForm
                         formData={data}
                         setFormData={setData}
+                        setSlotsSelecao={setSlotsSelecao}
                     />
                     <Button variant="outline" size="sm" onClick={limparSelecao}>
                         Limpar seleção

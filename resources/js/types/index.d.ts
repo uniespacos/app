@@ -260,6 +260,7 @@ export interface SlotCalendario {
         conflito?: string | null; // <-- ADICIONE ESTA LINHA
     };
     isLocked?: boolean;
+    isPast?: boolean; // <-- ADICIONE ESTA LINHA
     // Se o status for 'livre', conterá o ID da agenda para criar uma nova reserva.
     agenda_id?: number;
     isShowReservation?: boolean;

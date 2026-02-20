@@ -9,11 +9,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { OpcoesRecorrencia, ReservaFormData, SlotCalendario } from '@/types';
-import { addDays, addMonths, format } from 'date-fns';
+import { Espaco, OpcoesRecorrencia, ReservaFormData, SlotCalendario } from '@/types';
+import { addDays, addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
-import { FormEvent, useMemo } from 'react';
+import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 // Tipagem das props foi atualizada
 type AgendaDialogReservaProps = {
@@ -24,8 +24,10 @@ type AgendaDialogReservaProps = {
     hoje: Date;
     isSubmitting: boolean;
     isEditMode?: boolean;
+    espaco: Espaco;
     formData: ReservaFormData;
     setFormData: (key: keyof ReservaFormData, value: any) => void;
+    setSlotsSelecao?: (slots: SlotCalendario[]) => void;
 };
 
 export default function AgendaDialogReserva({
@@ -36,9 +38,14 @@ export default function AgendaDialogReserva({
     slotsSelecao,
     hoje,
     isSubmitting,
+    espaco,
     formData,
     setFormData,
+    setSlotsSelecao,
 }: AgendaDialogReservaProps) {
+    const [showRecurrenceAlert, setShowRecurrenceAlert] = useState(false);
+    const [datasComConflito, setDatasComConflito] = useState<string[]>([]);
+
     const opcoesRecorrencia: OpcoesRecorrencia[] = [
         {
             valor: 'unica',
@@ -65,6 +72,98 @@ export default function AgendaDialogReserva({
             calcularDataFinal: (dataInicial: Date) => dataInicial,
         },
     ];
+
+    const verificarConflitos = (horarios: any[]) => {
+        const conflitos: string[] = [];
+        horarios.forEach((hSol) => {
+            const dataSol = hSol.data;
+            espaco.agendas?.forEach((agenda) => {
+                if (agenda.id === hSol.agenda_id) {
+                    agenda.horarios?.forEach((hExist) => {
+                        if (
+                            hExist.data === dataSol &&
+                            hExist.situacao === 'deferida' &&
+                            hExist.horario_inicio < hSol.horario_fim &&
+                            hExist.horario_fim > hSol.horario_inicio
+                        ) {
+                            const dataFormatada = format(parseISO(dataSol), 'dd/MM/yyyy');
+                            if (!conflitos.includes(dataFormatada)) {
+                                conflitos.push(dataFormatada);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        setDatasComConflito(conflitos);
+    };
+
+    const handleSetFormData = (key: keyof ReservaFormData, value: any) => {
+        if (key === 'data_inicial') {
+            const newDate = value instanceof Date ? value : new Date(value);
+            const oldDate = formData.data_inicial ? new Date(formData.data_inicial) : null;
+
+            if (oldDate && !isNaN(newDate.getTime()) && !isNaN(oldDate.getTime())) {
+                const diffTime = newDate.getTime() - oldDate.getTime();
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays !== 0) {
+                    // 1. Shift horarios_solicitados in form data
+                    const newHorarios = formData.horarios_solicitados.map((h) => {
+                        const d = new Date(h.data + 'T00:00:00');
+                        d.setDate(d.getDate() + diffDays);
+                        return { ...h, data: format(d, 'yyyy-MM-dd') };
+                    });
+                    setFormData('horarios_solicitados', newHorarios);
+                    verificarConflitos(newHorarios);
+
+                    // 2. Shift slotsSelecao if possible (to update calendar UI)
+                    if (setSlotsSelecao) {
+                        const newSlots = slotsSelecao.map((s) => {
+                            const d = new Date(s.data);
+                            d.setDate(d.getDate() + diffDays);
+                            return { ...s, data: d, id: `${format(d, 'yyyy-MM-dd')}|${s.horario_inicio}` };
+                        });
+                        setSlotsSelecao(newSlots);
+                    }
+
+                    // 3. Update data_final based on recurrence
+                    if (formData.recorrencia !== 'personalizado') {
+                        const option = opcoesRecorrencia.find((o) => o.valor === formData.recorrencia);
+                        if (option) {
+                            setFormData('data_final', option.calcularDataFinal(newDate));
+                        }
+                    }
+                    setShowRecurrenceAlert(true);
+                }
+            }
+        } else if (key === 'recorrencia') {
+            setShowRecurrenceAlert(value !== 'unica');
+        } else if (key === 'horarios_solicitados') {
+            verificarConflitos(value);
+        }
+
+        setFormData(key, value);
+    };
+
+    // Alerta automático ao abrir o diálogo se houver recorrência ativa
+    useEffect(() => {
+        if (isOpen) {
+            if (formData.recorrencia !== 'unica') {
+                setShowRecurrenceAlert(true);
+            }
+            
+            // Verifica se a data inicial está no passado e ajusta se necessário
+            const dataInicial = formData.data_inicial ? new Date(formData.data_inicial) : null;
+            if (dataInicial && isBefore(startOfDay(dataInicial), startOfDay(hoje))) {
+                // Se estiver no passado, sugerimos mover para a próxima semana
+                const sugerida = addWeeks(dataInicial, 1);
+                handleSetFormData('data_inicial', sugerida);
+            } else {
+                verificarConflitos(formData.horarios_solicitados);
+            }
+        }
+    }, [isOpen]);
 
     const periodoRecorrencia = useMemo(
         () => ({
@@ -116,7 +215,7 @@ export default function AgendaDialogReserva({
                                 id="titulo"
                                 placeholder="Ex: Aula, Reunião"
                                 value={formData.titulo}
-                                onChange={(e) => setFormData('titulo', e.target.value)}
+                                onChange={(e) => handleSetFormData('titulo', e.target.value)}
                                 required
                             />
                         </div>
@@ -128,7 +227,7 @@ export default function AgendaDialogReserva({
                                 id="descricao"
                                 placeholder="Descreva o propósito da reserva..."
                                 value={formData.descricao}
-                                onChange={(e) => setFormData('descricao', e.target.value)}
+                                onChange={(e) => handleSetFormData('descricao', e.target.value)}
                                 className="min-h-[80px] resize-none"
                             />
                         </div>
@@ -136,7 +235,7 @@ export default function AgendaDialogReserva({
                         {isEditMode && (
                             <div className="space-y-2 border-t pt-4">
                                 <h3 className="flex items-center gap-2 font-medium">Aplicar Alterações Para:</h3>
-                                <RadioGroup value={formData.edit_scope} onValueChange={(v) => setFormData('edit_scope', v)} className="space-y-2">
+                                <RadioGroup value={formData.edit_scope} onValueChange={(v) => handleSetFormData('edit_scope', v)} className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="recurring" id="edit-scope-recurring" />
                                         <Label htmlFor="edit-scope-recurring" className="cursor-pointer">
@@ -157,7 +256,7 @@ export default function AgendaDialogReserva({
                             <h3 className="flex items-center gap-2 font-medium">
                                 <Repeat className="text-muted-foreground h-4 w-4" /> Período de Recorrência
                             </h3>
-                            <RadioGroup value={formData.recorrencia} onValueChange={(v) => setFormData('recorrencia', v)} className="space-y-2">
+                            <RadioGroup value={formData.recorrencia} onValueChange={(v) => handleSetFormData('recorrencia', v)} className="space-y-2">
                                 {opcoesRecorrencia.map((opcao) => (
                                     <div key={opcao.valor} className="flex items-start space-x-2">
                                         <RadioGroupItem value={opcao.valor} id={opcao.valor} />
@@ -172,70 +271,69 @@ export default function AgendaDialogReserva({
                             </RadioGroup>
                         </div>
 
-                        {formData.recorrencia === 'personalizado' && (
-                            <div className="bg-muted/10 grid grid-cols-2 gap-4 rounded-md border p-3">
-                                <div className="space-y-2">
-                                    <Label htmlFor="data-inicial" className="text-xs">
-                                        Início
-                                    </Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={'outline'}
-                                                className={cn(
-                                                    'w-full justify-start text-left font-normal',
-                                                    !formData.data_inicial && 'text-muted-foreground',
-                                                )}
-                                            >
-                                                <Calendar className="mr-2 h-4 w-4" />
-                                                {formData.data_inicial ? (
-                                                    format(new Date(formData.data_inicial), 'dd/MM/yyyy')
-                                                ) : (
-                                                    <span>Selecione</span>
-                                                )}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <CalendarComponent
-                                                mode="single"
-                                                selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
-                                                onSelect={(date) => setFormData('data_inicial', date)}
-                                                initialFocus
-                                                disabled={(date) => date < hoje}
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="data-final" className="text-xs">
-                                        Término
-                                    </Label>
-                                    <Popover modal>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant={'outline'}
-                                                className={cn(
-                                                    'w-full justify-start text-left font-normal',
-                                                    !formData.data_final && 'text-muted-foreground',
-                                                )}
-                                            >
-                                                <Calendar className="mr-2 h-4 w-4" />
-                                                {formData.data_final ? format(new Date(formData.data_final), 'dd/MM/yyyy') : <span>Selecione</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <CalendarComponent
-                                                mode="single"
-                                                selected={formData.data_final ? new Date(formData.data_final) : undefined}
-                                                onSelect={(date) => setFormData('data_final', date)}
-                                                initialFocus
-                                                disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
+                        <div className="bg-muted/10 grid grid-cols-2 gap-4 rounded-md border p-3">
+                            <div className="space-y-2">
+                                <Label htmlFor="data-inicial" className="text-xs">
+                                    Início {formData.recorrencia !== 'personalizado' && '(ajusta recorrência)'}
+                                </Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={'outline'}
+                                            className={cn(
+                                                'w-full justify-start text-left font-normal',
+                                                !formData.data_inicial && 'text-muted-foreground',
+                                            )}
+                                        >
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            {formData.data_inicial ? (
+                                                format(new Date(formData.data_inicial), 'dd/MM/yyyy')
+                                            ) : (
+                                                <span>Selecione</span>
+                                            )}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                            mode="single"
+                                            selected={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
+                                            onSelect={(date) => handleSetFormData('data_inicial', date)}
+                                            initialFocus
+                                            disabled={(date) => date < hoje}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                             </div>
-                        )}
+                            <div className="space-y-2">
+                                <Label htmlFor="data-final" className="text-xs">
+                                    Término {formData.recorrencia !== 'personalizado' && '(calculado)'}
+                                </Label>
+                                <Popover modal>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={'outline'}
+                                            className={cn(
+                                                'w-full justify-start text-left font-normal',
+                                                !formData.data_final && 'text-muted-foreground',
+                                            )}
+                                            disabled={formData.recorrencia !== 'personalizado'}
+                                        >
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            {formData.data_final ? format(new Date(formData.data_final), 'dd/MM/yyyy') : <span>Selecione</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                            mode="single"
+                                            selected={formData.data_final ? new Date(formData.data_final) : undefined}
+                                            onSelect={(date) => handleSetFormData('data_final', date)}
+                                            initialFocus
+                                            disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
 
                         <div className="bg-muted/30 flex items-start gap-2 rounded-md p-3">
                             <Info className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -266,6 +364,31 @@ export default function AgendaDialogReserva({
                             </ScrollArea>
                         </div>
                     </div>
+                    {datasComConflito.length > 0 && (
+                        <div className="bg-destructive/10 border-l-4 border-destructive text-destructive p-4 mt-4 rounded-sm shadow-sm" role="alert">
+                            <div className="flex items-center gap-2">
+                                <AlertCircle className="h-4 w-4" />
+                                <p className="font-semibold text-sm">Conflito de Horários Detectado</p>
+                            </div>
+                            <p className="mt-1 text-xs opacity-90">
+                                Já existem reservas confirmadas para as seguintes datas: <strong>{datasComConflito.join(', ')}</strong>.
+                                Por favor, altere os horários ou as datas para evitar conflitos, ou saiba que estes dias podem ser indeferidos.
+                            </p>
+                        </div>
+                    )}
+
+                    {showRecurrenceAlert && (
+                        <div className="bg-amber-50 border-l-4 border-amber-500 text-amber-900 p-4 mt-4 rounded-sm shadow-sm" role="alert">
+                            <div className="flex items-center gap-2">
+                                <Repeat className="h-4 w-4 text-amber-600" />
+                                <p className="font-semibold text-sm">Ajuste de Recorrência</p>
+                            </div>
+                            <p className="mt-1 text-xs opacity-90">
+                                O período final e os horários foram ajustados automaticamente para seguir o padrão de recorrência selecionado. 
+                                Ao alterar a data de início, todos os horários selecionados serão deslocados proporcionalmente.
+                            </p>
+                        </div>
+                    )}
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancelar

@@ -17,6 +17,7 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       locale={ptBR}
+      weekStartsOn={1} // Inicia a semana na segunda-feira
       classNames={{
         months: "flex flex-col sm:flex-row gap-2",
         month: "flex flex-col gap-4",

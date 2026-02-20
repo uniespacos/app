@@ -14,6 +14,10 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
 
     // Função interna para renderizar o conteúdo do slot
     const renderSlotContent = (): JSX.Element | null => {
+        if (slot.isPast && slot.status === 'livre') {
+            return null;
+        }
+
         if (isSelecionado) {
             return <p className="text-xs font-bold text-green-900">Selecionado</p>;
         }
@@ -69,6 +73,8 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                     'cursor-not-allowed': slot.isLocked,
                     // Hover genérico apenas para slots livres e clicáveis
                     'cursor-pointer hover:bg-gray-100': slot.status === 'livre' && !slot.isLocked,
+                    'bg-gray-200/50': slot.isPast && slot.status === 'livre',
+                    'grayscale opacity-60': slot.isPast && slot.status !== 'livre',
                 },
             )}
         >

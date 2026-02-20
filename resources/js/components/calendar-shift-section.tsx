@@ -87,13 +87,17 @@ export default function CalendarShiftSection({
                             const diaFormatado = format(dia.data, 'yyyy-MM-dd');
                             const chave = `${diaFormatado}|${horario_inicio_str}`;
 
+                            // Verifica se o slot está no passado (data e hora)
+                            const slotDateTime = new Date(`${diaFormatado}T${horario_inicio_str}`);
+                            const isPast = slotDateTime < new Date();
+
                             // Lógica para decidir o que renderizar na célula
                             let slot: SlotCalendario;
                             const horarioSolicitado = slotsSolicitadosMap.get(chave);
                             const horarioReservado = horariosReservadosMap.get(chave);
 
                             if (horarioSolicitado) {
-                                slot = horarioSolicitado;
+                                slot = { ...horarioSolicitado, isPast };
                             } else if (horarioReservado) {
                                 slot = {
                                     id: chave,
@@ -101,6 +105,7 @@ export default function CalendarShiftSection({
                                     data: dia.data,
                                     horario_inicio: horario_inicio_str,
                                     horario_fim: horario_fim_str,
+                                    isPast,
                                     dadosReserva: {
                                         horarioDB: horarioReservado.horario,
                                         autor: horarioReservado.autor,
@@ -115,6 +120,7 @@ export default function CalendarShiftSection({
                                     horario_inicio: horario_inicio_str,
                                     horario_fim: horario_fim_str,
                                     agenda_id: agenda.id,
+                                    isPast,
                                 };
                             }
 
