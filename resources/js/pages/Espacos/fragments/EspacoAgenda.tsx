@@ -125,34 +125,34 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             horario_fim: s.horario_fim,
             agenda_id: s.agenda_id,
         }));
-        
+
         setData((prevData) => {
             // Se os horários solicitados mudaram (mudança na seleção do calendário),
             // recalculamos as datas iniciais e finais sugeridas.
-            const novaDataInicial = slotsSelecao.length > 0 
-                ? new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime())))
-                : prevData.data_inicial;
-            
+            const novaDataInicial =
+                slotsSelecao.length > 0 ? new Date(Math.min(...slotsSelecao.map((s) => s.data.getTime()))) : prevData.data_inicial;
+
             let novaDataFinal = prevData.data_final;
             if (slotsSelecao.length > 0 && prevData.recorrencia !== 'personalizado') {
                 const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === prevData.recorrencia);
                 if (opcaoRecorrencia) {
-                    novaDataFinal = prevData.recorrencia === 'unica'
-                        ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                        : opcaoRecorrencia.calcularDataFinal(novaDataInicial);
+                    novaDataFinal =
+                        prevData.recorrencia === 'unica'
+                            ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                            : opcaoRecorrencia.calcularDataFinal(novaDataInicial);
                 }
             }
 
-            return { 
-                ...prevData, 
+            return {
+                ...prevData,
                 horarios_solicitados: horariosParaEnviar,
                 // Só atualizamos as datas se for uma mudança real na seleção de slots
                 // para não sobrescrever mudanças manuais feitas no modal.
                 data_inicial: novaDataInicial,
-                data_final: novaDataFinal
+                data_final: novaDataFinal,
             };
         });
-    }, [slotsSelecao]); // Removemos data.recorrencia e setData como dependências diretas
+    }, [slotsSelecao, setData]); // Adicionado setData
 
     // Efeito para reagir apenas à mudança de recorrência
     useEffect(() => {
@@ -164,13 +164,14 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === prevData.recorrencia);
             if (!opcaoRecorrencia) return prevData;
 
-            const novaDataFinal = prevData.recorrencia === 'unica'
-                ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                : opcaoRecorrencia.calcularDataFinal(prevData.data_inicial);
+            const novaDataFinal =
+                prevData.recorrencia === 'unica'
+                    ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
+                    : opcaoRecorrencia.calcularDataFinal(prevData.data_inicial);
 
             return { ...prevData, data_final: novaDataFinal };
         });
-    }, [data.recorrencia]);
+    }, [data.recorrencia, slotsSelecao, setData]);
 
     const diasSemana = useMemo(() => diasDaSemana(semanaVisivel, hoje), [semanaVisivel, hoje]);
 

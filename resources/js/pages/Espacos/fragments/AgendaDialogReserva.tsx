@@ -73,97 +73,106 @@ export default function AgendaDialogReserva({
         },
     ];
 
-    const verificarConflitos = (horarios: any[]) => {
-        const conflitos: string[] = [];
-        horarios.forEach((hSol) => {
-            const dataSol = hSol.data;
-            espaco.agendas?.forEach((agenda) => {
-                if (agenda.id === hSol.agenda_id) {
-                    agenda.horarios?.forEach((hExist) => {
-                        if (
-                            hExist.data === dataSol &&
-                            hExist.situacao === 'deferida' &&
-                            hExist.horario_inicio < hSol.horario_fim &&
-                            hExist.horario_fim > hSol.horario_inicio
-                        ) {
-                            const dataFormatada = format(parseISO(dataSol), 'dd/MM/yyyy');
-                            if (!conflitos.includes(dataFormatada)) {
-                                conflitos.push(dataFormatada);
+    const verificarConflitos = useCallback(
+        (horarios: any[]) => {
+            const conflitos: string[] = [];
+            horarios.forEach((hSol) => {
+                const dataSol = hSol.data;
+                espaco.agendas?.forEach((agenda) => {
+                    if (agenda.id === hSol.agenda_id) {
+                        agenda.horarios?.forEach((hExist) => {
+                            if (
+                                hExist.data === dataSol &&
+                                hExist.situacao === 'deferida' &&
+                                hExist.horario_inicio < hSol.horario_fim &&
+                                hExist.horario_fim > hSol.horario_inicio
+                            ) {
+                                const dataFormatada = format(parseISO(dataSol), 'dd/MM/yyyy');
+                                if (!conflitos.includes(dataFormatada)) {
+                                    conflitos.push(dataFormatada);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            setDatasComConflito(conflitos);
+        },
+        [espaco.agendas],
+    );
+
+    const handleSetFormData = useCallback(
+        (key: keyof ReservaFormData, value: any) => {
+            if (key === 'data_inicial') {
+                const newDate = value instanceof Date ? value : new Date(value);
+                const oldDate = formData.data_inicial ? new Date(formData.data_inicial) : null;
+
+                if (oldDate && !isNaN(newDate.getTime()) && !isNaN(oldDate.getTime())) {
+                    const diffTime = newDate.getTime() - oldDate.getTime();
+                    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays !== 0) {
+                        const newHorarios = formData.horarios_solicitados.map((h: any) => {
+                            const d = new Date(h.data + 'T00:00:00');
+                            d.setDate(d.getDate() + diffDays);
+                            return { ...h, data: format(d, 'yyyy-MM-dd') };
+                        });
+                        setFormData('horarios_solicitados', newHorarios);
+                        verificarConflitos(newHorarios);
+
+                        if (setSlotsSelecao) {
+                            const newSlots = slotsSelecao.map((s) => {
+                                const d = new Date(s.data);
+                                d.setDate(d.getDate() + diffDays);
+                                return { ...s, data: d, id: `${format(d, 'yyyy-MM-dd')}|${s.horario_inicio}` };
+                            });
+                            setSlotsSelecao(newSlots);
+                        }
+
+                        if (formData.recorrencia !== 'personalizado') {
+                            const option = opcoesRecorrencia.find((o) => o.valor === formData.recorrencia);
+                            if (option) {
+                                setFormData('data_final', option.calcularDataFinal(newDate));
                             }
                         }
-                    });
-                }
-            });
-        });
-        setDatasComConflito(conflitos);
-    };
-
-    const handleSetFormData = (key: keyof ReservaFormData, value: any) => {
-        if (key === 'data_inicial') {
-            const newDate = value instanceof Date ? value : new Date(value);
-            const oldDate = formData.data_inicial ? new Date(formData.data_inicial) : null;
-
-            if (oldDate && !isNaN(newDate.getTime()) && !isNaN(oldDate.getTime())) {
-                const diffTime = newDate.getTime() - oldDate.getTime();
-                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays !== 0) {
-                    // 1. Shift horarios_solicitados in form data
-                    const newHorarios = formData.horarios_solicitados.map((h) => {
-                        const d = new Date(h.data + 'T00:00:00');
-                        d.setDate(d.getDate() + diffDays);
-                        return { ...h, data: format(d, 'yyyy-MM-dd') };
-                    });
-                    setFormData('horarios_solicitados', newHorarios);
-                    verificarConflitos(newHorarios);
-
-                    // 2. Shift slotsSelecao if possible (to update calendar UI)
-                    if (setSlotsSelecao) {
-                        const newSlots = slotsSelecao.map((s) => {
-                            const d = new Date(s.data);
-                            d.setDate(d.getDate() + diffDays);
-                            return { ...s, data: d, id: `${format(d, 'yyyy-MM-dd')}|${s.horario_inicio}` };
-                        });
-                        setSlotsSelecao(newSlots);
+                        setShowRecurrenceAlert(true);
                     }
-
-                    // 3. Update data_final based on recurrence
-                    if (formData.recorrencia !== 'personalizado') {
-                        const option = opcoesRecorrencia.find((o) => o.valor === formData.recorrencia);
-                        if (option) {
-                            setFormData('data_final', option.calcularDataFinal(newDate));
-                        }
-                    }
-                    setShowRecurrenceAlert(true);
                 }
+            } else if (key === 'recorrencia') {
+                setShowRecurrenceAlert(value !== 'unica');
+            } else if (key === 'horarios_solicitados') {
+                verificarConflitos(value);
             }
-        } else if (key === 'recorrencia') {
-            setShowRecurrenceAlert(value !== 'unica');
-        } else if (key === 'horarios_solicitados') {
-            verificarConflitos(value);
-        }
 
-        setFormData(key, value);
-    };
+            setFormData(key, value);
+        },
+        [
+            formData.data_inicial,
+            formData.horarios_solicitados,
+            formData.recorrencia,
+            setFormData,
+            setSlotsSelecao,
+            slotsSelecao,
+            verificarConflitos,
+            opcoesRecorrencia,
+        ],
+    );
 
-    // Alerta automático ao abrir o diálogo se houver recorrência ativa
     useEffect(() => {
         if (isOpen) {
             if (formData.recorrencia !== 'unica') {
                 setShowRecurrenceAlert(true);
             }
-            
-            // Verifica se a data inicial está no passado e ajusta se necessário
+
             const dataInicial = formData.data_inicial ? new Date(formData.data_inicial) : null;
             if (dataInicial && isBefore(startOfDay(dataInicial), startOfDay(hoje))) {
-                // Se estiver no passado, sugerimos mover para a próxima semana
                 const sugerida = addWeeks(dataInicial, 1);
                 handleSetFormData('data_inicial', sugerida);
             } else {
                 verificarConflitos(formData.horarios_solicitados);
             }
         }
-    }, [isOpen]);
+    }, [isOpen, formData.recorrencia, formData.data_inicial, formData.horarios_solicitados, hoje, handleSetFormData, verificarConflitos]);
 
     const periodoRecorrencia = useMemo(
         () => ({
@@ -235,7 +244,11 @@ export default function AgendaDialogReserva({
                         {isEditMode && (
                             <div className="space-y-2 border-t pt-4">
                                 <h3 className="flex items-center gap-2 font-medium">Aplicar Alterações Para:</h3>
-                                <RadioGroup value={formData.edit_scope} onValueChange={(v) => handleSetFormData('edit_scope', v)} className="space-y-2">
+                                <RadioGroup
+                                    value={formData.edit_scope}
+                                    onValueChange={(v) => handleSetFormData('edit_scope', v)}
+                                    className="space-y-2"
+                                >
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="recurring" id="edit-scope-recurring" />
                                         <Label htmlFor="edit-scope-recurring" className="cursor-pointer">
@@ -286,11 +299,7 @@ export default function AgendaDialogReserva({
                                             )}
                                         >
                                             <Calendar className="mr-2 h-4 w-4" />
-                                            {formData.data_inicial ? (
-                                                format(new Date(formData.data_inicial), 'dd/MM/yyyy')
-                                            ) : (
-                                                <span>Selecione</span>
-                                            )}
+                                            {formData.data_inicial ? format(new Date(formData.data_inicial), 'dd/MM/yyyy') : <span>Selecione</span>}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
@@ -365,27 +374,27 @@ export default function AgendaDialogReserva({
                         </div>
                     </div>
                     {datasComConflito.length > 0 && (
-                        <div className="bg-destructive/10 border-l-4 border-destructive text-destructive p-4 mt-4 rounded-sm shadow-sm" role="alert">
+                        <div className="bg-destructive/10 border-destructive text-destructive mt-4 rounded-sm border-l-4 p-4 shadow-sm" role="alert">
                             <div className="flex items-center gap-2">
                                 <AlertCircle className="h-4 w-4" />
-                                <p className="font-semibold text-sm">Conflito de Horários Detectado</p>
+                                <p className="text-sm font-semibold">Conflito de Horários Detectado</p>
                             </div>
                             <p className="mt-1 text-xs opacity-90">
-                                Já existem reservas confirmadas para as seguintes datas: <strong>{datasComConflito.join(', ')}</strong>.
-                                Por favor, altere os horários ou as datas para evitar conflitos, ou saiba que estes dias podem ser indeferidos.
+                                Já existem reservas confirmadas para as seguintes datas: <strong>{datasComConflito.join(', ')}</strong>. Por favor,
+                                altere os horários ou as datas para evitar conflitos, ou saiba que estes dias podem ser indeferidos.
                             </p>
                         </div>
                     )}
 
                     {showRecurrenceAlert && (
-                        <div className="bg-amber-50 border-l-4 border-amber-500 text-amber-900 p-4 mt-4 rounded-sm shadow-sm" role="alert">
+                        <div className="mt-4 rounded-sm border-l-4 border-amber-500 bg-amber-50 p-4 text-amber-900 shadow-sm" role="alert">
                             <div className="flex items-center gap-2">
                                 <Repeat className="h-4 w-4 text-amber-600" />
-                                <p className="font-semibold text-sm">Ajuste de Recorrência</p>
+                                <p className="text-sm font-semibold">Ajuste de Recorrência</p>
                             </div>
                             <p className="mt-1 text-xs opacity-90">
-                                O período final e os horários foram ajustados automaticamente para seguir o padrão de recorrência selecionado. 
-                                Ao alterar a data de início, todos os horários selecionados serão deslocados proporcionalmente.
+                                O período final e os horários foram ajustados automaticamente para seguir o padrão de recorrência selecionado. Ao
+                                alterar a data de início, todos os horários selecionados serão deslocados proporcionalmente.
                             </p>
                         </div>
                     )}
