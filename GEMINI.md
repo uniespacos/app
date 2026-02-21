@@ -68,7 +68,7 @@ The project is designed to run within a Dockerized environment.
     php artisan storage:link
     php artisan migrate --seed
     ```
-    
+
     *Note: Ensure `REVERB_APP_ID`, `REVERB_APP_KEY`, and `REVERB_APP_SECRET` are set in `.env` for real-time features.*
 
 7. **Run the Dev Server:** Start the Vite development server for hot-reloading.
@@ -96,14 +96,14 @@ All commands below are intended to be run from the host machine unless specified
 
 The project uses Laravel Reverb for WebSockets. The configuration decouples internal Docker communication from external browser access:
 
-*   **Internal (Backend -> Reverb):** Uses **HTTP** on port **9000**.
-    *   `REVERB_HOST="reverb"`
-    *   `REVERB_PORT=9000`
-    *   `REVERB_SCHEME=http`
-*   **External (Browser -> Nginx -> Reverb):** Uses **HTTPS** (WSS) on port **443**.
-    *   `VITE_REVERB_HOST="localhost"`
-    *   `VITE_REVERB_PORT=443`
-    *   `VITE_REVERB_SCHEME=https`
+- **Internal (Backend -> Reverb):** Uses **HTTP** on port **9000**.
+  - `REVERB_HOST="reverb"`
+  - `REVERB_PORT=9000`
+  - `REVERB_SCHEME=http`
+- **External (Browser -> Nginx -> Reverb):** Uses **HTTPS** (WSS) on port **443**.
+  - `VITE_REVERB_HOST="localhost"`
+  - `VITE_REVERB_PORT=443`
+  - `VITE_REVERB_SCHEME=https`
 
 **Note:** The `queue-worker` container must have the `pcntl` PHP extension installed to handle Reverb signals correctly.
 
@@ -126,7 +126,6 @@ The project uses Laravel Reverb for WebSockets. The configuration decouples inte
   - Run all tests: `docker compose -f compose.dev.yml exec workspace php artisan test`
   - Alternatively: `docker compose -f compose.dev.yml exec workspace ./vendor/bin/phpunit`
 
-
 ### CI/CD Pipeline (`.github/workflows/main-pipeline.yml`)
 
 The pipeline automates quality checks and deployment:
@@ -135,3 +134,10 @@ The pipeline automates quality checks and deployment:
 2. **PHPUnit Tests:** Runs `php artisan test`.
 3. **Docker Build Check:** Ensures the production Docker image builds successfully.
 4. **Deploy to Production:** On a push to the `main` branch, automatically deploys the application to the production server via SSH.
+
+i### Don't forget
+
+Triggers who dont can forget:
+
+1. **Context7 MCP**
+   - Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
