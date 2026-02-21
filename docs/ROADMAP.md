@@ -22,7 +22,11 @@ This document outlines the strategic development plan for UniEspaços, organized
         *   [ ] Enhance Email and Reverb Notification Templates (#103)
         *   [ ] UI: Reservation List UI: Display Space and Module Information (#105)
         *   [ ] UI: Calendar UI: Add Day of Week to Slot Groups (#106)
-        *   [ ] Improve the reservation flow, calendar interaction, and feedback messages.
+        *   [x] Improve the reservation flow, calendar interaction, and feedback messages.
+            *   Fixed datepicker bugs preventing manual date changes.
+            *   Implemented "smart shift" for past slots and manual date adjustments.
+            *   Added dynamic alerts for recurrence and conflict detection.
+            *   Improved calendar UI by highlighting past slots and setting the week to start on Monday.
 
 ---
 
