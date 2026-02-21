@@ -27,6 +27,7 @@ This document outlines the strategic development plan for UniEspaços, organized
             *   Implemented "smart shift" for past slots and manual date adjustments.
             *   Added dynamic alerts for recurrence and conflict detection.
             *   Improved calendar UI by highlighting past slots and setting the week to start on Monday.
+            *   Fixed `useCallback` import to resolve runtime error.
 
 ---
 
