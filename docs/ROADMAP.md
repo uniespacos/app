@@ -8,7 +8,7 @@ This document outlines the strategic development plan for UniEspaços, organized
 *   **🛡️ Stability & Quality**
     *   [ ] **Bug Squashing Campaign:**
         *   [ ] Admin Page: Managers List Order Incorrect (#101)
-        *   [ ] Browser Tab Title (Title Tag) Not Updating Correctly (#110)
+        *   [x] Browser Tab Title (Title Tag) Not Updating Correctly (#110)
         *   [ ] Delete Confirmation Alert Positioned Incorrectly (#111)
     *   [/] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
     *   [x] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
@@ -66,4 +66,4 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize planning.
 
 ---
-*Last updated: February 20, 2026*
+*Last updated: February 21, 2026*
