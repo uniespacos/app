@@ -1,4 +1,4 @@
-import { router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -32,6 +32,7 @@ export default function Login() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+            <Head title="Entrar" />
             <div className="w-full max-w-md">
                 <Card className="w-full">
                     <CardHeader className="space-y-1">

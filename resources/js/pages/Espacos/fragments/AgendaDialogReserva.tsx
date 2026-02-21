@@ -13,7 +13,7 @@ import { Espaco, OpcoesRecorrencia, ReservaFormData, SlotCalendario } from '@/ty
 import { addDays, addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useState, useCallback } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 // Tipagem das props foi atualizada
 type AgendaDialogReservaProps = {
