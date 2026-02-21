@@ -35,27 +35,5 @@ class NewReservationNotification extends BaseNotification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'reserva_id' => $this->reserva->id,
-            'user_id' => $this->reserva->user->id,
-            'user_name' => $this->reserva->user->name,
-            'reserva_name' => $this->reserva->nome,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'user_id' => $this->reserva->user->id,
-            'user_name' => $this->reserva->user->name,
-            'reserva_name' => $this->reserva->nome,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

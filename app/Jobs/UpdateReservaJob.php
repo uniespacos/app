@@ -48,7 +48,7 @@ class UpdateReservaJob implements ShouldQueue
             DB::transaction(function () {
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
-                    'descricao' => $this->validatedData['descricao'],
+                    'descricao' => $this->validatedData['descricao'] ?? '',
                     'data_inicial' => $this->validatedData['data_inicial'],
                     'data_final' => $this->validatedData['data_final'],
                     'recorrencia' => $this->validatedData['recorrencia'],

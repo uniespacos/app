@@ -39,27 +39,5 @@ class UserRemovedAsManagerNotification extends BaseNotification
             ->view('emails.users.user_removed_as_manager', ['user' => $this->user, 'espacoNome' => $this->espacoNome, 'turno' => $this->turno, 'url' => $this->url]);
     }
 
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-            'espaco_nome' => $this->espacoNome,
-            'turno' => $this->turno,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-            'espaco_nome' => $this->espacoNome,
-            'turno' => $this->turno,
-        ]);
-    }
-}

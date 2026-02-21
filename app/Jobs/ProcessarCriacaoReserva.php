@@ -62,7 +62,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 // 1. Cria a reserva principal com os dados recebidos.
                 $reserva = Reserva::create([
                     'titulo' => $this->dadosRequisicao['titulo'],
-                    'descricao' => $this->dadosRequisicao['descricao'],
+                    'descricao' => $this->dadosRequisicao['descricao'] ?? '',
                     'data_inicial' => $this->dadosRequisicao['data_inicial'],
                     'data_final' => $this->dadosRequisicao['data_final'],
                     'recorrencia' => $this->dadosRequisicao['recorrencia'],
@@ -71,7 +71,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 ]);
 
                 // --- LÓGICA DE CRIAÇÃO DOS HORÁRIOS (A PARTE LENTA) ---
-                $horariosData = $this->dadosRequisicao['horarios'];
+                $horariosData = $this->dadosRequisicao['horarios_solicitados'] ?? $this->dadosRequisicao['horarios'];
                 $gestores = [];
                 $dataFinalReserva = Carbon::parse($reserva->data_final);
 

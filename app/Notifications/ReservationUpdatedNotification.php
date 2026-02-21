@@ -26,23 +26,5 @@ class ReservationUpdatedNotification extends BaseNotification
             ->view('emails.reservations.reservation_updated', ['reserva' => $this->reserva, 'url' => $this->url]);
     }
 
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

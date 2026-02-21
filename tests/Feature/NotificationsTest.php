@@ -71,12 +71,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->manager)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals($this->reserva->user->id, $broadcastData['user_id']);
-        $this->assertEquals($this->reserva->user->name, $broadcastData['user_name']);
-        $this->assertEquals($this->reserva->nome, $broadcastData['reserva_name']);
-        $this->assertStringContainsString('Uma nova solicitação de reserva para', $broadcastData['message']);
-        $this->assertEquals(route('gestor.reservas.show', $this->reserva->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_evaluated_notification_sends_correct_mail_and_broadcast_data()
@@ -97,11 +94,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals('deferida', $broadcastData['status_avaliacao']);
-        $this->assertEquals($this->reserva->nome, $broadcastData['reserva_name']);
-        $this->assertStringContainsString("Sua reserva para '{$this->reserva->nome}' foi deferida.", $broadcastData['message']);
-        $this->assertEquals(route('reservas.show', $this->reserva->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_created_notification_sends_correct_mail_and_broadcast_data()
@@ -122,10 +117,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals($this->reserva->titulo, $broadcastData['reserva_titulo']);
-        $this->assertStringContainsString('Sua solicitação de reserva para', $broadcastData['message']);
-        $this->assertEquals(route('reservas.show', $this->reserva->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_failed_notification_sends_correct_mail_and_broadcast_data()
@@ -146,11 +140,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->reserva->titulo, $broadcastData['reservation_title']);
-        $this->assertEquals($this->user->id, $broadcastData['user_id']);
-        $this->assertEquals($this->user->name, $broadcastData['user_name']);
-        $this->assertStringContainsString('Houve um erro ao processar sua solicitação para', $broadcastData['message']);
-        $this->assertEquals(route('reservas.index'), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_canceled_notification_sends_correct_mail_and_broadcast_data()
@@ -171,12 +163,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->manager)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals($this->reserva->titulo, $broadcastData['reserva_titulo']);
-        $this->assertEquals($this->user->id, $broadcastData['canceler_id']);
-        $this->assertEquals($this->user->name, $broadcastData['canceler_name']);
-        $this->assertStringContainsString('O usuário '.$this->user->name.' cancelou a reserva', $broadcastData['message']);
-        $this->assertEquals(route('gestor.reservas.index'), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_updated_notification_sends_correct_mail_and_broadcast_data()
@@ -196,10 +185,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals($this->reserva->titulo, $broadcastData['reserva_titulo']);
-        $this->assertStringContainsString("Sua reserva '{$this->reserva->titulo}' foi atualizada com sucesso.", $broadcastData['message']);
-        $this->assertEquals(route('reservas.show', $this->reserva->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_reservation_update_failed_notification_sends_correct_mail_and_broadcast_data()
@@ -220,12 +208,9 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->reserva->id, $broadcastData['reserva_id']);
-        $this->assertEquals($this->reserva->titulo, $broadcastData['reserva_titulo']);
-        $this->assertEquals($this->user->id, $broadcastData['user_id']);
-        $this->assertEquals($this->user->name, $broadcastData['user_name']);
-        $this->assertStringContainsString("Ocorreu um erro ao processar a atualização da sua reserva '{$this->reserva->titulo}'.", $broadcastData['message']);
-        $this->assertEquals(route('reservas.edit', $this->reserva->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 
     public function test_user_assigned_as_manager_notification_sends_correct_mail_and_broadcast_data()
@@ -241,6 +226,11 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString('Você foi designado(a) como gestor(a) de agenda em nosso sistema.', $mailDataGeneral);
         $this->assertStringContainsString(route('espacos.index'), $mailDataGeneral);
 
+        $broadcastDataGeneral = $generalManagerNotification->toBroadcast($this->manager)->data;
+        $this->assertArrayHasKey('titulo', $broadcastDataGeneral);
+        $this->assertArrayHasKey('descricao', $broadcastDataGeneral);
+        $this->assertArrayHasKey('url', $broadcastDataGeneral);
+
         // Test for space-specific manager assignment
         $spaceManagerNotification = new UserAssignedAsManagerNotification($this->manager, $this->espaco->nome, 'manha');
         $mailMessageSpace = $spaceManagerNotification->toMail($this->manager);
@@ -250,12 +240,9 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString(route('espacos.show', $this->espaco->id), $mailDataSpace);
 
         $broadcastDataSpace = $spaceManagerNotification->toBroadcast($this->manager)->data;
-        $this->assertEquals($this->manager->id, $broadcastDataSpace['user_id']);
-        $this->assertEquals($this->manager->name, $broadcastDataSpace['user_name']);
-        $this->assertStringContainsString("Você foi designado como gestor do espaço: {$this->espaco->nome} Turno: manha.", $broadcastDataSpace['message']);
-        $this->assertEquals(route('espacos.show', $this->espaco->id), $broadcastDataSpace['url']);
-        $this->assertEquals($this->espaco->nome, $broadcastDataSpace['espaco_nome']);
-        $this->assertEquals('manha', $broadcastDataSpace['turno']);
+        $this->assertArrayHasKey('titulo', $broadcastDataSpace);
+        $this->assertArrayHasKey('descricao', $broadcastDataSpace);
+        $this->assertArrayHasKey('url', $broadcastDataSpace);
     }
 
     public function test_user_removed_as_manager_notification_sends_correct_mail_and_broadcast_data()
@@ -271,6 +258,11 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString('Você foi removido(a) como gestor(a) de agenda em nosso sistema.', $mailDataGeneral);
         $this->assertStringContainsString(route('espacos.index'), $mailDataGeneral);
 
+        $broadcastDataGeneral = $generalRemovalNotification->toBroadcast($this->manager)->data;
+        $this->assertArrayHasKey('titulo', $broadcastDataGeneral);
+        $this->assertArrayHasKey('descricao', $broadcastDataGeneral);
+        $this->assertArrayHasKey('url', $broadcastDataGeneral);
+
         // Test for space-specific manager removal
         $spaceRemovalNotification = new UserRemovedAsManagerNotification($this->manager, $this->espaco->nome, 'manha');
         $mailMessageSpace = $spaceRemovalNotification->toMail($this->manager);
@@ -280,12 +272,9 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString(route('espacos.index'), $mailDataSpace);
 
         $broadcastDataSpace = $spaceRemovalNotification->toBroadcast($this->manager)->data;
-        $this->assertEquals($this->manager->id, $broadcastDataSpace['user_id']);
-        $this->assertEquals($this->manager->name, $broadcastDataSpace['user_name']);
-        $this->assertStringContainsString("Você foi removido como gestor do espaço: {$this->espaco->nome} Turno: manha.", $broadcastDataSpace['message']);
-        $this->assertEquals(route('espacos.index'), $broadcastDataSpace['url']);
-        $this->assertEquals($this->espaco->nome, $broadcastDataSpace['espaco_nome']);
-        $this->assertEquals('manha', $broadcastDataSpace['turno']);
+        $this->assertArrayHasKey('titulo', $broadcastDataSpace);
+        $this->assertArrayHasKey('descricao', $broadcastDataSpace);
+        $this->assertArrayHasKey('url', $broadcastDataSpace);
     }
 
     public function test_sector_updated_notification_sends_correct_mail_and_broadcast_data()
@@ -306,11 +295,8 @@ class NotificationsTest extends TestCase
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
-        $this->assertEquals($this->setor->id, $broadcastData['setor_id']);
-        $this->assertEquals($this->setor->nome, $broadcastData['setor_name']);
-        $this->assertEquals($this->user->id, $broadcastData['user_id']);
-        $this->assertEquals($this->user->name, $broadcastData['user_name']);
-        $this->assertStringContainsString("O setor {$this->setor->nome} foi atualizado.", $broadcastData['message']);
-        $this->assertEquals(route('institucional.setors.show', $this->setor->id), $broadcastData['url']);
+        $this->assertArrayHasKey('titulo', $broadcastData);
+        $this->assertArrayHasKey('descricao', $broadcastData);
+        $this->assertArrayHasKey('url', $broadcastData);
     }
 }

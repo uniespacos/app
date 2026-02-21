@@ -29,27 +29,5 @@ class SectorUpdatedNotification extends BaseNotification
             ->view('emails.users.sector_updated', ['setor' => $this->setor, 'user' => $this->user, 'url' => $this->url]);
     }
 
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'setor_id' => $this->setor->id,
-            'setor_name' => $this->setor->nome,
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'setor_id' => $this->setor->id,
-            'setor_name' => $this->setor->nome,
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

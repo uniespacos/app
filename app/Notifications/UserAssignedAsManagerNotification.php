@@ -39,15 +39,4 @@ class UserAssignedAsManagerNotification extends BaseNotification
             ->view('emails.users.user_assigned_as_manager', ['manager' => $this->manager, 'espacoNome' => $this->espacoNome, 'turno' => $this->turno, 'url' => $this->url]);
     }
 
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'user_id' => $this->manager->id,
-            'user_name' => $this->manager->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-            'espaco_nome' => $this->espacoNome,
-            'turno' => $this->turno,
-        ]);
     }
-}

@@ -29,27 +29,5 @@ class ReservationCanceledNotification extends BaseNotification
             ->view('emails.reservations.reservation_canceled', ['reserva' => $this->reserva, 'canceler' => $this->canceler, 'url' => $this->url]);
     }
 
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'canceler_id' => $this->canceler->id,
-            'canceler_name' => $this->canceler->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'canceler_id' => $this->canceler->id,
-            'canceler_name' => $this->canceler->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

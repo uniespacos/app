@@ -37,22 +37,5 @@ class NovaSolicitacaoReservaNotification extends BaseNotification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'solicitacao_id' => $this->solicitacao->id,
-            'usuario_nome' => $this->solicitacao->user->name, // Supondo que a solicitação tem um usuário
-            'mensagem' => $this->descricao,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'solicitacao_id' => $this->solicitacao->id,
-            'usuario_nome' => $this->solicitacao->user->name,
-            'mensagem' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

@@ -40,24 +40,5 @@ class ReservaAvaliadaNotification extends BaseNotification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
-    {
-        // Dados para serem salvos no banco de dados
-        return [
-            'reserva_id' => $this->reserva->id,
-            'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => $this->descricao,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        // Dados para serem enviados via Pusher
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}

@@ -29,27 +29,5 @@ class ReservationUpdateFailedNotification extends BaseNotification
             ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reserva->titulo, 'user' => $this->user, 'url' => $this->url]);
     }
 
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ];
+    
     }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'reserva_titulo' => $this->reserva->titulo,
-            'user_id' => $this->user->id,
-            'user_name' => $this->user->name,
-            'message' => $this->descricao,
-            'url' => $this->url,
-        ]);
-    }
-}
