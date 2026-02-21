@@ -1,10 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Head } from '@inertiajs/react';
 import { Building2, Link, Settings, Users } from 'lucide-react';
 import { Button } from 'react-day-picker';
 
 export default function Home() {
     return (
         <div className="container mx-auto py-8">
+            <Head title="Painel Administrativo" />
             <div className="mb-8 text-center">
                 <h1 className="mb-4 text-4xl font-bold">Sistema de Gestão Organizacional</h1>
                 <p className="text-muted-foreground text-xl">Gerencie instituições, unidades e setores de forma integrada</p>

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Instituicao } from '@/types';
-import { router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { FormRegistroUsuario } from './fragments/FormRegistroUsuario';
@@ -62,6 +62,7 @@ export default function Register() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+            <Head title="Criar conta" />
             <div className="container mx-auto px-4 py-8">
                 <div className="mx-auto max-w-6xl">
                     <div className="grid items-center gap-8 lg:grid-cols-2">
