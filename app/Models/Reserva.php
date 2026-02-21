@@ -29,6 +29,19 @@ class Reserva extends Model
         'cache_validated_at' => 'datetime',
     ];
 
+    // Accessor para formatar a situação para exibição
+    public function getSituacaoFormatadaAttribute(): string
+    {
+        return match ($this->situacao) {
+            'em_analise' => 'Em Análise',
+            'deferida' => 'Deferida',
+            'indeferida' => 'Indeferida',
+            'parcialmente_deferida' => 'Parcialmente Deferida',
+            'inativa' => 'Inativa',
+            default => ucfirst(str_replace('_', ' ', $this->situacao)),
+        };
+    }
+
     public function horarios()
     {
         return $this->hasMany(Horario::class);

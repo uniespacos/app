@@ -12,7 +12,7 @@ use App\Models\Espaco;
 use App\Models\Modulo;
 use App\Models\Unidade;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\UserAssignedAsManagerNotification;
 use App\Services\GestaoAgendaService;
 use Exception;
 use Illuminate\Http\Request;
@@ -254,10 +254,10 @@ class InstitucionalEspacoController extends Controller
             });
             foreach ($espaco->agendas as $agenda) {
                 if ($agenda->user) {
-                    $agenda->user->notify(new NotificationModel(
-                        'Gestão de Espaços',
-                        'O espaço '.$espaco->nome.' foi atualizado.',
-                        route('espacos.show', $espaco->id)
+                    $agenda->user->notify(new UserAssignedAsManagerNotification(
+                        $agenda->user,
+                        $espaco->nome,
+                        $agenda->turno
                     ));
                 }
             }

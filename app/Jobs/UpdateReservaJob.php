@@ -4,7 +4,8 @@ namespace App\Jobs;
 
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationUpdateFailedNotification;
+use App\Notifications\ReservationUpdatedNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -95,10 +96,8 @@ class UpdateReservaJob implements ShouldQueue
             });
 
             // Notifica o usuário que a edição foi processada com sucesso
-            $this->user->notify(new NotificationModel(
-                'Reserva Atualizada',
-                "Sua reserva '{$this->reserva->titulo}' foi atualizada com sucesso.",
-                route('reservas.show', $this->reserva->id)
+            $this->user->notify(new ReservationUpdatedNotification(
+                $this->reserva
             ));
 
         } catch (Exception $e) {
@@ -113,10 +112,9 @@ class UpdateReservaJob implements ShouldQueue
     public function failed(Throwable $exception): void
     {
         // Notifica o usuário que a edição falhou
-        $this->user->notify(new NotificationModel(
-            'Falha ao Atualizar Reserva',
-            "Ocorreu um erro ao processar a atualização da sua reserva '{$this->reserva->titulo}'. Por favor, tente novamente.",
-            route('reservas.edit', $this->reserva->id)
+        $this->user->notify(new ReservationUpdateFailedNotification(
+            $this->reserva,
+            $this->user
         ));
     }
 }

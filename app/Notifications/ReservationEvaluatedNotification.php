@@ -2,37 +2,34 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
+use App\Models\Reserva;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use App\Notifications\BaseNotification;
 
-class ReservaAvaliadaNotification extends BaseNotification
+class ReservationEvaluatedNotification extends BaseNotification
 {
-    use Queueable;
+    public Reserva $reserva;
+    public string $statusAvaliacao;
 
-    public $reserva;
-
-    public $statusAvaliacao; // 'aprovada', 'parcialmente_aprovada', 'rejeitada'
-
-    public function __construct($reserva, $statusAvaliacao)
+    public function __construct(Reserva $reserva, string $statusAvaliacao)
     {
         parent::__construct(
             'Reserva Avaliada',
             "Sua reserva para '{$reserva->nome}' foi {$statusAvaliacao}.",
-            route('reservas.index')
+            route('reservas.show', $reserva->id)
         );
         $this->reserva = $reserva;
         $this->statusAvaliacao = $statusAvaliacao;
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
+     * Get the mail representation of the notification.
      */
-    public function via(object $notifiable): array
+    public function toMail(object $notifiable): MailMessage
     {
-        return ['database', 'broadcast'];
+        return (new MailMessage)
+            ->subject('Reserva Avaliada: ' . $this->reserva->nome)
+            ->view('emails.reservations.reservation_evaluated', ['reserva' => $this->reserva, 'statusAvaliacao' => $this->statusAvaliacao, 'url' => $this->url]);
     }
 
     /**
@@ -42,21 +39,22 @@ class ReservaAvaliadaNotification extends BaseNotification
      */
     public function toArray(object $notifiable): array
     {
-        // Dados para serem salvos no banco de dados
         return [
             'reserva_id' => $this->reserva->id,
             'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => $this->descricao,
+            'reserva_name' => $this->reserva->nome,
+            'message' => $this->descricao,
+            'url' => $this->url,
         ];
     }
 
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        // Dados para serem enviados via Pusher
         return new BroadcastMessage([
             'reserva_id' => $this->reserva->id,
             'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => $this->descricao,
+            'reserva_name' => $this->reserva->nome,
+            'message' => $this->descricao,
             'url' => $this->url,
         ]);
     }

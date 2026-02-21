@@ -138,13 +138,13 @@ jobs:
 
       - name: Run Frontend Tests
         env:
-            NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-            export NVM_DIR=\"\$HOME/.nvm\"
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-            npm test
-           "
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+           export NVM_DIR=\"\$HOME/.nvm\"
+           [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+           npm test
+          "
 
       - name: Run Backend Tests
         run: |
@@ -204,6 +204,9 @@ jobs:
         run: npm ci && npm run build
 
       - name: Build and push PHP App Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -219,6 +222,9 @@ jobs:
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
       - name: Build and push Nginx Web Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -265,14 +271,14 @@ jobs:
           # Securely copy the configuration files
           scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
           scp ./.env.staging ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/.env
-          
+
           # Create nginx config directory and copy default.conf
           ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
           scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/docker/production/nginx/default.conf
 
           # Securely copy the new deployment script to the server
           scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
-          
+
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_HOST }} "
             set -e
@@ -321,11 +327,11 @@ jobs:
       - name: Deploy to Production via SSH
         run: |
           PRODUCTION_PATH="/home/operador/app"
-          
+
           # Securely copy the new deployment script to the server
           scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
           scp ./scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
-          
+
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
             set -e

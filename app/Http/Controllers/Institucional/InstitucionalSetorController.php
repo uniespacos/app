@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateSetorRequest;
 use App\Models\Setor;
 use App\Models\Unidade;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\SectorUpdatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -89,10 +89,9 @@ class InstitucionalSetorController extends Controller
             $setor->load(['users']);
             // Notifica os usuários do setor sobre a atualização
             foreach ($setor->users as $user) {
-                $user->notify(new NotificationModel(
-                    'Setor Atualizado',
-                    'O setor '.$setor->nome.' foi atualizado.',
-                    route('institucional.setors.show', $setor->id) // Redireciona para a página do setor atualizado
+                $user->notify(new SectorUpdatedNotification(
+                    $setor,
+                    $user
                 ));
             }
 

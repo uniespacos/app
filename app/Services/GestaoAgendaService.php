@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\BaseNotification;
+use App\Notifications\UserAssignedAsManagerNotification;
+use App\Notifications\UserRemovedAsManagerNotification;
 use Illuminate\Support\Facades\DB;
 
 class GestaoAgendaService
@@ -46,22 +48,14 @@ class GestaoAgendaService
                 if (! empty($agendaIds)) {
                     Agenda::whereIn('id', $agendaIds)->update(['user_id' => $user->id]);
                 }
-                $user->notify(new NotificationModel(
-                    'Gestão de Espaços',
-                    'Você foi designado como gestor de agenda.',
-                    route('espacos.index')
-                ));
+                $user->notify(new UserAssignedAsManagerNotification($user));
             });
         } else {
             // 4. Se a permissão for de Administrador ou outra que não gerencia agendas,
             // garante que ele não tenha nenhuma agenda vinculada.
             if ($permissionTypeId == 1 || $permissionTypeId == 3) { // Ex: Admin, etc.
                 Agenda::where('user_id', $user->id)->update(['user_id' => null]);
-                $user->notify(new NotificationModel(
-                    'Gestão de Espaços',
-                    'Você foi removido como gestor de agenda.',
-                    route('espacos.index')
-                ));
+                $user->notify(new UserRemovedAsManagerNotification($user));
             }
         }
     }
@@ -98,12 +92,7 @@ class GestaoAgendaService
                     if ($newUser && $newUser->permission_type_id != self::GESTOR_PERMISSION_ID) {
                         $newUser->permission_type_id = self::GESTOR_PERMISSION_ID;
                         $newUser->save();
-                        $newUser->notify(new NotificationModel(
-                            'Gestão de Espaços',
-                            'Você foi designado como gestor do espaço: '.$espaco->nome
-                                .' Turno: '.$turno,
-                            route('espacos.show', $espaco->id)
-                        ));
+                        $newUser->notify(new UserAssignedAsManagerNotification($newUser, $espaco->nome, $turno));
                     }
                 }
 
@@ -116,12 +105,7 @@ class GestaoAgendaService
                     if ($oldUser && ! Agenda::where('user_id', $oldUserId)->exists()) {
                         $oldUser->permission_type_id = 3; // Ex: Rebaixar para tipo padrão
                         $oldUser->save();
-                        $oldUser->notify(new NotificationModel(
-                            'Gestão de Espaços',
-                            'Você foi removido como gestor do espaço: '.$espaco->nome
-                                .' Turno: '.$turno,
-                            route('espacos.show', $espaco->id)
-                        ));
+                        $oldUser->notify(new UserRemovedAsManagerNotification($oldUser, $espaco->nome, $turno));
                     }
                 }
             }

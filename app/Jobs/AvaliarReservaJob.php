@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationEvaluatedNotification;
 use App\Services\ConflictDetectionService;
 use Carbon\Carbon;
 use Exception;
@@ -144,12 +144,9 @@ class AvaliarReservaJob implements ShouldQueue
             if ($horariosRecemAprovados->isNotEmpty()) {
                 $this->triggerConflictRevalidation($horariosRecemAprovados);
             }
-            $partesDoNome = explode(' ', $this->gestor->name);
-            $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
-            $this->reserva->user->notify(new NotificationModel(
-                'Sua reserva foi avaliada',
-                "A reserva '{$this->reserva->titulo}' foi avaliada. Status atual: {$this->reserva->situacao_formatada}.",
-                route('reservas.show', ['reserva' => $this->reserva->id])
+            $this->reserva->user->notify(new ReservationEvaluatedNotification(
+                $this->reserva,
+                $this->reserva->situacao_formatada
             ));
 
         } catch (Exception $e) {
@@ -166,10 +163,10 @@ class AvaliarReservaJob implements ShouldQueue
         } else {
             $errorMessage .= ' A equipe de suporte foi notificada.';
         }
-        $this->gestor->notify(new NotificationModel(
-            'Falha na Avaliação',
-            $errorMessage,
-            route('gestor.reservas.show', $this->reserva->id)
+        $this->gestor->notify(new UserRemovedAsManagerNotification(
+            $this->gestor,
+            $this->reserva->espaco->nome,
+            $this->reserva->agendas->first()->turno // Assuming there's at least one agenda
         ));
     }
 

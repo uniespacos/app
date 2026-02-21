@@ -83,6 +83,8 @@ services:
       - ./:/var/www
     networks:
       - development
+    env_file:
+      - .env
 
   reverb:
     container_name: reverb

@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use App\Models\User;
+
+class ReservationFailedNotification extends BaseNotification
+{
+    public string $reservationTitle;
+    public User $user;
+
+    public function __construct(string $reservationTitle, User $user)
+    {
+        parent::__construct(
+            'Falha na sua solicitação de reserva',
+            'Houve um erro ao processar sua solicitação para "' . $reservationTitle . '". Por favor, tente novamente ou contate o suporte.',
+            route('reservas.index')
+        );
+        $this->reservationTitle = $reservationTitle;
+        $this->user = $user;
+    }
+
+    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    {
+        return (new \Illuminate\Notifications\Messages\MailMessage)
+            ->subject('Falha na sua solicitação de reserva: ' . $this->reservationTitle)
+            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reservationTitle, 'user' => $this->user, 'url' => $this->url]);
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'reservation_title' => $this->reservationTitle,
+            'user_id' => $this->user->id,
+            'user_name' => $this->user->name,
+            'message' => $this->descricao,
+            'url' => $this->url,
+        ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'reservation_title' => $this->reservationTitle,
+            'user_id' => $this->user->id,
+            'user_name' => $this->user->name,
+            'message' => $this->descricao,
+            'url' => $this->url,
+        ]);
+    }
+}

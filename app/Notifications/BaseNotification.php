@@ -7,7 +7,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotificationModel extends Notification
+abstract class BaseNotification extends Notification
 {
     use Queueable;
 

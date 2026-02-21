@@ -9,7 +9,7 @@ use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationCanceledNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -283,16 +283,10 @@ class ReservaController extends Controller
                 $gestores = array_unique($gestores); // Remove gestores duplicados
 
                 foreach ($gestores as $gestor) {
-                    $partesDoNome = explode(' ', Auth::user()->name);
-                    $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
-                    $resultado = implode(' ', $doisPrimeirosNomesArray);
-                    // 3. Notifica cada gestor sobre o cancelamento da reserva.
                     $gestor->notify(
-                        new NotificationModel(
-                            'Reserva cancelada',
-                            'O usuário '.$resultado.
-                            ' cancelou uma reserva.',
-                            route('gestor.reservas.index')
+                        new ReservationCanceledNotification(
+                            $reserva,
+                            $user
                         )
                     );
                 }
