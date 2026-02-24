@@ -9,6 +9,7 @@ ARG NODE_VERSION=22.0.0
 
 # Install system dependencies and build libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
     curl \
     unzip \
     libpq-dev \
@@ -54,17 +55,20 @@ RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
 
 # If the group already exists, use it; otherwise, create the 'www' group
 RUN if [ "${UID}" -ne "0" ]; then \
-        if getent group ${GID}; then \
-            useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
-        else \
-            groupadd -g ${GID} www && \
-            useradd -m -u ${UID} -g www -s /bin/bash www; \
-        fi && \
-        usermod -aG sudo www && \
-        echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
+    if getent group ${GID}; then \
+    useradd -m -u ${UID} -g ${GID} -s /bin/bash www; \
     else \
-        apt-get update && apt-get install -y sudo; \
+    groupadd -g ${GID} www && \
+    useradd -m -u ${UID} -g www -s /bin/bash www; \
+    fi && \
+    usermod -aG sudo www && \
+    echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers; \
+    else \
+    apt-get update && apt-get install -y sudo; \
     fi
+# Copy the entrypoint script
+COPY ./docker/development/workspace/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch to the non-root user to install NVM and Node.js
 USER www
@@ -83,12 +87,11 @@ RUN echo 'export NVM_DIR="$HOME/.nvm"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/www/.bashrc
 
-
 # Set the working directory
 WORKDIR /var/www
 
 # Override the entrypoint to avoid the default php entrypoint
-ENTRYPOINT []
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Default command to keep the container running
 CMD ["bash"]

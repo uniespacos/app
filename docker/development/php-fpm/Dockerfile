@@ -1,6 +1,7 @@
 FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
     curl \
     unzip \
     libpq-dev \
@@ -86,9 +87,10 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Switch back to the non-privileged user to run the application
 USER www
 
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000
+
 # Change the default command to run the entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
 CMD ["php-fpm"]
