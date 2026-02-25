@@ -57,5 +57,47 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('testing')) {
             Vite::macro('shouldBeIgnored', fn () => true);
         }
+
+        // Environment variable validation
+        $this->validateEnvVariables();
+    }
+
+    /**
+     * Validate essential environment variables.
+     */
+    protected function validateEnvVariables(): void
+    {
+        $requiredEnvVariables = [
+            'APP_NAME',
+            'APP_ENV',
+            'APP_URL',
+            'APP_URL_WITHOUT_SCHEME',
+            'DB_CONNECTION',
+            'DB_HOST',
+            'DB_PORT',
+            'DB_DATABASE',
+            'DB_USERNAME',
+            'DB_PASSWORD',
+            'SESSION_DRIVER',
+            'BROADCAST_DRIVER',
+            'CACHE_STORE',
+            'REVERB_APP_ID',
+            'REVERB_APP_KEY',
+            'REVERB_APP_SECRET',
+            'REVERB_HOST',
+            'REVERB_PORT',
+            'REVERB_SCHEME',
+            'VITE_APP_NAME',
+            'VITE_REVERB_APP_KEY',
+            'VITE_REVERB_HOST',
+            'VITE_REVERB_PORT',
+            'VITE_REVERB_SCHEME',
+        ];
+
+        foreach ($requiredEnvVariables as $variable) {
+            if (! env($variable)) {
+                throw new \Exception("Missing required environment variable: {$variable}");
+            }
+        }
     }
 }

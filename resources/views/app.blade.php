@@ -33,17 +33,6 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-        <script>
-            window.Uniespacos = {
-                reverb: {
-                    app_key: '{{ config('frontend.reverb.app_key') }}',
-                    host: '{{ config('frontend.reverb.host') }}',
-                    port: '{{ config('frontend.reverb.port') }}',
-                    scheme: '{{ config('frontend.reverb.scheme') }}',
-                }
-            };
-        </script>
-
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
