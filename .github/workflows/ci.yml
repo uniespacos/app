@@ -108,11 +108,11 @@ jobs:
             [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
 
             set -e
-            echo 'Installing PHP dependencies...'
-            composer install --no-interaction --no-progress --prefer-dist
-            
             echo 'Copying .env file...'
             cp .env.testing .env
+
+            echo 'Installing PHP dependencies...'
+            composer install --no-interaction --no-progress --prefer-dist
 
             echo 'Generating app key...'
             php artisan key:generate

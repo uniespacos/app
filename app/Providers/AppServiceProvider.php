@@ -67,6 +67,12 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function validateEnvVariables(): void
     {
+        // Skip validation during CLI commands that don't need the full environment
+        // (like package:discover, config:clear, etc.)
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+
         $requiredEnvVariables = [
             'APP_NAME',
             'APP_ENV',
