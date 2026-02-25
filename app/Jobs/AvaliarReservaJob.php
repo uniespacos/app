@@ -152,7 +152,7 @@ class AvaliarReservaJob implements ShouldQueue
                     $this->gestor
                 ));
             } catch (\Exception $e) {
-                Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: " . $e->getMessage());
+                Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: ".$e->getMessage());
             }
 
         } catch (Exception $e) {

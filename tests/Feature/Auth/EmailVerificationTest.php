@@ -79,5 +79,4 @@ class EmailVerificationTest extends TestCase
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
         $response->assertRedirect('/dashboard?verified=1');
     }
-
 }

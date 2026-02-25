@@ -10,7 +10,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-// All of these are now handled by Laravel Fortify. 
+// All of these are now handled by Laravel Fortify.
 // See app/Providers/FortifyServiceProvider.php and config/fortify.php
 
 /*

@@ -101,7 +101,7 @@ class UpdateReservaJob implements ShouldQueue
                     $this->reserva
                 ));
             } catch (\Exception $e) {
-                Log::warning("Falha ao enviar notificação de sucesso para edição da reserva {$this->reserva->id}: " . $e->getMessage());
+                Log::warning("Falha ao enviar notificação de sucesso para edição da reserva {$this->reserva->id}: ".$e->getMessage());
             }
 
         } catch (Exception $e) {
@@ -122,7 +122,7 @@ class UpdateReservaJob implements ShouldQueue
                 $this->user
             ));
         } catch (\Exception $e) {
-            Log::error("Falha fatal ao enviar notificação de erro para edição da reserva {$this->reserva->id}: " . $e->getMessage());
+            Log::error("Falha fatal ao enviar notificação de erro para edição da reserva {$this->reserva->id}: ".$e->getMessage());
         }
     }
 }

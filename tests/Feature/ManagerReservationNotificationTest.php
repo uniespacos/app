@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Reserva;
-use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\ReservationCreatedNotification;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -20,7 +19,7 @@ class ManagerReservationNotificationTest extends TestCase
         $manager = User::factory()->create();
         $espaco = Espaco::factory()->create();
         $agenda = Agenda::factory()->for($espaco)->create(['user_id' => $manager->id]);
-        
+
         $reserva = Reserva::factory()->create(['user_id' => $manager->id]);
         $reserva->horarios()->create([
             'data' => '2026-03-01',
@@ -54,10 +53,10 @@ class ManagerReservationNotificationTest extends TestCase
             'agenda_id' => $agenda->id,
             'situacao' => 'em_analise',
         ]);
-        
+
         $notification = new ReservationCreatedNotification($reserva);
         $channels = $notification->via($normalUser);
-        
+
         // Normal user should get all notifications including email
         $this->assertContains('database', $channels);
         $this->assertContains('broadcast', $channels);

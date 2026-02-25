@@ -5,7 +5,6 @@ namespace Tests\Unit\Jobs;
 use App\Jobs\UpdateReservaJob;
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\ReservationUpdatedNotification;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -30,7 +29,7 @@ class UpdateReservaJobTest extends TestCase
             'recorrencia' => $reserva->recorrencia,
             'edit_scope' => 'single',
             'edited_week_date' => $reserva->data_inicial,
-            'horarios_solicitados' => []
+            'horarios_solicitados' => [],
         ];
 
         // Simulate notification failure
@@ -39,7 +38,7 @@ class UpdateReservaJobTest extends TestCase
             ->andThrow(new \Exception('Mail server error'));
 
         $job = new UpdateReservaJob($reserva, $validatedData, $user);
-        
+
         // This should not throw an exception anymore because of the try-catch
         $job->handle();
 

@@ -292,7 +292,7 @@ class ReservaController extends Controller
                         )
                     );
                 } catch (\Exception $e) {
-                    Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: " . $e->getMessage());
+                    Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: ".$e->getMessage());
                 }
             }
 

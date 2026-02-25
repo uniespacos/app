@@ -38,20 +38,20 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
         // Se a notificação estiver ligada a uma reserva
         if (property_exists($this, 'reserva') && $this->reserva instanceof \App\Models\Reserva) {
-            
+
             // Verifica se o usuário sendo notificado é o solicitante da reserva
             $isApplicant = $this->reserva->user_id === $notifiable->id;
 
             // Busca os IDs dos gestores das agendas associadas a esta reserva
             $managerIds = \App\Models\Agenda::whereIn(
-                'id', 
+                'id',
                 \App\Models\Horario::where('reserva_id', $this->reserva->id)->select('agenda_id')
             )->pluck('user_id')->unique();
 
             // Verifica se o solicitante é o ÚNICO gestor envolvido em todos os horários da reserva
             $isSoleManager = $managerIds->count() === 1 && $managerIds->first() === $notifiable->id;
 
-            // Se um gestor cria uma reserva para a própria agenda, 
+            // Se um gestor cria uma reserva para a própria agenda,
             // suprime o e-mail, enviando apenas notificação interna (database/broadcast)
             if ($isApplicant && $isSoleManager) {
                 return $channels;
@@ -60,6 +60,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
         // Para os demais casos, envia também por e-mail
         $channels[] = 'mail';
+
         return $channels;
     }
 

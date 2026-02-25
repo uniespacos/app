@@ -1,9 +1,9 @@
-import '../css/app.css';
-import Echo from 'laravel-echo';
 import { createInertiaApp } from '@inertiajs/react';
+import Echo from 'laravel-echo';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import Pusher from 'pusher-js';
 import { createRoot } from 'react-dom/client';
+import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'UniEspaços';
@@ -16,7 +16,7 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_REVERB_APP_KEY,
     wsHost: import.meta.env.VITE_REVERB_HOST, // Use host from .env.dev
     wssHost: import.meta.env.VITE_REVERB_HOST, // Use host from .env.dev
-    wsPort: import.meta.env.VITE_REVERB_SCHEME === 'https' ? 443 : (parseInt(import.meta.env.VITE_REVERB_PORT, 10) || 80),
+    wsPort: import.meta.env.VITE_REVERB_SCHEME === 'https' ? 443 : parseInt(import.meta.env.VITE_REVERB_PORT, 10) || 80,
     wssPort: parseInt(import.meta.env.VITE_REVERB_PORT, 10) || 443,
     forceTLS: import.meta.env.VITE_REVERB_SCHEME === 'https',
     enabledTransports: ['ws', 'wss'],

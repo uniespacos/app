@@ -22,7 +22,7 @@ class CustomVerifyEmailResponse implements VerifyEmailResponseContract
             'scheme' => $request->getScheme(),
             'is_secure' => $request->isSecure(),
             'headers' => $request->headers->all(),
-            'url' => $request->fullUrl()
+            'url' => $request->fullUrl(),
         ]);
 
         // If the user is not authenticated when they hit the verification link,

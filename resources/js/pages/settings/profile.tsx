@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -27,7 +27,15 @@ type ProfileForm = {
     setor_id: string;
 };
 
-export default function Profile({ mustVerifyEmail, status, instituicaos }: { mustVerifyEmail: boolean; status?: string; instituicaos: any[] }) {
+export default function Profile({
+    mustVerifyEmail,
+    status,
+    instituicaos,
+}: {
+    mustVerifyEmail: boolean;
+    status?: string;
+    instituicaos: Instituicao[];
+}) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
