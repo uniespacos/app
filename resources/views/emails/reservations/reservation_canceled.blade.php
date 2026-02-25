@@ -9,8 +9,8 @@
         <li><strong>Espaço:</strong> {{ $reserva->horarios->first()->agenda->espaco->nome ?? 'N/A' }}</li>
         <li><strong>Cancelado por:</strong> {{ $canceler->name }}</li>
         <li><strong>Data/Horário:</strong>
-            @foreach($reserva->horarios as $horario)
-                <p>{{ \Carbon\Carbon::parse($horario->data)->format('d/m/Y') }} das {{ \Carbon\Carbon::parse($horario->horario_inicio)->format('H:i') }} às {{ \Carbon\Carbon::parse($horario->horario_fim)->format('H:i') }} (Turno: {{ $horario->agenda->turno }})</p>
+            @foreach($reserva->resumo_horarios as $item)
+                <p>{{ $item->texto }}</p>
             @endforeach
         </li>
     </ul>

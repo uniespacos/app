@@ -5,7 +5,6 @@ namespace Tests\Unit\Jobs;
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Models\Agenda;
 use App\Models\User;
-use App\Models\Setor;
 use App\Notifications\NewReservationNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationFailedNotification;
@@ -66,13 +65,13 @@ class ProcessarCriacaoReservaNotificationTest extends TestCase
     {
         Notification::fake();
         $applicantUser = User::factory()->create();
-        
+
         $dadosRequisicao = [
             'titulo' => 'Test Reservation Fail With Notifications',
         ];
 
         $job = new ProcessarCriacaoReserva($dadosRequisicao, $applicantUser);
-        
+
         // Call failed directly to test the notification dispatch logic on failure
         $job->failed(new \Exception('Simulated failure'));
 

@@ -123,8 +123,16 @@ The project uses Laravel Reverb for WebSockets. The configuration decouples inte
 ### Testing
 
 - **Backend (PHPUnit):** The backend has both unit and feature tests, configured in `phpunit.xml`.
-  - Run all tests: `docker compose -f compose.dev.yml exec workspace php artisan test`
-  - Alternatively: `docker compose -f compose.dev.yml exec workspace ./vendor/bin/phpunit`
+  - **CRITICAL:** Always explicitly pass `-e APP_ENV=testing` to the container to prevent CSRF 419 errors caused by testing environment bleeding.
+  - Run all tests: `docker compose -f compose.dev.yml exec -e APP_ENV=testing workspace php artisan test`
+  - Alternatively: `docker compose -f compose.dev.yml exec -e APP_ENV=testing workspace ./vendor/bin/phpunit`
+
+## Mandatory Rules
+
+1. **Test Isolation:** **NEVER** use the `RefreshDatabase` trait in tests. This will wipe the development database. **ALWAYS** use `DatabaseTransactions` for test isolation.
+2. **Resilient Notifications:** All system notifications must implement `ShouldQueue` for asynchronous background delivery.
+3. **Job Safety:** When dispatching notifications from within critical jobs (e.g., reservation creation), always wrap the `notify()` calls in a `try-catch` block. This prevents external service failures (like Mailtrap rate limits) from crashing the core job logic and sending false "failure" alerts to users.
+4. **Reverb Connectivity:** For internal Docker broadcasting to work correctly without TLS handshake timeouts, `REVERB_SCHEME` must strictly be set to `http` in the host's `.env.dev` file.
 
 ### CI/CD Pipeline (`.github/workflows/main-pipeline.yml`)
 
