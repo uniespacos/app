@@ -10,6 +10,10 @@ This document outlines the strategic development plan for UniEspaços, organized
         *   [ ] Admin Page: Managers List Order Incorrect (#101)
         *   [x] Browser Tab Title (Title Tag) Not Updating Correctly (#110)
         *   [ ] Delete Confirmation Alert Positioned Incorrectly (#111)
+        *   [x] Reverb/Broadcasting Timeout and "Double Notification" Bug:
+            *   Stabilized internal Docker broadcasting by forcing HTTP on port 9000.
+            *   Implemented `ShouldQueue` on `BaseNotification` for resilient asynchronous delivery.
+            *   Wrapped notification dispatches in `try-catch` to prevent external service failures from crashing core application jobs.
     *   [/] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
     *   [x] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
 
