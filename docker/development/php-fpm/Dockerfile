@@ -58,14 +58,6 @@ RUN curl -o /usr/local/bin/php-fpm-healthcheck \
 COPY ./docker/development/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Adiciona o repositório do Node.js (estamos usando a versão 22.x LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-
-# Instala o Node.js, npm e outras dependências
-RUN apt-get install -y nodejs
-
-# Install Composer and dependencies
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer 
 
 # Add ARGs for syncing permissions
 ARG UID=1000
@@ -86,13 +78,6 @@ RUN sed -i "s/user = www-data/user = www/g" /usr/local/etc/php-fpm.d/www.conf &&
     sed -i "s/group = www-data/group = $group_name/g" /usr/local/etc/php-fpm.d/www.conf
 
 WORKDIR /var/www
-
-COPY . /var/www
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer install --optimize-autoloader --no-interaction --no-progress --prefer-dist
-
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Change the default command to run the entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

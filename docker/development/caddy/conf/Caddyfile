@@ -1,0 +1,13 @@
+localhost {
+    root * /var/www/public
+    php_fastcgi app:9000
+    file_server
+
+    handle /app/* {
+        reverse_proxy reverb:9000 {
+            header_up Host {http.request.host}
+            header_up X-Forwarded-For {http.request.remote}
+            header_up X-Forwarded-Proto {http.request.scheme}
+        }
+    }
+}

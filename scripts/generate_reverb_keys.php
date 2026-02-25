@@ -15,6 +15,6 @@ function generateReverbCredentials()
 
 $creds = generateReverbCredentials();
 
-echo "REVERB_APP_ID=" . $creds['REVERB_APP_ID'] . PHP_EOL;
-echo "REVERB_APP_KEY=" . $creds['REVERB_APP_KEY'] . PHP_EOL;
-echo "REVERB_APP_SECRET=" . $creds['REVERB_APP_SECRET'] . PHP_EOL;
+echo 'REVERB_APP_ID='.$creds['REVERB_APP_ID'].PHP_EOL;
+echo 'REVERB_APP_KEY='.$creds['REVERB_APP_KEY'].PHP_EOL;
+echo 'REVERB_APP_SECRET='.$creds['REVERB_APP_SECRET'].PHP_EOL;

@@ -6,7 +6,6 @@ FROM php:8.4-cli
 ARG UID=1000
 ARG GID=1000
 ARG NODE_VERSION=22.0.0
-ARG HOME="/home/www"
 
 # Install system dependencies and build libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -62,12 +61,11 @@ RUN if getent group ${GID}; then \
     usermod -aG sudo www && \
     echo 'www ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# Copy the entrypoint script
-COPY ./docker/development/workspace/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Switch to the non-root user to install NVM and Node.js
+USER www
 
 # Install NVM (Node Version Manager) as the www user
-RUN export NVM_DIR="${HOME}/.nvm" && \
+RUN export NVM_DIR="$HOME/.nvm" && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash && \
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
     nvm install ${NODE_VERSION} && \
@@ -75,7 +73,7 @@ RUN export NVM_DIR="${HOME}/.nvm" && \
     nvm use default
 
 # Ensure NVM is available for all future shells
-RUN echo 'export NVM_DIR="${HOME}/.nvm"' >> /home/www/.bashrc && \
+RUN echo 'export NVM_DIR="$HOME/.nvm"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/www/.bashrc && \
     echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/www/.bashrc
 
@@ -83,9 +81,7 @@ RUN echo 'export NVM_DIR="${HOME}/.nvm"' >> /home/www/.bashrc && \
 WORKDIR /var/www
 
 # Override the entrypoint to avoid the default php entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-USER www
+ENTRYPOINT []
 
 # Default command to keep the container running
 CMD ["bash"]
