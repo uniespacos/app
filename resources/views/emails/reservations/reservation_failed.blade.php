@@ -7,7 +7,7 @@
     <p>Pedimos desculpas pelo inconveniente. Por favor, tente novamente ou entre em contato com o suporte técnico se o problema persistir.</p>
 
     <p>Para visualizar suas reservas, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Minhas Reservas</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Minhas Reservas</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>

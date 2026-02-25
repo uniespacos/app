@@ -31,7 +31,7 @@
     </ul>
 
     <p>Para visualizar os detalhes completos e tomar uma ação, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Visualizar Reserva</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Visualizar Reserva</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>

@@ -30,7 +30,7 @@
     @endif
 
     <p>Para visualizar os detalhes completos da sua reserva, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Ver Detalhes da Reserva</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Ver Detalhes da Reserva</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>

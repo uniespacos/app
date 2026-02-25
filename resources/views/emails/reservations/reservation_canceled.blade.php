@@ -31,7 +31,7 @@
     </ul>
 
     <p>Para visualizar a lista de reservas, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Ver Reservas</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Ver Reservas</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>

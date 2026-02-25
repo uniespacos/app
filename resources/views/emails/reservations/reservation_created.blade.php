@@ -33,7 +33,7 @@
     <p>Você será notificado assim que sua reserva for avaliada pelos gestores responsáveis.</p>
 
     <p>Para acompanhar o status da sua reserva, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Acompanhar Reserva</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Acompanhar Reserva</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>

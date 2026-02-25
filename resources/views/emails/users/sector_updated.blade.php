@@ -7,7 +7,7 @@
     <p>As informações do setor podem ter sido alteradas. Por favor, verifique se há alguma mudança que possa impactar suas atividades.</p>
 
     <p>Para visualizar os detalhes do setor, clique no botão abaixo:</p>
-    <a href="{{ $url }}" class="button">Ver Detalhes do Setor</a>
+    <div class="cta-container"><a href="{{ $url }}" class="button">Ver Detalhes do Setor</a></div>
 
     <p>Atenciosamente,</p>
     <p>Equipe UniEspaços</p>
