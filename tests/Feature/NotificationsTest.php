@@ -84,7 +84,7 @@ class NotificationsTest extends TestCase
     {
         Notification::fake();
 
-        $notification = new ReservationEvaluatedNotification($this->reserva, 'deferida');
+        $notification = new ReservationEvaluatedNotification($this->reserva, 'deferida', $this->manager);
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
@@ -94,6 +94,10 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString('foi avaliada.', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
         $this->assertStringContainsString('Deferida', $mailData);
+        $this->assertStringContainsString('Solicitante:', $mailData);
+        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString('Avaliador:', $mailData);
+        $this->assertStringContainsString($this->manager->name, $mailData);
         $this->assertStringContainsString(route('reservas.show', $this->reserva->id), $mailData);
 
         // Test Broadcast

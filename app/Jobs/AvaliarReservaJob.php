@@ -146,7 +146,8 @@ class AvaliarReservaJob implements ShouldQueue
             }
             $this->reserva->user->notify(new ReservationEvaluatedNotification(
                 $this->reserva,
-                $this->reserva->situacao_formatada
+                $this->reserva->situacao_formatada,
+                $this->gestor
             ));
 
         } catch (Exception $e) {
