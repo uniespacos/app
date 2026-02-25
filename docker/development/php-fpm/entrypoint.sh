@@ -9,10 +9,8 @@ GROUP_ID=${GID:-1000}
 echo "Fixing file permissions with UID=${USER_ID} and GID=${GROUP_ID}..."
 chown -R ${USER_ID}:${GROUP_ID} /var/www || echo "Some files could not be changed"
 
-# Clear configurations to avoid caching issues in development
-echo "Clearing configurations..."
-
 cd /var/www || exit 1
+
 composer install --optimize-autoloader --no-interaction --no-progress --prefer-dist
 
 # Verifica se a APP_KEY está definida
