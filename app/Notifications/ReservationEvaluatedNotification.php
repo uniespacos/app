@@ -18,7 +18,7 @@ class ReservationEvaluatedNotification extends BaseNotification
     {
         parent::__construct(
             'Reserva Avaliada',
-            "Sua reserva para '{$reserva->nome}' foi {$statusAvaliacao}.",
+            "Sua reserva para '{$reserva->titulo}' foi {$statusAvaliacao}.",
             route('reservas.show', $reserva->id)
         );
         $this->reserva = $reserva;
@@ -32,7 +32,7 @@ class ReservationEvaluatedNotification extends BaseNotification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Reserva Avaliada: '.$this->reserva->nome)
+            ->subject('Reserva Avaliada: '.$this->reserva->titulo)
             ->view('emails.reservations.reservation_evaluated', [
                 'reserva' => $this->reserva,
                 'statusAvaliacao' => $this->statusAvaliacao,

@@ -31,5 +31,9 @@ class RegistrationTest extends TestCase
 
         $response->assertRedirect(route('dashboard', absolute: false));
         $this->assertAuthenticated();
+
+        // After redirecting to dashboard, the verified middleware should kick in
+        $dashboardResponse = $this->get(route('dashboard'));
+        $dashboardResponse->assertRedirect(route('verification.notice'));
     }
 }

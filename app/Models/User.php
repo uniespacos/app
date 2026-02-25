@@ -6,10 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, MustVerifyEmailTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -72,6 +74,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function horariosAvaliados()
     {
         return $this->hasMany(Horario::class, 'user_id');
+    }
+
+    /**
+     * Mark the given user's email as verified.
+     *
+     * @return bool
+     */
+    public function markEmailAsVerified()
+    {
+        \Illuminate\Support\Facades\Log::info('Attempting to mark email as verified', ['user_id' => $this->id]);
+        $result = $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+        \Illuminate\Support\Facades\Log::info('Email verification result', ['user_id' => $this->id, 'success' => $result]);
+        return $result;
     }
 
     /**

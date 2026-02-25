@@ -2,21 +2,44 @@ import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Instituicao, Setor, Unidade } from '@/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SeletorInstituicaoProps {
     instituicaos: Instituicao[];
     processing: boolean;
     onSetorChange: (setorId: string) => void;
     errors: Record<string, string>;
+    initialSetorId?: string; // NOVO: Prop para valor inicial
 }
 
-export function SeletorInstituicao({ instituicaos, processing, onSetorChange, errors }: SeletorInstituicaoProps) {
+export function SeletorInstituicao({ instituicaos, processing, onSetorChange, errors, initialSetorId }: SeletorInstituicaoProps) {
     const [instituicaoId, setInstituicaoId] = useState<string>('');
     const [unidades, setUnidades] = useState<Unidade[]>([]);
     const [unidadeId, setUnidadeId] = useState<string>('');
     const [setores, setSetores] = useState<Setor[]>([]);
     const [setorId, setSetorId] = useState<string>('');
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Efeito para inicializar com o setor atual do usuário
+    useEffect(() => {
+        if (initialSetorId && instituicaos.length > 0 && !isInitialized) {
+            // Encontra qual instituição, unidade e setor correspondem ao ID inicial
+            for (const inst of instituicaos) {
+                for (const unid of inst.unidades || []) {
+                    const foundSetor = unid.setors?.find((s) => s.id.toString() === initialSetorId);
+                    if (foundSetor) {
+                        setInstituicaoId(inst.id.toString());
+                        setUnidades(inst.unidades || []);
+                        setUnidadeId(unid.id.toString());
+                        setSetores(unid.setors || []);
+                        setSetorId(initialSetorId);
+                        setIsInitialized(true);
+                        return;
+                    }
+                }
+            }
+        }
+    }, [initialSetorId, instituicaos, isInitialized]);
 
     const handleInstituicaoChange = (value: string) => {
         setInstituicaoId(value);

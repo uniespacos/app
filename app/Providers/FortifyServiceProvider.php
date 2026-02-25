@@ -14,6 +14,10 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
+use Laravel\Fortify\Contracts\VerifyEmailResponse as VerifyEmailResponseContract;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use App\Http\Responses\CustomVerifyEmailResponse;
+use App\Http\Responses\CustomLoginResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -22,7 +26,11 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Bind your custom VerifyEmailResponse
+        $this->app->singleton(VerifyEmailResponseContract::class, CustomVerifyEmailResponse::class);
+
+        // Bind your custom LoginResponse
+        $this->app->singleton(LoginResponseContract::class, CustomLoginResponse::class);
     }
 
     /**
@@ -73,6 +81,9 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::confirmPasswordView(function () {
             return Inertia::render('auth/confirm-password');
         });
+
+        // Explicitly define where to redirect after email verification
+        Fortify::redirects('email-verification', '/dashboard?verified=1');
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
