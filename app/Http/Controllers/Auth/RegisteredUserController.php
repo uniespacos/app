@@ -40,18 +40,18 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'phone' => 'required|string|max:20',
-            'setor_id' => 'required|exists:setors,id',
+            'phone' => 'nullable|string|max:15',
+            'setor_id' => 'nullable|exists:setors,id',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'telefone' => $request->phone,
-            'profile_pic' => 'aushaushuahsas', // temporario
+            'telefone' => $request->phone ?? 'XX XXXXXXXXX',
+            'profile_pic' => 'aushaushuahsas', // TODO: temporario
             'setor_id' => $request->setor_id,
             'permission_type_id' => 3, // Usuario default
         ]);
