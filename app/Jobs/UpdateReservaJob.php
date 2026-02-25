@@ -96,9 +96,13 @@ class UpdateReservaJob implements ShouldQueue
             });
 
             // Notifica o usuário que a edição foi processada com sucesso
-            $this->user->notify(new ReservationUpdatedNotification(
-                $this->reserva
-            ));
+            try {
+                $this->user->notify(new ReservationUpdatedNotification(
+                    $this->reserva
+                ));
+            } catch (\Exception $e) {
+                Log::warning("Falha ao enviar notificação de sucesso para edição da reserva {$this->reserva->id}: " . $e->getMessage());
+            }
 
         } catch (Exception $e) {
             Log::error("Falha no Job UpdateReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
@@ -112,9 +116,13 @@ class UpdateReservaJob implements ShouldQueue
     public function failed(Throwable $exception): void
     {
         // Notifica o usuário que a edição falhou
-        $this->user->notify(new ReservationUpdateFailedNotification(
-            $this->reserva,
-            $this->user
-        ));
+        try {
+            $this->user->notify(new ReservationUpdateFailedNotification(
+                $this->reserva,
+                $this->user
+            ));
+        } catch (\Exception $e) {
+            Log::error("Falha fatal ao enviar notificação de erro para edição da reserva {$this->reserva->id}: " . $e->getMessage());
+        }
     }
 }

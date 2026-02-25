@@ -144,11 +144,16 @@ class AvaliarReservaJob implements ShouldQueue
             if ($horariosRecemAprovados->isNotEmpty()) {
                 $this->triggerConflictRevalidation($horariosRecemAprovados);
             }
-            $this->reserva->user->notify(new ReservationEvaluatedNotification(
-                $this->reserva,
-                $this->reserva->situacao_formatada,
-                $this->gestor
-            ));
+
+            try {
+                $this->reserva->user->notify(new ReservationEvaluatedNotification(
+                    $this->reserva,
+                    $this->reserva->situacao_formatada,
+                    $this->gestor
+                ));
+            } catch (\Exception $e) {
+                Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: " . $e->getMessage());
+            }
 
         } catch (Exception $e) {
             Log::error("Falha no Job AvaliarReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
@@ -158,17 +163,7 @@ class AvaliarReservaJob implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
-        $errorMessage = "Ocorreu um erro ao processar sua avaliação para a reserva '{$this->reserva->titulo}'.";
-        if (config('app.debug')) {
-            $errorMessage .= ' Detalhe do erro: '.$exception->getMessage();
-        } else {
-            $errorMessage .= ' A equipe de suporte foi notificada.';
-        }
-        $this->gestor->notify(new UserRemovedAsManagerNotification(
-            $this->gestor,
-            $this->reserva->espaco->nome,
-            $this->reserva->agendas->first()->turno // Assuming there's at least one agenda
-        ));
+        Log::error("Falha final no Job AvaliarReservaJob para reserva {$this->reserva->id} após todas as tentativas.");
     }
 
     /**

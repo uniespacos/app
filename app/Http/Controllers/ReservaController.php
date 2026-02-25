@@ -261,7 +261,8 @@ class ReservaController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($reserva) {
+            $gestores = [];
+            DB::transaction(function () use ($reserva, &$gestores) {
 
                 // 1. Itera sobre cada horário associado a esta reserva
                 // para atualizar a situação na tabela pivô (horario_reserva).
@@ -275,19 +276,25 @@ class ReservaController extends Controller
                         'situacao' => 'inativa',
                     ]);
                 }
-                $gestores = array_unique($gestores); // Remove gestores duplicados
 
-                foreach ($gestores as $gestor) {
+                // 2. Atualiza a situação da própria reserva para 'inativa'
+                $reserva->update(['situacao' => 'inativa']);
+            });
+
+            // Notifica os gestores FORA da transação
+            $gestoresUnicos = collect($gestores)->unique('id');
+            foreach ($gestoresUnicos as $gestor) {
+                try {
                     $gestor->notify(
                         new ReservationCanceledNotification(
                             $reserva,
                             $user
                         )
                     );
+                } catch (\Exception $e) {
+                    Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: " . $e->getMessage());
                 }
-                // 2. Atualiza a situação da própria reserva para 'inativa'
-                $reserva->update(['situacao' => 'inativa']);
-            });
+            }
 
             return back()->with('success', 'Reserva cancelada com sucesso!');
         } catch (Exception $error) {
