@@ -6,15 +6,14 @@ use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Reserva;
 use App\Models\Setor;
-use App\Models\Unidade;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use App\Notifications\ReservationCanceledNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationEvaluatedNotification;
 use App\Notifications\ReservationFailedNotification;
-use App\Notifications\ReservationUpdateFailedNotification;
 use App\Notifications\ReservationUpdatedNotification;
+use App\Notifications\ReservationUpdateFailedNotification;
 use App\Notifications\SectorUpdatedNotification;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Notifications\UserRemovedAsManagerNotification;
@@ -27,10 +26,15 @@ class NotificationsTest extends TestCase
     use DatabaseTransactions;
 
     protected User $user;
+
     protected User $manager;
+
     protected Reserva $reserva;
+
     protected Espaco $espaco;
+
     protected Agenda $agenda;
+
     protected Setor $setor;
 
     protected function setUp(): void
@@ -61,8 +65,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->manager);
-        $this->assertStringContainsString('Nova Solicitação de Reserva: ' . $this->reserva->nome, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Nova Solicitação de Reserva: '.$this->reserva->nome, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma nova solicitação de reserva foi criada:', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -84,8 +88,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Reserva Avaliada: ' . $this->reserva->nome, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Reserva Avaliada: '.$this->reserva->nome, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi avaliada.', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -107,8 +111,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Sua reserva foi criada!: ' . $this->reserva->titulo, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Sua reserva foi criada!: '.$this->reserva->titulo, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('criada com sucesso e está aguardando avaliação.', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -130,8 +134,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Falha na sua solicitação de reserva: ' . $this->reserva->titulo, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Falha na sua solicitação de reserva: '.$this->reserva->titulo, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -153,8 +157,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->manager);
-        $this->assertStringContainsString('Reserva Cancelada: ' . $this->reserva->titulo, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Reserva Cancelada: '.$this->reserva->titulo, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma reserva foi cancelada pelo solicitante:', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -176,8 +180,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Reserva Atualizada: ' . $this->reserva->titulo, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Reserva Atualizada: '.$this->reserva->titulo, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizada com sucesso.', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -198,8 +202,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Falha ao Atualizar Reserva: ' . $this->reserva->titulo, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Falha ao Atualizar Reserva: '.$this->reserva->titulo, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData); // uses reservation_failed view
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
@@ -221,7 +225,7 @@ class NotificationsTest extends TestCase
         $generalManagerNotification = new UserAssignedAsManagerNotification($this->manager);
         $mailMessageGeneral = $generalManagerNotification->toMail($this->manager);
         $this->assertStringContainsString('Você foi designado como gestor de agenda.', $mailMessageGeneral->subject);
-        
+
         $mailDataGeneral = (string) $mailMessageGeneral->render();
         $this->assertStringContainsString('Você foi designado(a) como gestor(a) de agenda em nosso sistema.', $mailDataGeneral);
         $this->assertStringContainsString(route('espacos.index'), $mailDataGeneral);
@@ -234,9 +238,9 @@ class NotificationsTest extends TestCase
         // Test for space-specific manager assignment
         $spaceManagerNotification = new UserAssignedAsManagerNotification($this->manager, $this->espaco->nome, 'manha');
         $mailMessageSpace = $spaceManagerNotification->toMail($this->manager);
-        
+
         $mailDataSpace = (string) $mailMessageSpace->render();
-        $this->assertStringContainsString("Você foi designado(a) como gestor(a) do espaço", $mailDataSpace);
+        $this->assertStringContainsString('Você foi designado(a) como gestor(a) do espaço', $mailDataSpace);
         $this->assertStringContainsString(route('espacos.show', $this->espaco->id), $mailDataSpace);
 
         $broadcastDataSpace = $spaceManagerNotification->toBroadcast($this->manager)->data;
@@ -253,7 +257,7 @@ class NotificationsTest extends TestCase
         $generalRemovalNotification = new UserRemovedAsManagerNotification($this->manager);
         $mailMessageGeneral = $generalRemovalNotification->toMail($this->manager);
         $this->assertStringContainsString('Você foi removido como gestor de agenda.', $mailMessageGeneral->subject);
-        
+
         $mailDataGeneral = (string) $mailMessageGeneral->render();
         $this->assertStringContainsString('Você foi removido(a) como gestor(a) de agenda em nosso sistema.', $mailDataGeneral);
         $this->assertStringContainsString(route('espacos.index'), $mailDataGeneral);
@@ -266,9 +270,9 @@ class NotificationsTest extends TestCase
         // Test for space-specific manager removal
         $spaceRemovalNotification = new UserRemovedAsManagerNotification($this->manager, $this->espaco->nome, 'manha');
         $mailMessageSpace = $spaceRemovalNotification->toMail($this->manager);
-        
+
         $mailDataSpace = (string) $mailMessageSpace->render();
-        $this->assertStringContainsString("Você foi removido(a) como gestor(a) do espaço", $mailDataSpace);
+        $this->assertStringContainsString('Você foi removido(a) como gestor(a) do espaço', $mailDataSpace);
         $this->assertStringContainsString(route('espacos.index'), $mailDataSpace);
 
         $broadcastDataSpace = $spaceRemovalNotification->toBroadcast($this->manager)->data;
@@ -285,8 +289,8 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Setor Atualizado: ' . $this->setor->nome, $mailMessage->subject);
-        
+        $this->assertStringContainsString('Setor Atualizado: '.$this->setor->nome, $mailMessage->subject);
+
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizado em nosso sistema.', $mailData);
         $this->assertStringContainsString($this->setor->nome, $mailData);

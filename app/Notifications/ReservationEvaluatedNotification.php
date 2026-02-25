@@ -4,11 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Reserva;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class ReservationEvaluatedNotification extends BaseNotification
 {
     public Reserva $reserva;
+
     public string $statusAvaliacao;
 
     public function __construct(Reserva $reserva, string $statusAvaliacao)
@@ -28,7 +28,7 @@ class ReservationEvaluatedNotification extends BaseNotification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Reserva Avaliada: ' . $this->reserva->nome)
+            ->subject('Reserva Avaliada: '.$this->reserva->nome)
             ->view('emails.reservations.reservation_evaluated', ['reserva' => $this->reserva, 'statusAvaliacao' => $this->statusAvaliacao, 'url' => $this->url]);
     }
 
@@ -37,5 +37,4 @@ class ReservationEvaluatedNotification extends BaseNotification
      *
      * @return array<string, mixed>
      */
-    
-    }
+}

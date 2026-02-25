@@ -4,11 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Reserva;
 use App\Models\User;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class ReservationUpdateFailedNotification extends BaseNotification
 {
     public Reserva $reserva;
+
     public User $user;
 
     public function __construct(Reserva $reserva, User $user)
@@ -25,9 +25,7 @@ class ReservationUpdateFailedNotification extends BaseNotification
     public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('Falha ao Atualizar Reserva: ' . $this->reserva->titulo)
+            ->subject('Falha ao Atualizar Reserva: '.$this->reserva->titulo)
             ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reserva->titulo, 'user' => $this->user, 'url' => $this->url]);
     }
-
-    
-    }
+}

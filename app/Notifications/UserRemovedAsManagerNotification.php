@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\User;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class UserRemovedAsManagerNotification extends BaseNotification
 {
     public User $user;
+
     public ?string $espacoNome;
+
     public ?string $turno;
 
     public function __construct(User $user, ?string $espacoNome = null, ?string $turno = null)
@@ -17,7 +18,7 @@ class UserRemovedAsManagerNotification extends BaseNotification
         $url = route('espacos.index');
 
         if ($espacoNome && $turno) {
-            $message = 'Você foi removido como gestor do espaço: ' . $espacoNome . ' Turno: ' . $turno . '.';
+            $message = 'Você foi removido como gestor do espaço: '.$espacoNome.' Turno: '.$turno.'.';
             $url = route('espacos.index'); // Or a more specific page if available
         }
 
@@ -38,6 +39,4 @@ class UserRemovedAsManagerNotification extends BaseNotification
             ->subject('Você foi removido como gestor de agenda.')
             ->view('emails.users.user_removed_as_manager', ['user' => $this->user, 'espacoNome' => $this->espacoNome, 'turno' => $this->turno, 'url' => $this->url]);
     }
-
-    
-    }
+}

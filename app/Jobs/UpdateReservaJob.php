@@ -4,8 +4,8 @@ namespace App\Jobs;
 
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\ReservationUpdateFailedNotification;
 use App\Notifications\ReservationUpdatedNotification;
+use App\Notifications\ReservationUpdateFailedNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;

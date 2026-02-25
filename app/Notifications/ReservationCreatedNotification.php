@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use App\Models\Reserva;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class ReservationCreatedNotification extends BaseNotification
 {
@@ -13,7 +12,7 @@ class ReservationCreatedNotification extends BaseNotification
     {
         parent::__construct(
             'Sua reserva foi criada!',
-            'Sua solicitação de reserva para "' . $reserva->titulo . '" foi processada com sucesso.',
+            'Sua solicitação de reserva para "'.$reserva->titulo.'" foi processada com sucesso.',
             route('reservas.show', $reserva->id)
         );
         $this->reserva = $reserva;
@@ -22,9 +21,7 @@ class ReservationCreatedNotification extends BaseNotification
     public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('Sua reserva foi criada!: ' . $this->reserva->titulo)
+            ->subject('Sua reserva foi criada!: '.$this->reserva->titulo)
             ->view('emails.reservations.reservation_created', ['reserva' => $this->reserva, 'url' => $this->url]);
     }
-
-    
-    }
+}

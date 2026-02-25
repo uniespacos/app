@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\User;
-use App\Notifications\BaseNotification;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Notifications\UserRemovedAsManagerNotification;
 use Illuminate\Support\Facades\DB;

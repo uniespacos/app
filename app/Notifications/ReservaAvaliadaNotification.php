@@ -3,8 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-use App\Notifications\BaseNotification;
 
 class ReservaAvaliadaNotification extends BaseNotification
 {
@@ -40,5 +38,4 @@ class ReservaAvaliadaNotification extends BaseNotification
      *
      * @return array<string, mixed>
      */
-    
-    }
+}
