@@ -59,7 +59,7 @@ class ProfileUpdateTest extends TestCase
                 'email' => $user->email,
                 'phone' => '77999999999',
                 'setor_id' => $setor->id,
-        ]);
+            ]);
 
         $response
             ->assertSessionHasNoErrors()

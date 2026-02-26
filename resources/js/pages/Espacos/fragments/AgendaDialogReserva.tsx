@@ -221,7 +221,8 @@ export default function AgendaDialogReserva({
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="titulo" className="flex items-center gap-2 font-medium">
-                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva <p className="text-sm text-red-500">* Obrigatório</p>
+                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva{' '}
+                                <p className="text-sm text-red-500">* Obrigatório</p>
                             </Label>
                             <Input
                                 id="titulo"
