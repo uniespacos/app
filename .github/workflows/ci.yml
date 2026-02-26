@@ -130,9 +130,8 @@ jobs:
       - name: Install Node Dependencies
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-            export NVM_DIR=\"\$HOME/.nvm\"
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-            npm config set fetch-timeout 600000
+            . /home/www/.nvm/nvm.sh &&
+            npm config set fetch-timeout 600000 &&
             npm ci --verbose
           "
 
@@ -141,8 +140,7 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-           export NVM_DIR=\"\$HOME/.nvm\"
-           [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+           . /home/www/.nvm/nvm.sh &&
            npm test
           "
 
@@ -150,7 +148,8 @@ jobs:
         env:
           APP_ENV: testing
         run: |
-          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
+          grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
 
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
