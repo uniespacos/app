@@ -147,6 +147,8 @@ jobs:
           "
 
       - name: Run Backend Tests
+        env:
+          APP_ENV: testing
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace php artisan test
 
