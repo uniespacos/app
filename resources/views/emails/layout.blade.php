@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -124,12 +125,14 @@
                 width: 100% !important;
                 border-radius: 0;
             }
+
             .content {
                 padding: 32px 20px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="wrapper">
         <div class="container">
@@ -143,9 +146,10 @@
             <div class="footer">
                 <p>&copy; {{ date('Y') }} <strong>UniEspaços</strong>. Todos os direitos reservados.</p>
                 <p>Sistema de Gestão de Reservas de Espaços Acadêmicos.</p>
-                <p>Precisa de ajuda? <a href="mailto:suporte@uniespacos.com.br">Contate o suporte</a>.</p>
+                <p>Precisa de ajuda? <a href="mailto:uniespacos@uesb.edu.br">Contate o suporte</a>.</p>
             </div>
         </div>
     </div>
 </body>
+
 </html>
