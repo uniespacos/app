@@ -221,7 +221,7 @@ export default function AgendaDialogReserva({
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="titulo" className="flex items-center gap-2 font-medium">
-                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva
+                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva <p className="text-sm text-red-500">* Obrigatório</p>
                             </Label>
                             <Input
                                 id="titulo"
@@ -233,7 +233,7 @@ export default function AgendaDialogReserva({
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="descricao" className="flex items-center gap-2 font-medium">
-                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição
+                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição <p className="text-sm text-red-500">* Obrigatório</p>
                             </Label>
                             <Textarea
                                 id="descricao"
@@ -405,7 +405,7 @@ export default function AgendaDialogReserva({
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={!formData.titulo.trim() || isSubmitting}>
+                        <Button type="submit" disabled={!formData.titulo.trim() || !formData.descricao.trim() || isSubmitting}>
                             {isSubmitting ? (isEditMode ? 'Salvando...' : 'Enviando...') : isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}
                         </Button>
                     </DialogFooter>
