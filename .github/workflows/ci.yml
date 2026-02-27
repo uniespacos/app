@@ -289,8 +289,11 @@ jobs:
             # Log into GHCR on the remote server to pull images
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            # Run the deployment script, passing the branch name as the image tag
-            ./deploy.sh development
+            # Calculate short SHA for image tag
+            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
+
+            # Run the deployment script, passing the short SHA as the image tag
+            ./deploy.sh sha-\${SHORT_SHA}
           "
 
   deploy_production:
@@ -342,9 +345,12 @@ jobs:
             # Log into GHCR on the remote server to pull images
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            # Run the deployment script, passing the branch name as the image tag
+            # Calculate short SHA for image tag
+            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
+
+            # Run the deployment script, passing the short SHA as the image tag
             set -a
             source .env
             set +a
-            ./deploy.sh main
+            ./deploy.sh sha-\${SHORT_SHA}
           "
