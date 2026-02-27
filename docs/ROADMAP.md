@@ -50,7 +50,7 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Advanced Management:**
         *   [ ] "Gerenciar Reservas" Page: Add Sorting Options (#102)
         *   [ ] UI: "Gerenciar Reservas" List: Implement Filter/Archive (Soft Delete) Option (#108)
-        *   [ ] Optimize Notification: No Email for Self-Requested Manager Reservations (#109)
+        *   [x] Optimize Notification: No Email for Self-Requested Manager Reservations (#109)
 
 ---
 
@@ -70,4 +70,4 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [ ] **Demand Forecasting:** Use Machine Learning on historical data to predict future space needs and optimize planning.
 
 ---
-*Last updated: February 21, 2026*
+*Last updated: February 26, 2026*
