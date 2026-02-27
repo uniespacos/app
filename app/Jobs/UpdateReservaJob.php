@@ -4,7 +4,8 @@ namespace App\Jobs;
 
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationUpdatedNotification;
+use App\Notifications\ReservationUpdateFailedNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -47,7 +48,7 @@ class UpdateReservaJob implements ShouldQueue
             DB::transaction(function () {
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
-                    'descricao' => $this->validatedData['descricao'],
+                    'descricao' => $this->validatedData['descricao'] ?? '',
                     'data_inicial' => $this->validatedData['data_inicial'],
                     'data_final' => $this->validatedData['data_final'],
                     'recorrencia' => $this->validatedData['recorrencia'],
@@ -95,11 +96,13 @@ class UpdateReservaJob implements ShouldQueue
             });
 
             // Notifica o usuário que a edição foi processada com sucesso
-            $this->user->notify(new NotificationModel(
-                'Reserva Atualizada',
-                "Sua reserva '{$this->reserva->titulo}' foi atualizada com sucesso.",
-                route('reservas.show', $this->reserva->id)
-            ));
+            try {
+                $this->user->notify(new ReservationUpdatedNotification(
+                    $this->reserva
+                ));
+            } catch (\Exception $e) {
+                Log::warning("Falha ao enviar notificação de sucesso para edição da reserva {$this->reserva->id}: ".$e->getMessage());
+            }
 
         } catch (Exception $e) {
             Log::error("Falha no Job UpdateReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
@@ -113,10 +116,13 @@ class UpdateReservaJob implements ShouldQueue
     public function failed(Throwable $exception): void
     {
         // Notifica o usuário que a edição falhou
-        $this->user->notify(new NotificationModel(
-            'Falha ao Atualizar Reserva',
-            "Ocorreu um erro ao processar a atualização da sua reserva '{$this->reserva->titulo}'. Por favor, tente novamente.",
-            route('reservas.edit', $this->reserva->id)
-        ));
+        try {
+            $this->user->notify(new ReservationUpdateFailedNotification(
+                $this->reserva,
+                $this->user
+            ));
+        } catch (\Exception $e) {
+            Log::error("Falha fatal ao enviar notificação de erro para edição da reserva {$this->reserva->id}: ".$e->getMessage());
+        }
     }
 }

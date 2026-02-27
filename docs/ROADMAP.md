@@ -10,6 +10,10 @@ This document outlines the strategic development plan for UniEspaços, organized
         *   [ ] Admin Page: Managers List Order Incorrect (#101)
         *   [x] Browser Tab Title (Title Tag) Not Updating Correctly (#110)
         *   [ ] Delete Confirmation Alert Positioned Incorrectly (#111)
+        *   [x] Reverb/Broadcasting Timeout and "Double Notification" Bug:
+            *   Stabilized internal Docker broadcasting by forcing HTTP on port 9000.
+            *   Implemented `ShouldQueue` on `BaseNotification` for resilient asynchronous delivery.
+            *   Wrapped notification dispatches in `try-catch` to prevent external service failures from crashing core application jobs.
     *   [/] **Test Coverage:** Complete frontend (Jest/RTL) and backend (PHPUnit) test coverage.
     *   [x] **CI/CD Finalization:** Ensure GitHub Actions pipelines are 100% reliable for testing and deployment.
 
@@ -19,7 +23,7 @@ This document outlines the strategic development plan for UniEspaços, organized
 *   **👥 User Experience**
     *   [/] **Admin Dashboard 2.0:** Enhance tools for campus/sector managers (better tables, filters, quick actions).
     *   [ ] **UX Refinements:**
-        *   [ ] Enhance Email and Reverb Notification Templates (#103)
+        *   [x] Enhance Email and Reverb Notification Templates (#103)
         *   [ ] UI: Reservation List UI: Display Space and Module Information (#105)
         *   [ ] UI: Calendar UI: Add Day of Week to Slot Groups (#106)
         *   [x] Improve the reservation flow, calendar interaction, and feedback messages.

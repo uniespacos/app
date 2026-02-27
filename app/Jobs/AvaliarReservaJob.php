@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationEvaluatedNotification;
 use App\Services\ConflictDetectionService;
 use Carbon\Carbon;
 use Exception;
@@ -144,13 +144,16 @@ class AvaliarReservaJob implements ShouldQueue
             if ($horariosRecemAprovados->isNotEmpty()) {
                 $this->triggerConflictRevalidation($horariosRecemAprovados);
             }
-            $partesDoNome = explode(' ', $this->gestor->name);
-            $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
-            $this->reserva->user->notify(new NotificationModel(
-                'Sua reserva foi avaliada',
-                "A reserva '{$this->reserva->titulo}' foi avaliada. Status atual: {$this->reserva->situacao_formatada}.",
-                route('reservas.show', ['reserva' => $this->reserva->id])
-            ));
+
+            try {
+                $this->reserva->user->notify(new ReservationEvaluatedNotification(
+                    $this->reserva,
+                    $this->reserva->situacao_formatada,
+                    $this->gestor
+                ));
+            } catch (\Exception $e) {
+                Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: ".$e->getMessage());
+            }
 
         } catch (Exception $e) {
             Log::error("Falha no Job AvaliarReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
@@ -160,17 +163,7 @@ class AvaliarReservaJob implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
-        $errorMessage = "Ocorreu um erro ao processar sua avaliação para a reserva '{$this->reserva->titulo}'.";
-        if (config('app.debug')) {
-            $errorMessage .= ' Detalhe do erro: '.$exception->getMessage();
-        } else {
-            $errorMessage .= ' A equipe de suporte foi notificada.';
-        }
-        $this->gestor->notify(new NotificationModel(
-            'Falha na Avaliação',
-            $errorMessage,
-            route('gestor.reservas.show', $this->reserva->id)
-        ));
+        Log::error("Falha final no Job AvaliarReservaJob para reserva {$this->reserva->id} após todas as tentativas.");
     }
 
     /**

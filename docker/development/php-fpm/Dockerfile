@@ -1,6 +1,7 @@
 FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    iputils-ping \
     curl \
     unzip \
     libpq-dev \
@@ -10,6 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
     libicu-dev \
     libzip-dev \
+    libfcgi-bin \
+    procps \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
     pdo_pgsql \
@@ -32,8 +35,6 @@ ARG XDEBUG_IDE_KEY=DOCKER
 ARG XDEBUG_LOG=/dev/stdout
 ARG XDEBUG_LOG_LEVEL=0
 
-USER root
-
 # Configure Xdebug if enabled
 RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
     pecl install xdebug && \
@@ -48,15 +49,15 @@ RUN if [ "${XDEBUG_ENABLED}" = "true" ]; then \
 
 # Install only runtime libraries needed 
 # libfcgi-bin and procps are required for the php-fpm-healthcheck script
+# Download and install php-fpm health check script
+RUN curl -o /usr/local/bin/php-fpm-healthcheck \
+    https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
+    && chmod +x /usr/local/bin/php-fpm-healthcheck
 
-# Adiciona o repositório do Node.js (estamos usando a versão 22.x LTS)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+# Copy the entrypoint script
+COPY ./docker/development/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Instala o Node.js, npm e outras dependências
-RUN apt-get install -y nodejs
-
-# Install Composer and dependencies
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer 
 
 # Add ARGs for syncing permissions
 ARG UID=1000
@@ -76,19 +77,12 @@ RUN if getent group ${GID}; then \
 RUN sed -i "s/user = www-data/user = www/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/group = www-data/group = $group_name/g" /usr/local/etc/php-fpm.d/www.conf
 
-# Set the working directory
 WORKDIR /var/www
-
-# Copy the entrypoint script
-COPY ./docker/development/php-fpm/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Switch back to the non-privileged user to run the application
-USER www
 
 # Change the default command to run the entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
+
 CMD ["php-fpm"]

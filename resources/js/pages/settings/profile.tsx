@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { SeletorInstituicao } from '../auth/fragments/SeletorInstituicao';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,15 +23,49 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
+    phone: string;
+    setor_id: string;
 };
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+export default function Profile({
+    mustVerifyEmail,
+    status,
+    instituicaos,
+}: {
+    mustVerifyEmail: boolean;
+    status?: string;
+    instituicaos: Instituicao[];
+}) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
+        phone: auth.user.telefone || '',
+        setor_id: auth.user.setor_id?.toString() || '',
     });
+
+    const formatPhoneNumber = (value: string) => {
+        const cleaned = value.replace(/\D/g, '');
+        const limited = cleaned.slice(0, 11);
+
+        if (limited.length <= 2) {
+            return `(${limited}`;
+        } else if (limited.length <= 7) {
+            return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+        } else {
+            return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
+        }
+    };
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setData('phone', formatted);
+    };
+
+    const handleSetorChange = (setorId: string) => {
+        setData('setor_id', setorId);
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -46,7 +81,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Informações do perfil" description="Atualize seu nome e endereço de e-mail" />
+                    <HeadingSmall title="Informações do perfil" description="Atualize seu nome, endereço de e-mail, telefone e setor" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -80,6 +115,33 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             />
 
                             <InputError className="mt-2" message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone">Número de celular</Label>
+
+                            <Input
+                                id="phone"
+                                className="mt-1 block w-full"
+                                value={data.phone}
+                                onChange={handlePhoneChange}
+                                required
+                                placeholder="(73) 99999-9999"
+                                maxLength={15}
+                            />
+
+                            <InputError className="mt-2" message={errors.phone} />
+                        </div>
+
+                        <div className="border-t pt-6">
+                            <h3 className="mb-4 text-lg font-medium text-gray-900">Informações Institucionais</h3>
+                            <SeletorInstituicao
+                                instituicaos={instituicaos}
+                                processing={processing}
+                                onSetorChange={handleSetorChange}
+                                errors={errors}
+                                initialSetorId={data.setor_id}
+                            />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (

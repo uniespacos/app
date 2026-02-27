@@ -3,12 +3,12 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\Setor;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_registration_screen_can_be_rendered()
     {
@@ -31,5 +31,9 @@ class RegistrationTest extends TestCase
 
         $response->assertRedirect(route('dashboard', absolute: false));
         $this->assertAuthenticated();
+
+        // After redirecting to dashboard, the verified middleware should kick in
+        $dashboardResponse = $this->get(route('dashboard'));
+        $dashboardResponse->assertRedirect(route('verification.notice'));
     }
 }

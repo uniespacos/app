@@ -16,15 +16,17 @@ fi
 
 NEW_TAG=$1
 VERSION_FILE="docker/production/versions.txt"
+BACKUP_FILENAME="storage/backups/backup_$(date +%F_%H-%M-%S).sql"
 
 # 1. Faz o backup do banco de dados
 echo "Creating database backup..."
-docker compose -f compose.prod.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "storage/backups/backup_$(date +%F_%H-%M-%S).sql"
+docker compose -f compose.prod.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "$BACKUP_FILENAME"
 
-# 2. Salva a tag da imagem atual para o rollback
-CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2)
+# 2. Salva a tag da imagem atual e o nome do backup para o rollback
+CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2 || echo "")
 echo "PREVIOUS_TAG=$CURRENT_TAG" > "$VERSION_FILE"
 echo "CURRENT_TAG=$NEW_TAG" >> "$VERSION_FILE"
+echo "BACKUP_FILE=$BACKUP_FILENAME" >> "$VERSION_FILE"
 
 # 3. Para a aplicação para limpar os volumes de assets
 echo "Stopping application to clear asset volumes..."

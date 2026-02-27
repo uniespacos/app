@@ -9,7 +9,7 @@ use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
-use App\Notifications\NotificationModel;
+use App\Notifications\ReservationCanceledNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -45,11 +45,6 @@ class ReservaController extends Controller
         $reservas = Reserva::query()
             ->where('user_id', $user->id)
             ->where('situacao', '!=', 'inativa')
-            // Otimização: Só busca reservas que estejam ativas no período da semana
-            ->where(function ($query) use ($inicioSemana, $fimSemana) {
-                $query->where('data_inicial', '<=', $fimSemana)
-                    ->where('data_final', '>=', $inicioSemana);
-            })
             ->when($filters['search'] ?? null, function ($query, $search) { // Filtro de busca
                 $query->where('titulo', 'like', '%'.$search.'%');
             })
@@ -266,7 +261,8 @@ class ReservaController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($reserva) {
+            $gestores = [];
+            DB::transaction(function () use ($reserva, &$gestores) {
 
                 // 1. Itera sobre cada horário associado a esta reserva
                 // para atualizar a situação na tabela pivô (horario_reserva).
@@ -280,25 +276,25 @@ class ReservaController extends Controller
                         'situacao' => 'inativa',
                     ]);
                 }
-                $gestores = array_unique($gestores); // Remove gestores duplicados
 
-                foreach ($gestores as $gestor) {
-                    $partesDoNome = explode(' ', Auth::user()->name);
-                    $doisPrimeirosNomesArray = array_slice($partesDoNome, 0, 2);
-                    $resultado = implode(' ', $doisPrimeirosNomesArray);
-                    // 3. Notifica cada gestor sobre o cancelamento da reserva.
-                    $gestor->notify(
-                        new NotificationModel(
-                            'Reserva cancelada',
-                            'O usuário '.$resultado.
-                            ' cancelou uma reserva.',
-                            route('gestor.reservas.index')
-                        )
-                    );
-                }
                 // 2. Atualiza a situação da própria reserva para 'inativa'
                 $reserva->update(['situacao' => 'inativa']);
             });
+
+            // Notifica os gestores FORA da transação
+            $gestoresUnicos = collect($gestores)->unique('id');
+            foreach ($gestoresUnicos as $gestor) {
+                try {
+                    $gestor->notify(
+                        new ReservationCanceledNotification(
+                            $reserva,
+                            $user
+                        )
+                    );
+                } catch (\Exception $e) {
+                    Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: ".$e->getMessage());
+                }
+            }
 
             return back()->with('success', 'Reserva cancelada com sucesso!');
         } catch (Exception $error) {

@@ -6,7 +6,9 @@ use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NotificationModel;
+use App\Notifications\NewReservationNotification;
+use App\Notifications\ReservationCreatedNotification;
+use App\Notifications\ReservationFailedNotification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -60,7 +62,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 // 1. Cria a reserva principal com os dados recebidos.
                 $reserva = Reserva::create([
                     'titulo' => $this->dadosRequisicao['titulo'],
-                    'descricao' => $this->dadosRequisicao['descricao'],
+                    'descricao' => $this->dadosRequisicao['descricao'] ?? '',
                     'data_inicial' => $this->dadosRequisicao['data_inicial'],
                     'data_final' => $this->dadosRequisicao['data_final'],
                     'recorrencia' => $this->dadosRequisicao['recorrencia'],
@@ -69,7 +71,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 ]);
 
                 // --- LÓGICA DE CRIAÇÃO DOS HORÁRIOS (A PARTE LENTA) ---
-                $horariosData = $this->dadosRequisicao['horarios_solicitados'];
+                $horariosData = $this->dadosRequisicao['horarios_solicitados'] ?? $this->dadosRequisicao['horarios'];
                 $gestores = [];
                 $dataFinalReserva = Carbon::parse($reserva->data_final);
 
@@ -93,46 +95,42 @@ class ProcessarCriacaoReserva implements ShouldQueue
 
                 // --- LÓGICA DE NOTIFICAÇÃO E ATUALIZAÇÃO DE STATUS ---
                 $gestoresUnicos = collect($gestores)->unique('id');
-
                 if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
                     $reserva->update(['situacao' => 'deferida']);
                 } elseif (collect($gestores)->contains(fn ($g) => $g->id === $this->solicitante->id)) {
                     $reserva->update(['situacao' => 'parcialmente_deferida']);
                 }
 
-                $partesDoNome = explode(' ', $this->solicitante->name);
-                $doisPrimeirosNomes = implode(' ', array_slice($partesDoNome, 0, 2));
+                return $reserva;
+            });
+
+            if ($reserva) {
+                // --- LÓGICA DE NOTIFICAÇÃO E ATUALIZAÇÃO DE STATUS (FORA DA TRANSAÇÃO) ---
+                $horariosData = $this->dadosRequisicao['horarios_solicitados'] ?? $this->dadosRequisicao['horarios'];
+                $gestoresUnicos = collect($horariosData)->map(fn ($h) => Agenda::find($h['agenda_id'])?->user)->filter()->unique('id');
 
                 foreach ($gestoresUnicos as $gestor) {
                     if ($gestor->id !== $this->solicitante->id) {
-                        $gestor->notify(
-                            new NotificationModel(
-                                'Nova solicitação de reserva',
-                                'O usuário '.$doisPrimeirosNomes.' solicitou uma reserva.',
-                                route('gestor.reservas.show', ['reserva' => $reserva->id])
-                            )
-                        );
+                        try {
+                            $gestor->notify(new NewReservationNotification($reserva));
+                        } catch (\Exception $e) {
+                            Log::warning("Falha ao notificar gestor {$gestor->id}: ".$e->getMessage());
+                        }
                     }
                 }
 
-                return $reserva;
-            });
-            if ($reserva) {
                 ValidateReservationConflictsJob::dispatch($reserva);
+
+                // Notifica o usuário que a solicitação foi processada com SUCESSO.
+                try {
+                    $this->solicitante->notify(new ReservationCreatedNotification($reserva));
+                } catch (\Exception $e) {
+                    Log::warning('Falha ao enviar notificação de sucesso: '.$e->getMessage());
+                }
             }
-            // Notifica o usuário que a solicitação foi processada com SUCESSO.
-            $this->solicitante->notify(
-                new NotificationModel(
-                    'Sua reserva foi criada!',
-                    'Sua solicitação de reserva para "'.$reserva->titulo.'" foi processada com sucesso.',
-                    route('reservas.show', ['reserva' => $reserva->id])
-                )
-            );
 
         } catch (Exception $e) {
-            // Se algo der errado, jogue a exceção novamente para que o Laravel
-            // saiba que o job falhou e possa tentar novamente mais tarde.
-            Log::error('Falha no Job ProcessarCriacaoReserva: '.$e->getMessage());
+            Log::error($e);
             $this->fail($e); // Marca o Job como falho
         }
     }
@@ -144,12 +142,15 @@ class ProcessarCriacaoReserva implements ShouldQueue
     public function failed(Throwable $exception): void
     {
         // Notifica o usuário que algo deu errado com a solicitação dele.
-        $this->solicitante->notify(
-            new NotificationModel(
-                'Falha na sua solicitação de reserva',
-                'Houve um erro ao processar sua solicitação para "'.$this->dadosRequisicao['titulo'].'". Por favor, tente novamente ou contate o suporte.',
-                route('reservas.index') // Link para a página de reservas
-            )
-        );
+        try {
+            $this->solicitante->notify(
+                new ReservationFailedNotification(
+                    $this->dadosRequisicao['titulo'],
+                    $this->solicitante
+                )
+            );
+        } catch (\Exception $e) {
+            Log::error('Falha fatal ao enviar notificação de erro: '.$e->getMessage());
+        }
     }
 }

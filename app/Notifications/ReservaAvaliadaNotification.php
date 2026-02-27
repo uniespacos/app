@@ -3,11 +3,8 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class ReservaAvaliadaNotification extends Notification
+class ReservaAvaliadaNotification extends BaseNotification
 {
     use Queueable;
 
@@ -17,6 +14,11 @@ class ReservaAvaliadaNotification extends Notification
 
     public function __construct($reserva, $statusAvaliacao)
     {
+        parent::__construct(
+            'Reserva Avaliada',
+            "Sua reserva para '{$reserva->nome}' foi {$statusAvaliacao}.",
+            route('reservas.index')
+        );
         $this->reserva = $reserva;
         $this->statusAvaliacao = $statusAvaliacao;
     }
@@ -32,39 +34,8 @@ class ReservaAvaliadaNotification extends Notification
     }
 
     /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
-    {
-        // Dados para serem salvos no banco de dados
-        return [
-            'reserva_id' => $this->reserva->id,
-            'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => "Sua reserva para '{$this->reserva->nome}' foi {$this->statusAvaliacao}.",
-        ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        // Dados para serem enviados via Pusher
-        return new BroadcastMessage([
-            'reserva_id' => $this->reserva->id,
-            'status_avaliacao' => $this->statusAvaliacao,
-            'mensagem' => "Sua reserva para '{$this->reserva->nome}' foi {$this->statusAvaliacao}.",
-            'url' => route('reservas.index'), // Exemplo de URL
-        ]);
-    }
 }

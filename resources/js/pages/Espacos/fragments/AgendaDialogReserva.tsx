@@ -46,32 +46,35 @@ export default function AgendaDialogReserva({
     const [showRecurrenceAlert, setShowRecurrenceAlert] = useState(false);
     const [datasComConflito, setDatasComConflito] = useState<string[]>([]);
 
-    const opcoesRecorrencia: OpcoesRecorrencia[] = [
-        {
-            valor: 'unica',
-            label: 'Apenas esta semana',
-            descricao: 'A reserva será feita apenas para os dias selecionados nesta semana',
-            calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6),
-        },
-        {
-            valor: '15dias',
-            label: 'Próximos 15 dias',
-            descricao: 'A reserva será replicada pelos próximos 15 dias',
-            calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 14),
-        },
-        {
-            valor: '1mes',
-            label: '1 mês',
-            descricao: 'A reserva será replicada por 1 mês',
-            calcularDataFinal: (dataInicial: Date) => addMonths(dataInicial, 1),
-        },
-        {
-            valor: 'personalizado',
-            label: 'Período personalizado',
-            descricao: 'Defina um período personalizado para a recorrência',
-            calcularDataFinal: (dataInicial: Date) => dataInicial,
-        },
-    ];
+    const opcoesRecorrencia: OpcoesRecorrencia[] = useMemo(
+        () => [
+            {
+                valor: 'unica',
+                label: 'Apenas esta semana',
+                descricao: 'A reserva será feita apenas para os dias selecionados nesta semana',
+                calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6),
+            },
+            {
+                valor: '15dias',
+                label: 'Próximos 15 dias',
+                descricao: 'A reserva será replicada pelos próximos 15 dias',
+                calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 14),
+            },
+            {
+                valor: '1mes',
+                label: '1 mês',
+                descricao: 'A reserva será replicada por 1 mês',
+                calcularDataFinal: (dataInicial: Date) => addMonths(dataInicial, 1),
+            },
+            {
+                valor: 'personalizado',
+                label: 'Período personalizado',
+                descricao: 'Defina um período personalizado para a recorrência',
+                calcularDataFinal: (dataInicial: Date) => dataInicial,
+            },
+        ],
+        [],
+    );
 
     const verificarConflitos = useCallback(
         (horarios: any[]) => {
@@ -218,7 +221,8 @@ export default function AgendaDialogReserva({
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="titulo" className="flex items-center gap-2 font-medium">
-                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva
+                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva{' '}
+                                <p className="text-sm text-red-500">* Obrigatório</p>
                             </Label>
                             <Input
                                 id="titulo"
@@ -230,7 +234,7 @@ export default function AgendaDialogReserva({
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="descricao" className="flex items-center gap-2 font-medium">
-                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição
+                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição <p className="text-sm text-red-500">* Obrigatório</p>
                             </Label>
                             <Textarea
                                 id="descricao"
@@ -402,7 +406,7 @@ export default function AgendaDialogReserva({
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={!formData.titulo.trim() || isSubmitting}>
+                        <Button type="submit" disabled={!formData.titulo.trim() || !formData.descricao.trim() || isSubmitting}>
                             {isSubmitting ? (isEditMode ? 'Salvando...' : 'Enviando...') : isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}
                         </Button>
                     </DialogFooter>

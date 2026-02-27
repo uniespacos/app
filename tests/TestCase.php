@@ -19,6 +19,8 @@ abstract class TestCase extends BaseTestCase
             $this->withoutVite();
         }
 
+        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+
         // Se a tabela permission_types estiver vazia, roda o seeder.
         // Isso garante que os dados essenciais (como permission_type_id = 3) existam.
         if (PermissionType::count() === 0) {

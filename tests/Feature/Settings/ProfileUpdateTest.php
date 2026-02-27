@@ -2,13 +2,14 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Models\Setor;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_profile_page_is_displayed()
     {
@@ -24,12 +25,15 @@ class ProfileUpdateTest extends TestCase
     public function test_profile_information_can_be_updated()
     {
         $user = User::factory()->create();
+        $setor = Setor::factory()->create();
 
         $response = $this
             ->actingAs($user)
             ->patch('/settings/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'phone' => '77999999999',
+                'setor_id' => $setor->id,
             ]);
 
         $response
@@ -46,12 +50,15 @@ class ProfileUpdateTest extends TestCase
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
     {
         $user = User::factory()->create();
+        $setor = Setor::factory()->create();
 
         $response = $this
             ->actingAs($user)
             ->patch('/settings/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
+                'phone' => '77999999999',
+                'setor_id' => $setor->id,
             ]);
 
         $response

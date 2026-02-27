@@ -15,7 +15,7 @@ return [
 
     'reverb' => [
         'app_key' => env('VITE_REVERB_APP_KEY', env('REVERB_APP_KEY')),
-        'host' => env('VITE_REVERB_HOST', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        'host' => env('VITE_REVERB_HOST', env('REVERB_HOST')),
         'port' => env('VITE_REVERB_PORT', 443),
         'scheme' => env('VITE_REVERB_SCHEME', 'https'),
     ],

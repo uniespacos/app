@@ -108,11 +108,11 @@ jobs:
             [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
 
             set -e
-            echo 'Installing PHP dependencies...'
-            composer install --no-interaction --no-progress --prefer-dist
-            
             echo 'Copying .env file...'
             cp .env.testing .env
+
+            echo 'Installing PHP dependencies...'
+            composer install --no-interaction --no-progress --prefer-dist
 
             echo 'Generating app key...'
             php artisan key:generate
@@ -130,25 +130,26 @@ jobs:
       - name: Install Node Dependencies
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-            export NVM_DIR=\"\$HOME/.nvm\"
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-            npm config set fetch-timeout 600000
+            . /home/www/.nvm/nvm.sh &&
+            npm config set fetch-timeout 600000 &&
             npm ci --verbose
           "
 
       - name: Run Frontend Tests
         env:
-            NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-            export NVM_DIR=\"\$HOME/.nvm\"
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-            npm test
-           "
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+           . /home/www/.nvm/nvm.sh &&
+           npm test
+          "
 
       - name: Run Backend Tests
+        env:
+          APP_ENV: testing
         run: |
-          docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
+          grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
 
       # Add this step once frontend tests are configured
       # - name: Run Frontend Tests
@@ -204,6 +205,9 @@ jobs:
         run: npm ci && npm run build
 
       - name: Build and push PHP App Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -219,6 +223,9 @@ jobs:
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
       - name: Build and push Nginx Web Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -265,14 +272,14 @@ jobs:
           # Securely copy the configuration files
           scp ./compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/compose.prod.yml
           scp ./.env.staging ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/.env
-          
+
           # Create nginx config directory and copy default.conf
           ssh ${{ secrets.SSH_HOST }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
           scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/docker/production/nginx/default.conf
 
           # Securely copy the new deployment script to the server
           scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${STAGING_PATH}/deploy.sh
-          
+
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_HOST }} "
             set -e
@@ -282,8 +289,11 @@ jobs:
             # Log into GHCR on the remote server to pull images
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            # Run the deployment script, passing the branch name as the image tag
-            ./deploy.sh development
+            # Calculate short SHA for image tag
+            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
+
+            # Run the deployment script, passing the short SHA as the image tag
+            ./deploy.sh sha-\${SHORT_SHA}
           "
 
   deploy_production:
@@ -321,11 +331,11 @@ jobs:
       - name: Deploy to Production via SSH
         run: |
           PRODUCTION_PATH="/home/operador/app"
-          
+
           # Securely copy the new deployment script to the server
           scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
           scp ./scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
-          
+
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
             set -e
@@ -335,9 +345,12 @@ jobs:
             # Log into GHCR on the remote server to pull images
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            # Run the deployment script, passing the branch name as the image tag
+            # Calculate short SHA for image tag
+            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
+
+            # Run the deployment script, passing the short SHA as the image tag
             set -a
             source .env
             set +a
-            ./deploy.sh main
+            ./deploy.sh sha-\${SHORT_SHA}
           "
