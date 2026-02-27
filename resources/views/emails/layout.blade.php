@@ -137,7 +137,7 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
-                <img src="{{ $message->embed(public_path('logo.svg')) }}" alt="UniEspaços Logo" class="logo">
+                <img src="https://uniespacos.uesb.br/_img/icon_logo.svg" alt="UniEspaços Logo" class="logo">
                 <h2>UniEspaços</h2>
             </div>
             <div class="content">
