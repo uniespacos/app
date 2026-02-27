@@ -30,11 +30,14 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
 
         if (limited.length <= 2) {
             return `(${limited}`;
-        } else if (limited.length <= 7) {
+        } else if (limited.length <= 6) {
             return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+        } else if (limited.length <= 10) {
+            return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6, 10)}`;
         } else {
             return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
         }
+    
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,13 +79,12 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="phone">Número de celular *</Label>
+                    <Label htmlFor="phone">Número de celular </Label>
                     <Input
                         id="phone"
                         value={data.phone}
                         onChange={handlePhoneChange}
-                        placeholder="(73) 99999-9999"
-                        required
+                        placeholder="Exemplo: (XX) XXXXX-XXXX"
                         maxLength={15}
                         className="h-11"
                     />
