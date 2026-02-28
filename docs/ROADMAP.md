@@ -33,6 +33,9 @@ This document outlines the strategic development plan for UniEspaços, organized
             *   Improved calendar UI by highlighting past slots and setting the week to start on Monday.
             *   Fixed `useCallback` import to resolve runtime error.
 
+*   **🔒 Security & Privacy (LGPD)**
+    *   [ ] Resolver apontamentos críticos de segurança e LGPD (Gerenciado internamente no GitHub Projects).
+
 ---
 
 ## 🚀 v2.x: Expansion & Intelligence

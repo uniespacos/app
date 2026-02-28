@@ -1,6 +1,5 @@
 import CalendarShiftSection from '@/components/calendar-shift-section'; // Importa o componente que corrigimos
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
@@ -29,8 +28,8 @@ export default function AgendaCalendario({
 
     return (
         <Card className="p-0">
-            <ScrollArea>
-                <div className="min-w-[800px] overflow-auto rounded-xl">
+            <div className="w-full overflow-auto">
+                <div className="min-w-[800px] rounded-xl">
                     {/* Cabeçalho com os dias da semana */}
                     <div className="bg-background sticky top-0 z-10 grid grid-cols-[80px_repeat(7,1fr)] border-b">
                         <div className="text-muted-foreground p-2 text-center text-sm font-medium"></div>
@@ -63,7 +62,7 @@ export default function AgendaCalendario({
                         return null;
                     })}
                 </div>
-            </ScrollArea>
+            </div>
         </Card>
     );
 }
