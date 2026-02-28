@@ -145,7 +145,7 @@ class GestorReservaController extends Controller
     public function update(AvaliarReservaRequest $request, Reserva $reserva)
     {
         $this->authorize('viewForGestor', $reserva);
-        
+
         $gestor = Auth::user();
         $validated = $request->validated();
 

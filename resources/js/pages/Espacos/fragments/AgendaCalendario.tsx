@@ -63,6 +63,6 @@ export default function AgendaCalendario({
                     })}
                 </div>
             </div>
-    </Card>
+        </Card>
     );
 }
