@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.5](https://github.com/uniespacos/app/compare/v1.1.4...v1.1.5) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** separate docker metadata actions for app and web images to prevent tag overriding ([d2543db](https://github.com/uniespacos/app/commit/d2543dba7813c027b825ce0b6868ee826223aad6))
+
 ## [1.1.4](https://github.com/uniespacos/app/compare/v1.1.3...v1.1.4) (2026-02-28)
 
 
