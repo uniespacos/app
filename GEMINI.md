@@ -149,3 +149,7 @@ Triggers who dont can forget:
 
 1. **Context7 MCP**
    - Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+
+## CI/CD and Release Process
+
+The `.github/` workflows in this project use `release-please` (v4 Manifest structure) to manage automated versioning based on Conventional Commits in the `develop` branch. Merging a release PR generates a semantic version tag (e.g., `v1.1.0`), which then triggers the `deploy-staging.yml` workflow. The staging environment requires the `v*` tag rule to be allowed in GitHub's Environment settings. PR titles must adhere to Conventional Commits to pass the `pr-lint.yml` check, ensuring clean automatic squash commits.
