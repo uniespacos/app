@@ -70,11 +70,34 @@ CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2 || echo "initia
 log "Stopping application to clear asset volumes..."
 docker compose -f "$COMPOSE_FILE" down --timeout 30
 
+log "Removing old asset volumes to ensure a clean update..."
+# Dynamically find the project name to delete the correct volumes
+PROJECT_NAME=$(docker compose -f "$COMPOSE_FILE" config | grep "name:" | head -n 1 | awk '{print $2}' || echo "app")
+docker volume rm "${PROJECT_NAME}_uniespacos-public-assets-v2-staging" "${PROJECT_NAME}_uniespacos-public-staging-v2" 2>/dev/null || log "Volumes not found or already removed."
+
 log "Pulling new images with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" pull
 
 log "Starting application with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" up -d
+
+log "Waiting for application container to be ready..."
+# OCI exec can fail if attempted immediately after start
+RETRIES=10
+while [ $RETRIES -gt 0 ]; do
+    if docker compose -f "$COMPOSE_FILE" exec -T app php -v > /dev/null 2>&1; then
+        log "Application container is ready."
+        break
+    fi
+    echo "Waiting for container initialization ($RETRIES retries left)..."
+    sleep 3
+    RETRIES=$((RETRIES - 1))
+done
+
+if [ $RETRIES -eq 0 ]; then
+    echo "Error: Application container failed to become ready in time."
+    exit 1
+fi
 
 log "Running post-deployment Laravel commands..."
 docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate --force
