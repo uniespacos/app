@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.9](https://github.com/uniespacos/app/compare/v1.1.8...v1.1.9) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** automate removal of poisoned Caddyfile directory on staging ([396f367](https://github.com/uniespacos/app/commit/396f367a1d9c65e61698cbad59a812890d8ef8db))
+
 ## [1.1.8](https://github.com/uniespacos/app/compare/v1.1.7...v1.1.8) (2026-02-28)
 
 
