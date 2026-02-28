@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.12](https://github.com/uniespacos/app/compare/v1.1.11...v1.1.12) (2026-02-28)
+
+
+### Bug Fixes
+
+* **ci:** correct syntax for staging path variable in deployment step ([1e152d0](https://github.com/uniespacos/app/commit/1e152d06a557894509ad669bbfde2e8701809b9d))
+* **deploy:** use ssh pipe to create Caddyfile on server ([13559dc](https://github.com/uniespacos/app/commit/13559dc7f461ffb794c360f676cdf819f4539278))
+
 ## [1.1.11](https://github.com/uniespacos/app/compare/v1.1.10...v1.1.11) (2026-02-28)
 
 
