@@ -20,7 +20,7 @@ class UnidadePolicy
      */
     public function view(User $user, Unidade $unidade): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $unidade->instituicao_id;
     }
 
@@ -37,7 +37,7 @@ class UnidadePolicy
      */
     public function update(User $user, Unidade $unidade): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $unidade->instituicao_id;
     }
 
@@ -46,7 +46,7 @@ class UnidadePolicy
      */
     public function delete(User $user, Unidade $unidade): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $unidade->instituicao_id;
     }
 }

@@ -20,7 +20,7 @@ class SetorPolicy
      */
     public function view(User $user, Setor $setor): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $setor->unidade->instituicao_id;
     }
 
@@ -37,7 +37,7 @@ class SetorPolicy
      */
     public function update(User $user, Setor $setor): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $setor->unidade->instituicao_id;
     }
 
@@ -46,7 +46,7 @@ class SetorPolicy
      */
     public function delete(User $user, Setor $setor): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $setor->unidade->instituicao_id;
     }
 }

@@ -83,7 +83,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
     }
 

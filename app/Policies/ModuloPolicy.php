@@ -20,7 +20,7 @@ class ModuloPolicy
      */
     public function view(User $user, Modulo $modulo): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $modulo->unidade->instituicao_id;
     }
 
@@ -37,7 +37,7 @@ class ModuloPolicy
      */
     public function update(User $user, Modulo $modulo): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $modulo->unidade->instituicao_id;
     }
 
@@ -46,7 +46,7 @@ class ModuloPolicy
      */
     public function delete(User $user, Modulo $modulo): bool
     {
-        return $user->permission_type_id === 1 
+        return $user->permission_type_id === 1
             && $user->setor->unidade->instituicao_id === $modulo->unidade->instituicao_id;
     }
 }

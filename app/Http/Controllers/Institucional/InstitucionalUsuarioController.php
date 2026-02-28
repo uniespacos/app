@@ -147,9 +147,9 @@ class InstitucionalUsuarioController extends Controller
     public function show($id)
     {
         abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
-        
+
         $user = User::findOrFail($id);
-        
+
         $this->authorize('view', $user);
 
         return Inertia::render('Editar/UserDetail', [
@@ -163,9 +163,9 @@ class InstitucionalUsuarioController extends Controller
     public function edit($id)
     {
         abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
-        
+
         $user = User::findOrFail($id);
-        
+
         $this->authorize('update', $user);
 
         $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
@@ -187,7 +187,7 @@ class InstitucionalUsuarioController extends Controller
         abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
 
         $user = User::findOrFail($id);
-        
+
         $this->authorize('update', $user);
 
         $request->validate([
@@ -215,7 +215,7 @@ class InstitucionalUsuarioController extends Controller
         abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
 
         $targetUser = User::findOrFail($id);
-        
+
         $this->authorize('delete', $targetUser);
 
         $request->validate([
