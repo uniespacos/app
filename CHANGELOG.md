@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.8](https://github.com/uniespacos/app/compare/v1.1.7...v1.1.8) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** ensure staging Caddyfile is copied to the server ([09e9ee3](https://github.com/uniespacos/app/commit/09e9ee35c2324647bfcf964a62422e59cb6378b7))
+
 ## [1.1.7](https://github.com/uniespacos/app/compare/v1.1.6...v1.1.7) (2026-02-28)
 
 
