@@ -7,6 +7,7 @@ use App\Http\Requests\StoreModuloRequest;
 use App\Http\Requests\UpdateModuloRequest;
 use App\Models\Modulo;
 use App\Models\Unidade;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +16,15 @@ use Inertia\Inertia;
 
 class InstitucionalModuloController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $this->authorize('viewAny', Modulo::class);
+
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
 
@@ -35,6 +40,8 @@ class InstitucionalModuloController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Modulo::class);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
         $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
@@ -50,6 +57,8 @@ class InstitucionalModuloController extends Controller
      */
     public function store(StoreModuloRequest $request)
     {
+        $this->authorize('create', Modulo::class);
+
         $request->validated(); // Valida os dados usando a Form Request
         try {
             DB::beginTransaction();
@@ -86,6 +95,8 @@ class InstitucionalModuloController extends Controller
      */
     public function edit(Modulo $modulo) // Corrigido o nome do parâmetro para $instituico
     {
+        $this->authorize('update', $modulo);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
         $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
@@ -103,6 +114,8 @@ class InstitucionalModuloController extends Controller
      */
     public function update(UpdateModuloRequest $request, Modulo $modulo)
     {
+        $this->authorize('update', $modulo);
+
         $dadosValidados = $request->validated();
         try {
             DB::beginTransaction();
@@ -169,6 +182,8 @@ class InstitucionalModuloController extends Controller
      */
     public function destroy(Request $request, Modulo $modulo)
     {
+        $this->authorize('delete', $modulo);
+
         $request->validate([
             'password' => 'required',
         ]);
@@ -201,3 +216,4 @@ class InstitucionalModuloController extends Controller
         }
     }
 }
+.

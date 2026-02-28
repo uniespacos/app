@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Unidade;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,11 +12,15 @@ use Inertia\Inertia;
 
 class InstitucionalUnidadeController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $this->authorize('viewAny', Unidade::class);
+
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
 
@@ -31,6 +36,8 @@ class InstitucionalUnidadeController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Unidade::class);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
 
@@ -44,6 +51,8 @@ class InstitucionalUnidadeController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Unidade::class);
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'sigla' => 'required|string|max:10',
@@ -63,6 +72,8 @@ class InstitucionalUnidadeController extends Controller
      */
     public function edit(Unidade $unidade) // Corrigido o nome do parâmetro para $instituico
     {
+        $this->authorize('update', $unidade);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
 
@@ -77,6 +88,8 @@ class InstitucionalUnidadeController extends Controller
      */
     public function update(Request $request, Unidade $unidade)
     {
+        $this->authorize('update', $unidade);
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'sigla' => 'required|string|max:10',
@@ -103,6 +116,8 @@ class InstitucionalUnidadeController extends Controller
      */
     public function destroy(Request $request, Unidade $unidade)
     {
+        $this->authorize('delete', $unidade);
+
         $request->validate([
             'password' => 'required',
         ]);
@@ -122,3 +137,4 @@ class InstitucionalUnidadeController extends Controller
         }
     }
 }
+.

@@ -12,7 +12,7 @@ class EspacoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->permission_type_id === 1;
     }
 
     /**
@@ -20,7 +20,8 @@ class EspacoPolicy
      */
     public function view(User $user, Espaco $espaco): bool
     {
-        return false;
+        return $user->permission_type_id === 1 
+            && $user->setor->unidade->instituicao_id === $espaco->andar->modulo->unidade->instituicao_id;
     }
 
     /**
@@ -36,7 +37,8 @@ class EspacoPolicy
      */
     public function update(User $user, Espaco $espaco): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->permission_type_id === 1 
+            && $user->setor->unidade->instituicao_id === $espaco->andar->modulo->unidade->instituicao_id;
     }
 
     /**
@@ -44,7 +46,8 @@ class EspacoPolicy
      */
     public function delete(User $user, Espaco $espaco): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->permission_type_id === 1 
+            && $user->setor->unidade->instituicao_id === $espaco->andar->modulo->unidade->instituicao_id;
     }
 
     /**

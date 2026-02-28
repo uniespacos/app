@@ -74,9 +74,7 @@ class GestorReservaController extends Controller
             ])->find($filters['reserva']);
 
             if ($reservaToShow) {
-                if (! $gestor->can('viewForGestor', $reservaToShow)) {
-                    abort(403);
-                }
+                abort_unless($gestor->can('viewForGestor', $reservaToShow), 403);
             }
         }
 

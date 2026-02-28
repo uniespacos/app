@@ -17,13 +17,20 @@ class UserPolicy
 
     /**
      *   Ver um usuário específico
-     * - Institucional (1) e Gestor (2) podem ver qualquer usuário
+     * - Institucional (1) e Gestor (2) podem ver qualquer usuário da mesma instituição
      * - O próprio usuário pode ver o seu perfil
      */
     public function view(User $user, User $model): bool
     {
-        return $user->id === $model->id
-            || in_array($user->permission_type_id, [1, 2]);
+        if ($user->id === $model->id) {
+            return true;
+        }
+
+        if (in_array($user->permission_type_id, [1, 2])) {
+            return $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
+        }
+
+        return false;
     }
 
     /**
@@ -38,21 +45,36 @@ class UserPolicy
     /**
      *  Atualizar usuários
      * - O próprio usuário pode atualizar o seu perfil
-     * - Institucional (1), Gestor (2) e Comum (3) podem atualizar qualquer usuário
+     * - Institucional (1) e Gestor (2) podem atualizar usuários da mesma instituição
      */
     public function update(User $user, User $model): bool
     {
-        return $user->id === $model->id
-            || in_array($user->permission_type_id, [1, 2, 3]);
+        if ($user->id === $model->id) {
+            return true;
+        }
+
+        if (in_array($user->permission_type_id, [1, 2])) {
+            return $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
+        }
+
+        return false;
     }
 
     /**
      *  Deletar usuários
-     * Apenas Institucional (1) pode deletar
+     * Apenas Institucional (1) pode deletar usuários da mesma instituição
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        if ($user->id === $model->id) {
+            return false; // Não permitir auto-exclusão por segurança
+        }
+
+        if ($user->permission_type_id === 1) {
+            return $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
+        }
+
+        return false;
     }
 
     /**
@@ -61,7 +83,8 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->permission_type_id === 1 
+            && $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
     }
 
     /**
@@ -70,7 +93,8 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->permission_type_id === 1
+            && $user->setor->unidade->instituicao_id === $model->setor->unidade->instituicao_id;
     }
 
     /**

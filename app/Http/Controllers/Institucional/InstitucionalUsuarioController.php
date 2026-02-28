@@ -8,20 +8,25 @@ use App\Models\Instituicao;
 use App\Models\PermissionType;
 use App\Models\Setor;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Importar o modelo User para buscar o usuário
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Inertia\Inertia; // Importar Rule para validações
+use Inertia\Inertia;
 
 class InstitucionalUsuarioController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $this->authorize('viewAny', User::class);
+
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
         $users = User::whereHas('setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with([
@@ -53,6 +58,8 @@ class InstitucionalUsuarioController extends Controller
 
     public function updatePermissions(Request $request, User $user)
     {
+        $this->authorize('update', $user);
+
         $validated = $request->validate([
             'permission_type_id' => ['required', 'exists:permission_types,id'],
             'agendas' => ['array'], // Permite que agendas seja um array vazio ou com IDs
@@ -80,7 +87,6 @@ class InstitucionalUsuarioController extends Controller
                         ->update(['user_id' => $userId]);
                 }
             });
-            DB::commit();
 
             return redirect()->route('institucional.usuarios.index')->with('success', 'Permissões atualizadas com sucesso.');
         } catch (\Throwable $th) {
@@ -96,6 +102,8 @@ class InstitucionalUsuarioController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', User::class);
+
         // Renderiza o componente UserController para criação de um novo usuário
         // Você pode passar listas de roles e statuses disponíveis
         $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
@@ -112,6 +120,8 @@ class InstitucionalUsuarioController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -134,11 +144,13 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        // Geralmente, a tela de "show" exibe os detalhes de um usuário.
-        // Você pode renderizar um componente React para isso, ou usar os dados diretamente.
+        abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
+        
         $user = User::findOrFail($id);
+        
+        $this->authorize('view', $user);
 
         return Inertia::render('Editar/UserDetail', [
             'user' => $user,
@@ -148,9 +160,14 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
+        abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
+        
         $user = User::findOrFail($id);
+        
+        $this->authorize('update', $user);
+
         $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
         $statuses = ['active', 'inactive', 'suspended']; // Exemplo de status
 
@@ -165,9 +182,13 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
+        abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
+
         $user = User::findOrFail($id);
+        
+        $this->authorize('update', $user);
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -189,21 +210,26 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, $id)
     {
+        abort_unless(filter_var($id, FILTER_VALIDATE_INT), 404);
+
+        $targetUser = User::findOrFail($id);
+        
+        $this->authorize('delete', $targetUser);
+
         $request->validate([
             'password' => 'required',
         ]);
 
-        $user = Auth::user(); // Obtém o usuário logado
+        $authUser = Auth::user(); // Obtém o usuário logado
 
         // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $authUser || ! Hash::check($request->password, $authUser->password)) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
         try {
-            $user = User::findOrFail($id);
-            $user->delete();
+            $targetUser->delete();
 
             return redirect()->route('institucional.usuarios.index')->with('success', 'Usuário excluído com sucesso.');
         } catch (\Throwable $th) {

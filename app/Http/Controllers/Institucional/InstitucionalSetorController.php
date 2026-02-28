@@ -9,6 +9,7 @@ use App\Models\Setor;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Notifications\SectorUpdatedNotification;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,11 +17,15 @@ use Inertia\Inertia;
 
 class InstitucionalSetorController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $this->authorize('viewAny', Setor::class);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao->load(['unidades']);
 
@@ -28,7 +33,7 @@ class InstitucionalSetorController extends Controller
             'instituicao' => $instituicao,
             'unidades' => Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao', 'setors'])->get(), // Carrega unidades com instituições e setores
             'setores' => Setor::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao->id))->with(['unidade.instituicao'])->get(),
-            'usuarios' => User::with(['setor'])->get(), // Carrega setores com unidade e instituição
+            'usuarios' => User::whereHas('setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicao->id))->with(['setor'])->get(), // Carrega setores com unidade e instituição
         ]);
     }
 
@@ -47,6 +52,8 @@ class InstitucionalSetorController extends Controller
      */
     public function store(StoreSetorRequest $request)
     {
+        $this->authorize('create', Setor::class);
+
         $request->validated(); // Valida os dados usando a Form Request
         try {
             Setor::create([
@@ -79,6 +86,8 @@ class InstitucionalSetorController extends Controller
      */
     public function update(UpdateSetorRequest $request, Setor $setor)
     {
+        $this->authorize('update', $setor);
+
         $request->validated(); // Valida os dados usando a Form Request
         try {
             $setor->update([
@@ -109,6 +118,8 @@ class InstitucionalSetorController extends Controller
      */
     public function destroy(Request $request, Setor $setor)
     {
+        $this->authorize('delete', $setor);
+
         $request->validate([
             'password' => 'required',
         ]);

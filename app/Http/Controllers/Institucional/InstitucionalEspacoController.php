@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Services\GestaoAgendaService;
 use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,8 @@ use Inertia\Inertia;
 
 class InstitucionalEspacoController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $gestaoAgendaService;
 
     public function __construct(GestaoAgendaService $gestaoAgendaService)
@@ -37,10 +40,10 @@ class InstitucionalEspacoController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Espaco::class);
+
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
-
-        $users = User::with(['agendas', 'setor'])->get();
 
         $unidades = Unidade::where('instituicao_id', $instituicao_id)->with('modulos.andars')->get();
 
@@ -72,6 +75,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Espaco::class);
+
         $user = Auth::user();
         $instituicao_id = $user->setor->unidade->instituicao_id;
 
@@ -89,6 +94,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function store(StoreEspacoRequest $request)
     {
+        $this->authorize('create', Espaco::class);
+
         // A validação já foi feita pela Form Request!
         $validated = $request->validated();
         try {
@@ -146,6 +153,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function show(Espaco $espaco)
     {
+        $this->authorize('view', $espaco);
+
         try {
             $agendas = Agenda::whereEspacoId($espaco->id)->get();
             $andar = $espaco->andar;
@@ -189,10 +198,15 @@ class InstitucionalEspacoController extends Controller
      */
     public function edit(Espaco $espaco)
     {
+        $this->authorize('update', $espaco);
+
         $espaco->load('andar.modulo.unidade');
-        $unidades = Unidade::all();
-        $modulos = Modulo::with('unidade')->get();
-        $andares = Andar::with('modulo.unidade')->get();
+        $user = Auth::user();
+        $instituicao_id = $user->setor->unidade->instituicao_id;
+
+        $unidades = Unidade::where('instituicao_id', $instituicao_id)->get();
+        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with('unidade')->get();
+        $andares = Andar::whereHas('modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with('modulo.unidade')->get();
 
         return inertia('Administrativo/Espacos/CadastroEspaco', compact('espaco', 'unidades', 'modulos', 'andares'));
     }
@@ -202,6 +216,7 @@ class InstitucionalEspacoController extends Controller
      */
     public function update(UpdateEspacoRequest $request, Espaco $espaco)
     {
+        $this->authorize('update', $espaco);
 
         $validated = $request->validated();
         try {
@@ -275,6 +290,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function destroy(Request $request, Espaco $espaco)
     {
+        $this->authorize('delete', $espaco);
+
         $request->validate([
             'password' => 'required',
         ]);
@@ -300,6 +317,7 @@ class InstitucionalEspacoController extends Controller
      */
     public function alterarGestores(AlterarGestoresEspacoRequest $request, Espaco $espaco)
     {
+        $this->authorize('update', $espaco);
 
         $validated = $request->validated();
         try {
