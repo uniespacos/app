@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.13](https://github.com/uniespacos/app/compare/v1.1.12...v1.1.13) (2026-02-28)
+
+
+### Bug Fixes
+
+* **security:** harden institucional controllers and policies for multi-tenancy and authorization ([a585957](https://github.com/uniespacos/app/commit/a585957e4a264df30f498c72241dacfa8454d58c))
+
 ## [1.1.12](https://github.com/uniespacos/app/compare/v1.1.11...v1.1.12) (2026-02-28)
 
 
