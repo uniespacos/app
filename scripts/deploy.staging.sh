@@ -20,6 +20,7 @@ BACKUP_FILENAME="storage/backups/backup_staging_$(date +%F_%H-%M-%S).sql"
 
 # 1. Backup the database
 echo "Creating database backup..."
+mkdir -p storage/backups
 docker compose -f compose.staging.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "$BACKUP_FILENAME"
 
 # 2. Save the current image tag and backup name for rollback
