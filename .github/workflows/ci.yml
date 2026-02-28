@@ -242,7 +242,7 @@ jobs:
 
       - name: Deploy to Staging via SSH
         run: |
-          STAGING_PATH="${{ secrets.PATH_TO_APP_FOLDER_STAGING}}"
+          STAGING_PATH=${{ secrets.PATH_TO_APP_FOLDER_STAGING}}
           # Securely copy the configuration files
           scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
           scp ./.env.staging ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/.env
