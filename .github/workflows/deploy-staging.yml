@@ -227,16 +227,12 @@ jobs:
           scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
           scp ./scripts/deploy.staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.staging.sh
 
-          # Create caddy config directory and copy Caddyfile
-          # Proactively remove Caddyfile if it exists as a directory (Docker artifact from failed mounts)
+          # Create caddy config directory and pipe the Caddyfile content
           ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
             mkdir -p ${STAGING_PATH}/docker/staging/caddy
-            if [ -d \"${STAGING_PATH}/docker/staging/caddy/Caddyfile\" ]; then
-              echo 'Found Caddyfile as directory, removing...'
-              docker run --rm -v ${STAGING_PATH}/docker/staging/caddy:/cleanup busybox rm -rf /cleanup/Caddyfile
-            fi
-          "
-          scp ./docker/staging/caddy/Caddyfile ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/docker/staging/caddy/Caddyfile
+            rm -f ${STAGING_PATH}/docker/staging/caddy/Caddyfile
+            cat > ${STAGING_PATH}/docker/staging/caddy/Caddyfile
+          " < ./docker/staging/caddy/Caddyfile
 
           # Execute the script on the remote server
           ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
