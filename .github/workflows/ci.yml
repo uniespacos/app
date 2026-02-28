@@ -247,15 +247,18 @@ jobs:
           scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
           scp ./.env.staging ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/.env
 
-          # Create caddy config directory and copy Caddyfile
-          ssh ${{ secrets.SSH_HOST_STAGING }} "mkdir -p ${STAGING_PATH}/docker/staging/caddy"
-          scp ./docker/staging/caddy/Caddyfile ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/docker/staging/caddy/Caddyfile
+          # Create caddy config directory and pipe the Caddyfile content
+          ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
+            mkdir -p ${STAGING_PATH}/docker/staging/caddy
+            rm -f ${STAGING_PATH}/docker/staging/caddy/Caddyfile
+            cat > ${STAGING_PATH}/docker/staging/caddy/Caddyfile
+          " < ./docker/staging/caddy/Caddyfile
 
           # Securely copy the new deployment script to the server
-          scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.sh
+          scp ./scripts/deploy.staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.sh
 
           # Execute the script on the remote server
-          ssh ${{ secrets.SSH_HOST_STAGING }} "
+          ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
             set -e
             cd ${STAGING_PATH}
             chmod +x deploy.sh
@@ -306,9 +309,12 @@ jobs:
         run: |
           PRODUCTION_PATH="/home/operador/app"
 
-          # Create caddy config directory and copy Caddyfile
-          ssh ${{ secrets.SSH_HOST_PRODUCTION }} "mkdir -p ${PRODUCTION_PATH}/docker/production/caddy"
-          scp ./docker/production/caddy/Caddyfile ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/docker/production/caddy/Caddyfile
+          # Create caddy config directory and pipe the Caddyfile content
+          ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
+            mkdir -p ${PRODUCTION_PATH}/docker/production/caddy
+            rm -f ${PRODUCTION_PATH}/docker/production/caddy/Caddyfile
+            cat > ${PRODUCTION_PATH}/docker/production/caddy/Caddyfile
+          " < ./docker/production/caddy/Caddyfile
 
           # Securely copy the new deployment script to the server
           scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
