@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/uniespacos/app/compare/v1.1.1...v1.1.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** make database backup fault-tolerant on staging ([199627d](https://github.com/uniespacos/app/commit/199627d84b83c7401b8dcfb747344cd7e6bf78a7))
+
 ## [1.1.1](https://github.com/uniespacos/app/compare/v1.1.0...v1.1.1) (2026-02-28)
 
 
