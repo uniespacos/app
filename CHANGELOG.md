@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/uniespacos/app/compare/v1.1.5...v1.1.6) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** resolve route naming conflict and harden deployment script ([572841b](https://github.com/uniespacos/app/commit/572841b5137c8eac590fdc8357d8c1a15717cdf9))
+
 ## [1.1.5](https://github.com/uniespacos/app/compare/v1.1.4...v1.1.5) (2026-02-28)
 
 
