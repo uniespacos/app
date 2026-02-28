@@ -25,6 +25,6 @@ class ReservationFailedNotification extends BaseNotification
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
             ->subject('Falha na sua solicitação de reserva: '.$this->reservationTitle)
-            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reservationTitle, 'user' => $this->user, 'url' => $this->url]);
+            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reservationTitle, 'userName' => $this->user->name, 'url' => $this->url]);
     }
 }
