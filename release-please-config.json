@@ -1,7 +1,11 @@
 {
-  "release-type": "php",
-  "bump-minor-pre-major": true,
-  "bump-patch-for-minor-pre-major": true,
-  "changelog-path": "CHANGELOG.md",
+  "packages": {
+    ".": {
+      "release-type": "php",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "changelog-path": "CHANGELOG.md"
+    }
+  },
   "bootstrap-sha": "b3fc0ad4d3f6f30025009c141a47bfc613dfe0f8"
 }
