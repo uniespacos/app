@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.14](https://github.com/uniespacos/app/compare/v1.1.13...v1.1.14) (2026-02-28)
+
+
+### Bug Fixes
+
+* **security:** resolve syntax errors and apply code style fixes to institucional controllers ([6e80ab0](https://github.com/uniespacos/app/commit/6e80ab0db55ef6cce75a9387ac621c1f349d4235))
+
 ## [1.1.13](https://github.com/uniespacos/app/compare/v1.1.12...v1.1.13) (2026-02-28)
 
 
