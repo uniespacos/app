@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.15](https://github.com/uniespacos/app/compare/v1.1.14...v1.1.15) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deployment:** update Caddyfile handling in staging and production scripts ([57c2842](https://github.com/uniespacos/app/commit/57c28427ad169b328eb7583874c94836b5c1173d))
+* **deploy:** set correct permissions for storage and cache directories on staging ([5af9d41](https://github.com/uniespacos/app/commit/5af9d41a9dd29871d877b362c6ebc9207b567b66))
+
 ## [1.1.14](https://github.com/uniespacos/app/compare/v1.1.13...v1.1.14) (2026-02-28)
 
 
