@@ -21,7 +21,11 @@ BACKUP_FILENAME="storage/backups/backup_staging_$(date +%F_%H-%M-%S).sql"
 # 1. Backup the database
 echo "Creating database backup..."
 mkdir -p storage/backups
-docker compose -f compose.staging.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "$BACKUP_FILENAME"
+if docker compose -f compose.staging.yml ps | grep -q postgres; then
+    docker compose -f compose.staging.yml exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "$BACKUP_FILENAME" || echo "Warning: Database backup failed. Continuing deployment."
+else
+    echo "Warning: Postgres container is not running. Skipping database backup."
+fi
 
 # 2. Save the current image tag and backup name for rollback
 CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2 || echo "")
