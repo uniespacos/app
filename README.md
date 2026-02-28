@@ -93,3 +93,4 @@ We welcome contributions! Whether you're a student, a developer, or just interes
 This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
 
 You are free to use, adapt, and share this software for **non-commercial purposes only**, provided you give appropriate credit and distribute your contributions under the same license. See the [LICENSE](LICENSE) file for details.
+
