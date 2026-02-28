@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/uniespacos/app/compare/v1.1.3...v1.1.4) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** wait for container readiness to prevent OCI exec pipe errors ([da78779](https://github.com/uniespacos/app/commit/da78779ad5532f65a9d4c9fd9c6d0324d1813f13))
+
 ## [1.1.3](https://github.com/uniespacos/app/compare/v1.1.2...v1.1.3) (2026-02-28)
 
 
