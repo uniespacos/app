@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/uniespacos/app/compare/v1.1.0...v1.1.1) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** ensure backup directory is created before backup ([ab9415a](https://github.com/uniespacos/app/commit/ab9415a5455fb076882c3f6e066c46da305c83af))
+
 ## [1.1.0](https://github.com/uniespacos/app/compare/v1.0.0...v1.1.0) (2026-02-28)
 
 
