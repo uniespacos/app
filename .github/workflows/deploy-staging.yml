@@ -168,13 +168,19 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.PAT }}
 
-      - name: Extract Docker metadata
-        id: meta
+      - name: Extract Docker metadata for App
+        id: meta-app
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ghcr.io/${{ github.repository }}/app
-            ghcr.io/${{ github.repository }}/web
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=semver,pattern={{version}}
+
+      - name: Extract Docker metadata for Web
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
           tags: |
             type=semver,pattern={{version}}
 
@@ -194,8 +200,8 @@ jobs:
           file: ./docker/production/php-fpm/Dockerfile
           target: production
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-app.outputs.tags }}
+          labels: ${{ steps.meta-app.outputs.labels }}
           build-args: |
             VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}
             VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
@@ -208,8 +214,8 @@ jobs:
           context: .
           file: ./docker/production/nginx/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
 
       - name: Install cloudflared
         run: |
