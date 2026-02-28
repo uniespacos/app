@@ -26,6 +26,6 @@ class ReservationUpdateFailedNotification extends BaseNotification
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
             ->subject('Falha ao Atualizar Reserva: '.$this->reserva->titulo)
-            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reserva->titulo, 'user' => $this->user, 'url' => $this->url]);
+            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reserva->titulo, 'userName' => $this->user->name, 'url' => $this->url]);
     }
 }
