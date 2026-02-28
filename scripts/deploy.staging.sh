@@ -41,12 +41,20 @@ BACKUP_FILENAME="$BACKUP_DIR/backup_staging_$(date +%F_%H-%M-%S).sql"
 COMPOSE_FILE="compose.staging.yml"
 
 # Ensure necessary directories exist
-log "Ensuring directories exist..."
+log "Ensuring necessary directories exist..."
 mkdir -p "$VERSION_DIR"
 mkdir -p "$BACKUP_DIR"
 touch "$VERSION_FILE"
+mkdir -p storage/logs bootstrap/cache
+
+log "Setting correct permissions for storage and cache directories..."
+# Set ownership to www-data (UID 33) and group to www-data (GID 33)
+# Use docker compose exec on a temporary app container to run chown safely
+docker compose -f "$COMPOSE_FILE" run --rm -u root app chown -R www-data:www-data storage bootstrap/cache
+docker compose -f "$COMPOSE_FILE" run --rm -u root app chmod -R 775 storage bootstrap/cache
 
 # --- Deployment Steps ---
+
 
 log "Putting application into maintenance mode..."
 # This command can fail if the container isn't running yet, so we add || true
