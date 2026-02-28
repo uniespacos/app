@@ -37,7 +37,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         } else {
             return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
         }
-    
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {

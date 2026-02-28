@@ -55,7 +55,7 @@ class GestorReservaController extends Controller
             ->withQueryString();
 
         $reservaToShow = null;
-        if ($filters['reserva'] ?? null) {
+        if (! empty($filters['reserva']) && filter_var($filters['reserva'], FILTER_VALIDATE_INT) !== false) {
             $reservaToShow = Reserva::with([
                 'user',
                 'horarios' => function ($query) use ($agendasDoGestorIds, $inicioSemana, $fimSemana) {
@@ -72,6 +72,12 @@ class GestorReservaController extends Controller
                         ]);
                 },
             ])->find($filters['reserva']);
+
+            if ($reservaToShow) {
+                if (! $gestor->can('viewForGestor', $reservaToShow)) {
+                    abort(403);
+                }
+            }
         }
 
         return Inertia::render('Reservas/Gestor/ReservasGestorPage', [
@@ -138,6 +144,8 @@ class GestorReservaController extends Controller
      */
     public function update(AvaliarReservaRequest $request, Reserva $reserva)
     {
+        $this->authorize('viewForGestor', $reserva);
+
         $gestor = Auth::user();
         $validated = $request->validated();
 

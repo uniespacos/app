@@ -20,7 +20,7 @@ class ReservaPolicy
      */
     public function view(User $user, Reserva $reserva): bool
     {
-        return false;
+        return $user->id === $reserva->user_id;
     }
 
     /**

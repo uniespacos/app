@@ -73,7 +73,7 @@ class ReservaController extends Controller
 
         // 5. Query para a reserva específica que será exibida no modal (reservaToShow)
         $reservaToShow = null;
-        if ($filters['reserva'] ?? null) {
+        if (! empty($filters['reserva']) && filter_var($filters['reserva'], FILTER_VALIDATE_INT) !== false) {
             $reservaToShow = Reserva::with([
                 'user',
                 // O mesmo filtro de semana é aplicado aqui!
@@ -85,6 +85,9 @@ class ReservaController extends Controller
             ])->find($filters['reserva']);
 
             if ($reservaToShow) {
+                if (! $user->can('view', $reservaToShow)) {
+                    abort(403);
+                }
                 $reservaToShow->can_update = $user->can('update', $reservaToShow);
             }
         }
@@ -171,6 +174,8 @@ class ReservaController extends Controller
      */
     public function show(Reserva $reserva)
     {
+        $this->authorize('view', $reserva);
+
         return redirect()->route('reservas.index', ['reserva' => $reserva->id]);
     }
 
@@ -179,6 +184,7 @@ class ReservaController extends Controller
      */
     public function edit(Request $request, Reserva $reserva)
     {
+        $this->authorize('update', $reserva);
         // --- INÍCIO DA CORREÇÃO ---
 
         // 1. Busca o primeiro horário agendado em ordem cronológica.

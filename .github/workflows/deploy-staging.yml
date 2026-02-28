@@ -1,14 +1,9 @@
-name: CI/CD
+name: Deploy to Staging
 
 on:
   push:
-    branches:
-      - "main"
-  pull_request:
-    branches:
-      - develop
-      - main
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
@@ -102,8 +97,8 @@ jobs:
       - name: Setup Environment
         run: |
           docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
-            export NVM_DIR=\"\$HOME/.nvm\"
-            [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
+            export NVM_DIR="\$HOME/.nvm"
+            [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
 
             set -e
             echo 'Copying .env file...'
@@ -118,7 +113,7 @@ jobs:
             echo 'Creating dummy Vite manifest...'
             mkdir -p public/build/assets
             touch public/build/assets/app.js
-            echo '{\"resources/js/app.tsx\": {\"file\": \"assets/app.js\", \"src\": \"resources/js/app.tsx\", \"isEntry\": true}}' > public/build/manifest.json
+            echo '{"resources/js/app.tsx": {"file": "assets/app.js", "src": "resources/js/app.tsx", "isEntry": true}}' > public/build/manifest.json
           "
 
       - name: Run Migrations
@@ -149,19 +144,19 @@ jobs:
           docker compose -f docker-compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
           grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
 
-      # Add this step once frontend tests are configured
-      # - name: Run Frontend Tests
-      #   run: npm test
-
       - name: Stop Services
         if: always()
         run: docker compose -f docker-compose.test.yml down
 
-  build-and-push:
-    name: 🐳 Build & Push to GHCR
-    if: github.event_name == 'push'
+  deploy_staging:
+    name: 🚀 Build, Push & Deploy to Staging
     needs: test
     runs-on: ubuntu-latest
+    environment:
+      name: staging
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -173,25 +168,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate Docker meta for app image
-        id: meta_app
+      - name: Extract Docker metadata
+        id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}/app
+          images: |
+            ghcr.io/${{ github.repository }}/app
+            ghcr.io/${{ github.repository }}/web
           tags: |
-            type=ref,event=branch
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-
-      - name: Generate Docker meta for web image
-        id: meta_web
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/web
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{version}}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -203,17 +188,14 @@ jobs:
         run: npm ci && npm run build
 
       - name: Build and push PHP App Image
-        env:
-          APP_NAME: ${{ secrets.APP_NAME}}
-          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./docker/production/php-fpm/Dockerfile
           target: production
           push: true
-          tags: ${{ steps.meta_app.outputs.tags }}
-          labels: ${{ steps.meta_app.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}
             VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
@@ -221,30 +203,13 @@ jobs:
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
       - name: Build and push Nginx Web Image
-        env:
-          APP_NAME: ${{ secrets.APP_NAME}}
-          APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./docker/production/nginx/Dockerfile
           push: true
-          tags: ${{ steps.meta_web.outputs.tags }}
-          labels: ${{ steps.meta_web.outputs.labels }}
-
-  deploy_staging:
-    name: 🚀 Deploy to Staging
-    if: github.ref == 'refs/heads/development'
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-    env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Install cloudflared
         run: |
@@ -266,89 +231,25 @@ jobs:
 
       - name: Deploy to Staging via SSH
         run: |
-          STAGING_PATH="${{ secrets.PATH_TO_APP_FOLDER_STAGING}}"
-          # Securely copy the configuration files
-          scp ./compose.prod.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.prod.yml
-          scp ./.env.staging ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/.env
-
-          # Create nginx config directory and copy default.conf
-          ssh ${{ secrets.SSH_HOST_STAGING }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
-          scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/docker/production/nginx/default.conf
+          STAGING_PATH="${{secrets.PATH_TO_APP_FOLDER_STAGING}}"
+          IMAGE_TAG=$(echo ${{ github.ref_name }} | sed 's/^v//')
 
           # Securely copy the new deployment script to the server
-          scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.sh
+          scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
+          scp ./scripts/deploy.staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.staging.sh
 
           # Execute the script on the remote server
-          ssh ${{ secrets.SSH_HOST_STAGING }} "
+          ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
             set -e
             cd ${STAGING_PATH}
-            chmod +x deploy.sh
+            chmod +x deploy.staging.sh
             
             # Log into GHCR on the remote server to pull images
             echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-            # Calculate short SHA for image tag
-            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
-
-            # Run the deployment script, passing the short SHA as the image tag
-            ./deploy.sh sha-\${SHORT_SHA}
-          "
-
-  deploy_production:
-    name: 🚀 Deploy to Production
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-    env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install cloudflared
-        run: |
-          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared.deb
-
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo "Host ${{ secrets.SSH_HOST_PRODUCTION }}
-            User ${{ secrets.SSH_USER_PRODUCTION }}
-            IdentityFile ~/.ssh/id_ed25519
-            ProxyCommand cloudflared access ssh --hostname %h
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null" > ~/.ssh/config
-          chmod 600 ~/.ssh/config
-
-      - name: Deploy to Production via SSH
-        run: |
-          PRODUCTION_PATH="/home/operador/app"
-
-          # Securely copy the new deployment script to the server
-          scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
-          scp ./scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.sh
-
-          # Execute the script on the remote server
-          ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
-            set -e
-            cd ${PRODUCTION_PATH}
-            chmod +x deploy.sh
-            
-            # Log into GHCR on the remote server to pull images
-            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
-
-            # Calculate short SHA for image tag
-            SHORT_SHA=\$(echo ${{ github.sha }} | cut -c1-7)
-
-            # Run the deployment script, passing the short SHA as the image tag
+            # Run the deployment script, passing the semver tag
             set -a
             source .env
             set +a
-            ./deploy.sh sha-\${SHORT_SHA}
+            ./deploy.staging.sh ${IMAGE_TAG}
           "
