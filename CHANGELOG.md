@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/uniespacos/app/compare/v1.1.2...v1.1.3) (2026-02-28)
+
+
+### Miscellaneous Chores
+
+* **deploy:** improve staging deployment script for robustness ([efe2a3a](https://github.com/uniespacos/app/commit/efe2a3ad96ed54f8163422407ca566463bd30af0))
+
 ## [1.1.2](https://github.com/uniespacos/app/compare/v1.1.1...v1.1.2) (2026-02-28)
 
 
