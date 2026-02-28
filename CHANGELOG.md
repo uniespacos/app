@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.11](https://github.com/uniespacos/app/compare/v1.1.10...v1.1.11) (2026-02-28)
+
+
+### Bug Fixes
+
+* **notifications:** standardize user variable in ReservationFailedNotification ([44d2a42](https://github.com/uniespacos/app/commit/44d2a42d8e05c5d16b99955b7de93945e3221f67))
+
 ## [1.1.10](https://github.com/uniespacos/app/compare/v1.1.9...v1.1.10) (2026-02-28)
 
 
