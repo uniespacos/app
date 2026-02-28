@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.7](https://github.com/uniespacos/app/compare/v1.1.6...v1.1.7) (2026-02-28)
+
+
+### Bug Fixes
+
+* **deploy:** force new release for Caddy migration ([3d3ca7d](https://github.com/uniespacos/app/commit/3d3ca7d2a19429deed94fb447060067149cb5774))
+
 ## [1.1.6](https://github.com/uniespacos/app/compare/v1.1.5...v1.1.6) (2026-02-28)
 
 
