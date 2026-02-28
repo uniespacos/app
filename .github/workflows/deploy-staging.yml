@@ -176,14 +176,6 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
 
-      - name: Extract Docker metadata for Web
-        id: meta-web
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/web
-          tags: |
-            type=semver,pattern={{version}}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -207,15 +199,6 @@ jobs:
             VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
             VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
-
-      - name: Build and push Nginx Web Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/production/nginx/Dockerfile
-          push: true
-          tags: ${{ steps.meta-web.outputs.tags }}
-          labels: ${{ steps.meta-web.outputs.labels }}
 
       - name: Install cloudflared
         run: |

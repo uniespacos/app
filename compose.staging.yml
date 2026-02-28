@@ -1,7 +1,7 @@
 services:
     web:
         container_name: web-staging
-        image: ghcr.io/${GHCR_REPO_WEB:-uniespacos/app/web}:${IMAGE_TAG:-latest}
+        image: caddy:alpine
         restart: unless-stopped
         env_file:
             - .env
@@ -11,7 +11,9 @@ services:
             - uniespacos-storage-staging:/var/www/storage:ro
             - uniespacos-public-assets-v2-staging:/var/www/public/build:ro
             - uniespacos-public-staging-v2:/var/www/public:ro
-            - ./docker/production/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./docker/staging/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy_data_staging:/data
+            - caddy_config_staging:/config
         networks:
             - uniespacos-staging
         depends_on:
@@ -94,3 +96,5 @@ volumes:
     uniespacos-storage-staging:
     uniespacos-public-assets-v2-staging:
     uniespacos-public-staging-v2:
+    caddy_data_staging:
+    caddy_config_staging:

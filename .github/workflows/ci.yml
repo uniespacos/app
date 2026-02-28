@@ -181,16 +181,6 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-      - name: Generate Docker meta for web image
-        id: meta_web
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}/web
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -217,18 +207,6 @@ jobs:
             VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
             VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
-
-      - name: Build and push Nginx Web Image
-        env:
-          APP_NAME: ${{ secrets.APP_NAME}}
-          APP_ENV: ${{ secrets.APP_ENV }}
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/production/nginx/Dockerfile
-          push: true
-          tags: ${{ steps.meta_web.outputs.tags }}
-          labels: ${{ steps.meta_web.outputs.labels }}
 
   deploy_staging:
     name: 🚀 Deploy to Staging
@@ -266,12 +244,12 @@ jobs:
         run: |
           STAGING_PATH="${{ secrets.PATH_TO_APP_FOLDER_STAGING}}"
           # Securely copy the configuration files
-          scp ./compose.prod.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.prod.yml
+          scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
           scp ./.env.staging ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/.env
 
-          # Create nginx config directory and copy default.conf
-          ssh ${{ secrets.SSH_HOST_STAGING }} "mkdir -p ${STAGING_PATH}/docker/production/nginx"
-          scp ./docker/production/nginx/default.conf ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/docker/production/nginx/default.conf
+          # Create caddy config directory and copy Caddyfile
+          ssh ${{ secrets.SSH_HOST_STAGING }} "mkdir -p ${STAGING_PATH}/docker/staging/caddy"
+          scp ./docker/staging/caddy/Caddyfile ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/docker/staging/caddy/Caddyfile
 
           # Securely copy the new deployment script to the server
           scp ./scripts/deploy-staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.sh
@@ -327,6 +305,10 @@ jobs:
       - name: Deploy to Production via SSH
         run: |
           PRODUCTION_PATH="/home/operador/app"
+
+          # Create caddy config directory and copy Caddyfile
+          ssh ${{ secrets.SSH_HOST_PRODUCTION }} "mkdir -p ${PRODUCTION_PATH}/docker/production/caddy"
+          scp ./docker/production/caddy/Caddyfile ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/docker/production/caddy/Caddyfile
 
           # Securely copy the new deployment script to the server
           scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
