@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.26](https://github.com/uniespacos/app/compare/v1.1.25...v1.1.26) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** run key:generate on existing container to prevent OOM errors ([3080f85](https://github.com/uniespacos/app/commit/3080f85c62b71809fe379ff1ef0325a98629461c))
+
 ## [1.1.25](https://github.com/uniespacos/app/compare/v1.1.24...v1.1.25) (2026-03-01)
 
 
