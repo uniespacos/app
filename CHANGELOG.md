@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.22](https://github.com/uniespacos/app/compare/v1.1.21...v1.1.22) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** definitive .env, APP_KEY, and ownership handling ([002da0f](https://github.com/uniespacos/app/commit/002da0f998f086caf93ad0b4d30a1521c427c477))
+* **deploy:** force new release for definitive .env and cache handling ([9093ae0](https://github.com/uniespacos/app/commit/9093ae062da8f2974f57b54e4b3986d5b7888a64))
+
 ## [1.1.21](https://github.com/uniespacos/app/compare/v1.1.20...v1.1.21) (2026-03-01)
 
 
