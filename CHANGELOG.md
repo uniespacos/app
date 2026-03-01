@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.16](https://github.com/uniespacos/app/compare/v1.1.15...v1.1.16) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** robust .env and APP_KEY handling on staging server ([e3373bf](https://github.com/uniespacos/app/commit/e3373bf8841ce24fce530e573bb653d612bf0ece))
+
 ## [1.1.15](https://github.com/uniespacos/app/compare/v1.1.14...v1.1.15) (2026-02-28)
 
 
