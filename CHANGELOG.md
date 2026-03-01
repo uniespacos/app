@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.27](https://github.com/uniespacos/app/compare/v1.1.26...v1.1.27) (2026-03-01)
+
+
+### Bug Fixes
+
+* **tests:** use RefreshDatabase trait to prevent unique constraint violations ([3c3a6c9](https://github.com/uniespacos/app/commit/3c3a6c9a5f73e2175e8746620bee77cbf6fd7d9a))
+
 ## [1.1.26](https://github.com/uniespacos/app/compare/v1.1.25...v1.1.26) (2026-03-01)
 
 
