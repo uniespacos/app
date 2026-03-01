@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.24](https://github.com/uniespacos/app/compare/v1.1.23...v1.1.24) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** resolve 502 Bad Gateway by fixing FPM config and Docker network ([47d9bf2](https://github.com/uniespacos/app/commit/47d9bf24f8db4bf6b5e6024f1c00ba0c5530236e))
+
 ## [1.1.23](https://github.com/uniespacos/app/compare/v1.1.22...v1.1.23) (2026-03-01)
 
 
