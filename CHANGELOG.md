@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.18](https://github.com/uniespacos/app/compare/v1.1.17...v1.1.18) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** use docker cp to ensure .env file presence in container ([9224f18](https://github.com/uniespacos/app/commit/9224f18bfc13a8fabf44237c96545b6e82eaa36e))
+
 ## [1.1.17](https://github.com/uniespacos/app/compare/v1.1.16...v1.1.17) (2026-03-01)
 
 
