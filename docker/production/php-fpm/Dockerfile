@@ -23,7 +23,7 @@ RUN npm ci
 COPY vite.config.ts .
 COPY tsconfig.json .
 COPY tailwind.config.js .
-eslint.config.js .
+COPY eslint.config.js .
 COPY resources/ ./resources
 
 # Build the frontend assets
