@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.21](https://github.com/uniespacos/app/compare/v1.1.20...v1.1.21) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** force new release for .env handling ([64a7ff4](https://github.com/uniespacos/app/commit/64a7ff46282e517d9fcd813b0d0b04b9c0ec87d3))
+
 ## [1.1.20](https://github.com/uniespacos/app/compare/v1.1.19...v1.1.20) (2026-03-01)
 
 
