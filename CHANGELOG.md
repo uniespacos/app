@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.20](https://github.com/uniespacos/app/compare/v1.1.19...v1.1.20) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** clear caches before caching to prevent ownership conflicts ([6706724](https://github.com/uniespacos/app/commit/6706724118d9ba912e97991ff784b0bac582a739))
+
 ## [1.1.19](https://github.com/uniespacos/app/compare/v1.1.18...v1.1.19) (2026-03-01)
 
 
