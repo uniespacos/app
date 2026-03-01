@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.28](https://github.com/uniespacos/app/compare/v1.1.27...v1.1.28) (2026-03-01)
+
+
+### Bug Fixes
+
+* **tests:** clean up RefreshDatabase usage and fix code style in NotificationsTest ([bf9a667](https://github.com/uniespacos/app/commit/bf9a6671b1f6b49151672b79512faab18f55ee0a))
+
 ## [1.1.27](https://github.com/uniespacos/app/compare/v1.1.26...v1.1.27) (2026-03-01)
 
 
