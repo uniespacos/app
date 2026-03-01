@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.25](https://github.com/uniespacos/app/compare/v1.1.24...v1.1.25) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** correct typo in Dockerfile to fix build failure ([7c979a3](https://github.com/uniespacos/app/commit/7c979a31f2e5d57c5f44700f1339f36390820607))
+
 ## [1.1.24](https://github.com/uniespacos/app/compare/v1.1.23...v1.1.24) (2026-03-01)
 
 
