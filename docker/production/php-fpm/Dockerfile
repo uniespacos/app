@@ -23,7 +23,7 @@ RUN npm ci
 COPY vite.config.ts .
 COPY tsconfig.json .
 COPY tailwind.config.js .
-COPY eslint.config.js .
+eslint.config.js .
 COPY resources/ ./resources
 
 # Build the frontend assets
@@ -88,6 +88,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Remove the problematic default config
+RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
+
 # Download and install php-fpm health check script
 RUN curl -o /usr/local/bin/php-fpm-healthcheck \
     https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
@@ -138,4 +141,3 @@ ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
-
