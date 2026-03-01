@@ -117,6 +117,11 @@ if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=" /var/www/
 fi
 
 log "Running post-deployment Laravel commands..."
+# Clear caches before attempting to cache again to avoid permission issues
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan config:clear
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan route:clear
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan view:clear
+
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan migrate --force
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan config:cache || log "Warning: config:cache failed."
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan route:cache || log "Warning: route:cache failed."
