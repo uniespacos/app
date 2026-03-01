@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Agenda;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Espaco;
 use App\Models\Reserva;
 use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
+    use RefreshDatabase;
 use App\Notifications\ReservationCanceledNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationEvaluatedNotification;
