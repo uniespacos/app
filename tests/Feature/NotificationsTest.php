@@ -3,13 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Agenda;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Espaco;
 use App\Models\Reserva;
 use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
-    use RefreshDatabase;
 use App\Notifications\ReservationCanceledNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationEvaluatedNotification;
@@ -19,13 +17,13 @@ use App\Notifications\ReservationUpdateFailedNotification;
 use App\Notifications\SectorUpdatedNotification;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Notifications\UserRemovedAsManagerNotification;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class NotificationsTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
 
