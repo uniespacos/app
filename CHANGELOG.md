@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.23](https://github.com/uniespacos/app/compare/v1.1.22...v1.1.23) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** ensure .env file is correctly owned by www-data in container ([13caaaf](https://github.com/uniespacos/app/commit/13caaafce55c264718554938dd3d08b2d46711d1))
+
 ## [1.1.22](https://github.com/uniespacos/app/compare/v1.1.21...v1.1.22) (2026-03-01)
 
 
