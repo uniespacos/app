@@ -117,13 +117,13 @@ if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=" /var/www/
 fi
 
 log "Running post-deployment Laravel commands..."
-docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate --force
-docker compose -f "$COMPOSE_FILE" exec -T app php artisan config:cache || log "Warning: config:cache failed."
-docker compose -f "$COMPOSE_FILE" exec -T app php artisan route:cache || log "Warning: route:cache failed."
-docker compose -f "$COMPOSE_FILE" exec -T app php artisan view:cache || log "Warning: view:cache failed."
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan migrate --force
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan config:cache || log "Warning: config:cache failed."
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan route:cache || log "Warning: route:cache failed."
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan view:cache || log "Warning: view:cache failed."
 
 log "Bringing application out of maintenance mode..."
-docker compose -f "$COMPOSE_FILE" exec -T app php artisan up || log "Warning: artisan up failed (maybe it was already up)."
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan up || log "Warning: artisan up failed (maybe it was already up)."
 
 log "Cleaning up old Docker images..."
 docker image prune -f
