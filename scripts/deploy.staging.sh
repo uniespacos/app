@@ -103,12 +103,15 @@ if [ $RETRIES -eq 0 ]; then
     exit 1
 fi
 
-log "Ensuring .env file is present and APP_KEY is set..."
+log "Ensuring .env file is present and correctly owned..."
 # Use docker cp to definitively get the .env file into the container
 if ! docker compose -f "$COMPOSE_FILE" exec -T app [ -f /var/www/.env ]; then
     log "No .env file found in container. Copying .env.staging from host..."
     docker cp "$STAGING_PATH/.env.staging" app-staging:/var/www/.env
 fi
+
+# Definitively fix .env ownership to allow key generation
+docker compose -f "$COMPOSE_FILE" exec -T -u root app chown www-data:www-data /var/www/.env
 
 # Check if APP_KEY is set in .env inside the container
 if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=$" /var/www/.env; then
