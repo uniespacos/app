@@ -111,9 +111,9 @@ if ! docker compose -f "$COMPOSE_FILE" exec -T app [ -f /var/www/.env ]; then
 fi
 
 # Check if APP_KEY is set in .env inside the container
-if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=" /var/www/.env; then
-    log "APP_KEY not found in .env. Generating one..."
-    docker compose -f "$COMPOSE_FILE" exec -T app php artisan key:generate
+if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=$" /var/www/.env; then
+    log "APP_KEY is empty in .env. Generating one..."
+    docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan key:generate
 fi
 
 log "Running post-deployment Laravel commands..."
