@@ -226,6 +226,7 @@ jobs:
           # Securely copy the new deployment script to the server
           scp ./compose.staging.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.staging.yml
           scp ./scripts/deploy.staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.staging.sh
+          scp ./.env.staging ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/.env.staging
 
           # Create caddy config directory and pipe the Caddyfile content
           ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "

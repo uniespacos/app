@@ -41,7 +41,7 @@ BACKUP_FILENAME="$BACKUP_DIR/backup_staging_$(date +%F_%H-%M-%S).sql"
 COMPOSE_FILE="compose.staging.yml"
 
 # Ensure necessary directories exist
-log "Ensuring necessary directories exist..."
+log "Ensuring directories exist..."
 mkdir -p "$VERSION_DIR"
 mkdir -p "$BACKUP_DIR"
 touch "$VERSION_FILE"
