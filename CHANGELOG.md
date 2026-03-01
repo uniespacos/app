@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.19](https://github.com/uniespacos/app/compare/v1.1.18...v1.1.19) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** run artisan commands as www-data user to fix maintenance mode ownership ([4db4ca2](https://github.com/uniespacos/app/commit/4db4ca2c2679e09f317a8992b95156610a5a7375))
+
 ## [1.1.18](https://github.com/uniespacos/app/compare/v1.1.17...v1.1.18) (2026-03-01)
 
 
