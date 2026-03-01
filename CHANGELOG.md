@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.17](https://github.com/uniespacos/app/compare/v1.1.16...v1.1.17) (2026-03-01)
+
+
+### Bug Fixes
+
+* **deploy:** ensure .env.staging is copied correctly and simplify .env handling in script ([c041353](https://github.com/uniespacos/app/commit/c041353eda21703d59f28f9a2c0e0a0050bdedd8))
+
 ## [1.1.16](https://github.com/uniespacos/app/compare/v1.1.15...v1.1.16) (2026-03-01)
 
 
