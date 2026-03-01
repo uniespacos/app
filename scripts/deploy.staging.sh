@@ -34,6 +34,7 @@ if [ -z "$1" ]; then
 fi
 
 NEW_TAG=$1
+STAGING_PATH="/home/phplemos/uniespacos/app"
 VERSION_DIR="docker/staging"
 VERSION_FILE="$VERSION_DIR/versions.txt"
 BACKUP_DIR="storage/backups"
@@ -41,7 +42,7 @@ BACKUP_FILENAME="$BACKUP_DIR/backup_staging_$(date +%F_%H-%M-%S).sql"
 COMPOSE_FILE="compose.staging.yml"
 
 # Ensure necessary directories exist
-log "Ensuring directories exist..."
+log "Ensuring necessary directories exist..."
 mkdir -p "$VERSION_DIR"
 mkdir -p "$BACKUP_DIR"
 touch "$VERSION_FILE"
@@ -49,15 +50,12 @@ mkdir -p storage/logs bootstrap/cache
 
 log "Setting correct permissions for storage and cache directories..."
 # Set ownership to www-data (UID 33) and group to www-data (GID 33)
-# Use docker compose exec on a temporary app container to run chown safely
 docker compose -f "$COMPOSE_FILE" run --rm -u root app chown -R www-data:www-data storage bootstrap/cache
 docker compose -f "$COMPOSE_FILE" run --rm -u root app chmod -R 775 storage bootstrap/cache
 
 # --- Deployment Steps ---
 
-
 log "Putting application into maintenance mode..."
-# This command can fail if the container isn't running yet, so we add || true
 docker compose -f "$COMPOSE_FILE" exec -T app php artisan down || true
 
 log "Backing up the database..."
@@ -79,7 +77,6 @@ log "Stopping application to clear asset volumes..."
 docker compose -f "$COMPOSE_FILE" down --timeout 30
 
 log "Removing old asset volumes to ensure a clean update..."
-# Dynamically find the project name to delete the correct volumes
 PROJECT_NAME=$(docker compose -f "$COMPOSE_FILE" config | grep "name:" | head -n 1 | awk '{print $2}' || echo "app")
 docker volume rm "${PROJECT_NAME}_uniespacos-public-assets-v2-staging" "${PROJECT_NAME}_uniespacos-public-staging-v2" 2>/dev/null || log "Volumes not found or already removed."
 
@@ -90,7 +87,6 @@ log "Starting application with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" up -d
 
 log "Waiting for application container to be ready..."
-# OCI exec can fail if attempted immediately after start
 RETRIES=10
 while [ $RETRIES -gt 0 ]; do
     if docker compose -f "$COMPOSE_FILE" exec -T app php -v > /dev/null 2>&1; then
@@ -108,11 +104,10 @@ if [ $RETRIES -eq 0 ]; then
 fi
 
 log "Ensuring .env file is present and APP_KEY is set..."
-# Check if .env exists inside the container
+# Use docker cp to definitively get the .env file into the container
 if ! docker compose -f "$COMPOSE_FILE" exec -T app [ -f /var/www/.env ]; then
-    log "No .env file found in container. Copying .env.staging to .env..."
-    # Copy .env.staging to .env inside the container
-    docker compose -f "$COMPOSE_FILE" exec -T app cp /var/www/.env.staging /var/www/.env
+    log "No .env file found in container. Copying .env.staging from host..."
+    docker cp "$STAGING_PATH/.env.staging" app-staging:/var/www/.env
 fi
 
 # Check if APP_KEY is set in .env inside the container
