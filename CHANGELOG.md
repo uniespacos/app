@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.36](https://github.com/uniespacos/app/compare/v1.1.35...v1.1.36) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** robust APP_KEY generation on host .env ([1e95b33](https://github.com/uniespacos/app/commit/1e95b33a0969fef6809ac158f50eee9ea17a18de))
+
 ## [1.1.35](https://github.com/uniespacos/app/compare/v1.1.34...v1.1.35) (2026-03-02)
 
 
