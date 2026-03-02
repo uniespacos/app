@@ -61,6 +61,23 @@ if [ ! -f .env ]; then
     fi
 fi
 
+log "Pulling new images with tag: $NEW_TAG..."
+IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" pull
+
+log "Checking APP_KEY in host .env..."
+if ! grep -q "^APP_KEY=base64:" .env; then
+    log "APP_KEY is missing or empty. Generating one..."
+    # Generate key using a temporary container based on the pulled image
+    APP_KEY=$(IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" run --rm -T app php artisan key:generate --show 2>/dev/null | grep -oE '^base64:.*')
+    APP_KEY=$(echo "$APP_KEY" | tr -d '[:space:]')
+    if [ -n "$APP_KEY" ]; then
+        sed -i "s|^APP_KEY=.*|APP_KEY=$APP_KEY|" .env
+        log "APP_KEY generated successfully."
+    else
+        log "Warning: Failed to generate APP_KEY."
+    fi
+fi
+
 # Source environment variables
 set -a
 # shellcheck source=/dev/null
@@ -84,9 +101,6 @@ log "Removing old asset volumes to ensure a clean update..."
 # These are specifically public asset volumes and can be safely removed
 PROJECT_NAME=$(docker compose -f "$COMPOSE_FILE" config | grep "name:" | head -n 1 | awk '{print $2}' || echo "app")
 docker volume rm "${PROJECT_NAME}_uniespacos-public-assets-v2-staging" "${PROJECT_NAME}_uniespacos-public-staging-v2" 2>/dev/null || log "Volumes not found or already removed."
-
-log "Pulling new images with tag: $NEW_TAG..."
-IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" pull
 
 log "Starting application with tag: $NEW_TAG..."
 IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" up -d
@@ -120,13 +134,6 @@ docker compose -f "$COMPOSE_FILE" exec -T -u root app chown www-data:www-data /v
 log "Ensuring correct permissions for storage and cache directories inside container..."
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chmod -R 775 storage bootstrap/cache
-
-log "Checking APP_KEY..."
-# Check if APP_KEY is empty or missing in the .env file inside the container
-if ! docker compose -f "$COMPOSE_FILE" exec -T app grep -q "^APP_KEY=.\+$" /var/www/.env; then
-    log "APP_KEY is missing or empty. Generating one..."
-    docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan key:generate
-fi
 
 log "Running post-deployment Laravel commands..."
 # Clear caches before attempting to cache again to avoid permission issues
