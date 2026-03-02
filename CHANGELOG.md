@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.33](https://github.com/uniespacos/app/compare/v1.1.32...v1.1.33) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** fix EOF syntax error in deploy.staging.sh ([f7bdb31](https://github.com/uniespacos/app/commit/f7bdb3155d2a0ba72418f47f5992b74696478031))
+
 ## [1.1.32](https://github.com/uniespacos/app/compare/v1.1.31...v1.1.32) (2026-03-02)
 
 
