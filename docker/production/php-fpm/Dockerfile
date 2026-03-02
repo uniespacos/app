@@ -33,7 +33,6 @@ RUN npm run build
 FROM php:8.4-fpm AS builder
 
 # Install system dependencies and PHP extensions required for Laravel + MySQL/PostgreSQL support
-# Some dependencies are required for PHP extensions only in the build stage
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     unzip \
@@ -79,7 +78,6 @@ RUN composer dump-autoload --optimize
 FROM php:8.4-fpm as production
 
 # Install only runtime libraries needed in production
-# libfcgi-bin and procps are required for the php-fpm-healthcheck script
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libicu-dev \
@@ -88,8 +86,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Remove the problematic default config
-RUN rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
+# Overwrite the problematic default config with correct settings
+# This ensures PHP-FPM runs in the foreground and listens on the correct port
+RUN printf "[global]\ndaemonize = no\n\n[www]\nlisten = 9000\n" > /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Download and install php-fpm health check script
 RUN curl -o /usr/local/bin/php-fpm-healthcheck \
@@ -109,18 +108,12 @@ COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
 
 # Use the recommended production PHP configuration
-# -----------------------------------------------------------
-# PHP provides development and production configurations.
-# Here, we replace the default php.ini with the production
-# version to apply settings optimized for performance and
-# security in a live environment.
-# -----------------------------------------------------------
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Copy the application code and dependencies from the build stage
 COPY --from=builder /var/www /var/www
 
-# Copy compiled frontend assets (manifest.json, etc.)
+# Copy compiled frontend assets
 COPY --from=frontend-builder /var/www/public/build /var/www/public/build
 
 # Set working directory
