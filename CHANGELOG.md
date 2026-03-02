@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.34](https://github.com/uniespacos/app/compare/v1.1.33...v1.1.34) (2026-03-02)
+
+
+### Bug Fixes
+
+* **app:** revert db readiness check to use valid db:monitor command ([3fa645c](https://github.com/uniespacos/app/commit/3fa645cee4d35565695fc3fb1548561e3a80a1ac))
+
 ## [1.1.33](https://github.com/uniespacos/app/compare/v1.1.32...v1.1.33) (2026-03-02)
 
 
