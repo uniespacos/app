@@ -92,8 +92,13 @@ if [ $RETRIES -eq 0 ]; then
     exit 1
 fi
 
-log "Ensuring correct permissions inside container..."
-docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data storage bootstrap/cache /var/www/.env
+# --- CRITICAL: Ensure .env is in container and correctly owned BEFORE other commands ---
+log "Copying .env to container and ensuring correct ownership..."
+docker cp "$STAGING_PATH/.env" app-staging:/var/www/.env
+docker compose -f "$COMPOSE_FILE" exec -T -u root app chown www-data:www-data /var/www/.env
+
+log "Ensuring correct permissions for storage and cache directories inside container..."
+docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chmod -R 775 storage bootstrap/cache
 
 log "Checking APP_KEY..."
