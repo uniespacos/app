@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.32](https://github.com/uniespacos/app/compare/v1.1.31...v1.1.32) (2026-03-02)
+
+
+### Bug Fixes
+
+* **app:** harden entrypoint.sh with robust db check and error handling ([0cd83a9](https://github.com/uniespacos/app/commit/0cd83a9299973c0586e612b04be3e26c3792e510))
+
 ## [1.1.31](https://github.com/uniespacos/app/compare/v1.1.30...v1.1.31) (2026-03-02)
 
 
