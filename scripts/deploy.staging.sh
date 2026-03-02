@@ -12,6 +12,24 @@ log() {
   echo "------------------------------------------------"
 }
 
+# Function to wait for PHP-FPM to be ready inside the container
+wait_for_php_fpm_ready() {
+    log "Waiting for PHP-FPM to be ready inside the app container..."
+    local retries=20
+    local count=0
+    while [ $count -lt $retries ]; do
+        if docker compose -f "$COMPOSE_FILE" exec -T app php -v > /dev/null 2>&1; then
+            log "PHP-FPM is ready."
+            return 0
+        fi
+        echo "Waiting for PHP-FPM readiness ($((retries - count)) retries left)..."
+        sleep 3
+        count=$((count + 1))
+    done
+    echo "Error: PHP-FPM did not become ready in time."
+    return 1
+}
+
 # --- Environment and Variables ---
 log "Setting up environment and variables..."
 
@@ -81,7 +99,7 @@ while [ $RETRIES -gt 0 ]; do
         log "Application container is running."
         break
     fi
-    echo "Waiting for container (current state: $STATE, $RETRIES retries left)..."
+    echo "Waiting for container (current state: $STATE, $((RETRIES -1)) retries left)..."
     sleep 3
     RETRIES=$((RETRIES - 1))
 done
@@ -92,7 +110,9 @@ if [ $RETRIES -eq 0 ]; then
     exit 1
 fi
 
-# --- CRITICAL: Ensure .env is in container and correctly owned BEFORE other commands ---
+# --- CRITICAL: Wait for PHP-FPM to be ready before executing commands ---
+wait_for_php_fpm_ready || exit 1
+
 log "Copying .env to container and ensuring correct ownership..."
 docker cp "$STAGING_PATH/.env" app-staging:/var/www/.env
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chown www-data:www-data /var/www/.env
