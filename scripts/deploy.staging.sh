@@ -143,8 +143,7 @@ docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan route:cach
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan view:cache
 
 log "Bringing application out of maintenance mode..."
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan up || log "Warning: artisan up failed (maybe it was already up).
-
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan up || log "Warning: artisan up failed (maybe it was already up)."
 log "Saving version information..."
 {
     echo "CURRENT_TAG=$NEW_TAG"
