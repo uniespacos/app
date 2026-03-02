@@ -70,7 +70,7 @@ export default function Profile({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'), {
+        patch(route('settings.profile.update'), {
             preserveScroll: true,
         });
     };
