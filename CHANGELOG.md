@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.30](https://github.com/uniespacos/app/compare/v1.1.29...v1.1.30) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** reorder .env copy and ownership to prevent 'file not found' error ([d960c48](https://github.com/uniespacos/app/commit/d960c488ba759ce09f155f3d26af73ed216d8eaf))
+
 ## [1.1.29](https://github.com/uniespacos/app/compare/v1.1.28...v1.1.29) (2026-03-02)
 
 
