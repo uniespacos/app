@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.37](https://github.com/uniespacos/app/compare/v1.1.36...v1.1.37) (2026-03-02)
+
+
+### Bug Fixes
+
+* **boot:** ensure correct root URL is set in production environment ([d8908b4](https://github.com/uniespacos/app/commit/d8908b415a376fde4ac9d556c7a6b9055b1a560f))
+
 ## [1.1.36](https://github.com/uniespacos/app/compare/v1.1.35...v1.1.36) (2026-03-02)
 
 
