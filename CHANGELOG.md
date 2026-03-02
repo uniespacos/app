@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.35](https://github.com/uniespacos/app/compare/v1.1.34...v1.1.35) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** correctly configure PHP-FPM for foreground operation and port 9000 ([6b0eac3](https://github.com/uniespacos/app/commit/6b0eac374471c0568fa86e643ec59dfd3c6e8b36))
+
 ## [1.1.34](https://github.com/uniespacos/app/compare/v1.1.33...v1.1.34) (2026-03-02)
 
 
