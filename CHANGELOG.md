@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.29](https://github.com/uniespacos/app/compare/v1.1.28...v1.1.29) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** definitive staging script: .env on host, safe pruning, FPM fix, OOM fix, test fix ([52ba632](https://github.com/uniespacos/app/commit/52ba632fe5a329ce6f837515733e7f8f4541c3d2))
+
 ## [1.1.28](https://github.com/uniespacos/app/compare/v1.1.27...v1.1.28) (2026-03-01)
 
 
