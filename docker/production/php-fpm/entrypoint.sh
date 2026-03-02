@@ -3,8 +3,7 @@ set -e
 
 # Function to check if the database is ready
 is_db_ready() {
-    # Using db:test as it's more direct for connection readiness
-    php artisan db:test || false
+    php artisan db:monitor --quiet || false
 }
 
 # Wait for the database
