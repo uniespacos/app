@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.31](https://github.com/uniespacos/app/compare/v1.1.30...v1.1.31) (2026-03-02)
+
+
+### Bug Fixes
+
+* **deploy:** add robust PHP-FPM readiness check and reorder .env handling for stability ([d2880cd](https://github.com/uniespacos/app/commit/d2880cde532f782d93ec99da04590d005841aea3))
+
 ## [1.1.30](https://github.com/uniespacos/app/compare/v1.1.29...v1.1.30) (2026-03-02)
 
 
