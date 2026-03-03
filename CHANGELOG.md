@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.40](https://github.com/uniespacos/app/compare/v1.1.39...v1.1.40) (2026-03-03)
+
+
+### Bug Fixes
+
+* **caddy:** update APP_URL syntax in Caddyfile for staging environment ([0268473](https://github.com/uniespacos/app/commit/02684737c953e3713a41b4c706a0bb3cbd4abbb1))
+
 ## [1.1.39](https://github.com/uniespacos/app/compare/v1.1.38...v1.1.39) (2026-03-03)
 
 
