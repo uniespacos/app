@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.41](https://github.com/uniespacos/app/compare/v1.1.40...v1.1.41) (2026-03-03)
+
+
+### Bug Fixes
+
+* **caddy:** add port specification to APP_URL_WITHOUT_SCHEME in Caddyfile ([d3a8c40](https://github.com/uniespacos/app/commit/d3a8c40508ec958e127c34888ad4668a7a8189a2))
+* **caddy:** update APP_URL to APP_URL_WITHOUT_SCHEME in Caddyfile for staging environment ([fca85e9](https://github.com/uniespacos/app/commit/fca85e96ff731f53899c482c44dbf91f3d78f370))
+
 ## [1.1.40](https://github.com/uniespacos/app/compare/v1.1.39...v1.1.40) (2026-03-03)
 
 
