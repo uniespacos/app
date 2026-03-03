@@ -5,8 +5,19 @@
 
 :80 {
     root * /var/www/public
-    php_fastcgi app:9000
     file_server
+    
+    # Enable robust logging for debugging
+    log {
+        output stdout
+        format json
+    }
+
+    # Proxy to PHP-FPM
+    php_fastcgi app:9000 {
+        # Ensure we pass the correct protocol to Laravel
+        env HTTPS on
+    }
 
     # Reverb WebSockets
     handle /app/* {

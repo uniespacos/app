@@ -32,7 +32,9 @@ class AppServiceProvider extends ServiceProvider
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
-            URL::forceRootUrl(config('app.url'));
+            // Force root URL and ensure no trailing slash to prevent signature mismatches
+            $rootUrl = rtrim(config('app.url'), '/');
+            URL::forceRootUrl($rootUrl);
         }
 
         DB::listen(function ($query) {
