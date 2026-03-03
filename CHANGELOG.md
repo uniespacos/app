@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.42](https://github.com/uniespacos/app/compare/v1.1.41...v1.1.42) (2026-03-03)
+
+
+### Bug Fixes
+
+* **caddy:** remove variable from port specification in Caddyfile ([9477331](https://github.com/uniespacos/app/commit/9477331b0e78e18401bb4b65a6e9905f9c3e12bd))
+
 ## [1.1.41](https://github.com/uniespacos/app/compare/v1.1.40...v1.1.41) (2026-03-03)
 
 
