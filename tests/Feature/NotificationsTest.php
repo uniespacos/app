@@ -65,7 +65,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->manager);
-        $this->assertStringContainsString('Nova Solicitação de Reserva: ' . $this->reserva->nome, $mailMessage->subject);
+        $this->assertStringContainsString('Nova Solicitação de Reserva: '.$this->reserva->nome, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma nova solicitação de reserva foi criada:', $mailData);
@@ -88,7 +88,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Reserva Avaliada: ' . $this->reserva->nome, $mailMessage->subject);
+        $this->assertStringContainsString('Reserva Avaliada: '.$this->reserva->nome, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
 
@@ -116,7 +116,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Sua reserva foi criada!: ' . $this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Sua reserva foi criada!: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('criada com sucesso e está aguardando avaliação.', $mailData);
@@ -139,7 +139,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Falha na sua solicitação de reserva: ' . $this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Falha na sua solicitação de reserva: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData);
@@ -162,7 +162,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->manager);
-        $this->assertStringContainsString('Reserva Cancelada: ' . $this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Reserva Cancelada: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma reserva foi cancelada pelo solicitante:', $mailData);
@@ -185,7 +185,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Reserva Atualizada: ' . $this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Reserva Atualizada: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizada com sucesso.', $mailData);
@@ -207,7 +207,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Falha ao Atualizar Reserva: ' . $this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Falha ao Atualizar Reserva: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData); // uses reservation_failed view
@@ -294,7 +294,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Setor Atualizado: ' . $this->setor->nome, $mailMessage->subject);
+        $this->assertStringContainsString('Setor Atualizado: '.$this->setor->nome, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizado em nosso sistema.', $mailData);
