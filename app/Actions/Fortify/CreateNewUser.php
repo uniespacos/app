@@ -32,7 +32,6 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'phone' => ['required', 'string', 'max:20'],
-            'instituicao_id' => ['required', 'exists:instituicaos,id'],
             'setor_id' => ['required', 'exists:setors,id'],
             'password' => $this->passwordRules(),
         ])->validate();

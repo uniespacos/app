@@ -49,7 +49,7 @@ export function SeletorInstituicao({
         if (initialSetorId && setorId !== initialSetorId) {
             setSetorId(initialSetorId);
         }
-    }, [initialSetorId]);
+    }, [initialSetorId, setorId]);
 
 
     const handleInstituicaoChange = (value: string) => {
@@ -98,7 +98,7 @@ export function SeletorInstituicao({
                     <SelectContent>
                         {setores.map((setor) => (
                             <SelectItem key={setor.id} value={setor.id.toString()}>
-                                {`[${setor.unidade?.sigla}] - ${setor.nome}`}
+                                {`[${setor.unidade?.sigla || 'N/A'}] - ${setor.nome}`}
                             </SelectItem>
                         ))}
                     </SelectContent>
