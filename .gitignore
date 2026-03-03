@@ -34,3 +34,8 @@ package-lock.json
 gha-creds-*.json
 
 .gemini/
+
+
+# Mailpit
+
+docker/development/mailpit/data

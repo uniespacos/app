@@ -53,7 +53,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::registerView(function () {
-            $instituicaos = \App\Models\Instituicao::with(['unidades.setors'])->get();
+            $instituicaos = \App\Models\Instituicao::with(['setors.unidade'])->get();
 
             return Inertia::render('auth/register', [
                 'instituicaos' => $instituicaos,

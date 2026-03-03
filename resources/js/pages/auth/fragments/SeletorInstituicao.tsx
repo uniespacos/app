@@ -1,61 +1,63 @@
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Instituicao, Setor, Unidade } from '@/types';
+import type { Instituicao, Setor } from '@/types';
 import { useEffect, useState } from 'react';
 
 interface SeletorInstituicaoProps {
     instituicaos: Instituicao[];
     processing: boolean;
+    onInstituicaoChange?: (instituicaoId: string) => void;
     onSetorChange: (setorId: string) => void;
     errors: Record<string, string>;
-    initialSetorId?: string; // NOVO: Prop para valor inicial
+    initialSetorId?: string;
 }
 
-export function SeletorInstituicao({ instituicaos, processing, onSetorChange, errors, initialSetorId }: SeletorInstituicaoProps) {
+export function SeletorInstituicao({ 
+    instituicaos, 
+    processing, 
+    onInstituicaoChange,
+    onSetorChange, 
+    errors, 
+    initialSetorId 
+}: SeletorInstituicaoProps) {
     const [instituicaoId, setInstituicaoId] = useState<string>('');
-    const [unidades, setUnidades] = useState<Unidade[]>([]);
-    const [unidadeId, setUnidadeId] = useState<string>('');
     const [setores, setSetores] = useState<Setor[]>([]);
-    const [setorId, setSetorId] = useState<string>('');
+    const [setorId, setSetorId] = useState<string>(initialSetorId || '');
     const [isInitialized, setIsInitialized] = useState(false);
 
     // Efeito para inicializar com o setor atual do usuário
     useEffect(() => {
         if (initialSetorId && instituicaos.length > 0 && !isInitialized) {
-            // Encontra qual instituição, unidade e setor correspondem ao ID inicial
+            // Encontra qual instituição e setor correspondem ao ID inicial
             for (const inst of instituicaos) {
-                for (const unid of inst.unidades || []) {
-                    const foundSetor = unid.setors?.find((s) => s.id.toString() === initialSetorId);
-                    if (foundSetor) {
-                        setInstituicaoId(inst.id.toString());
-                        setUnidades(inst.unidades || []);
-                        setUnidadeId(unid.id.toString());
-                        setSetores(unid.setors || []);
-                        setSetorId(initialSetorId);
-                        setIsInitialized(true);
-                        return;
-                    }
+                const foundSetor = inst.setors?.find((s) => s.id.toString() === initialSetorId);
+                if (foundSetor) {
+                    const instId = inst.id.toString();
+                    setInstituicaoId(instId);
+                    setSetores(inst.setors || []);
+                    setSetorId(initialSetorId);
+                    onInstituicaoChange?.(instId);
+                    setIsInitialized(true);
+                    return;
                 }
             }
         }
-    }, [initialSetorId, instituicaos, isInitialized]);
+    }, [initialSetorId, instituicaos, isInitialized, onInstituicaoChange]);
+    
+    useEffect(() => {
+        if (initialSetorId && setorId !== initialSetorId) {
+            setSetorId(initialSetorId);
+        }
+    }, [initialSetorId, setorId]);
+
 
     const handleInstituicaoChange = (value: string) => {
         setInstituicaoId(value);
         const instituicao = instituicaos.find((i) => i.id.toString() === value);
-        setUnidades(instituicao?.unidades || []);
-        setUnidadeId('');
-        setSetores([]);
+        setSetores(instituicao?.setors || []);
         setSetorId('');
-        onSetorChange('');
-    };
-
-    const handleUnidadeChange = (value: string) => {
-        setUnidadeId(value);
-        const unidade = unidades.find((u) => u.id.toString() === value);
-        setSetores(unidade?.setors || []);
-        setSetorId('');
+        onInstituicaoChange?.(value);
         onSetorChange('');
     };
 
@@ -83,43 +85,26 @@ export function SeletorInstituicao({ instituicaos, processing, onSetorChange, er
                 <InputError message={errors.instituicao_id} />
             </div>
 
-            {instituicaoId && unidades.length > 0 && (
-                <div className="space-y-2">
-                    <Label>Unidade *</Label>
-                    <Select value={unidadeId} onValueChange={handleUnidadeChange} disabled={processing}>
-                        <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Selecione uma unidade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {unidades.map((unidade) => (
-                                <SelectItem key={unidade.id} value={unidade.id.toString()}>
-                                    {unidade.nome}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <InputError message={errors.unidade_id} />
-                </div>
-            )}
-
-            {unidadeId && setores.length > 0 && (
-                <div className="space-y-2">
-                    <Label>Setor *</Label>
-                    <Select value={setorId} onValueChange={handleSetorChange} disabled={processing}>
-                        <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Selecione um setor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {setores.map((setor) => (
-                                <SelectItem key={setor.id} value={setor.id.toString()}>
-                                    {setor.nome}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <InputError message={errors.setor_id} />
-                </div>
-            )}
+            <div className="space-y-2">
+                <Label>Setor *</Label>
+                <Select 
+                    value={setorId} 
+                    onValueChange={handleSetorChange} 
+                    disabled={processing || !instituicaoId}
+                >
+                    <SelectTrigger className="h-11">
+                        <SelectValue placeholder={!instituicaoId ? "Selecione primeiro a instituição" : "Selecione um setor"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {setores.map((setor) => (
+                            <SelectItem key={setor.id} value={setor.id.toString()}>
+                                {`[${setor.unidade?.sigla || 'N/A'}] - ${setor.nome}`}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <InputError message={errors.setor_id} />
+            </div>
         </div>
     );
 }

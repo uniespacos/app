@@ -23,6 +23,7 @@ export default function Register() {
         password: '',
         password_confirmation: '',
         campus: '',
+        instituicao_id: '',
         setor_id: '',
         instituicao_custom: '',
         unidade_custom: '',

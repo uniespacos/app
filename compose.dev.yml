@@ -137,6 +137,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    volumes:
+      - ./docker/development/mailpit/data:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+    networks:
+      - internal
 
 networks:
   internal:
