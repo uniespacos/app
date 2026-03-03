@@ -2,9 +2,8 @@
 {
     auto_https off
 }
-
-{$APP_URL_WITHOUT_SCHEME} {
-    root /var/www/public
+{$APP_URL_WITHOUT_SCHEME}:80 {
+    root * /var/www/public
     file_server
     
     # Enable robust logging for debugging
