@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.39](https://github.com/uniespacos/app/compare/v1.1.38...v1.1.39) (2026-03-03)
+
+
+### Bug Fixes
+
+* **caddy:** correct root directive syntax in Caddyfile for staging environment ([752a1f1](https://github.com/uniespacos/app/commit/752a1f18c9c3ef3d8214b57f57b1cf56f029477d))
+
 ## [1.1.38](https://github.com/uniespacos/app/compare/v1.1.37...v1.1.38) (2026-03-03)
 
 
