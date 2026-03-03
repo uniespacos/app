@@ -21,7 +21,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
-            'instituicaos' => \App\Models\Instituicao::with(['unidades.setors'])->get(),
+            'instituicaos' => \App\Models\Instituicao::with(['setors.unidade'])->get(),
         ]);
     }
 

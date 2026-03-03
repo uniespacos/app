@@ -35,6 +35,7 @@ export interface User {
     telefone: string;
     profile_pic?: string;
     permission_type_id: number;
+    setor_id: number | null;
     setor?: Setor; // Opcional, carregar com with('setor')
     agendas?: Agenda[]; // Relação aninhada, array de agendas
     unread_notifications: []; // Adicionado no AppServiceProvider
@@ -98,6 +99,7 @@ export interface Instituicao {
     sigla: string;
     endereco: string;
     unidades?: Unidade[]; // Relação aninhada, array de unidades
+    setors?: Setor[]; // Relação aninhada, array de setores
 }
 
 export interface Unidade {

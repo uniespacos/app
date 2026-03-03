@@ -190,6 +190,13 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'nome',
+        'email' => 'e-mail',
+        'password' => 'senha',
+        'phone' => 'telefone',
+        'instituicao_id' => 'instituição',
+        'setor_id' => 'setor',
+    ],
 
 ];

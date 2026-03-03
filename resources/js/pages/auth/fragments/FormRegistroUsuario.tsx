@@ -14,6 +14,7 @@ interface FormRegistroUsuarioProps {
         phone: string;
         password: string;
         password_confirmation: string;
+        instituicao_id: string;
         setor_id: string;
     };
     onInputChange: (field: string, value: string) => void;
@@ -101,6 +102,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                     <SeletorInstituicao
                         instituicaos={instituicaos}
                         processing={processing}
+                        onInstituicaoChange={(instId) => onInputChange('instituicao_id', instId)}
                         onSetorChange={(setorId) => onInputChange('setor_id', setorId)}
                         errors={errors}
                     />

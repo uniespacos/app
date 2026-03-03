@@ -32,6 +32,7 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'phone' => ['required', 'string', 'max:20'],
+            'instituicao_id' => ['required', 'exists:instituicaos,id'],
             'setor_id' => ['required', 'exists:setors,id'],
             'password' => $this->passwordRules(),
         ])->validate();
@@ -41,8 +42,8 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'telefone' => $input['phone'],
             'setor_id' => $input['setor_id'],
-            'profile_pic' => 'aushaushuahsas', // temporario
-            'permission_type_id' => 3, // Assuming 3 is the default normal user permission based on your earlier test setups
+            'profile_pic' => 'aushaushuahsas', // TODO: Impl avatars system
+            'permission_type_id' => 3, // TODO: Impl permissions system
             'password' => Hash::make($input['password']),
         ]);
     }

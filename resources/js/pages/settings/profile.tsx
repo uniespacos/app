@@ -24,6 +24,7 @@ type ProfileForm = {
     name: string;
     email: string;
     phone: string;
+    instituicao_id: string;
     setor_id: string;
 };
 
@@ -35,13 +36,14 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
     instituicaos: Instituicao[];
-}) {
+    }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
         phone: auth.user.telefone || '',
+        instituicao_id: '',
         setor_id: auth.user.setor_id?.toString() || '',
     });
 
@@ -61,6 +63,10 @@ export default function Profile({
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = formatPhoneNumber(e.target.value);
         setData('phone', formatted);
+    };
+
+    const handleInstituicaoChange = (instituicaoId: string) => {
+        setData('instituicao_id', instituicaoId);
     };
 
     const handleSetorChange = (setorId: string) => {
@@ -138,6 +144,7 @@ export default function Profile({
                             <SeletorInstituicao
                                 instituicaos={instituicaos}
                                 processing={processing}
+                                onInstituicaoChange={handleInstituicaoChange}
                                 onSetorChange={handleSetorChange}
                                 errors={errors}
                                 initialSetorId={data.setor_id}

@@ -20,4 +20,16 @@ class Instituicao extends Model
     {
         return $this->hasMany(Unidade::class);
     }
+
+    public function setors()
+    {
+        return $this->hasManyThrough(
+            Setor::class,
+            Unidade::class,
+            'instituicao_id',   // Foreign key on unidades table
+            'unidade_id',      // Foreign key on setors table...
+            'id',               // Local key on instituicaos table...
+            'id'          // Local key on unidades table...
+        );
+    }
 }
