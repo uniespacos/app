@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.38](https://github.com/uniespacos/app/compare/v1.1.37...v1.1.38) (2026-03-03)
+
+
+### Bug Fixes
+
+* **auth:** resolve 403 invalid signature on staging by forcing HTTPS and rtrimming APP_URL ([2d2bd15](https://github.com/uniespacos/app/commit/2d2bd15664d20e56a56e55a76a4af224f06a836a))
+
 ## [1.1.37](https://github.com/uniespacos/app/compare/v1.1.36...v1.1.37) (2026-03-02)
 
 
