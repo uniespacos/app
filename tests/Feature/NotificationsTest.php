@@ -91,6 +91,11 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString('Reserva Avaliada: '.$this->reserva->nome, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
+
+        // New debug lines
+        echo "Manager Name: " . $this->manager->name;
+        echo "Mail Data: " . $mailData;
+        
         $this->assertStringContainsString('foi avaliada.', $mailData);
         $this->assertStringContainsString($this->reserva->titulo, $mailData);
         $this->assertStringContainsString('Deferida', $mailData);
