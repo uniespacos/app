@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.47](https://github.com/uniespacos/app/compare/v1.1.46...v1.1.47) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** add diagnostics to entrypoint to debug artisan missing error ([#179](https://github.com/uniespacos/app/issues/179)) ([b8ee2fd](https://github.com/uniespacos/app/commit/b8ee2fd0703a064e920d565a18f7c2eeeb27ec86))
+
 ## [1.1.46](https://github.com/uniespacos/app/compare/v1.1.45...v1.1.46) (2026-03-04)
 
 
