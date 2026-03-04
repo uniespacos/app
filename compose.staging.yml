@@ -7,7 +7,7 @@ services:
         env_file:
             - .env
         ports:
-            - "80:80"
+            - "443:443"
         volumes:
             - uniespacos-storage-staging:/var/www/storage:ro
             # Asset volumes removed because the image is now immutable
