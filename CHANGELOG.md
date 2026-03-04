@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.45](https://github.com/uniespacos/app/compare/v1.1.44...v1.1.45) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** use single frontend build context to prevent asset hash mismatches ([#175](https://github.com/uniespacos/app/issues/175)) ([3eef0f5](https://github.com/uniespacos/app/commit/3eef0f536903cd31b39f296bbe51a28f93a80cc5))
+
 ## [1.1.44](https://github.com/uniespacos/app/compare/v1.1.43...v1.1.44) (2026-03-04)
 
 
