@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.43](https://github.com/uniespacos/app/compare/v1.1.42...v1.1.43) (2026-03-04)
+
+
+### Miscellaneous Chores
+
+* improve staging deployment pipeline and architecture ([#172](https://github.com/uniespacos/app/issues/172)) ([4ddc520](https://github.com/uniespacos/app/commit/4ddc52002e44ee620b6765eff4d81abf76f79ccb))
+* update package.json to add lint-staged configuration and improve formatting ([91be28b](https://github.com/uniespacos/app/commit/91be28b834806d3bdd6d9921f97c5650f0e6d4e8))
+
 ## [1.1.42](https://github.com/uniespacos/app/compare/v1.1.41...v1.1.42) (2026-03-03)
 
 
