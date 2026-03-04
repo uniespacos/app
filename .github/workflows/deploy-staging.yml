@@ -106,6 +106,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.PAT }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Extract Docker metadata for App
         id: meta-app
         uses: docker/metadata-action@v5
@@ -132,6 +135,12 @@ jobs:
           VITE_REVERB_PORT: ${{ secrets.VITE_REVERB_PORT }}
           VITE_REVERB_SCHEME: ${{ secrets.VITE_REVERB_SCHEME }}
         run: npm ci && npm run build
+
+      - name: Verify Build Assets
+        run: |
+          ls -la public/
+          ls -la public/build/
+          ls -la public/build/manifest.json
 
       - name: Build and push PHP App Image
         uses: docker/build-push-action@v5
