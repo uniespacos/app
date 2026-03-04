@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.46](https://github.com/uniespacos/app/compare/v1.1.45...v1.1.46) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** skip db wait in entrypoint for one-off commands ([#177](https://github.com/uniespacos/app/issues/177)) ([8f9708f](https://github.com/uniespacos/app/commit/8f9708fd7e0c54c585ce67f3a9a19e5fa654d26a))
+
 ## [1.1.45](https://github.com/uniespacos/app/compare/v1.1.44...v1.1.45) (2026-03-04)
 
 
