@@ -1,8 +1,11 @@
+ARG APP_IMAGE=ghcr.io/uniespacos/app/app:latest
+FROM ${APP_IMAGE} AS app-source
+
 FROM caddy:alpine
 
 # Set the working directory
 WORKDIR /var/www
 
-# Copy the built public assets from the CI/CD build stage
-# We copy the entire public directory to ensure index.php and build/ are present
-COPY public /var/www/public
+# Copy the built public assets from the EXACTLY built app image
+# This ensures 100% consistency between PHP and Caddy containers
+COPY --from=app-source /var/www/public /var/www/public
