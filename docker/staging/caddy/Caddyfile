@@ -1,8 +1,4 @@
 # Global options
-{
-    auto_https off
-}
-
 :80 {
     root * /var/www/public
     file_server
