@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.54](https://github.com/uniespacos/app/compare/v1.1.53...v1.1.54) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** add proxy headers to caddy and fix deploy script ([#193](https://github.com/uniespacos/app/issues/193)) ([b125566](https://github.com/uniespacos/app/commit/b1255666ee5ed1005e29c1d720002b1d010b7852))
+
 ## [1.1.53](https://github.com/uniespacos/app/compare/v1.1.52...v1.1.53) (2026-03-04)
 
 
