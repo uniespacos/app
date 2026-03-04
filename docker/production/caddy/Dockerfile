@@ -9,3 +9,6 @@ WORKDIR /var/www
 # Copy the built public assets from the EXACTLY built app image
 # This ensures 100% consistency between PHP and Caddy containers
 COPY --from=app-source /var/www/public /var/www/public
+
+EXPOSE 80
+EXPOSE 443
