@@ -48,7 +48,6 @@ if [ "$RESTORE_DB" = true ]; then
     BACKUP_FILE=$(grep "BACKUP_FILE" "$VERSION_FILE" | cut -d'=' -f2 || echo "")
     if [ -f "$BACKUP_FILE" ]; then
         log "WARNING: Restoring database from $BACKUP_FILE."
-        # Note: postgres-staging is the container name in compose.staging.yml
         docker compose -f "$COMPOSE_FILE" exec -T postgres psql -U "${DB_USERNAME}" -d "${DB_DATABASE}" < "$BACKUP_FILE"
         log "Database restored successfully."
     else

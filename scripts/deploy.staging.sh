@@ -100,17 +100,17 @@ fi
 
 # 7. Post-deployment Optimization
 log "Ensuring correct permissions..."
-docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data storage bootstrap/cache
-docker compose -f "$COMPOSE_FILE" exec -T -u root app chmod -R 775 storage bootstrap/cache
+docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+docker compose -f "$COMPOSE_FILE" exec -T -u root app chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 log "Refreshing application cache..."
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan config:cache
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan route:cache
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan view:cache
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan config:cache
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan route:cache
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan view:cache
 
 # 8. Disable Maintenance Mode
 log "Bringing application out of maintenance mode..."
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php artisan up
+docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan up
 
 log "Cleaning up old Docker images..."
 docker image prune -f
