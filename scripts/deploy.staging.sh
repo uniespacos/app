@@ -103,9 +103,8 @@ log "Ensuring correct permissions..."
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 docker compose -f "$COMPOSE_FILE" exec -T -u root app chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-log "Clearing all caches and restarting opcache..."
+log "Clearing all caches..."
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan optimize:clear
-docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan opcache:clear
 
 log "Refreshing application cache..."
 docker compose -f "$COMPOSE_FILE" exec -T -u www-data app php /var/www/artisan config:cache
