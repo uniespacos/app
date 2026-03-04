@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.53](https://github.com/uniespacos/app/compare/v1.1.52...v1.1.53) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** add opcache clear to deployment script ([#191](https://github.com/uniespacos/app/issues/191)) ([34b47da](https://github.com/uniespacos/app/commit/34b47daf020d6c41f70a4390e4f6f1266aa272ef))
+
 ## [1.1.52](https://github.com/uniespacos/app/compare/v1.1.51...v1.1.52) (2026-03-04)
 
 
