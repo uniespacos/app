@@ -60,7 +60,11 @@ jobs:
             php artisan migrate --seed --force
           "
       - name: Run Tests
-        run: docker compose -f docker-compose.test.yml exec -T workspace php artisan test
+        env:
+          APP_ENV: testing
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
+          grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
       - name: Stop Services
         if: always()
         run: docker compose -f docker-compose.test.yml down
