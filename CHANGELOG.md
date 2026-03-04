@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.59](https://github.com/uniespacos/app/compare/v1.1.58...v1.1.59) (2026-03-04)
+
+
+### Bug Fixes
+
+* **caddy:** update Caddyfile comments for clarity ([21d1602](https://github.com/uniespacos/app/commit/21d1602816ccba639c72629682a901c1c6517859))
+
 ## [1.1.58](https://github.com/uniespacos/app/compare/v1.1.57...v1.1.58) (2026-03-04)
 
 
