@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.49](https://github.com/uniespacos/app/compare/v1.1.48...v1.1.49) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** use absolute paths and robust entrypoint ([#183](https://github.com/uniespacos/app/issues/183)) ([8921a7e](https://github.com/uniespacos/app/commit/8921a7e9933ddb80ab6f26cc8b54a28398070907))
+
 ## [1.1.48](https://github.com/uniespacos/app/compare/v1.1.47...v1.1.48) (2026-03-04)
 
 
