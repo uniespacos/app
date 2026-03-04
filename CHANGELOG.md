@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.48](https://github.com/uniespacos/app/compare/v1.1.47...v1.1.48) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** use absolute paths to artisan and fix entrypoint diagnostic ([#181](https://github.com/uniespacos/app/issues/181)) ([c99c49c](https://github.com/uniespacos/app/commit/c99c49cccebd4426760b15e4840e0091a986df54))
+
 ## [1.1.47](https://github.com/uniespacos/app/compare/v1.1.46...v1.1.47) (2026-03-04)
 
 
