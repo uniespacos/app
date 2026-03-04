@@ -160,6 +160,8 @@ jobs:
           push: true
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}
+          build-args: |
+            APP_IMAGE=ghcr.io/${{ github.repository }}/app:${{ steps.meta-app.outputs.version }}
 
       - name: Install cloudflared
         run: |
