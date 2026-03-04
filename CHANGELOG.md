@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.57](https://github.com/uniespacos/app/compare/v1.1.56...v1.1.57) (2026-03-04)
+
+
+### Bug Fixes
+
+* **caddy:** correct php_fastcgi syntax in staging Caddyfile ([#199](https://github.com/uniespacos/app/issues/199)) ([e621e7e](https://github.com/uniespacos/app/commit/e621e7eb7d25e3de2240e8be42faee606a146f0b))
+
 ## [1.1.56](https://github.com/uniespacos/app/compare/v1.1.55...v1.1.56) (2026-03-04)
 
 
