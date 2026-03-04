@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.52](https://github.com/uniespacos/app/compare/v1.1.51...v1.1.52) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** use php image as source for caddy assets ([#189](https://github.com/uniespacos/app/issues/189)) ([b0cf262](https://github.com/uniespacos/app/commit/b0cf262e606364277494fc77afbe7d046570e506))
+
 ## [1.1.51](https://github.com/uniespacos/app/compare/v1.1.50...v1.1.51) (2026-03-04)
 
 
