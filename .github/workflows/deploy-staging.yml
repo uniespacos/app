@@ -128,6 +128,9 @@ jobs:
       - name: Install & Build Frontend
         env:
           VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
+          VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST }}
+          VITE_REVERB_PORT: ${{ secrets.VITE_REVERB_PORT }}
+          VITE_REVERB_SCHEME: ${{ secrets.VITE_REVERB_SCHEME }}
         run: npm ci && npm run build
 
       - name: Build and push PHP App Image
@@ -139,11 +142,6 @@ jobs:
           push: true
           tags: ${{ steps.meta-app.outputs.tags }}
           labels: ${{ steps.meta-app.outputs.labels }}
-          build-args: |
-            VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}
-            VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
-            VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
-            VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
       - name: Build and push Web (Caddy) Image
         uses: docker/build-push-action@v5
