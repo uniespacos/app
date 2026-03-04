@@ -1,9 +1,9 @@
-# Global options
-:80 {
+# Caddyfile for staging environment
+{$APP_URL} {
     root * /var/www/public
     file_server
     
-    # Enable robust logging for debugging
+    # Enable logging for debugging
     log {
         output stdout
         format json
