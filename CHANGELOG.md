@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.56](https://github.com/uniespacos/app/compare/v1.1.55...v1.1.56) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** correctly pass https proto from caddy to php-fpm ([#197](https://github.com/uniespacos/app/issues/197)) ([9920a2c](https://github.com/uniespacos/app/commit/9920a2c589d71a14e489c4c52a398f759ef8602e))
+
 ## [1.1.55](https://github.com/uniespacos/app/compare/v1.1.54...v1.1.55) (2026-03-04)
 
 
