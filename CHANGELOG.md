@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.51](https://github.com/uniespacos/app/compare/v1.1.50...v1.1.51) (2026-03-04)
+
+
+### Bug Fixes
+
+* **deploy:** sync build assets into docker images using buildx context ([#187](https://github.com/uniespacos/app/issues/187)) ([b0e1b4c](https://github.com/uniespacos/app/commit/b0e1b4c55436995bfc162a459a44e8d45af93004))
+
 ## [1.1.50](https://github.com/uniespacos/app/compare/v1.1.49...v1.1.50) (2026-03-04)
 
 
