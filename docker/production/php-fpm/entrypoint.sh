@@ -1,22 +1,21 @@
 #!/bin/sh
 set -e
 
-# Diagnostic: Print current state if it's failing
-if [ ! -f "/var/www/artisan" ]; then
-    echo "ERROR: artisan file not found in /var/www"
-    echo "Current directory: $(pwd)"
-    echo "Contents of /var/www:"
-    ls -la /var/www
-fi
+# Use absolute paths for everything to avoid ambiguity
+ARTISAN_PATH="/var/www/artisan"
 
 # If the command is 'php-fpm', it means we're starting the main server.
 if [ "$1" = 'php-fpm' ]; then
     echo "Waiting for database to be ready..."
-    # Try to use absolute path to artisan for the check
-    while ! php /var/www/artisan db:monitor --quiet; do
-      sleep 2
-    done
-    echo "Database is ready."
+    # Ensure artisan exists before calling it
+    if [ -f "$ARTISAN_PATH" ]; then
+        while ! php "$ARTISAN_PATH" db:monitor --quiet; do
+          sleep 2
+        done
+        echo "Database is ready."
+    else
+        echo "Warning: Artisan not found at $ARTISAN_PATH, skipping DB monitor."
+    fi
 
     # Initialize storage directory if empty
     if [ ! "$(ls -A /var/www/storage/app 2>/dev/null)" ]; then
@@ -25,13 +24,47 @@ if [ "$1" = 'php-fpm' ]; then
           cp -R /var/www/storage-init/. /var/www/storage
           chown -R www-data:www-data /var/www/storage
           echo "Storage directory initialized."
-      else
-          echo "Warning: storage-init directory not found."
       fi
     fi
 fi
 
-# Cleanup the init directory regardless
+# Cleanup the init directory
+rm -rf /var/www/storage-init
+
+# Execute the command
+exec "$@"
+ Here is the updated code:
+#!/bin/sh
+set -e
+
+# Use absolute paths for everything to avoid ambiguity
+ARTISAN_PATH="/var/www/artisan"
+
+# If the command is 'php-fpm', it means we're starting the main server.
+if [ "$1" = 'php-fpm' ]; then
+    echo "Waiting for database to be ready..."
+    # Ensure artisan exists before calling it
+    if [ -f "$ARTISAN_PATH" ]; then
+        while ! php "$ARTISAN_PATH" db:monitor --quiet; do
+          sleep 2
+        done
+        echo "Database is ready."
+    else
+        echo "Warning: Artisan not found at $ARTISAN_PATH, skipping DB monitor."
+    fi
+
+    # Initialize storage directory if empty
+    if [ ! "$(ls -A /var/www/storage/app 2>/dev/null)" ]; then
+      echo "Initializing storage directory from storage-init..."
+      if [ -d "/var/www/storage-init" ]; then
+          cp -R /var/www/storage-init/. /var/www/storage
+          chown -R www-data:www-data /var/www/storage
+          echo "Storage directory initialized."
+      fi
+    fi
+fi
+
+# Cleanup the init directory
 rm -rf /var/www/storage-init
 
 # Execute the command

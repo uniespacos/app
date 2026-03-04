@@ -72,7 +72,7 @@ docker compose -f "$COMPOSE_FILE" exec -T app php artisan down || log "Applicati
 
 # 5. Pre-flight Migrations (Zero-Downtime Improvement)
 log "Running pre-flight database migrations in ephemeral container..."
-IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" run --rm -T app php artisan migrate --force
+IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" run --rm -T app /usr/local/bin/php /var/www/artisan migrate --force
 
 # 6. Rolling Update (Zero-Downtime Improvement)
 log "Applying changes via rolling update (docker compose up -d)..."
