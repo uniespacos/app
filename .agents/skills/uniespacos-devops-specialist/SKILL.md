@@ -5,6 +5,11 @@ description: A DevOps specialist for the UniEspaços project, with expertise in 
 
 # UniEspaços DevOps Specialist Skill
 
+## Cross-References
+- **Security:** If working on network configurations, secrets, or TLS, activate `uniespacos-secdev-specialist`.
+- **Frontend Build:** If fixing Vite bundling in Docker, activate `laravel-vite`.
+- **Backend Architecture:** If diagnosing queue or database connection issues in code, activate `laravel-backend-architect`.
+
 ## 1. Core Directives
 
 When this skill is active, you are a **DevOps Engineer** specializing in the UniEspaços project. Your primary responsibility is to understand, manage, and troubleshoot the entire CI/CD and deployment workflow. Your expertise lies in Docker, GitHub Actions, and the specific deployment patterns used in this project.
@@ -22,51 +27,56 @@ You have a deep understanding of the production environment and the technologies
 -   **Database:** PostgreSQL
 -   **Deployment Target:** Virtual Private Server (VPS) accessed via SSH
 
-## 3. Primary Deployment Workflow (VPS via SSH)
+## 3. Deployment & CI Patterns
 
-The main deployment process is automated via the `.github/workflows/main-pipeline.yml` GitHub Actions workflow, triggered on a push to the `main` branch. You must be intimately familiar with this process.
+### Docker Best Practices
 
-The key steps executed on the VPS are:
-1.  **Initiate Deploy:** The script connects to the VPS (`${{ secrets.SSH_HOST }}`) via SSH.
-2.  **Enable Maintenance Mode:** Puts the Laravel application into maintenance mode to prevent users from accessing it during the update (`php artisan down`).
-3.  **Update Codebase:** Pulls the latest changes from the `main` branch (`git pull origin main`).
-4.  **Rebuild & Restart Services:** Rebuilds the Docker images if their Dockerfiles have changed and restarts all services defined in `compose.prod.yml` (`docker compose -f compose.prod.yml up -d --build --remove-orphans`). This is a critical step that applies new code and infrastructure changes.
-5.  **Run Database Migrations:** Applies any new database migrations to keep the schema in sync with the application (`php artisan migrate --force`).
-6.  **Optimize Application:** Caches the configuration and routes for improved performance (`php artisan optimize`, `php artisan view:cache`, `php artisan config:cache`).
-7.  **Restart Queue Worker:** Ensures the queue worker is running the latest version of the code.
+```yaml
+# CORRECT - UniEspaços Pattern (Using environment variables safely in docker-compose)
+services:
+  app:
+    build:
+      context: .
+      target: production
+    environment:
+      - APP_ENV=${APP_ENV}
+      - DB_HOST=postgres
+    restart: unless-stopped
+
+# INCORRECT - Hardcoding sensitive values or paths
+services:
+  app:
+    image: my-app:latest
+    environment:
+      - DB_PASSWORD=my_super_secret_password # ❌ Use .env interpolation
+```
+
+### GitHub Actions Pipeline
+
+The main deployment process is automated via `.github/workflows/main-pipeline.yml`.
+
+1.  **Initiate Deploy:** Connects to the VPS via SSH.
+2.  **Enable Maintenance Mode:** Puts the Laravel application into maintenance mode (`php artisan down`).
+3.  **Update Codebase:** Pulls the latest changes from `main`.
+4.  **Rebuild & Restart:** `docker compose -f compose.prod.yml up -d --build --remove-orphans`.
+5.  **Run Migrations:** `php artisan migrate --force`.
+6.  **Optimize:** `php artisan optimize`, `view:cache`, `config:cache`.
+7.  **Restart Queue Worker:** Reloads horizon/queue workers.
 8.  **Disable Maintenance Mode:** Brings the application back online (`php artisan up`).
 
 ## 4. Production Infrastructure (`compose.prod.yml`)
 
-Your understanding of the production setup is defined by the `compose.prod.yml` file. The main services are:
-
--   **`web` (Nginx):** Serves the application's frontend. It relies on a multi-stage `docker/production/nginx/Dockerfile` that first builds the React frontend (`npm run build`) and then copies the static assets into a lean Nginx image.
--   **`app` (PHP-FPM):** Runs the Laravel backend. It uses a multi-stage `docker/production/php-fpm/Dockerfile` where a `builder` stage installs all composer dependencies, and the final, lean `production` stage copies the application code and compiled dependencies.
+-   **`web` (Nginx):** Multi-stage build (`docker/production/nginx/Dockerfile`) copies React build output to the lean Nginx image.
+-   **`app` (PHP-FPM):** Multi-stage build (`docker/production/php-fpm/Dockerfile`) installs composer dependencies without dev tools.
 -   **`postgres`:** The production database.
--   **`queue-worker`:** A dedicated container to process background jobs. It **MUST** have the `pcntl` PHP extension installed to correctly handle signals (like those from Reverb).
--   **`reverb`:** The WebSocket server. It should be configured to listen internally on HTTP/9000, while external access is proxied via Nginx on HTTPS/443.
+-   **`queue-worker`:** Dedicated container to process background jobs. MUST have `pcntl` extension for Reverb signals.
+-   **`reverb`:** WebSocket server. Internal HTTP/9000, proxied via Nginx on HTTPS/443.
 
-## 5. Alternative Deployment & CI Workflows
-
-You should be aware of other workflows:
-
--   **Portainer Deployment (`portainer-stack-deploy.yml`):** An alternative deployment method that builds and pushes Docker images to GHCR, then triggers a stack update in a Portainer instance.
--   **Linting (`lint.yml`):** A workflow that runs on pushes and pull requests to `develop` and `main` to ensure code quality with `pint` and `npm run format`/`lint`.
--   **Health Check (`production-health-check.yml`):** A vital workflow for validating the integrity of the production Docker setup. It builds the production containers, runs them, and performs a series of checks, including database connectivity and queue worker status.
-
-## 6. Key Resources
-
-The following files are your primary sources of truth for any DevOps-related task. Always refer to them before taking action.
+## 5. Key Resources
 
 -   **Primary Deployment Logic:** `/.github/workflows/main-pipeline.yml`
--   **Production Environment Definition:** `/compose.prod.yml`
+-   **Production Environment:** `/compose.prod.yml`
 -   **Production Dockerfiles:**
     -   `/docker/production/nginx/Dockerfile`
     -   `/docker/production/php-fpm/Dockerfile`
--   **Production Entrypoints & Configs:**
-    -   `/docker/production/php-fpm/entrypoint.sh`
-    -   `/docker/production/nginx/nginx.conf`
--   **CI & Validation:**
-    -   `/.github/workflows/lint.yml`
-    -   `/.github/workflows/production-health-check.yml`
-    -   `/.github/workflows/portainer-stack-deploy.yml`
+-   **CI & Validation:** `/.github/workflows/ci.yml`, `/.github/workflows/pr-lint.yml`

@@ -1,7 +1,7 @@
 ---
 name: 02-php-laravel
 version: "2.0.0"
-description: Laravel framework specialist - Eloquent ORM, Blade templating, API development, queues, and Laravel 11.x ecosystem
+description: Laravel framework specialist - Eloquent ORM, Blade templating, API development, queues, and Laravel 11.x/12.x ecosystem
 models:
   - sonnet
 tools:
@@ -28,178 +28,48 @@ triggers:
 
 # Laravel Framework Agent
 
-> Production-grade AI agent for Laravel application development
+## Cross-References
+- **Project Specific Architecture:** For the exact implementation guidelines in this repository (e.g. Services, Controllers, Form Requests), you MUST activate `laravel-backend-architect`.
+- **Full-Stack:** For React + Inertia implementations, activate `uniespacos-fullstack-dev`.
+- **Security:** To audit code for vulnerabilities, activate `uniespacos-secdev-specialist`.
 
 ## Role & Responsibility
 
-### Primary Role
-Expert in Laravel framework development, covering version 10.x-11.x features, Eloquent ORM, Blade templating, API development, queue management, and the Laravel ecosystem.
+Expert in Laravel framework development, covering version 11.x-12.x features, Eloquent ORM, API development, queue management, and the Laravel ecosystem.
 
 ### Boundaries
 | In Scope | Out of Scope |
 |----------|--------------|
 | Laravel core & packages | Symfony-specific patterns |
 | Eloquent ORM & relationships | Raw PDO operations |
-| Blade templates & components | Vue/React implementation details |
 | Artisan commands & scheduling | Server configuration |
-| Laravel Sail & Herd | Kubernetes/Docker advanced |
-| Livewire & Inertia basics | Deep frontend frameworks |
+| Livewire & Inertia basics | Deep frontend frameworks (handled by fullstack skill) |
 
-### Delegation Rules
-```yaml
-delegate_to:
-  - agent: 01-php-fundamentals
-    when: "Pure PHP questions without Laravel context"
-  - agent: 05-php-database
-    when: "Complex raw SQL or database design"
-  - agent: 06-php-testing
-    when: "PHPUnit internals (not Laravel testing)"
-  - agent: 07-php-api
-    when: "API design patterns beyond Laravel Sanctum/Passport"
-```
+## Core Laravel Patterns
 
-## Input/Output Schema
-
-### Input Schema
-```typescript
-interface AgentInput {
-  query: string;
-  context?: {
-    laravel_version?: "10" | "11";
-    project_structure?: "monolith" | "modular" | "api-only";
-    stack?: "livewire" | "inertia-vue" | "inertia-react" | "blade-only";
-    database?: "mysql" | "postgresql" | "sqlite";
-  };
-  code_snippet?: string;
-  file_paths?: string[];
+```php
+// CORRECT - Laravel Modern Pattern (Eloquent Scopes)
+class Space extends Model
+{
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
 }
-```
 
-### Output Schema
-```typescript
-interface AgentOutput {
-  response: string;
-  code_examples?: {
-    file_type: "controller" | "model" | "migration" | "route" | "blade" | "config";
-    code: string;
-    path_suggestion?: string;
-  }[];
-  artisan_commands?: string[];
-  package_suggestions?: string[];
-  warnings?: string[];
-}
+// INCORRECT - Putting query constraints everywhere
+$spaces = Space::where('is_active', true)->get(); // ❌ Use the scope instead: Space::active()->get();
 ```
 
 ## Capabilities Matrix
 
-### Core Competencies
-| Category | Skills | Proficiency |
-|----------|--------|-------------|
-| **Eloquent** | Models, relationships, scopes, observers, accessors/mutators | Expert |
-| **Routing** | Web routes, API routes, route model binding, middleware | Expert |
-| **Blade** | Templates, components, layouts, slots, directives | Expert |
-| **Artisan** | Commands, scheduling, queue workers | Expert |
-| **Authentication** | Sanctum, Passport, Fortify, Breeze, Jetstream | Expert |
-| **Testing** | Feature tests, unit tests, database testing, mocking | Expert |
-
-### Laravel Version Coverage
-```php
-// Laravel 10.x Features
-- Process interaction improvements
-- Pennant (feature flags)
-- Laravel Herd support
-- Native types everywhere
-
-// Laravel 11.x Features (March 2024+)
-- Simplified directory structure
-- Per-second rate limiting
-- Graceful encryption key rotation
-- Prompt validator improvements
-- Model::casts() method
-- Dumpable trait
-- Laravel Reverb (WebSockets)
-- Health endpoint
-```
-
-### Eloquent Patterns Mastery
-```php
-// Relationships
-- hasOne, hasMany, belongsTo, belongsToMany
-- hasOneThrough, hasManyThrough
-- morphOne, morphMany, morphToMany
-- Polymorphic relationships
-
-// Query Optimization
-- Eager loading (with, load)
-- Lazy eager loading
-- Subquery selects
-- Chunking & cursor iteration
-
-// Advanced Features
-- Global & local scopes
-- Model events & observers
-- Attribute casting
-- Query scopes with parameters
-```
-
-## Error Handling & Fallbacks
-
-### Error Categories
-| Error Type | Detection | Recovery Strategy |
-|------------|-----------|-------------------|
-| `MigrationError` | Schema conflicts | Rollback guidance, fresh migration |
-| `RelationshipError` | N+1 query detection | Suggest eager loading |
-| `RouteError` | Route not found / method not allowed | Route list debug, binding check |
-| `QueueError` | Failed job handling | Retry strategy, failed_jobs table |
-| `AuthError` | Guard/middleware issues | Auth config review |
-
-### Fallback Chain
-```mermaid
-graph TD
-    A[User Query] --> B{Laravel Specific?}
-    B -->|Yes| C[Process with Laravel Context]
-    B -->|No| D{Pure PHP?}
-    D -->|Yes| E[Delegate to 01-php-fundamentals]
-    C --> F{Error Type?}
-    F -->|Database| G[Check Migrations & Models]
-    F -->|Routing| H[Check routes/web.php & api.php]
-    F -->|Queue| I[Check queue config & worker status]
-    F -->|Unknown| J[Provide debug checklist]
-```
-
-## Token & Cost Optimization
-
-### Context Management
-```yaml
-optimization:
-  max_context_files: 8
-  priority_loading:
-    - composer.json           # Check Laravel version
-    - .env.example            # Environment structure
-    - routes/web.php          # Web routes
-    - routes/api.php          # API routes
-    - app/Models/*.php        # Eloquent models
-    - config/app.php          # App configuration
-```
-
-## Usage Examples
-
-### Create CRUD Resource
-```
-Task(
-  subagent_type="php:02-php-laravel",
-  prompt="Create a complete CRUD for Post model with API endpoints"
-)
-```
-
-### Eloquent Optimization
-```
-Task(
-  subagent_type="php:02-php-laravel",
-  prompt="Optimize this query for N+1 prevention",
-  context={"file": "app/Http/Controllers/PostController.php"}
-)
-```
+| Category | Skills |
+|----------|--------|
+| **Eloquent** | Models, relationships, scopes, observers, accessors/mutators |
+| **Routing** | Web routes, API routes, route model binding, middleware |
+| **Artisan** | Commands, scheduling, queue workers |
+| **Authentication** | Sanctum, Fortify, Breeze |
+| **Testing** | Feature tests, unit tests, Pest/PHPUnit, mocking |
 
 ## Troubleshooting Guide
 
@@ -210,7 +80,6 @@ Symptom: New model/controller not recognized
 Debug Checklist:
   [ ] Run: composer dump-autoload
   [ ] Check namespace matches directory structure
-  [ ] Verify PSR-4 autoloading in composer.json
   [ ] Clear caches: php artisan optimize:clear
 ```
 
@@ -221,10 +90,6 @@ Debug Checklist:
   [ ] Check migration order (timestamps)
   [ ] Verify referenced tables exist
   [ ] Check column types match for foreign keys
-  [ ] Run: php artisan migrate:status
-Commands:
-  php artisan migrate:rollback --step=1
-  php artisan migrate:fresh --seed  # Development only!
 ```
 
 #### 3. Queue Jobs Not Processing
@@ -232,19 +97,6 @@ Commands:
 Symptom: Jobs stuck in queue
 Debug Checklist:
   [ ] Check QUEUE_CONNECTION in .env
-  [ ] Verify queue worker is running
-  [ ] Check failed_jobs table
-  [ ] Review job's handle() method
-Commands:
-  php artisan queue:work --tries=3
-  php artisan queue:retry all
-  php artisan queue:failed
+  [ ] Verify queue worker container is running
+  [ ] Review job's handle() method for silent failures
 ```
-
-## Performance Targets
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Response accuracy | ≥95% | Code works without modification |
-| Version compatibility | 100% | Match user's Laravel version |
-| Best practices | 100% | Follow Laravel conventions |
-| N+1 detection | 100% | Always suggest eager loading |

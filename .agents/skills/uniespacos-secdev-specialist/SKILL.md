@@ -5,7 +5,9 @@ description: Security development specialist for the UniEspaços project. Use th
 
 # UniEspaços Security Development Specialist
 
-This skill provides expert guidance for analyzing, securing, and suggesting improvements to the UniEspaços codebase and infrastructure.
+## Cross-References
+- **Backend Architecture:** For implementing standard Controllers or Services securely, activate `laravel-backend-architect`.
+- **Infrastructure:** For adjusting Docker networks or Nginx configs based on security findings, activate `uniespacos-devops-specialist`.
 
 ## Core Responsibilities
 
@@ -14,17 +16,54 @@ This skill provides expert guidance for analyzing, securing, and suggesting impr
 - **Data Protection:** Prevent sensitive data leaks through Inertia props, API responses, or logs.
 - **Infrastructure Review:** Secure Docker configurations and Nginx settings (headers, TLS, timeouts).
 
+## Security Patterns
+
+### Authorization & Gates
+
+```php
+// CORRECT - UniEspaços Pattern (Using Policies/Gates in FormRequests or Controllers)
+class UpdateSpaceRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->route('space'));
+    }
+}
+
+// INCORRECT - Manual ad-hoc permission checks in controllers
+class SpaceController extends Controller 
+{
+    public function update(Request $request, Space $space)
+    {
+        if ($request->user()->role !== 'admin') { // ❌ Brittle role checking, bypasses policies
+            abort(403);
+        }
+        // ...
+    }
+}
+```
+
+### Data Exposure (Inertia)
+
+```php
+// CORRECT - UniEspaços Pattern (Filtering data sent to frontend via Resources)
+return Inertia::render('Spaces/Show', [
+    'space' => new SpaceResource($space) // ✅ Only exposes safe fields defined in Resource
+]);
+
+// INCORRECT - Sending entire models to the frontend
+return Inertia::render('Spaces/Show', [
+    'space' => $space // ❌ Exposes hidden fields or sensitive timestamps if not carefully managed
+]);
+```
+
 ## Workflow for Security Analysis
 
 When asked to review a feature or suggest improvements:
 
 1. **Understand the Context:** Identify the components involved (e.g., a specific route, a new Controller, a React component, or a Dockerfile).
-2. **Consult References:**
-   - For backend (PHP/Laravel) security, read `references/laravel.md`.
-   - For frontend (React/Inertia) security, read `references/react-inertia.md`.
-   - For infrastructure (Docker/Nginx) security, read `references/infrastructure.md`.
-3. **Analyze:** Check for missing validation, improper access controls, insecure data handling, and misconfigurations.
-4. **Suggest Improvements:** Provide actionable, prioritized recommendations. Always prefer built-in framework security features over custom implementations.
+2. **Analyze:** Check for missing validation, improper access controls, insecure data handling, and misconfigurations.
+3. **Suggest Improvements:** Provide actionable, prioritized recommendations. Always prefer built-in framework security features over custom implementations.
 
 ## Guiding Principles
 
