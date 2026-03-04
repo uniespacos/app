@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.50](https://github.com/uniespacos/app/compare/v1.1.49...v1.1.50) (2026-03-04)
+
+
+### Bug Fixes
+
+* **test:** robust user name assertion in notification tests ([#185](https://github.com/uniespacos/app/issues/185)) ([d2c50fb](https://github.com/uniespacos/app/commit/d2c50fbf67c8141dc1d0626a110b29ccf4e24982))
+
 ## [1.1.49](https://github.com/uniespacos/app/compare/v1.1.48...v1.1.49) (2026-03-04)
 
 
