@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.44](https://github.com/uniespacos/app/compare/v1.1.43...v1.1.44) (2026-03-04)
+
+
+### Bug Fixes
+
+* **ci:** restore robust test exit code handling ([#173](https://github.com/uniespacos/app/issues/173)) ([e6b744b](https://github.com/uniespacos/app/commit/e6b744b75ff3fe1aafa4a3c779c3b1abea3b5f09))
+
 ## [1.1.43](https://github.com/uniespacos/app/compare/v1.1.42...v1.1.43) (2026-03-04)
 
 
