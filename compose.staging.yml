@@ -1,7 +1,8 @@
 services:
     web:
         container_name: web-staging
-        image: caddy:alpine
+        # Use our new immutable image instead of vanilla Caddy
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/web}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         env_file:
             - .env
@@ -9,8 +10,7 @@ services:
             - "80:80"
         volumes:
             - uniespacos-storage-staging:/var/www/storage:ro
-            - uniespacos-public-assets-v2-staging:/var/www/public/build:ro
-            - uniespacos-public-staging-v2:/var/www/public:ro
+            # Asset volumes removed because the image is now immutable
             - ./docker/staging/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
             - caddy_data_staging:/data
             - caddy_config_staging:/config
@@ -23,8 +23,6 @@ services:
         image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         volumes:
-            - uniespacos-public-assets-v2-staging:/var/www/public/build
-            - uniespacos-public-staging-v2:/var/www/public
             - uniespacos-storage-staging:/var/www/storage
         env_file:
             - .env
@@ -53,8 +51,7 @@ services:
         image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         command: php artisan reverb:start --host=0.0.0.0 --port=9000
-        ports:
-            - "9000:9000"
+        # REMOVED ports: "9000:9000" for network isolation (accessible only to internal network)
         env_file:
             - .env
         networks:
@@ -94,7 +91,6 @@ networks:
 volumes:
     postgres-data-staging:
     uniespacos-storage-staging:
-    uniespacos-public-assets-v2-staging:
-    uniespacos-public-staging-v2:
+    # Asset volumes removed to ensure immutability
     caddy_data_staging:
     caddy_config_staging:
