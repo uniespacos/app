@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.58](https://github.com/uniespacos/app/compare/v1.1.57...v1.1.58) (2026-03-04)
+
+
+### Bug Fixes
+
+* **caddy:** remove auto_https directive in staging Caddyfile ([#202](https://github.com/uniespacos/app/issues/202)) ([337096f](https://github.com/uniespacos/app/commit/337096f1c099859e6fb3fbf4d3d8c97f1e8dc581))
+
 ## [1.1.57](https://github.com/uniespacos/app/compare/v1.1.56...v1.1.57) (2026-03-04)
 
 
