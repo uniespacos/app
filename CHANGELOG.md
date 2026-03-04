@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.60](https://github.com/uniespacos/app/compare/v1.1.59...v1.1.60) (2026-03-04)
+
+
+### Bug Fixes
+
+* **caddy:** update Caddyfile to use APP_URL_WITHOUT_SCHEME for staging ([7c401ad](https://github.com/uniespacos/app/commit/7c401adedcd7d5dbfd7323b2dc2f2819e066f4ea))
+* **compose:** update web service ports to use 443 for HTTPS ([14dbe3d](https://github.com/uniespacos/app/commit/14dbe3d123e359c080f34ab1bf3536504e18cf6f))
+
 ## [1.1.59](https://github.com/uniespacos/app/compare/v1.1.58...v1.1.59) (2026-03-04)
 
 
