@@ -15,10 +15,9 @@
 
     # Proxy to PHP-FPM
     php_fastcgi app:9000 {
-        # Ensure we pass the correct protocol to Laravel
-        # This is critical for URL signature verification
-        env HTTPS on
-        env HTTP_X_FORWARDED_PROTO https
+        # Dynamically set HTTPS=on for PHP if the X-Forwarded-Proto header is 'https'
+        # This is the definitive fix for Laravel's URL signature validation behind a proxy.
+        env HTTPS {header.X-Forwarded-Proto} == 'https' ? 'on' : 'off'
     }
 
     # Reverb WebSockets
