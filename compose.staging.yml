@@ -51,7 +51,6 @@ services:
         image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         command: php artisan reverb:start --host=0.0.0.0 --port=9000
-        # REMOVED ports: "9000:9000" for network isolation (accessible only to internal network)
         env_file:
             - .env
         networks:
@@ -91,6 +90,5 @@ networks:
 volumes:
     postgres-data-staging:
     uniespacos-storage-staging:
-    # Asset volumes removed to ensure immutability
     caddy_data_staging:
     caddy_config_staging:
