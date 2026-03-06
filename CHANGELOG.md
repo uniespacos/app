@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.61](https://github.com/uniespacos/app/compare/v1.1.60...v1.1.61) (2026-03-06)
+
+
+### Bug Fixes
+
+* **compose:** remove ports for reverb service and asset volumes for immutability ([3b4e81a](https://github.com/uniespacos/app/commit/3b4e81a60ec67a2be15c61343c0d2a04dd8d9f62))
+
 ## [1.1.60](https://github.com/uniespacos/app/compare/v1.1.59...v1.1.60) (2026-03-04)
 
 
