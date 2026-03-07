@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/uniespacos/app/compare/v1.1.63...v1.2.0) (2026-03-07)
+
+
+### Features
+
+* **env:** add environment configuration files for development and production ([f75ce5f](https://github.com/uniespacos/app/commit/f75ce5f8587434cba0e6a64ce8e4cd536edf7b4b))
+
+
+### Bug Fixes
+
+* **AppServiceProvider:** update environment check for production and staging ([f75ce5f](https://github.com/uniespacos/app/commit/f75ce5f8587434cba0e6a64ce8e4cd536edf7b4b))
+
+
+### Miscellaneous Chores
+
+* **docker:** add cloudflared service to staging compose file ([f75ce5f](https://github.com/uniespacos/app/commit/f75ce5f8587434cba0e6a64ce8e4cd536edf7b4b))
+
 ## [1.1.63](https://github.com/uniespacos/app/compare/v1.1.62...v1.1.63) (2026-03-07)
 
 
