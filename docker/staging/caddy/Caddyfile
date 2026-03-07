@@ -1,5 +1,5 @@
 # Caddyfile for staging environment
-{$APP_URL_WITHOUT_SCHEME}:80 {
+{$APP_URL} {
     root * /var/www/public
     file_server
     
@@ -10,10 +10,8 @@
     }
 
     # Proxy to PHP-FPM
-    php_fastcgi app:9000 {
-        # Force HTTPS on for PHP-FPM since we are always behind a secure proxy (Cloudflare)
-        # This is the most reliable way to ensure Laravel correctly validates URL signatures.
-        env HTTPS on
+    php_fastcgi app:9000{
+        env HTTPS "true"
     }
 
     # Reverb WebSockets
