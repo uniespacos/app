@@ -7,7 +7,7 @@ services:
         env_file:
             - .env
         ports:
-            - "443:443"
+            - "20500:80"
         volumes:
             - uniespacos-storage-staging:/var/www/storage:ro
             # Asset volumes removed because the image is now immutable
@@ -86,6 +86,7 @@ services:
 
 networks:
     uniespacos-staging:
+
 
 volumes:
     postgres-data-staging:

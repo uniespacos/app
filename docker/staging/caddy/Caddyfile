@@ -1,5 +1,5 @@
 # Caddyfile for staging environment
-{$APP_URL_WITHOUT_SCHEME} {
+{$APP_URL_WITHOUT_SCHEME}:80 {
     root * /var/www/public
     file_server
     
