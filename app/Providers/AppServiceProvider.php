@@ -28,9 +28,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         Gate::policy(Reserva::class, ReservaPolicy::class);
 
-        if ($this->app->environment('production')) {
+        if ($this->app->environment('production' || 'staging')) {
             URL::forceScheme('https');
             // Force root URL and ensure no trailing slash to prevent signature mismatches
             $rootUrl = rtrim(config('app.url'), '/');
@@ -58,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             },
         ]);
         if ($this->app->environment('testing')) {
-            Vite::macro('shouldBeIgnored', fn () => true);
+            Vite::macro('shouldBeIgnored', fn() => true);
         }
 
         // Environment variable validation
@@ -104,7 +105,7 @@ class AppServiceProvider extends ServiceProvider
         ];
 
         foreach ($requiredEnvVariables as $variable) {
-            if (! env($variable)) {
+            if (!env($variable)) {
                 throw new \Exception("Missing required environment variable: {$variable}");
             }
         }

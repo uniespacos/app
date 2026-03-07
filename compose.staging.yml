@@ -1,4 +1,9 @@
 services:
+    cloudflared:
+        image: cloudflare/cloudflared:latest
+        command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+        networks:
+            - tunnel_net
     web:
         container_name: web-staging
         # Use our new immutable image instead of vanilla Caddy
@@ -15,6 +20,7 @@ services:
             - caddy_data_staging:/data
             - caddy_config_staging:/config
         networks:
+            - tunnel_net
             - uniespacos-staging
         depends_on:
             - app
@@ -85,6 +91,8 @@ services:
             start_period: 60s
 
 networks:
+    tunnel_net:
+        driver: bridge
     uniespacos-staging:
 
 
