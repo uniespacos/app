@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.62](https://github.com/uniespacos/app/compare/v1.1.61...v1.1.62) (2026-03-07)
+
+
+### Bug Fixes
+
+* **compose:** update web service ports to map 20500:80 and adjust Caddyfile for correct URL handling ([50e746e](https://github.com/uniespacos/app/commit/50e746ec94cd2790cbb42ce0403006d08c56d367))
+
 ## [1.1.61](https://github.com/uniespacos/app/compare/v1.1.60...v1.1.61) (2026-03-06)
 
 
