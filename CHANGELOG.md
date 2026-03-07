@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.63](https://github.com/uniespacos/app/compare/v1.1.62...v1.1.63) (2026-03-07)
+
+
+### Bug Fixes
+
+* **caddy:** update Caddyfile to use APP_URL and ensure HTTPS is set correctly for PHP-FPM ([ea5de12](https://github.com/uniespacos/app/commit/ea5de12741a913c82ae7673bbabed0dae4336968))
+
 ## [1.1.62](https://github.com/uniespacos/app/compare/v1.1.61...v1.1.62) (2026-03-07)
 
 
