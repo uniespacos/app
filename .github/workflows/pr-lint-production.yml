@@ -32,5 +32,3 @@ jobs:
                       build
                       ci
                       revert
-                  # Allow optional scopes, like `feat(api): ...`
-                  allow-scopes: true
