@@ -1,0 +1,223 @@
+name: CI/CD - Production
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    name: 🔍 Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          npm ci --no-optional
+
+      - name: Run Pint (PHP Code Style)
+        run: vendor/bin/pint --test
+
+      - name: Run ESLint (Frontend Linting)
+        run: npm run lint
+  test-backend:
+    name: 🐘 Backend Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expose UID and GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+      - name: Start Services
+        run: UID=${{ env.UID }} GID=${{ env.GID }} docker compose -f docker-compose.test.yml up -d
+      - name: Setup Environment
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace /bin/bash -c "
+            cp .env.testing .env
+            composer install --no-interaction --no-progress --prefer-dist
+            php artisan key:generate
+            php artisan migrate --seed --force
+          "
+      - name: Run Tests
+        env:
+          APP_ENV: testing
+        run: |
+          docker compose -f docker-compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
+          grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
+      - name: Stop Services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
+
+  test-frontend:
+    name: ⚛️ Frontend Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Tests
+        run: npm test
+
+  build-and-push:
+    name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker meta for app image
+        id: meta_app
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Generate Docker meta for web image
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & Build Frontend
+        env:
+          VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
+        run: npm ci && npm run build
+
+      - name: Build and push PHP App Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/php-fpm/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
+          build-args: |
+            VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}
+            VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}
+            VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
+            VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
+
+      - name: Build and push Nginx Web Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME}}
+          APP_ENV: ${{ secrets.APP_ENV }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/nginx/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
+
+  deploy_production:
+    name: 🚀 Deploy to Production
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_PRODUCTION }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "Host ${{ secrets.SSH_HOST_PRODUCTION }}
+            User ${{ secrets.SSH_USER_PRODUCTION }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy to Production via SSH
+        run: |
+          PRODUCTION_PATH="${{secrets.PATH_TO_APP_FOLDER_PRODUCTION}}"
+          IMAGE_TAG=$(echo ${{ github.ref_name }} | sed 's/^v//')
+
+          scp ./compose.production.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.production.yml
+          scp ./scripts/deploy.production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.production.sh
+          scp ./scripts/rollback.production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/rollback.production.sh
+          scp ./.env.production ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/.env.production
+
+          ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
+            mkdir -p ${PRODUCTION_PATH}/docker/production/caddy
+            cat > ${PRODUCTION_PATH}/docker/production/caddy/Caddyfile
+          " < ./docker/production/caddy/Caddyfile
+
+          ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
+            set -e
+            cd ${PRODUCTION_PATH}
+            chmod +x deploy.production.sh rollback.production.sh
+            echo '${{ secrets.PAT }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+            set -a
+            source .env
+            set +a
+            ./deploy.production.sh ${IMAGE_TAG}
+          "
