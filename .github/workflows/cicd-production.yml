@@ -163,7 +163,8 @@ jobs:
           push: true
           tags: ${{ steps.meta_web.outputs.tags }}
           labels: ${{ steps.meta_web.outputs.labels }}
-
+          build-args: |
+            APP_IMAGE=ghcr.io/${{ github.repository }}/app:${{ steps.meta_app.outputs.version }}
   deploy_production:
     name: 🚀 Deploy to Production
     if: github.ref == 'refs/heads/main'
@@ -204,7 +205,6 @@ jobs:
           scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
           scp ./docker/production/scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.production.sh
           scp ./docker/production/scripts/rollback.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/rollback.production.sh
-          scp ./.env.example ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/.env.production
 
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
             mkdir -p ${PRODUCTION_PATH}/docker/production/caddy
