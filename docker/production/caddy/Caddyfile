@@ -1,0 +1,27 @@
+# Global options
+{
+    # We are providing our own certificates
+    auto_https disable_certs
+}
+
+:80 {
+    # Redirect HTTP to HTTPS
+    redir https://{host}{uri} permanent
+}
+
+:443 {
+    tls /etc/caddy/certs/uesb2025fullchain.pem /etc/caddy/certs/uesb2025privkey.pem
+
+    root * /var/www/public
+    php_fastcgi app:9000
+    file_server
+
+    # Reverb WebSockets
+    handle /app/* {
+        reverse_proxy reverb:9000 {
+            header_up Host {http.request.host}
+            header_up X-Forwarded-For {http.request.remote}
+            header_up X-Forwarded-Proto {http.request.scheme}
+        }
+    }
+}
