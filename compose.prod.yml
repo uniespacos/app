@@ -92,3 +92,5 @@ volumes:
     uniespacos-storage-production:
     uniespacos-public-assets-v2:
     uniespacos-public-production-v2:
+    caddy_data_production:
+    caddy_config_production:

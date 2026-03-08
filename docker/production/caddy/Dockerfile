@@ -1,4 +1,4 @@
-ARG APP_IMAGE=ghcr.io/uniespacos/app/app:latest
+ARG APP_IMAGE
 FROM ${APP_IMAGE} AS app-source
 
 FROM caddy:alpine

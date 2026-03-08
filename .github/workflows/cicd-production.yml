@@ -152,14 +152,14 @@ jobs:
             VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}
             VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}
 
-      - name: Build and push Nginx Web Image
+      - name: Build and push Caddy Web Image
         env:
           APP_NAME: ${{ secrets.APP_NAME}}
           APP_ENV: ${{ secrets.APP_ENV }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/production/nginx/Dockerfile
+          file: ./docker/production/caddy/Dockerfile
           push: true
           tags: ${{ steps.meta_web.outputs.tags }}
           labels: ${{ steps.meta_web.outputs.labels }}
@@ -201,10 +201,10 @@ jobs:
           PRODUCTION_PATH="${{secrets.PATH_TO_APP_FOLDER_PRODUCTION}}"
           IMAGE_TAG=$(echo ${{ github.ref_name }} | sed 's/^v//')
 
-          scp ./compose.production.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.production.yml
-          scp ./scripts/deploy.production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.production.sh
-          scp ./scripts/rollback.production.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/rollback.production.sh
-          scp ./.env.production ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/.env.production
+          scp ./compose.prod.yml ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/compose.prod.yml
+          scp ./docker/production/scripts/deploy.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/deploy.production.sh
+          scp ./docker/production/scripts/rollback.sh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/rollback.production.sh
+          scp ./.env.example ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }}:${PRODUCTION_PATH}/.env.production
 
           ssh ${{ secrets.SSH_USER_PRODUCTION }}@${{ secrets.SSH_HOST_PRODUCTION }} "
             mkdir -p ${PRODUCTION_PATH}/docker/production/caddy
@@ -215,7 +215,7 @@ jobs:
             set -e
             cd ${PRODUCTION_PATH}
             chmod +x deploy.production.sh rollback.production.sh
-            echo '${{ secrets.PAT }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+            echo '${{ secrets.PAT_RELEASE_PLEASE_PRODUCTION }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
             set -a
             source .env
             set +a

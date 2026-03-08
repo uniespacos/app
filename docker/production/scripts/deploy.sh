@@ -32,7 +32,7 @@ if [ ! -f .env ]; then
     if [ -f .env.example ]; then
         log ".env file missing on host. Creating it from .env.example..."
         cp .env.example .env
-        chmod 600 .env
+        chmod 644 .env
     else
         echo "Error: Neither .env nor .env.example found on host server at $STAGING_PATH"
         exit 1
@@ -56,20 +56,11 @@ log "Creating database backup..."
 docker compose -f "$COMPOSE_FILE" exec -T postgres pg_dump -U "${DB_USERNAME}" -d "${DB_DATABASE}" > "$BACKUP_FILENAME" || log "Warning: Database backup failed. Proceeding anyway..."
 
 # 2. Version Tracking (Production Pattern)
-log "Configuring version tracking to update on successful deploy..."
-ORIGINAL_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2 || echo "")
-trap 'status=$?; if [ "$status" -eq 0 ]; then
-  log "Updating version tracking..."
-  tmp_file="${VERSION_FILE}.tmp"
-  {
-    echo "PREVIOUS_TAG=$ORIGINAL_TAG"
-    echo "CURRENT_TAG=$NEW_TAG"
-    echo "BACKUP_FILE=$BACKUP_FILENAME"
-  } > "$tmp_file"
-  mv "$tmp_file" "$VERSION_FILE"
-else
-  log "Deployment failed (exit code $status); leaving version tracking unchanged."
-fi' EXIT
+log "Updating version tracking..."
+CURRENT_TAG=$(grep "CURRENT_TAG" "$VERSION_FILE" | cut -d'=' -f2 || echo "")
+echo "PREVIOUS_TAG=$CURRENT_TAG" > "$VERSION_FILE"
+echo "CURRENT_TAG=$NEW_TAG" >> "$VERSION_FILE"
+echo "BACKUP_FILE=$BACKUP_FILENAME" >> "$VERSION_FILE"
 
 # 3. Pull Images
 log "Pulling new images with tag: $NEW_TAG..."
@@ -91,12 +82,7 @@ IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" up -d
 log "Waiting for application container to be running..."
 RETRIES=15
 while [ $RETRIES -gt 0 ]; do
-    CONTAINER_ID=$(docker compose -f "$COMPOSE_FILE" ps -q app 2>/dev/null || echo "")
-    if [ -n "$CONTAINER_ID" ]; then
-        STATE=$(docker inspect -f '{{.State.Status}}' "$CONTAINER_ID" 2>/dev/null || echo "not-found")
-    else
-        STATE="not-found"
-    fi
+    STATE=$(docker inspect -f '{{.State.Status}}' app-staging 2>/dev/null || echo "not-found")
     if [ "$STATE" == "running" ]; then
         log "Application container is running."
         break
