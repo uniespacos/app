@@ -107,6 +107,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}/app
           tags: |
+            type=semver,pattern={{version}}
             type=ref,event=branch
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
@@ -117,6 +118,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}/web
           tags: |
+            type=semver,pattern={{version}}
             type=ref,event=branch
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
