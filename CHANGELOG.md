@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/uniespacos/app/compare/v1.2.2...v1.2.3) (2026-03-09)
+
+
+### Bug Fixes
+
+* corrigir nome do container de app no health check do script de deploy ([a909c22](https://github.com/uniespacos/app/commit/a909c2268187d25ec6d6eae7b6f2adc29e9cc2f8))
+
 ## [1.2.2](https://github.com/uniespacos/app/compare/v1.2.1...v1.2.2) (2026-03-09)
 
 
