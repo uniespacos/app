@@ -82,7 +82,7 @@ IMAGE_TAG=$NEW_TAG docker compose -f "$COMPOSE_FILE" up -d
 log "Waiting for application container to be running..."
 RETRIES=15
 while [ $RETRIES -gt 0 ]; do
-    STATE=$(docker inspect -f '{{.State.Status}}' app-staging 2>/dev/null || echo "not-found")
+    STATE=$(docker inspect -f '{{.State.Status}}' app-production 2>/dev/null || echo "not-found")
     if [ "$STATE" == "running" ]; then
         log "Application container is running."
         break
