@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/uniespacos/app/compare/v1.2.1...v1.2.2) (2026-03-09)
+
+
+### Bug Fixes
+
+* ajustar caminhos de certificados e habilitar tags semver ([#219](https://github.com/uniespacos/app/issues/219)) ([1764be5](https://github.com/uniespacos/app/commit/1764be5087d885ba2f3ac0e74f8c12c6f8badc08))
+
 ## [1.2.1](https://github.com/uniespacos/app/compare/v1.2.0...v1.2.1) (2026-03-09)
 
 
