@@ -163,7 +163,6 @@ jobs:
             APP_IMAGE=ghcr.io/${{ github.repository }}/app:${{ steps.meta_app.outputs.version }}
   deploy_production:
     name: 🚀 Deploy to Production
-    if: github.ref == 'refs/heads/main'
     needs: build-and-push
     runs-on: ubuntu-latest
     environment:
