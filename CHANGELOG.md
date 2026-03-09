@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/uniespacos/app/compare/v1.2.0...v1.2.1) (2026-03-09)
+
+
+### Bug Fixes
+
+* **ci:** Restructure CI/CD for production with Caddy configuration and scripts ([#217](https://github.com/uniespacos/app/issues/217)) ([d07a85e](https://github.com/uniespacos/app/commit/d07a85e6fa12cccb4008210a11cfff12c6a780ed))
+
 ## [1.2.0](https://github.com/uniespacos/app/compare/v1.1.0...v1.2.0) (2026-03-09)
 
 
