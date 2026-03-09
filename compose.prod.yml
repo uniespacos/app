@@ -11,9 +11,9 @@ services:
             - "443:443/udp"
         volumes:
             - uniespacos-storage-production:/var/www/storage:ro
-            - ./docker/production/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-            - ${PATH_TO_PRODUCTION_ENVIRONMENT_FOLDER}/caddy/uesb2025fullchain.pem:/etc/caddy/certs/uesb2025fullchain.pem:ro
-            - ${PATH_TO_PRODUCTION_ENVIRONMENT_FOLDER}/caddy/uesb2025privkey.pem:/etc/caddy/certs/uesb2025privkey.pem:ro
+            - ${PATH_TO_PRODUCTION_ENVIRONMENT_FOLDER}/Caddyfile:/etc/caddy/Caddyfile:ro
+            - ${PATH_TO_PRODUCTION_ENVIRONMENT_FOLDER}/uesb2025fullchain.pem:/etc/caddy/certs/uesb2025fullchain.pem:ro
+            - ${PATH_TO_PRODUCTION_ENVIRONMENT_FOLDER}/uesb2025privkey.pem:/etc/caddy/certs/uesb2025privkey.pem:ro
             - caddy_data_production:/data
             - caddy_config_production:/config
         networks:

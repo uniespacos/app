@@ -26,7 +26,7 @@ yarn-error.log
 composer.lock
 package-lock.json
 *.sql
-/docker/production/nginx/*.pem
+/docker/production/caddy/certs/*.pem
 .secrets
 .act.secrets
 
