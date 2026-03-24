@@ -7,10 +7,6 @@
 /storage/*.key
 /storage/pail
 /vendor
-.env
-.env.dev
-.env.backup
-.env.production
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
@@ -35,7 +31,8 @@ gha-creds-*.json
 
 .gemini/
 
-
 # Mailpit
+docker/development/mailpit/*
 
-docker/development/mailpit/data
+# Environment variables
+.env
