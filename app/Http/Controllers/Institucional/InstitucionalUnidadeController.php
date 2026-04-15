@@ -1,124 +1,112 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\StoreUnidadeRequest;
+use App\Http\Requests\UpdateUnidadeRequest;
 use App\Models\Unidade;
-use Illuminate\Http\Request;
+use App\Services\UnidadeService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class InstitucionalUnidadeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $user = Auth::user();
-        $instituicao_id = $user->setor->unidade->instituicao_id;
+    public function __construct(
+        protected UnidadeService $service,
+    ) {}
 
-        $unidades = Unidade::whereInstituicaoId($instituicao_id)->with(['instituicao'])->latest()->paginate(10);
+    /**
+     * Display a paginated listing of units scoped to the authenticated user's institution.
+     */
+    public function index(): Response
+    {
+        $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
 
         return Inertia::render('Administrativo/Unidades/Unidades', [
-            'unidades' => $unidades,
+            'unidades' => $this->service->paginate($instituicaoId, 10),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new unit.
      */
-    public function create()
+    public function create(): Response
     {
         $user = Auth::user();
-        $instituicao = $user->setor->unidade->instituicao;
 
         return Inertia::render('Administrativo/Unidades/CadastrarUnidade', [
-            'instituicao' => $instituicao,
+            'instituicao' => $user->setor->unidade->instituicao,
         ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created unit in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUnidadeRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'sigla' => 'required|string|max:10',
-            'instituicao_id' => 'required|exists:instituicaos,id',
-        ]);
         try {
-            Unidade::create($validated);
+            $this->service->store($request->validated());
 
-            return redirect()->route('institucional.unidades.index')->with('success', 'Unidade criada com sucesso.');
+            return redirect()->route('institucional.unidades.index')
+                ->with('success', 'Unidade criada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao criar o unidade: '.$th->getMessage());
+            return redirect()->route('institucional.unidades.index')
+                ->with('error', 'Erro ao criar a unidade: '.$th->getMessage());
         }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified unit.
      */
-    public function edit(Unidade $unidade) // Corrigido o nome do parâmetro para $instituico
+    public function edit(Unidade $unidade): Response
     {
         $user = Auth::user();
-        $instituicao = $user->setor->unidade->instituicao;
 
         return Inertia::render('Administrativo/Unidades/EditarUnidade', [
-            'instituicao' => $instituicao,
+            'instituicao' => $user->setor->unidade->instituicao,
             'unidade' => $unidade,
         ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified unit in storage.
      */
-    public function update(Request $request, Unidade $unidade)
+    public function update(UpdateUnidadeRequest $request, Unidade $unidade): RedirectResponse
     {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'sigla' => 'required|string|max:10',
-            'instituicao_id' => 'required|exists:instituicaos,id',
-        ]);
-
         try {
-            $unidade->update([
-                'nome' => $validated['nome'],
-                'sigla' => $validated['sigla'],
-                'instituicao_id' => $validated['instituicao_id'],
-            ]);
+            $this->service->update($unidade, $request->validated());
 
-            $unidade->save();
-
-            return redirect()->route('institucional.unidades.index')->with('success', 'Unidade atualizada com sucesso.');
+            return redirect()->route('institucional.unidades.index')
+                ->with('success', 'Unidade atualizada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao atualizar a unidade: '.$th->getMessage());
+            return redirect()->route('institucional.unidades.index')
+                ->with('error', 'Erro ao atualizar a unidade: '.$th->getMessage());
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified unit from storage.
+     * Requires password confirmation from the authenticated user.
      */
-    public function destroy(Request $request, Unidade $unidade)
+    public function destroy(ConfirmPasswordRequest $request, Unidade $unidade): RedirectResponse
     {
-        $request->validate([
-            'password' => 'required',
-        ]);
-
-        $user = Auth::user(); // Obtém o usuário logado
-
-        // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
+
         try {
-            $unidade->delete();
+            $this->service->delete($unidade);
 
             return back()->with('success', 'Unidade excluída com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')->with('error', 'Erro ao deletar o unidade: '.$th->getMessage());
+            return redirect()->route('institucional.unidades.index')
+                ->with('error', 'Erro ao deletar a unidade: '.$th->getMessage());
         }
     }
 }

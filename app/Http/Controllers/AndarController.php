@@ -1,94 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAndarRequest;
 use App\Models\Andar;
-use Exception;
+use App\Services\AndarService;
 use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class AndarController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    public function __construct(
+        protected AndarService $service,
+    ) {}
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created floor in storage.
      */
-    public function create()
+    public function store(StoreAndarRequest $request): RedirectResponse
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $messages = [
-            'nome' => 'Erro: Nome ja cadastrado ou campo em branco!',
-            'tipo_acesso' => 'Campo "Tipo de acesso" não pode vir em branco',
-        ];
         try {
-            $form_validado = $request->validate([
-                'nome' => ['required', 'string'],
-                'tipo_acesso' => 'required',
-                'modulo_id' => 'required',
-            ], $messages);
-            $novo_andar = Andar::create([
-                'nome' => $form_validado['nome'], // Normaliza nome antes de cadastrar
-                'nome_normalizado' => Andar::normalizarNome($form_validado['nome']), // Normaliza nome antes de cadastrar
-                'tipo_acesso' => $form_validado['tipo_acesso'],
-                'modulo_id' => $form_validado['modulo_id'],
-            ]);
-            $id_novo_andar = $novo_andar->id;
+            $andar = $this->service->store($request->validated());
 
-            return redirect()->back()->withInput(compact('novo_andar', 'id_novo_andar'))->with('success', 'Andar cadastrado com sucesso!');
+            return redirect()->back()
+                ->withInput(['novo_andar' => $andar, 'id_novo_andar' => $andar->id])
+                ->with('success', 'Andar cadastrado com sucesso!');
         } catch (QueryException $error) {
-            if ($error->errorInfo[0] == '23505') {
-                return redirect()->back()->with('error', 'Ja existe andar cadastrado');
+            if ($error->errorInfo[0] === '23505') {
+                return redirect()->back()->with('error', 'Já existe andar cadastrado.');
             }
 
-            return redirect()->back()->with('error', "Erro ao cadastrar o andar: {$error->getMessage()} ");
-        } catch (Exception $error) {
-            return redirect()->back()->with('error', "Erro ao cadastrar o andar: {$error->getMessage()} ");
+            return redirect()->back()->with('error', "Erro ao cadastrar o andar: {$error->getMessage()}");
+        } catch (\Exception $error) {
+            return redirect()->back()->with('error', "Erro ao cadastrar o andar: {$error->getMessage()}");
         }
     }
 
     /**
-     * Display the specified resource.
+     * Display a listing of floors.
      */
-    public function show(Andar $andar)
-    {
-        //
-    }
+    public function index(): void {}
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for creating a new floor.
      */
-    public function edit(Andar $andar)
-    {
-        //
-    }
+    public function create(): void {}
 
     /**
-     * Update the specified resource in storage.
+     * Display the specified floor.
      */
-    public function update(Request $request, Andar $andar)
-    {
-        //
-    }
+    public function show(Andar $andar): void {}
 
     /**
-     * Remove the specified resource from storage.
+     * Show the form for editing the specified floor.
      */
-    public function destroy(Andar $andar)
-    {
-        //
-    }
+    public function edit(Andar $andar): void {}
+
+    /**
+     * Update the specified floor in storage.
+     */
+    public function update(StoreAndarRequest $request, Andar $andar): void {}
+
+    /**
+     * Remove the specified floor from storage.
+     */
+    public function destroy(Andar $andar): void {}
 }

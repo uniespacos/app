@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeleteProfileRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\Instituicao;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +25,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
-            'instituicaos' => \App\Models\Instituicao::with(['setors.unidade'])->get(),
+            'instituicaos' => Instituicao::with(['setors.unidade'])->get(),
         ]);
     }
 
@@ -50,14 +54,10 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Delete the user's account after password confirmation.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(DeleteProfileRequest $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
 
         Auth::logout();

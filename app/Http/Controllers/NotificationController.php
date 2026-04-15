@@ -1,31 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function index()
+    /**
+     * Returns the 20 most recent notifications for the authenticated user.
+     */
+    public function index(): JsonResponse
     {
         $user = Auth::user();
-
-        // Limite para um número razoável de notificações, ex: as 20 mais recentes
         $notifications = $user->notifications()->latest()->limit(20)->get();
 
         return response()->json($notifications);
     }
 
-    public function markAsRead(Request $request)
+    /**
+     * Marks notifications as read — all unread or only the specified IDs.
+     */
+    public function markAsRead(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        // Opcional: Marcar todas ou apenas as selecionadas
         if ($request->has('ids')) {
             $user->unreadNotifications->whereIn('id', $request->input('ids'))->markAsRead();
         } else {
-            // Marcar todas as não lidas como lidas
             $user->unreadNotifications->markAsRead();
         }
 
