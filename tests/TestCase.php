@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use App\Models\PermissionType;
 use Database\Seeders\PermissionTypeSeeder;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -19,7 +22,7 @@ abstract class TestCase extends BaseTestCase
             $this->withoutVite();
         }
 
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+        $this->withoutMiddleware(VerifyCsrfToken::class);
 
         // Se a tabela permission_types estiver vazia, roda o seeder.
         // Isso garante que os dados essenciais (como permission_type_id = 3) existam.

@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Database\Factories\AndarFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Andar extends Model
 {
-    /** @use HasFactory<\Database\Factories\AndarFactory> */
+    /** @use HasFactory<AndarFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -17,21 +22,33 @@ class Andar extends Model
     ];
 
     /**
-     * Atributos que vão ser feito o cast
-     *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'tipo_acesso' => 'array',
     ];
 
-    public function modulo()
+    /**
+     * @return BelongsTo<Modulo, $this>
+     */
+    public function modulo(): BelongsTo
     {
         return $this->belongsTo(Modulo::class);
     }
 
-    public function espacos()
+    /**
+     * @return HasMany<Espaco, $this>
+     */
+    public function espacos(): HasMany
     {
         return $this->hasMany(Espaco::class);
+    }
+
+    /**
+     * Normalizes a floor name for uniqueness comparison (lowercase + trim).
+     */
+    public static function normalizarNome(string $nome): string
+    {
+        return mb_strtolower(trim($nome));
     }
 }

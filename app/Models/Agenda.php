@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Agenda extends Model
 {
@@ -15,17 +19,26 @@ class Agenda extends Model
         'user_id',
     ];
 
-    public function espaco()
+    /**
+     * @return BelongsTo<Espaco, $this>
+     */
+    public function espaco(): BelongsTo
     {
         return $this->belongsTo(Espaco::class);
     }
 
-    public function horarios()
+    /**
+     * @return HasMany<Horario, $this>
+     */
+    public function horarios(): HasMany
     {
         return $this->hasMany(Horario::class);
     }
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

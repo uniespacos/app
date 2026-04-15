@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Database\Factories\InstituicaoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Instituicao extends Model
 {
-    /** @use HasFactory<\Database\Factories\InstituicaoFactory> */
+    /** @use HasFactory<InstituicaoFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -16,20 +21,26 @@ class Instituicao extends Model
         'endereco',
     ];
 
-    public function unidades()
+    /**
+     * @return HasMany<Unidade, $this>
+     */
+    public function unidades(): HasMany
     {
         return $this->hasMany(Unidade::class);
     }
 
-    public function setors()
+    /**
+     * @return HasManyThrough<Setor, Unidade, $this>
+     */
+    public function setors(): HasManyThrough
     {
         return $this->hasManyThrough(
             Setor::class,
             Unidade::class,
-            'instituicao_id',   // Foreign key on unidades table
-            'unidade_id',      // Foreign key on setors table...
-            'id',               // Local key on instituicaos table...
-            'id'          // Local key on unidades table...
+            'instituicao_id',
+            'unidade_id',
+            'id',
+            'id'
         );
     }
 }

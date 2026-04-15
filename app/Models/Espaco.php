@@ -1,14 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Database\Factories\EspacoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
 class Espaco extends Model
 {
-    /** @use HasFactory<\Database\Factories\EspacoFactory> */
+    /** @use HasFactory<EspacoFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -22,36 +28,52 @@ class Espaco extends Model
     ];
 
     /**
-     * Casting para array os urls das imagens
-     *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'imagens' => 'array',
     ];
 
-    protected $appends = ['is_favorited_by_user']; // Adicione este atributo
+    /**
+     * @var list<string>
+     */
+    protected $appends = ['is_favorited_by_user'];
 
-    public function agendas()
+    /**
+     * @return HasMany<Agenda, $this>
+     */
+    public function agendas(): HasMany
     {
         return $this->hasMany(Agenda::class);
     }
 
-    public function andar()
+    /**
+     * @return BelongsTo<Andar, $this>
+     */
+    public function andar(): BelongsTo
     {
         return $this->belongsTo(Andar::class);
     }
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function favoritadoPor()
+    /**
+     * @return BelongsToMany<User, $this>
+     */
+    public function favoritadoPor(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'espaco_user', 'espaco_id', 'user_id');
     }
 
+    /**
+     * Returns whether the currently authenticated user has favorited this space.
+     */
     public function getIsFavoritedByUserAttribute(): bool
     {
         $user = Auth::user();
@@ -60,7 +82,6 @@ class Espaco extends Model
             return false;
         }
 
-        // Essa linha é a crucial e deve estar como abaixo
         return $user->favoritos()->where('espaco_id', $this->id)->exists();
     }
 }

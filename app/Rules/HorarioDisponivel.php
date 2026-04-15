@@ -1,29 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
-// Implementamos a ValidationRule (padrão Laravel 11) e a DataAwareRule (para acesso aos dados)
 class HorarioDisponivel implements DataAwareRule, ValidationRule
 {
     /**
-     * Todos os dados da requisição.
-     *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
-     * Define os dados da requisição para a regra.
-     *
-     * @param  array  $data
-     * @return $this
+     * Sets the full request data, called by Laravel before validation runs.
      */
-    public function setData($data)
+    public function setData(array $data): static
     {
         $this->data = $data;
 
@@ -31,31 +28,24 @@ class HorarioDisponivel implements DataAwareRule, ValidationRule
     }
 
     /**
-     * Executa a regra de validação.
-     * Este é o método padrão do Laravel 11.
+     * Run the validation rule.
+     * Checks whether the requested time slot is already taken (situacao = deferida).
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string): PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // A lógica interna é exatamente a mesma da abordagem __invoke.
         $index = explode('.', $attribute)[1];
-        $horarioAtual = $this->data['horarios_solicitados'][$index];
+        $horario = $this->data['horarios_solicitados'][$index];
 
-        $data = $horarioAtual['data'];
-        $horario_inicio = $horarioAtual['horario_inicio'];
-        $agenda_id = $horarioAtual['agenda_id'];
-
-        // Consulta para verificar o conflito.
-        $conflito = DB::table('horarios')
-            ->where('horarios.data', $data)
-            ->where('horarios.horario_inicio', $horario_inicio)
-            ->where('horarios.agenda_id', $agenda_id)
-            ->whereIn('horarios.situacao', ['deferida'])
+        $conflict = DB::table('horarios')
+            ->where('data', $horario['data'])
+            ->where('horario_inicio', $horario['horario_inicio'])
+            ->where('agenda_id', $horario['agenda_id'])
+            ->where('situacao', 'deferida')
             ->exists();
 
-        // Se houver um conflito, chamamos a função $fail com a mensagem de erro.
-        if ($conflito) {
+        if ($conflict) {
             $fail('O horário selecionado já está reservado ou em análise.');
         }
     }
