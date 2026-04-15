@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,7 +14,7 @@ class StoreModuloRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->permission_type_id === 1;
+        return Auth::user()?->permission_type_id === 1;
     }
 
     /**
@@ -21,41 +23,16 @@ class StoreModuloRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Dados básicos do módulo
-            'nome' => [
-                'required',
-                'string',
-                'max:255',
-                'min:2',
-            ],
-            'unidade_id' => [
-                'required',
-                'integer',
-                'exists:unidades,id',
-            ],
-
-            // Validação dos andares
-            'andares' => [
-                'required',
-                'array',
-                'min:1',
-                'max:12', // Máximo: 2 subsolos + térreo + 10 andares superiores
-            ],
+            'nome' => ['required', 'string', 'min:2', 'max:255'],
+            'unidade_id' => ['required', 'integer', 'exists:unidades,id'],
+            'andares' => ['required', 'array', 'min:1', 'max:12'],
             'andares.*.nome' => [
                 'required',
                 'string',
                 'in:subsolo-2,subsolo-1,terreo,andar-1,andar-2,andar-3,andar-4,andar-5,andar-6,andar-7,andar-8,andar-9,andar-10',
             ],
-            'andares.*.tipo_acesso' => [
-                'required',
-                'array',
-                'min:1',
-            ],
-            'andares.*.tipo_acesso.*' => [
-                'required',
-                'string',
-                'in:terreo,escada,elevador,rampa',
-            ],
+            'andares.*.tipo_acesso' => ['required', 'array', 'min:1'],
+            'andares.*.tipo_acesso.*' => ['required', 'string', 'in:terreo,escada,elevador,rampa'],
         ];
     }
 
@@ -65,26 +42,20 @@ class StoreModuloRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // Mensagens para dados básicos
             'nome.required' => 'O nome do módulo é obrigatório.',
             'nome.string' => 'O nome do módulo deve ser um texto válido.',
             'nome.max' => 'O nome do módulo não pode ter mais de 255 caracteres.',
             'nome.min' => 'O nome do módulo deve ter pelo menos 2 caracteres.',
-
             'unidade_id.required' => 'A unidade é obrigatória.',
             'unidade_id.integer' => 'A unidade deve ser um número válido.',
             'unidade_id.exists' => 'A unidade selecionada não existe.',
-
-            // Mensagens para andares
             'andares.required' => 'Pelo menos um andar deve ser configurado.',
             'andares.array' => 'Os andares devem ser uma lista válida.',
             'andares.min' => 'Pelo menos um andar deve ser configurado.',
             'andares.max' => 'Máximo de 12 andares permitidos (2 subsolos + térreo + 10 andares superiores).',
-
             'andares.*.nome.required' => 'O nome do andar é obrigatório.',
             'andares.*.nome.string' => 'O nome do andar deve ser um texto válido.',
             'andares.*.nome.in' => 'O andar selecionado não é válido.',
-
             'andares.*.tipo_acesso.required' => 'Pelo menos um tipo de acesso deve ser selecionado.',
             'andares.*.tipo_acesso.array' => 'Os tipos de acesso devem ser uma lista válida.',
             'andares.*.tipo_acesso.min' => 'Pelo menos um tipo de acesso deve ser selecionado.',
@@ -109,7 +80,7 @@ class StoreModuloRequest extends FormRequest
     }
 
     /**
-     * Configure the validator instance.
+     * Configure the validator instance with additional cross-field rules.
      */
     public function withValidator($validator): void
     {
@@ -122,7 +93,7 @@ class StoreModuloRequest extends FormRequest
     }
 
     /**
-     * Valida se a estrutura dos andares está correta.
+     * Validates that the floor sequence has no gaps between levels.
      */
     protected function validateAndaresStructure($validator): void
     {
@@ -132,26 +103,16 @@ class StoreModuloRequest extends FormRequest
             return;
         }
 
-        // Mapear nomes para níveis numéricos
         $nivelMap = [
-            'subsolo-2' => -2,
-            'subsolo-1' => -1,
-            'terreo' => 0,
-            'andar-1' => 1,
-            'andar-2' => 2,
-            'andar-3' => 3,
-            'andar-4' => 4,
-            'andar-5' => 5,
-            'andar-6' => 6,
-            'andar-7' => 7,
-            'andar-8' => 8,
-            'andar-9' => 9,
-            'andar-10' => 10,
+            'subsolo-2' => -2, 'subsolo-1' => -1, 'terreo' => 0,
+            'andar-1' => 1, 'andar-2' => 2, 'andar-3' => 3, 'andar-4' => 4,
+            'andar-5' => 5, 'andar-6' => 6, 'andar-7' => 7, 'andar-8' => 8,
+            'andar-9' => 9, 'andar-10' => 10,
         ];
 
         $niveis = [];
         foreach ($andares as $andar) {
-            if (isset($andar['nome']) && isset($nivelMap[$andar['nome']])) {
+            if (isset($andar['nome'], $nivelMap[$andar['nome']])) {
                 $niveis[] = $nivelMap[$andar['nome']];
             }
         }
@@ -162,14 +123,10 @@ class StoreModuloRequest extends FormRequest
 
         sort($niveis);
 
-        // Verificar se há gaps na sequência
         for ($i = 1; $i < count($niveis); $i++) {
-            $atual = $niveis[$i];
-            $anterior = $niveis[$i - 1];
-
-            if ($atual - $anterior > 1) {
-                $nomeAnterior = array_search($anterior, $nivelMap);
-                $nomeAtual = array_search($atual, $nivelMap);
+            if ($niveis[$i] - $niveis[$i - 1] > 1) {
+                $nomeAnterior = array_search($niveis[$i - 1], $nivelMap);
+                $nomeAtual = array_search($niveis[$i], $nivelMap);
 
                 $validator->errors()->add(
                     'andares',
@@ -181,26 +138,24 @@ class StoreModuloRequest extends FormRequest
     }
 
     /**
-     * Valida se não há andares duplicados.
+     * Validates that no floor name is duplicated.
      */
     protected function validateAndaresUniqueness($validator): void
     {
         $andares = $this->input('andares', []);
         $nomes = array_column($andares, 'nome');
-        $nomesUnicos = array_unique($nomes);
 
-        if (count($nomes) !== count($nomesUnicos)) {
+        if (count($nomes) !== count(array_unique($nomes))) {
             $validator->errors()->add('andares', 'Há andares duplicados. Cada andar deve ser único.');
         }
     }
 
     /**
-     * Valida se o térreo existe (obrigatório).
+     * Validates that the ground floor (térreo) is always present.
      */
     protected function validateTerreoExists($validator): void
     {
-        $andares = $this->input('andares', []);
-        $nomes = array_column($andares, 'nome');
+        $nomes = array_column($this->input('andares', []), 'nome');
 
         if (! in_array('terreo', $nomes)) {
             $validator->errors()->add('andares', 'O térreo é obrigatório e deve estar presente.');
@@ -208,77 +163,54 @@ class StoreModuloRequest extends FormRequest
     }
 
     /**
-     * Valida a integridade da sequência (regras de dependência).
+     * Validates that each upper floor has its prerequisite floor present.
      */
     protected function validateSequenceIntegrity($validator): void
     {
-        $andares = $this->input('andares', []);
-        $nomes = array_column($andares, 'nome');
+        $nomes = array_column($this->input('andares', []), 'nome');
 
-        // Verificar se andares superiores têm seus pré-requisitos
-        $andaresSuperiores = ['andar-1', 'andar-2', 'andar-3', 'andar-4', 'andar-5', 'andar-6', 'andar-7', 'andar-8', 'andar-9', 'andar-10'];
+        foreach (['andar-1', 'andar-2', 'andar-3', 'andar-4', 'andar-5', 'andar-6', 'andar-7', 'andar-8', 'andar-9', 'andar-10'] as $andar) {
+            if (! in_array($andar, $nomes)) {
+                continue;
+            }
 
-        foreach ($andaresSuperiores as $andar) {
-            if (in_array($andar, $nomes)) {
-                $nivel = (int) str_replace('andar-', '', $andar);
+            $nivel = (int) str_replace('andar-', '', $andar);
+            $requisito = $nivel === 1 ? 'terreo' : 'andar-'.($nivel - 1);
 
-                // Verificar se tem o andar inferior
-                if ($nivel === 1) {
-                    // 1º andar precisa do térreo
-                    if (! in_array('terreo', $nomes)) {
-                        $validator->errors()->add('andares', 'Para ter o 1º andar, é necessário ter o térreo.');
-                    }
-                } else {
-                    // Outros andares precisam do andar imediatamente inferior
-                    $andarInferior = 'andar-'.($nivel - 1);
-                    if (! in_array($andarInferior, $nomes)) {
-                        $validator->errors()->add('andares', "Para ter o {$nivel}º andar, é necessário ter o ".($nivel - 1).'º andar.');
-                    }
-                }
+            if (! in_array($requisito, $nomes)) {
+                $label = $nivel === 1 ? 'o térreo' : "o {$requisito}º andar";
+                $validator->errors()->add('andares', "Para ter o {$nivel}º andar, é necessário ter {$label}.");
             }
         }
 
-        // Verificar subsolos
         if (in_array('subsolo-2', $nomes) && ! in_array('subsolo-1', $nomes)) {
             $validator->errors()->add('andares', 'Para ter o 2º subsolo, é necessário ter o subsolo.');
         }
     }
 
     /**
-     * Formatar nome do andar para exibição.
+     * Formats a floor key into a human-readable label.
      */
     protected function formatAndarName(string $nome): string
     {
-        $formatMap = [
-            'subsolo-2' => '2º Subsolo',
-            'subsolo-1' => 'Subsolo',
-            'terreo' => 'Térreo',
-            'andar-1' => '1º Andar',
-            'andar-2' => '2º Andar',
-            'andar-3' => '3º Andar',
-            'andar-4' => '4º Andar',
-            'andar-5' => '5º Andar',
-            'andar-6' => '6º Andar',
-            'andar-7' => '7º Andar',
-            'andar-8' => '8º Andar',
-            'andar-9' => '9º Andar',
+        return [
+            'subsolo-2' => '2º Subsolo', 'subsolo-1' => 'Subsolo', 'terreo' => 'Térreo',
+            'andar-1' => '1º Andar', 'andar-2' => '2º Andar', 'andar-3' => '3º Andar',
+            'andar-4' => '4º Andar', 'andar-5' => '5º Andar', 'andar-6' => '6º Andar',
+            'andar-7' => '7º Andar', 'andar-8' => '8º Andar', 'andar-9' => '9º Andar',
             'andar-10' => '10º Andar',
-        ];
-
-        return $formatMap[$nome] ?? $nome;
+        ][$nome] ?? $nome;
     }
 
     /**
-     * Preparar dados para validação (transformar se necessário).
+     * Prepare the data for validation.
      */
     protected function prepareForValidation(): void
     {
-        // Garantir que andares seja sempre um array
         if (! $this->has('andares') || ! is_array($this->input('andares'))) {
             $this->merge(['andares' => []]);
         }
 
-        // Limpar dados vazios dos tipos de acesso
         $andares = $this->input('andares', []);
         foreach ($andares as $index => $andar) {
             if (isset($andar['tipo_acesso']) && is_array($andar['tipo_acesso'])) {

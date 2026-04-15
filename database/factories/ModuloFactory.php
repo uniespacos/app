@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Models\Modulo;
 use App\Models\Unidade;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Modulo>
+ * @extends Factory<Modulo>
  */
 class ModuloFactory extends Factory
 {

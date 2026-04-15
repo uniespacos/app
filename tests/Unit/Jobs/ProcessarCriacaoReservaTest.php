@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\ProcessarCriacaoReserva;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
@@ -90,7 +93,7 @@ class ProcessarCriacaoReservaTest extends TestCase
 
         // Assert that ValidateReservationConflictsJob was dispatched
         Bus::assertDispatched(function ($job) use ($mockReserva) {
-            return $job instanceof \App\Jobs\ValidateReservationConflictsJob && $job->reserva->id === $mockReserva->id;
+            return $job instanceof ValidateReservationConflictsJob && $job->reserva->id === $mockReserva->id;
         });
     }
 
@@ -187,7 +190,7 @@ class ProcessarCriacaoReservaTest extends TestCase
         $job->handle();
 
         Notification::assertSentTo($user, ReservationCreatedNotification::class);
-        Bus::assertDispatched(fn ($job) => $job instanceof \App\Jobs\ValidateReservationConflictsJob);
+        Bus::assertDispatched(fn ($job) => $job instanceof ValidateReservationConflictsJob);
     }
 
     /**
@@ -264,6 +267,6 @@ class ProcessarCriacaoReservaTest extends TestCase
         Notification::assertSentTo($manager1, NewReservationNotification::class);
         Notification::assertSentTo($manager2, NewReservationNotification::class);
         Notification::assertSentTo($user, ReservationCreatedNotification::class);
-        Bus::assertDispatched(fn ($job) => $job instanceof \App\Jobs\ValidateReservationConflictsJob);
+        Bus::assertDispatched(fn ($job) => $job instanceof ValidateReservationConflictsJob);
     }
 }

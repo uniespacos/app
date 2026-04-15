@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\Reserva;
@@ -13,7 +15,7 @@ class NewReservationNotification extends BaseNotification
     {
         parent::__construct(
             'Nova Solicitação de Reserva',
-            "Uma nova solicitação de reserva para '{$reserva->nome}' foi criada por '{$reserva->user->name}'.",
+            "Uma nova solicitação de reserva para '{$reserva->titulo}' foi criada por '{$reserva->user->name}'.",
             route('gestor.reservas.show', $reserva->id)
         );
         $this->reserva = $reserva;
@@ -25,13 +27,7 @@ class NewReservationNotification extends BaseNotification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nova Solicitação de Reserva: '.$this->reserva->nome)
+            ->subject('Nova Solicitação de Reserva: '.$this->reserva->titulo)
             ->view('emails.reservations.new_reservation', ['reserva' => $this->reserva, 'url' => $this->url]);
     }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
 }

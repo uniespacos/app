@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -21,10 +23,7 @@ class MakeServiceCommand extends Command
      */
     protected $description = 'Cria uma nova classe de serviço';
 
-    /**
-     * @var Filesystem
-     */
-    protected $files;
+    protected Filesystem $files;
 
     public function __construct(Filesystem $files)
     {
@@ -35,7 +34,7 @@ class MakeServiceCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $name = $this->argument('name');
         $path = app_path("Services/{$name}.php");
@@ -48,16 +47,15 @@ class MakeServiceCommand extends Command
         if ($this->files->exists($path)) {
             $this->error('Serviço já existe!');
 
-            return 1;
+            return self::FAILURE;
         }
 
-        $stub = $this->getStub();
-        $stub = str_replace('{{className}}', $name, $stub);
+        $stub = str_replace('{{className}}', $name, $this->getStub());
 
         $this->files->put($path, $stub);
         $this->info('Serviço criado com sucesso!');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     protected function getStub(): string
@@ -65,11 +63,13 @@ class MakeServiceCommand extends Command
         return <<<EOT
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 class {{className}}
 {
-    // Sua lógica de negócio aqui...
+    //
 }
 EOT;
     }

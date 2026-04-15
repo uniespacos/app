@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\Reserva;
@@ -40,10 +42,4 @@ class ReservationEvaluatedNotification extends BaseNotification
                 'url' => $this->url,
             ]);
     }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
 }

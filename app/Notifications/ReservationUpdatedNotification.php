@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\Reserva;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class ReservationUpdatedNotification extends BaseNotification
 {
@@ -18,9 +21,12 @@ class ReservationUpdatedNotification extends BaseNotification
         $this->reserva = $reserva;
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new \Illuminate\Notifications\Messages\MailMessage)
+        return (new MailMessage)
             ->subject('Reserva Atualizada: '.$this->reserva->titulo)
             ->view('emails.reservations.reservation_updated', ['reserva' => $this->reserva, 'url' => $this->url]);
     }

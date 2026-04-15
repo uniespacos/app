@@ -1,130 +1,89 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use App\Models\Andar;
 use App\Models\Espaco;
-use App\Models\Modulo;
-use App\Models\Unidade;
-use Carbon\Carbon; // Importar Carbon
-use Illuminate\Http\Request; // Alterado para a classe correta
+use App\Services\EspacoService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class EspacoController extends Controller
 {
+    public function __construct(
+        protected EspacoService $service,
+    ) {}
+
     /**
-     * Exibe uma lista dos recursos.
+     * Display the public listing of spaces with search and filter support.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $user = Auth::user();
         $filters = $request->only(['search', 'unidade', 'modulo', 'andar', 'capacidade']);
-        $instituicao_id = $user->setor->unidade->instituicao_id;
+        $instituicaoId = $user->setor->unidade->instituicao_id;
 
-        $espacos = Espaco::query()
-            ->whereHas('andar.modulo.unidade', function ($query) use ($instituicao_id) {
-                $query->where('instituicao_id', $instituicao_id);
-            })
-            ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('nome', 'like', '%'.$search.'%')
-                        ->orWhereHas('andar', fn ($q) => $q->where('nome', 'like', '%'.$search.'%'))
-                        ->orWhereHas('andar.modulo', fn ($q) => $q->where('nome', 'like', '%'.$search.'%'));
-                });
-            })
-            ->when($filters['unidade'] ?? null, fn ($q, $unidade) => $q->whereHas('andar.modulo', fn ($q) => $q->where('unidade_id', $unidade)))
-            ->when($filters['modulo'] ?? null, fn ($q, $modulo) => $q->whereHas('andar', fn ($q) => $q->where('modulo_id', $modulo)))
-            ->when($filters['andar'] ?? null, fn ($q, $andar) => $q->where('andar_id', $andar))
-            ->when($filters['capacidade'] ?? null, fn ($q, $capacidade) => $q->where('capacidade_pessoas', '>=', $capacidade))
-            ->with([
-                'andar:id,nome,modulo_id',
-                'andar.modulo:id,nome,unidade_id',
-                'andar.modulo.unidade:id,sigla',
-            ])
-            ->latest('created_at')
-            ->paginate(6)
-            ->withQueryString();
+        $filterOptions = $this->service->getFilterOptions($instituicaoId);
 
-        $unidades = Unidade::where('instituicao_id', $instituicao_id)->get(['id', 'nome', 'sigla']);
-        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'unidade_id']);
-        $andares = Andar::whereHas('modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->get(['id', 'nome', 'modulo_id']);
-        $capacidadeEspacos = Espaco::query()
-            ->whereHas('andar.modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))
-            ->select('capacidade_pessoas')
-            ->distinct()
-            ->orderBy('capacidade_pessoas')
-            ->pluck('capacidade_pessoas');
-
-        return Inertia::render('Espacos/EspacosPage', compact('espacos', 'andares', 'modulos', 'unidades', 'filters', 'user', 'capacidadeEspacos'));
+        return Inertia::render('Espacos/EspacosPage', [
+            'espacos' => $this->service->getPaginatedForPublic($instituicaoId, $filters)->withQueryString(),
+            'unidades' => $filterOptions['unidades'],
+            'modulos' => $filterOptions['modulos'],
+            'andares' => $filterOptions['andares'],
+            'capacidadeEspacos' => $filterOptions['capacidades'],
+            'filters' => $filters,
+            'user' => $user,
+        ]);
     }
 
     /**
-     * Exibe o recurso especificado com horários filtrados por semana.
+     * Display the specified space with its week-filtered schedule.
      */
-    public function show(Request $request, Espaco $espaco)
+    public function show(Request $request, Espaco $espaco): Response|RedirectResponse
     {
-        // Lógica para carregar horários apenas da semana selecionada
-        $dataReferencia = Carbon::parse($request->input('semana', 'today'))->locale('pt_BR');
-        $inicioSemana = $dataReferencia->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
-        $fimSemana = $dataReferencia->copy()->endOfWeek(Carbon::SUNDAY)->format('Y-m-d');
-
-        $espaco->load([
-            'andar.modulo.unidade.instituicao',
-            'agendas' => function ($query) use ($inicioSemana, $fimSemana) {
-                $query->with([
-                    'user.setor',
-                    'horarios' => function ($q) use ($inicioSemana, $fimSemana) {
-                        $q->where('situacao', 'deferida')
-                            ->whereBetween('data', [$inicioSemana, $fimSemana])
-                            ->with(['reserva.user', 'avaliador']);
-                    },
-                ]);
-            },
-        ]);
+        $data = $this->service->getWithWeekSchedule($espaco, $request->input('semana', 'today'));
 
         if ($espaco->agendas()->whereNotNull('user_id')->count() === 0) {
-            return redirect()->route('espacos.index')->with('error', 'Este espaço ainda não possui um gestor definido.');
+            return redirect()->route('espacos.index')
+                ->with('error', 'Este espaço ainda não possui um gestor definido.');
         }
 
-        return Inertia::render('Espacos/VisualizarEspacoPage', [
-            'espaco' => $espaco,
-            // Passa as informações da semana para o frontend
-            'semana' => [
-                'inicio' => $inicioSemana,
-                'fim' => $fimSemana,
-                'referencia' => $dataReferencia->format('Y-m-d'),
-            ],
-        ]);
+        return Inertia::render('Espacos/VisualizarEspacoPage', $data);
     }
 
-    // ... (métodos favoritar e desfavoritar permanecem iguais)
-    public function favoritar(Espaco $espaco)
+    /**
+     * Add the specified space to the authenticated user's favorites.
+     */
+    public function favoritar(Espaco $espaco): RedirectResponse
     {
-        Auth::user()->favoritos()->attach($espaco->id);
+        $this->service->addFavorite(Auth::user(), $espaco);
 
         return redirect()->back()->with('success', 'Espaço adicionado aos favoritos!');
     }
 
-    public function desfavoritar(Espaco $espaco)
+    /**
+     * Remove the specified space from the authenticated user's favorites.
+     */
+    public function desfavoritar(Espaco $espaco): RedirectResponse
     {
-        Auth::user()->favoritos()->detach($espaco->id);
+        $this->service->removeFavorite(Auth::user(), $espaco);
 
         return redirect()->back()->with('success', 'Espaço removido dos favoritos!');
     }
 
-    public function meusFavoritos()
+    /**
+     * Display the authenticated user's favorited spaces.
+     */
+    public function meusFavoritos(): Response
     {
         $user = Auth::user();
-        // OTIMIZAÇÃO: Removido 'agendas.user' pois o EspacoCard não utiliza essa informação.
-        $favoritos = $user->favoritos()->with([
-            'andar:id,nome,modulo_id',
-            'andar.modulo:id,nome,unidade_id',
-            'andar.modulo.unidade:id,sigla',
-        ])->paginate(9);
 
         return Inertia::render('Espacos/FavoritosPage', [
-            'favoritos' => $favoritos,
+            'favoritos' => $this->service->getFavoritedByUser($user, 10),
             'user' => ['permission_type_id' => $user->permission_type_id],
         ]);
     }

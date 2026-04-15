@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Models\Reserva;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Reserva>
+ * @extends Factory<Reserva>
  */
 class ReservaFactory extends Factory
 {

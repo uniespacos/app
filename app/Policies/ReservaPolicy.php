@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Reserva;
@@ -33,29 +35,20 @@ class ReservaPolicy
 
     /**
      * Determine whether the user can update the model.
-     *
-     * Esta ação agora pode ser realizada por dois atores diferentes com regras distintas:
-     * 1. O USUÁRIO dono da reserva, SE a situação for 'em analise'.
-     * 2. O GESTOR da agenda da reserva, a qualquer momento (para avaliar/reavaliar).
+     * Allowed only for the reservation owner while the situacao is 'em_analise'
+     * and no horarios have been individually evaluated yet.
      */
     public function update(User $user, Reserva $reserva): bool
     {
-        // REGRA 1: O usuário pode alterar a reserva caso ainda esteja em análise.
-        if ($user->id === $reserva->user_id && $reserva->situacao === 'em_analise') {
-            // Só permite edição se NENHUM slot foi avaliado ainda (todos devem ser 'em_analise')
-            // Se houver qualquer slot 'deferida' ou 'indeferida', bloqueia a edição.
-            $hasProcessedSlots = $reserva->horarios()
-                ->whereIn('situacao', ['deferida', 'indeferida'])
-                ->exists();
-
-            if ($hasProcessedSlots) {
-                return false;
-            }
-
-            return true;
+        if ($user->id !== $reserva->user_id || $reserva->situacao !== 'em_analise') {
+            return false;
         }
 
-        return false;
+        $hasProcessedSlots = $reserva->horarios()
+            ->whereIn('situacao', ['deferida', 'indeferida'])
+            ->exists();
+
+        return ! $hasProcessedSlots;
     }
 
     /**
@@ -82,16 +75,15 @@ class ReservaPolicy
         return false;
     }
 
+    /**
+     * Determine whether a gestor can view the reservation for evaluation.
+     * Returns true only if the gestor manages at least one agenda associated with the reservation.
+     */
     public function viewForGestor(User $user, Reserva $reserva): bool
     {
-        // Pega os IDs de todas as agendas da reserva
         $agendasDaReservaIds = $reserva->horarios()->pluck('agenda_id')->unique();
-
-        // Pega os IDs de todas as agendas que o gestor gerencia
         $agendasDoGestorIds = $user->agendas()->pluck('id');
 
-        // Retorna 'true' (permitido) APENAS se houver pelo menos um item em comum
-        // entre as agendas da reserva e as agendas do gestor.
         return $agendasDoGestorIds->intersect($agendasDaReservaIds)->isNotEmpty();
     }
 }

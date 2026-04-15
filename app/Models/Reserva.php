@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Carbon\Carbon;
+use Database\Factories\ReservaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property bool $can_update Set dynamically in ReservaService based on policy check.
+ * @property string|null $existing_justification Set dynamically in ReservaService with first non-null justificativa.
+ */
 class Reserva extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReservaFactory> */
+    /** @use HasFactory<ReservaFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -25,12 +34,17 @@ class Reserva extends Model
         'cache_validated_at',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'conflict_cache' => 'array',
         'cache_validated_at' => 'datetime',
     ];
 
-    // Accessor para formatar a situação para exibição
+    /**
+     * Returns a human-readable label for the current situacao value.
+     */
     public function getSituacaoFormatadaAttribute(): string
     {
         return match ($this->situacao) {
@@ -38,20 +52,18 @@ class Reserva extends Model
             'deferida' => 'Deferida',
             'indeferida' => 'Indeferida',
             'parcialmente_deferida' => 'Parcialmente Deferida',
+            /** @phpstan-ignore match.alwaysTrue */
             'inativa' => 'Inativa',
             default => ucfirst(str_replace('_', ' ', $this->situacao)),
         };
     }
 
-    public function horarios()
-    {
-        return $this->hasMany(Horario::class);
-    }
-
     /**
-     * Obtém um resumo dos horários da reserva.
-     * Se houver poucos horários, retorna a lista detalhada.
-     * Se houver muitos, agrupa por dia da semana e intervalo de datas.
+     * Returns a summary of the reservation's horarios.
+     * For 10 or fewer horarios, returns a detailed list.
+     * For larger sets, groups by agenda/time slot showing date ranges and days of the week.
+     *
+     * @return array<int, object>
      */
     public function getResumoHorariosAttribute(): array
     {
@@ -77,9 +89,7 @@ class Reserva extends Model
             $minDate = $dates->min()->format('d/m/Y');
             $maxDate = $dates->max()->format('d/m/Y');
 
-            $daysOfWeek = $dates->map(function ($d) {
-                return ucfirst($d->locale('pt_BR')->dayName);
-            })->unique()->values();
+            $daysOfWeek = $dates->map(fn ($d) => ucfirst($d->locale('pt_BR')->dayName))->unique()->values();
 
             $diasTexto = $daysOfWeek->count() > 1
                 ? $daysOfWeek->slice(0, -1)->implode(', ').' e '.$daysOfWeek->last()
@@ -96,7 +106,18 @@ class Reserva extends Model
         })->values()->toArray();
     }
 
-    public function user()
+    /**
+     * @return HasMany<Horario, $this>
+     */
+    public function horarios(): HasMany
+    {
+        return $this->hasMany(Horario::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

@@ -19,10 +19,13 @@
         "tightenco/ziggy": "2.5.2"
     },
     "require-dev": {
+        "cebpereira/layers": "^1.3",
         "fakerphp/faker": "1.24.1",
+        "larastan/larastan": "^3.9",
         "laravel/pail": "1.2.2",
-        "laravel/pint": "1.22.0",
+        "laravel/pint": "^1.29",
         "laravel/sail": "1.41.1",
+        "laravel/telescope": "^5.19",
         "mockery/mockery": "1.6.12",
         "nunomaduro/collision": "8.8.0",
         "phpunit/phpunit": "12.1.3"
@@ -63,11 +66,16 @@
             "npm run build:ssr",
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr"
-        ]
+        ],
+        "lint": "./vendor/bin/pint",
+        "lint:check": "./vendor/bin/pint --test",
+        "analyse": "./vendor/bin/phpstan analyse --memory-limit=512M"
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel/telescope"
+            ]
         }
     },
     "config": {

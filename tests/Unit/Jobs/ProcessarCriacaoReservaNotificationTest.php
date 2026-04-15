@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\ProcessarCriacaoReserva;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
@@ -54,7 +57,7 @@ class ProcessarCriacaoReservaNotificationTest extends TestCase
 
         Notification::assertSentTo($managerUser, NewReservationNotification::class);
         Notification::assertSentTo($applicantUser, ReservationCreatedNotification::class);
-        Bus::assertDispatched(\App\Jobs\ValidateReservationConflictsJob::class);
+        Bus::assertDispatched(ValidateReservationConflictsJob::class);
     }
 
     /**
