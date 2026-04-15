@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Models\Reserva;
@@ -20,7 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
@@ -34,41 +39,37 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        DB::listen(function ($query) {
-            Log::info(
-                $query->sql, // A consulta SQL executada
-                $query->bindings, // Os valores que são ligados aos placeholders (?)
-                $query->time // O tempo de execução da consulta
-            );
-        });
+        if ($this->app->environment('development')) {
+            DB::listen(fn ($query) => Log::info($query->sql, $query->bindings));
+        }
+
         Inertia::share([
             'auth.user' => function () {
                 $user = Auth::user();
+
                 if ($user) {
                     return array_merge($user->toArray(), [
                         'unread_notifications_count' => $user->unreadNotifications->count(),
-                        // Você pode adicionar mais dados do usuário aqui se precisar
                     ]);
                 }
 
                 return null;
             },
         ]);
+
         if ($this->app->environment('testing')) {
             Vite::macro('shouldBeIgnored', fn () => true);
         }
 
-        // Environment variable validation
         $this->validateEnvVariables();
     }
 
     /**
-     * Validate essential environment variables.
+     * Validate essential environment variables on boot.
+     * Skipped during CLI commands that do not require a full environment.
      */
     protected function validateEnvVariables(): void
     {
-        // Skip validation during CLI commands that don't need the full environment
-        // (like package:discover, config:clear, etc.)
         if ($this->app->runningInConsole()) {
             return;
         }
@@ -101,6 +102,7 @@ class AppServiceProvider extends ServiceProvider
         ];
 
         foreach ($requiredEnvVariables as $variable) {
+            /** @phpstan-ignore larastan.noEnvCallsOutsideOfConfig */
             if (! env($variable)) {
                 throw new \Exception("Missing required environment variable: {$variable}");
             }
