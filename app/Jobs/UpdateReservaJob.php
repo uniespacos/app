@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Reserva;
@@ -21,29 +23,25 @@ class UpdateReservaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected Reserva $reserva;
-
-    protected array $validatedData;
-
-    protected User $user;
-
     public int $tries = 3;
 
-    /**
-     * Cria uma nova instância do Job.
-     */
-    public function __construct(Reserva $reserva, array $validatedData, User $user)
-    {
-        $this->reserva = $reserva;
-        $this->validatedData = $validatedData;
-        $this->user = $user;
-    }
+    public function __construct(
+        protected Reserva $reserva,
+        protected array $validatedData,
+        protected User $user,
+    ) {}
 
     /**
-     * Executa o Job.
+     * Execute the job — updates the reservation and regenerates horarios for the given scope.
      */
     public function handle(): void
     {
+        Log::info('UpdateReservaJob started', [
+            'reserva_id' => $this->reserva->id,
+            'user_id' => $this->user->id,
+            'scope' => $this->validatedData['edit_scope'],
+        ]);
+
         try {
             DB::transaction(function () {
                 $this->reserva->update([
@@ -62,7 +60,10 @@ class UpdateReservaJob implements ShouldQueue
                     $inicioSemana = $dataReferencia->copy()->startOfWeek(Carbon::MONDAY)->toDateString();
                     $fimSemana = $dataReferencia->copy()->endOfWeek(Carbon::SUNDAY)->toDateString();
 
-                    $horariosAtuaisNaSemana = $this->reserva->horarios()->whereBetween('data', [$inicioSemana, $fimSemana])->get();
+                    $horariosAtuaisNaSemana = $this->reserva->horarios()
+                        ->whereBetween('data', [$inicioSemana, $fimSemana])
+                        ->get();
+
                     $idsSolicitadosNaSemana = $horariosSolicitados->whereNotNull('id')->pluck('id');
 
                     foreach ($horariosAtuaisNaSemana as $horarioAtual) {
@@ -71,16 +72,16 @@ class UpdateReservaJob implements ShouldQueue
                         }
                     }
 
-                    $novosHorarios = $horariosSolicitados->whereNull('id');
-                    foreach ($novosHorarios as $novoHorario) {
+                    foreach ($horariosSolicitados->whereNull('id') as $novoHorario) {
                         $this->reserva->horarios()->create($novoHorario);
                     }
-                } else { // scope === 'recurring'
+                } else {
                     $this->reserva->horarios()->delete();
 
                     foreach ($horariosSolicitados as $horarioInfo) {
                         $dataIteracao = Carbon::parse($horarioInfo['data']);
                         $dataFinalReserva = Carbon::parse($this->reserva->data_final);
+
                         while ($dataIteracao->lte($dataFinalReserva)) {
                             $this->reserva->horarios()->create([
                                 'data' => $dataIteracao->toDateString(),
@@ -95,34 +96,48 @@ class UpdateReservaJob implements ShouldQueue
                 }
             });
 
-            // Notifica o usuário que a edição foi processada com sucesso
+            Log::info('UpdateReservaJob completed', [
+                'reserva_id' => $this->reserva->id,
+                'scope' => $this->validatedData['edit_scope'],
+            ]);
+
             try {
-                $this->user->notify(new ReservationUpdatedNotification(
-                    $this->reserva
-                ));
-            } catch (\Exception $e) {
-                Log::warning("Falha ao enviar notificação de sucesso para edição da reserva {$this->reserva->id}: ".$e->getMessage());
+                $this->user->notify(new ReservationUpdatedNotification($this->reserva));
+            } catch (Exception $e) {
+                Log::warning('Failed to send reservation update notification', [
+                    'reserva_id' => $this->reserva->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
         } catch (Exception $e) {
-            Log::error("Falha no Job UpdateReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
+            Log::error('UpdateReservaJob failed', [
+                'reserva_id' => $this->reserva->id,
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage(),
+            ]);
             $this->fail($e);
         }
     }
 
     /**
-     * Lida com a falha do job.
+     * Handle a job failure after all retries are exhausted.
      */
     public function failed(Throwable $exception): void
     {
-        // Notifica o usuário que a edição falhou
+        Log::error('UpdateReservaJob exhausted all retries', [
+            'reserva_id' => $this->reserva->id,
+            'user_id' => $this->user->id,
+            'error' => $exception->getMessage(),
+        ]);
+
         try {
-            $this->user->notify(new ReservationUpdateFailedNotification(
-                $this->reserva,
-                $this->user
-            ));
-        } catch (\Exception $e) {
-            Log::error("Falha fatal ao enviar notificação de erro para edição da reserva {$this->reserva->id}: ".$e->getMessage());
+            $this->user->notify(new ReservationUpdateFailedNotification($this->reserva, $this->user));
+        } catch (Exception $e) {
+            Log::error('Failed to send reservation update failure notification', [
+                'reserva_id' => $this->reserva->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

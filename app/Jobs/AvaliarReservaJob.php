@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Horario;
@@ -23,26 +25,28 @@ class AvaliarReservaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected Reserva $reserva;
-
-    protected array $validatedData;
-
-    protected User $gestor;
-
     public int $tries = 3;
 
-    public function __construct(Reserva $reserva, array $validatedData, User $gestor)
-    {
-        $this->reserva = $reserva;
-        $this->validatedData = $validatedData;
-        $this->gestor = $gestor;
-    }
+    public function __construct(
+        protected Reserva $reserva,
+        protected array $validatedData,
+        protected User $gestor,
+    ) {}
 
+    /**
+     * Execute the job — evaluates each horario based on the gestor's decisions and conflict state.
+     */
     public function handle(ConflictDetectionService $conflictService): void
     {
+        Log::info('AvaliarReservaJob started', [
+            'reserva_id' => $this->reserva->id,
+            'gestor_id' => $this->gestor->id,
+            'scope' => $this->validatedData['evaluation_scope'],
+            'horarios_count' => count($this->validatedData['horarios_avaliados']),
+        ]);
+
         try {
             DB::transaction(function () use ($conflictService) {
-                // --- SETUP INICIAL ---
                 $scope = $this->validatedData['evaluation_scope'];
                 $agendasDoGestorIds = $this->gestor->agendas()->pluck('id');
                 $motivoDoGestor = $this->validatedData['motivo'] ?? null;
@@ -52,33 +56,33 @@ class AvaliarReservaJob implements ShouldQueue
                 $horariosConflitantesIds = $conflitosMap->keys();
 
                 if ($scope === 'single') {
-                    // --- LÓGICA PARA 'APENAS ESTA SEMANA' (JÁ ESTAVA CORRETA) ---
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
-                        $statusDoGestor = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
+                        $statusFinal = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
                         $justificativaFinal = $motivoDoGestor;
-                        $statusFinal = $statusDoGestor;
 
                         if ($horariosConflitantesIds->contains($horarioId)) {
+                            $conflito = $conflitosMap->get($horarioId);
                             $statusFinal = 'indeferida';
-                            $justificativaFinal = $conflitosMap->get($horarioId)->conflict_details;
+                            $justificativaFinal = "Conflito com a reserva '{$conflito->conflito_reserva_titulo}' de {$conflito->conflito_user_name}.";
                         }
 
-                        Horario::where('id', $horarioId)->whereIn('agenda_id', $agendasDoGestorIds)
+                        Horario::where('id', $horarioId)
+                            ->whereIn('agenda_id', $agendasDoGestorIds)
                             ->update([
                                 'situacao' => $statusFinal,
                                 'user_id' => $this->gestor->id,
                                 'justificativa' => $justificativaFinal,
                             ]);
                     }
-
-                } else { // recurring
-                    // --- LÓGICA RECORRENTE TOTALMENTE REFEITA ---
-
-                    // FASE 1: Lidar com as exceções. Marcar TODOS os conflitos da reserva como indeferidos.
+                } else {
                     if ($horariosConflitantesIds->isNotEmpty()) {
                         foreach ($horariosConflitantesIds as $id) {
-                            $justificativa = $conflitosMap->get($id)->conflict_details ?? 'Conflito com outra reserva.';
+                            $conflito = $conflitosMap->get($id);
+                            $justificativa = $conflito
+                                ? "Conflito com a reserva '{$conflito->conflito_reserva_titulo}' de {$conflito->conflito_user_name}."
+                                : 'Conflito com outra reserva.';
+
                             Horario::where('id', $id)->update([
                                 'situacao' => 'indeferida',
                                 'justificativa' => $justificativa,
@@ -87,12 +91,10 @@ class AvaliarReservaJob implements ShouldQueue
                         }
                     }
 
-                    // FASE 2: Aplicar as decisões do gestor para cada padrão de horário recorrente.
                     $processedPatterns = [];
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
 
-                        // Pula os horários que já foram tratados como conflitos
                         if ($horariosConflitantesIds->contains($horarioId)) {
                             continue;
                         }
@@ -103,19 +105,15 @@ class AvaliarReservaJob implements ShouldQueue
                         }
 
                         $dayOfWeek = Carbon::parse($horarioFonte->data)->dayOfWeek;
-
-                        // O padrão agora inclui o horário de início, garantindo a granularidade
                         $pattern = "{$horarioFonte->agenda_id}-{$horarioFonte->horario_inicio}-{$dayOfWeek}";
 
                         if (in_array($pattern, $processedPatterns)) {
-                            continue; // Já processamos este padrão (ex: outra Quarta às 10h na mesma semana)
+                            continue;
                         }
 
                         $statusParaReplicar = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
                         $justificativaParaReplicar = $statusParaReplicar === 'indeferida' ? $motivoDoGestor : null;
 
-                        // Atualiza todos os horários que correspondem a este padrão,
-                        // exceto os que já foram marcados como conflito.
                         $this->reserva->horarios()
                             ->whereNotIn('id', $horariosConflitantesIds)
                             ->whereIn('agenda_id', $agendasDoGestorIds)
@@ -132,13 +130,23 @@ class AvaliarReservaJob implements ShouldQueue
                 }
 
                 $this->reserva->observacao = $this->validatedData['observacao'] ?? $this->reserva->observacao;
-                $this->atualizarStatusGeralDaReserva($this->reserva);
+                $this->updateReservaOverallStatus($this->reserva);
             });
 
             $this->reserva->refresh();
+
+            Log::info('AvaliarReservaJob completed', [
+                'reserva_id' => $this->reserva->id,
+                'situacao' => $this->reserva->situacao,
+            ]);
+
+            $recentlyApprovedIds = collect($this->validatedData['horarios_avaliados'])
+                ->where('status', 'deferida')
+                ->pluck('id');
+
             $horariosRecemAprovados = $this->reserva->horarios()
                 ->where('situacao', 'deferida')
-                ->whereIn('id', collect($this->validatedData['horarios_avaliados'])->where('status', 'deferida')->pluck('id'))
+                ->whereIn('id', $recentlyApprovedIds)
                 ->get();
 
             if ($horariosRecemAprovados->isNotEmpty()) {
@@ -151,27 +159,42 @@ class AvaliarReservaJob implements ShouldQueue
                     $this->reserva->situacao_formatada,
                     $this->gestor
                 ));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: ".$e->getMessage());
             }
 
         } catch (Exception $e) {
-            Log::error("Falha no Job AvaliarReservaJob para reserva {$this->reserva->id}: ".$e->getMessage());
+            Log::error('AvaliarReservaJob failed', [
+                'reserva_id' => $this->reserva->id,
+                'gestor_id' => $this->gestor->id,
+                'error' => $e->getMessage(),
+            ]);
             $this->fail($e);
         }
     }
 
+    /**
+     * Handle a job failure after all retries are exhausted.
+     */
     public function failed(Throwable $exception): void
     {
-        Log::error("Falha final no Job AvaliarReservaJob para reserva {$this->reserva->id} após todas as tentativas.");
+        Log::error('AvaliarReservaJob exhausted all retries', [
+            'reserva_id' => $this->reserva->id,
+            'gestor_id' => $this->gestor->id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 
     /**
-     * Dispara jobs de revalidação para outras reservas que possam ter se tornado conflitantes.
+     * Dispatches conflict revalidation jobs for other pending reservations
+     * that share a slot with any of the newly approved horarios.
+     *
+     * @param  Collection<int, Horario>  $horariosAprovados
      */
     private function triggerConflictRevalidation(Collection $horariosAprovados): void
     {
-        $slotsOcupados = $horariosAprovados->map(fn ($h) => ['data' => $h->data, 'agenda_id' => $h->agenda_id])
+        $slotsOcupados = $horariosAprovados
+            ->map(fn ($h) => ['data' => $h->data, 'agenda_id' => $h->agenda_id])
             ->unique(fn ($item) => $item['data'].$item['agenda_id']);
 
         if ($slotsOcupados->isEmpty()) {
@@ -190,7 +213,9 @@ class AvaliarReservaJob implements ShouldQueue
                         });
                     }
                 });
-            })->select('id')->get(); // Otimização: seleciona apenas o ID
+            })
+            ->select('id')
+            ->get();
 
         foreach ($reservasParaRevalidar as $reserva) {
             Log::info("Disparando revalidação de conflito para Reserva ID {$reserva->id} devido à aprovação da Reserva ID {$this->reserva->id}");
@@ -198,34 +223,39 @@ class AvaliarReservaJob implements ShouldQueue
         }
     }
 
-    private function atualizarStatusGeralDaReserva(Reserva $reserva)
+    /**
+     * Recalculates and persists the overall situacao of the reservation
+     * based on the aggregate statuses of its horarios.
+     */
+    private function updateReservaOverallStatus(Reserva $reserva): void
     {
-        $statusCounts = DB::table('horarios')->where('reserva_id', $reserva->id)
+        $statusCounts = DB::table('horarios')
+            ->where('reserva_id', $reserva->id)
             ->select('situacao', DB::raw('count(*) as total'))
             ->groupBy('situacao')
             ->pluck('total', 'situacao');
+
         $totalHorarios = $statusCounts->sum();
+
         if ($totalHorarios === 0) {
             $reserva->situacao = 'indeferida';
             $reserva->save();
 
             return;
         }
+
         $deferidosCount = $statusCounts->get('deferida', 0);
         $indeferidosCount = $statusCounts->get('indeferida', 0);
         $emAnaliseCount = $statusCounts->get('em_analise', 0);
 
-        $novaSituacaoGeral = 'em_analise';
-        if ($deferidosCount === $totalHorarios) {
-            $novaSituacaoGeral = 'deferida';
-        } elseif ($indeferidosCount === $totalHorarios) {
-            $novaSituacaoGeral = 'indeferida';
-        } elseif ($emAnaliseCount > 0) {
-            $novaSituacaoGeral = 'em_analise';
-        } elseif (($deferidosCount + $indeferidosCount) > 0) {
-            $novaSituacaoGeral = 'parcialmente_deferida';
-        }
-        $reserva->situacao = $novaSituacaoGeral;
+        $novaSituacao = match (true) {
+            $deferidosCount === $totalHorarios => 'deferida',
+            $indeferidosCount === $totalHorarios => 'indeferida',
+            $emAnaliseCount > 0 => 'em_analise',
+            default => 'parcialmente_deferida',
+        };
+
+        $reserva->situacao = $novaSituacao;
         $reserva->save();
     }
 }

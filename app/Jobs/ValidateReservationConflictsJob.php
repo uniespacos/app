@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Reserva;
@@ -16,27 +18,51 @@ class ValidateReservationConflictsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public Reserva $reserva) {}
+    public function __construct(
+        public Reserva $reserva,
+    ) {}
 
+    /**
+     * Execute the job — runs conflict detection and caches the result on the reservation.
+     */
     public function handle(ConflictDetectionService $conflictService): void
     {
+        Log::info('ValidateReservationConflictsJob started', ['reserva_id' => $this->reserva->id]);
+
         try {
-            // 1. Marca a reserva como "processando"
             $this->reserva->update(['validation_status' => 'processing']);
 
-            // 2. Executa a lógica de detecção de conflitos (usando nosso serviço otimizado)
             $conflitos = $conflictService->findConflictsFor($this->reserva->id);
 
-            // 3. Salva o resultado no cache da reserva
             $this->reserva->update([
                 'conflict_cache' => $conflitos,
                 'validation_status' => 'completed',
             ]);
 
+            Log::info('ValidateReservationConflictsJob completed', [
+                'reserva_id' => $this->reserva->id,
+                'conflicts_found' => $conflitos->count(),
+            ]);
+
         } catch (Throwable $e) {
-            Log::error("Falha ao validar conflitos para reserva ID {$this->reserva->id}: ".$e->getMessage());
+            Log::error('ValidateReservationConflictsJob failed', [
+                'reserva_id' => $this->reserva->id,
+                'error' => $e->getMessage(),
+            ]);
             $this->reserva->update(['validation_status' => 'failed']);
             $this->fail($e);
         }
+    }
+
+    /**
+     * Handle a job failure after all retries are exhausted.
+     */
+    public function failed(Throwable $exception): void
+    {
+        Log::error('ValidateReservationConflictsJob exhausted all retries', [
+            'reserva_id' => $this->reserva->id,
+            'error' => $exception->getMessage(),
+        ]);
+        $this->reserva->update(['validation_status' => 'failed']);
     }
 }
