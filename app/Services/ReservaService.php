@@ -1,0 +1,254 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Jobs\AvaliarReservaJob;
+use App\Jobs\ProcessarCriacaoReserva;
+use App\Jobs\UpdateReservaJob;
+use App\Models\Espaco;
+use App\Models\Reserva;
+use App\Models\User;
+use App\Notifications\ReservationCanceledNotification;
+use App\Repositories\AgendaRepositoryInterface;
+use App\Repositories\ReservaRepositoryInterface;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class ReservaService
+{
+    public function __construct(
+        protected ReservaRepositoryInterface $repoReserva,
+        protected AgendaRepositoryInterface $repoAgenda,
+        protected EspacoService $espacoService,
+        protected ConflictDetectionService $conflictService,
+    ) {}
+
+    /**
+     * Returns the paginated listing, the detail modal reservation, and week boundaries for the user's reservation page.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    public function getListingForUser(User $user, string $weekRef, array $filters, int $perPage = 10): array
+    {
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef);
+
+        /** @var \Illuminate\Pagination\LengthAwarePaginator<Reserva> $reservas */
+        $reservas = $this->repoReserva->getPaginatedForUser($user->id, $weekStart, $weekEnd, $filters, $perPage)
+            ->withQueryString();
+
+        $reservas->getCollection()->transform(function (Reserva $reserva) use ($user) {
+            $reserva->can_update = $user->can('update', $reserva);
+
+            return $reserva;
+        });
+
+        $reservaToShow = null;
+        if ($filters['reserva'] ?? null) {
+            $reservaToShow = $this->repoReserva->findWithWeekSlots((int) $filters['reserva'], $weekStart, $weekEnd);
+
+            if ($reservaToShow) {
+                $reservaToShow->can_update = $user->can('update', $reservaToShow);
+            }
+        }
+
+        return [
+            'reservas' => $reservas,
+            'filters' => $filters,
+            'reservaToShow' => $reservaToShow,
+            'semana' => ['inicio' => $weekStart, 'fim' => $weekEnd, 'referencia' => $reference],
+        ];
+    }
+
+    /**
+     * Returns all data needed to render the reservation edit page (espaco schedule + reservation).
+     *
+     * @return array<string, mixed>
+     */
+    public function getEditData(Reserva $reserva, string $weekRef): array
+    {
+        $firstSlot = $reserva->horarios()->orderBy('data', 'asc')->first();
+        $defaultDate = $firstSlot ? $firstSlot->data : $reserva->data_inicial;
+
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $defaultDate);
+
+        $reserva->load([
+            'user',
+            'horarios' => function ($query) use ($weekStart, $weekEnd) {
+                $query->whereBetween('data', [$weekStart, $weekEnd])
+                    ->orderBy('data')->orderBy('horario_inicio')
+                    ->with('agenda');
+            },
+        ]);
+
+        $espaco = $reserva->horarios->first()?->agenda?->espaco  // @phpstan-ignore nullsafe.neverNull
+            ?? Espaco::whereHas('agendas.horarios.reserva', fn ($q) => $q->where('id', $reserva->id))->firstOrFail();
+
+        $espaco->load([
+            'andar.modulo.unidade.instituicao',
+            'agendas' => function ($query) use ($weekStart, $weekEnd) {
+                $query->with([
+                    'user.setor',
+                    'horarios' => function ($q) use ($weekStart, $weekEnd) {
+                        $q->where('situacao', 'deferida')
+                            ->whereBetween('data', [$weekStart, $weekEnd])
+                            ->with(['reserva.user', 'avaliador']);
+                    },
+                ]);
+            },
+        ]);
+
+        return [
+            'espaco' => $espaco,
+            'reserva' => $reserva,
+            'isEditMode' => true,
+            'semana' => ['inicio' => $weekStart, 'fim' => $weekEnd, 'referencia' => $reference],
+        ];
+    }
+
+    /**
+     * Dispatches the async job to create a reservation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function create(array $data, User $user): void
+    {
+        ProcessarCriacaoReserva::dispatch($data, $user);
+    }
+
+    /**
+     * Dispatches the async job to update a reservation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Reserva $reserva, array $data, User $user): void
+    {
+        UpdateReservaJob::dispatch($reserva, $data, $user);
+    }
+
+    /**
+     * Cancels a reservation by marking it and its horarios as inactive and notifying managers.
+     */
+    public function cancel(Reserva $reserva, User $user): void
+    {
+        $agendaIds = $reserva->horarios->pluck('agenda_id')->unique()->values()->all();
+
+        DB::transaction(function () use ($reserva) {
+            $reserva->horarios()->update(['situacao' => 'inativa']);
+            $reserva->update(['situacao' => 'inativa']);
+        });
+
+        $gestores = $this->repoAgenda->getWithUserByIds($agendaIds)
+            ->pluck('user')
+            ->filter()
+            ->unique('id');
+
+        foreach ($gestores as $gestor) {
+            try {
+                $gestor->notify(new ReservationCanceledNotification($reserva, $user));
+            } catch (\Exception $e) {
+                Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: ".$e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Returns the paginated listing, the detail modal reservation, and week boundaries for the gestor's reservation page.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    public function getGestorListing(User $gestor, string $weekRef, array $filters, int $perPage = 10): array
+    {
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef);
+        $agendaIds = $gestor->agendas()->pluck('id')->all();
+
+        $reservas = $this->repoReserva->getPaginatedForGestor($agendaIds, $filters, $perPage)
+            ->withQueryString();
+
+        $reservaToShow = null;
+        if ($filters['reserva'] ?? null) {
+            $reservaToShow = $this->repoReserva->findForGestorModal(
+                (int) $filters['reserva'],
+                $agendaIds,
+                $weekStart,
+                $weekEnd
+            );
+        }
+
+        return [
+            'reservas' => $reservas,
+            'filters' => $filters,
+            'reservaToShow' => $reservaToShow,
+            'semana' => ['inicio' => $weekStart, 'fim' => $weekEnd, 'referencia' => $reference],
+        ];
+    }
+
+    /**
+     * Returns the reservation detail enriched with conflict data for the gestor review page.
+     *
+     * @return array<string, mixed>
+     */
+    public function getForGestorReview(Reserva $reserva, User $gestor, string $weekRef): array
+    {
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $reserva->data_inicial);
+        $agendaIds = $gestor->agendas()->pluck('id')->all();
+
+        $conflitosMap = $this->conflictService->findConflictsFor($reserva->id);
+
+        $horariosDaSemana = $reserva->horarios()
+            ->whereIn('agenda_id', $agendaIds)
+            ->whereBetween('data', [$weekStart, $weekEnd])
+            ->with('agenda.espaco')
+            ->get();
+
+        foreach ($horariosDaSemana as $horario) {
+            $horario->is_conflicted = false;
+            if ($conflitosMap->has($horario->id)) {
+                $conflito = $conflitosMap->get($horario->id);
+                $horario->is_conflicted = true;
+                $horario->conflict_details = "Conflito com a reserva '{$conflito->conflito_reserva_titulo}' de {$conflito->conflito_user_name}.";
+            }
+        }
+
+        $reserva->load(['user']);
+        $reserva->setRelation('horarios', $horariosDaSemana);
+        $reserva->existing_justification = $reserva->horarios()
+            ->whereNotNull('justificativa')
+            ->where('justificativa', '!=', '')
+            ->value('justificativa');
+
+        return [
+            'reserva' => $reserva,
+            'semana' => ['referencia' => $reference],
+            'todosOsConflitos' => $conflitosMap,
+        ];
+    }
+
+    /**
+     * Dispatches the async job to evaluate a reservation.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function evaluate(Reserva $reserva, array $data, User $gestor): void
+    {
+        AvaliarReservaJob::dispatch($reserva, $data, $gestor);
+    }
+
+    /**
+     * Resolves a week reference string into start date, end date, and reference date strings.
+     *
+     * @return array{string, string, string}
+     */
+    private function resolveWeek(string $weekRef): array
+    {
+        $reference = Carbon::parse($weekRef)->locale('pt_BR');
+        $start = $reference->copy()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $end = $reference->copy()->endOfWeek(Carbon::SUNDAY)->format('Y-m-d');
+
+        return [$start, $end, $reference->format('Y-m-d')];
+    }
+}
