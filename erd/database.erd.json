@@ -1,0 +1,2708 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dineug/erd-editor/main/json-schema/schema.json",
+  "version": "3.0.0",
+  "settings": {
+    "width": 5000,
+    "height": 3000,
+    "scrollTop": 0,
+    "scrollLeft": 0,
+    "zoomLevel": 1,
+    "show": 431,
+    "database": 4,
+    "databaseName": "uniespacos",
+    "canvasType": "ERD",
+    "language": 1,
+    "tableNameCase": 4,
+    "columnNameCase": 2,
+    "bracketType": 1,
+    "relationshipDataTypeSync": true,
+    "relationshipOptimization": false,
+    "columnOrder": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64
+    ],
+    "maxWidthComment": 200,
+    "ignoreSaveSettings": 3
+  },
+  "doc": {
+    "tableIds": [
+      "tbl-instituicaos",
+      "tbl-unidades",
+      "tbl-modulos",
+      "tbl-andars",
+      "tbl-espacos",
+      "tbl-agendas",
+      "tbl-reservas",
+      "tbl-horarios",
+      "tbl-espaco-user",
+      "tbl-users",
+      "tbl-setors",
+      "tbl-permission-types"
+    ],
+    "relationshipIds": [
+      "rel-01",
+      "rel-02",
+      "rel-03",
+      "rel-04",
+      "rel-05",
+      "rel-06",
+      "rel-07",
+      "rel-08",
+      "rel-09",
+      "rel-10",
+      "rel-11",
+      "rel-12",
+      "rel-13",
+      "rel-14",
+      "rel-15"
+    ],
+    "indexIds": [],
+    "memoIds": []
+  },
+  "collections": {
+    "tableEntities": {
+      "tbl-instituicaos": {
+        "id": "tbl-instituicaos",
+        "name": "instituicaos",
+        "comment": "",
+        "columnIds": [
+          "tbl-instituicaos-id",
+          "tbl-instituicaos-nome",
+          "tbl-instituicaos-sigla",
+          "tbl-instituicaos-endereco",
+          "tbl-instituicaos-created_at",
+          "tbl-instituicaos-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-instituicaos-id",
+          "tbl-instituicaos-nome",
+          "tbl-instituicaos-sigla",
+          "tbl-instituicaos-endereco",
+          "tbl-instituicaos-created_at",
+          "tbl-instituicaos-updated_at"
+        ],
+        "ui": {
+          "x": 923.1415,
+          "y": 668.4811,
+          "zIndex": 1,
+          "widthName": 61,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343589344,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades": {
+        "id": "tbl-unidades",
+        "name": "unidades",
+        "comment": "",
+        "columnIds": [
+          "tbl-unidades-id",
+          "tbl-unidades-nome",
+          "tbl-unidades-sigla",
+          "tbl-unidades-instituicao_id",
+          "tbl-unidades-created_at",
+          "tbl-unidades-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-unidades-id",
+          "tbl-unidades-nome",
+          "tbl-unidades-sigla",
+          "tbl-unidades-instituicao_id",
+          "tbl-unidades-created_at",
+          "tbl-unidades-updated_at"
+        ],
+        "ui": {
+          "x": 1740.616,
+          "y": 665.3419,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343587162,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos": {
+        "id": "tbl-modulos",
+        "name": "modulos",
+        "comment": "",
+        "columnIds": [
+          "tbl-modulos-id",
+          "tbl-modulos-nome",
+          "tbl-modulos-unidade_id",
+          "tbl-modulos-created_at",
+          "tbl-modulos-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-modulos-id",
+          "tbl-modulos-nome",
+          "tbl-modulos-unidade_id",
+          "tbl-modulos-created_at",
+          "tbl-modulos-updated_at"
+        ],
+        "ui": {
+          "x": 2421.7576,
+          "y": 546.1263,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343566730,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-andars": {
+        "id": "tbl-andars",
+        "name": "andars",
+        "comment": "",
+        "columnIds": [
+          "tbl-andars-id",
+          "tbl-andars-nome",
+          "tbl-andars-tipo_acesso",
+          "tbl-andars-modulo_id",
+          "tbl-andars-created_at",
+          "tbl-andars-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-andars-id",
+          "tbl-andars-nome",
+          "tbl-andars-tipo_acesso",
+          "tbl-andars-modulo_id",
+          "tbl-andars-created_at",
+          "tbl-andars-updated_at"
+        ],
+        "ui": {
+          "x": 3066.7518,
+          "y": 671.8941,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343564014,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-espacos": {
+        "id": "tbl-espacos",
+        "name": "espacos",
+        "comment": "",
+        "columnIds": [
+          "tbl-espacos-id",
+          "tbl-espacos-nome",
+          "tbl-espacos-capacidade_pessoas",
+          "tbl-espacos-descricao",
+          "tbl-espacos-imagens",
+          "tbl-espacos-main_image_index",
+          "tbl-espacos-andar_id",
+          "tbl-espacos-created_at",
+          "tbl-espacos-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-espacos-id",
+          "tbl-espacos-nome",
+          "tbl-espacos-capacidade_pessoas",
+          "tbl-espacos-descricao",
+          "tbl-espacos-imagens",
+          "tbl-espacos-main_image_index",
+          "tbl-espacos-andar_id",
+          "tbl-espacos-created_at",
+          "tbl-espacos-updated_at"
+        ],
+        "ui": {
+          "x": 2302.0822,
+          "y": 1679.1531,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343601684,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-agendas": {
+        "id": "tbl-agendas",
+        "name": "agendas",
+        "comment": "",
+        "columnIds": [
+          "tbl-agendas-id",
+          "tbl-agendas-turno",
+          "tbl-agendas-espaco_id",
+          "tbl-agendas-user_id",
+          "tbl-agendas-created_at",
+          "tbl-agendas-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-agendas-id",
+          "tbl-agendas-turno",
+          "tbl-agendas-espaco_id",
+          "tbl-agendas-user_id",
+          "tbl-agendas-created_at",
+          "tbl-agendas-updated_at"
+        ],
+        "ui": {
+          "x": 1742.3571,
+          "y": 2351.167,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343607249,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-reservas": {
+        "id": "tbl-reservas",
+        "name": "reservas",
+        "comment": "",
+        "columnIds": [
+          "tbl-reservas-id",
+          "tbl-reservas-titulo",
+          "tbl-reservas-descricao",
+          "tbl-reservas-situacao",
+          "tbl-reservas-data_inicial",
+          "tbl-reservas-data_final",
+          "tbl-reservas-recorrencia",
+          "tbl-reservas-observacao",
+          "tbl-reservas-user_id",
+          "tbl-reservas-validation_status",
+          "tbl-reservas-conflict_cache",
+          "tbl-reservas-cache_validated_at",
+          "tbl-reservas-created_at",
+          "tbl-reservas-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-reservas-id",
+          "tbl-reservas-titulo",
+          "tbl-reservas-descricao",
+          "tbl-reservas-situacao",
+          "tbl-reservas-data_inicial",
+          "tbl-reservas-data_final",
+          "tbl-reservas-recorrencia",
+          "tbl-reservas-observacao",
+          "tbl-reservas-user_id",
+          "tbl-reservas-validation_status",
+          "tbl-reservas-conflict_cache",
+          "tbl-reservas-cache_validated_at",
+          "tbl-reservas-created_at",
+          "tbl-reservas-updated_at"
+        ],
+        "ui": {
+          "x": 3114.4439,
+          "y": 992.0524,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343580238,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-horarios": {
+        "id": "tbl-horarios",
+        "name": "horarios",
+        "comment": "",
+        "columnIds": [
+          "tbl-horarios-id",
+          "tbl-horarios-agenda_id",
+          "tbl-horarios-reserva_id",
+          "tbl-horarios-horario_inicio",
+          "tbl-horarios-horario_fim",
+          "tbl-horarios-data",
+          "tbl-horarios-situacao",
+          "tbl-horarios-justificativa",
+          "tbl-horarios-user_id",
+          "tbl-horarios-created_at",
+          "tbl-horarios-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-horarios-id",
+          "tbl-horarios-agenda_id",
+          "tbl-horarios-reserva_id",
+          "tbl-horarios-horario_inicio",
+          "tbl-horarios-horario_fim",
+          "tbl-horarios-data",
+          "tbl-horarios-situacao",
+          "tbl-horarios-justificativa",
+          "tbl-horarios-user_id",
+          "tbl-horarios-created_at",
+          "tbl-horarios-updated_at"
+        ],
+        "ui": {
+          "x": 3119.5653,
+          "y": 1767.1852,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343605147,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-espaco-user": {
+        "id": "tbl-espaco-user",
+        "name": "espaco_user",
+        "comment": "",
+        "columnIds": [
+          "tbl-espaco-user-espaco_id",
+          "tbl-espaco-user-user_id",
+          "tbl-espaco-user-created_at",
+          "tbl-espaco-user-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-espaco-user-espaco_id",
+          "tbl-espaco-user-user_id",
+          "tbl-espaco-user-created_at",
+          "tbl-espaco-user-updated_at"
+        ],
+        "ui": {
+          "x": 1084.9014,
+          "y": 1852.8012,
+          "zIndex": 1,
+          "widthName": 66,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343596859,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-users": {
+        "id": "tbl-users",
+        "name": "users",
+        "comment": "",
+        "columnIds": [
+          "tbl-users-id",
+          "tbl-users-name",
+          "tbl-users-email",
+          "tbl-users-email_verified_at",
+          "tbl-users-password",
+          "tbl-users-telefone",
+          "tbl-users-profile_pic",
+          "tbl-users-permission_type_id",
+          "tbl-users-setor_id",
+          "tbl-users-remember_token",
+          "tbl-users-created_at",
+          "tbl-users-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-users-id",
+          "tbl-users-name",
+          "tbl-users-email",
+          "tbl-users-email_verified_at",
+          "tbl-users-password",
+          "tbl-users-telefone",
+          "tbl-users-profile_pic",
+          "tbl-users-permission_type_id",
+          "tbl-users-setor_id",
+          "tbl-users-remember_token",
+          "tbl-users-created_at",
+          "tbl-users-updated_at"
+        ],
+        "ui": {
+          "x": 1867.0429,
+          "y": 966.5982,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343576625,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-setors": {
+        "id": "tbl-setors",
+        "name": "setors",
+        "comment": "",
+        "columnIds": [
+          "tbl-setors-id",
+          "tbl-setors-nome",
+          "tbl-setors-sigla",
+          "tbl-setors-unidade_id",
+          "tbl-setors-created_at",
+          "tbl-setors-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-setors-id",
+          "tbl-setors-nome",
+          "tbl-setors-sigla",
+          "tbl-setors-unidade_id",
+          "tbl-setors-created_at",
+          "tbl-setors-updated_at"
+        ],
+        "ui": {
+          "x": 866.6001,
+          "y": 1099.4775,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343584802,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-permission-types": {
+        "id": "tbl-permission-types",
+        "name": "permission_types",
+        "comment": "",
+        "columnIds": [
+          "tbl-permission-types-id",
+          "tbl-permission-types-nome",
+          "tbl-permission-types-created_at",
+          "tbl-permission-types-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-permission-types-id",
+          "tbl-permission-types-nome",
+          "tbl-permission-types-created_at",
+          "tbl-permission-types-updated_at"
+        ],
+        "ui": {
+          "x": 954.714,
+          "y": 1506.5446,
+          "zIndex": 1,
+          "widthName": 93,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1775343582259,
+          "createAt": 1775343489062
+        }
+      }
+    },
+    "tableColumnEntities": {
+      "tbl-instituicaos-id": {
+        "id": "tbl-instituicaos-id",
+        "tableId": "tbl-instituicaos",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-instituicaos-nome": {
+        "id": "tbl-instituicaos-nome",
+        "tableId": "tbl-instituicaos",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-instituicaos-sigla": {
+        "id": "tbl-instituicaos-sigla",
+        "tableId": "tbl-instituicaos",
+        "name": "sigla",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-instituicaos-endereco": {
+        "id": "tbl-instituicaos-endereco",
+        "tableId": "tbl-instituicaos",
+        "name": "endereco",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-instituicaos-created_at": {
+        "id": "tbl-instituicaos-created_at",
+        "tableId": "tbl-instituicaos",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-instituicaos-updated_at": {
+        "id": "tbl-instituicaos-updated_at",
+        "tableId": "tbl-instituicaos",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-id": {
+        "id": "tbl-unidades-id",
+        "tableId": "tbl-unidades",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-nome": {
+        "id": "tbl-unidades-nome",
+        "tableId": "tbl-unidades",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-sigla": {
+        "id": "tbl-unidades-sigla",
+        "tableId": "tbl-unidades",
+        "name": "sigla",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-instituicao_id": {
+        "id": "tbl-unidades-instituicao_id",
+        "tableId": "tbl-unidades",
+        "name": "instituicao_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 71,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-created_at": {
+        "id": "tbl-unidades-created_at",
+        "tableId": "tbl-unidades",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-unidades-updated_at": {
+        "id": "tbl-unidades-updated_at",
+        "tableId": "tbl-unidades",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos-id": {
+        "id": "tbl-modulos-id",
+        "tableId": "tbl-modulos",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos-nome": {
+        "id": "tbl-modulos-nome",
+        "tableId": "tbl-modulos",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos-unidade_id": {
+        "id": "tbl-modulos-unidade_id",
+        "tableId": "tbl-modulos",
+        "name": "unidade_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos-created_at": {
+        "id": "tbl-modulos-created_at",
+        "tableId": "tbl-modulos",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-modulos-updated_at": {
+        "id": "tbl-modulos-updated_at",
+        "tableId": "tbl-modulos",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489062,
+          "createAt": 1775343489062
+        }
+      },
+      "tbl-andars-id": {
+        "id": "tbl-andars-id",
+        "tableId": "tbl-andars",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-andars-nome": {
+        "id": "tbl-andars-nome",
+        "tableId": "tbl-andars",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-andars-tipo_acesso": {
+        "id": "tbl-andars-tipo_acesso",
+        "tableId": "tbl-andars",
+        "name": "tipo_acesso",
+        "comment": "",
+        "dataType": "JSON",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 63,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-andars-modulo_id": {
+        "id": "tbl-andars-modulo_id",
+        "tableId": "tbl-andars",
+        "name": "modulo_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-andars-created_at": {
+        "id": "tbl-andars-created_at",
+        "tableId": "tbl-andars",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-andars-updated_at": {
+        "id": "tbl-andars-updated_at",
+        "tableId": "tbl-andars",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-id": {
+        "id": "tbl-espacos-id",
+        "tableId": "tbl-espacos",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-nome": {
+        "id": "tbl-espacos-nome",
+        "tableId": "tbl-espacos",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-capacidade_pessoas": {
+        "id": "tbl-espacos-capacidade_pessoas",
+        "tableId": "tbl-espacos",
+        "name": "capacidade_pessoas",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 108,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-descricao": {
+        "id": "tbl-espacos-descricao",
+        "tableId": "tbl-espacos",
+        "name": "descricao",
+        "comment": "",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-imagens": {
+        "id": "tbl-espacos-imagens",
+        "tableId": "tbl-espacos",
+        "name": "imagens",
+        "comment": "",
+        "dataType": "JSON",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-main_image_index": {
+        "id": "tbl-espacos-main_image_index",
+        "tableId": "tbl-espacos",
+        "name": "main_image_index",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 99,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-andar_id": {
+        "id": "tbl-espacos-andar_id",
+        "tableId": "tbl-espacos",
+        "name": "andar_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-created_at": {
+        "id": "tbl-espacos-created_at",
+        "tableId": "tbl-espacos",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espacos-updated_at": {
+        "id": "tbl-espacos-updated_at",
+        "tableId": "tbl-espacos",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-id": {
+        "id": "tbl-agendas-id",
+        "tableId": "tbl-agendas",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-turno": {
+        "id": "tbl-agendas-turno",
+        "tableId": "tbl-agendas",
+        "name": "turno",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-espaco_id": {
+        "id": "tbl-agendas-espaco_id",
+        "tableId": "tbl-agendas",
+        "name": "espaco_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-user_id": {
+        "id": "tbl-agendas-user_id",
+        "tableId": "tbl-agendas",
+        "name": "user_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-created_at": {
+        "id": "tbl-agendas-created_at",
+        "tableId": "tbl-agendas",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-agendas-updated_at": {
+        "id": "tbl-agendas-updated_at",
+        "tableId": "tbl-agendas",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-id": {
+        "id": "tbl-reservas-id",
+        "tableId": "tbl-reservas",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-titulo": {
+        "id": "tbl-reservas-titulo",
+        "tableId": "tbl-reservas",
+        "name": "titulo",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-descricao": {
+        "id": "tbl-reservas-descricao",
+        "tableId": "tbl-reservas",
+        "name": "descricao",
+        "comment": "",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-situacao": {
+        "id": "tbl-reservas-situacao",
+        "tableId": "tbl-reservas",
+        "name": "situacao",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-data_inicial": {
+        "id": "tbl-reservas-data_inicial",
+        "tableId": "tbl-reservas",
+        "name": "data_inicial",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-data_final": {
+        "id": "tbl-reservas-data_final",
+        "tableId": "tbl-reservas",
+        "name": "data_final",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-recorrencia": {
+        "id": "tbl-reservas-recorrencia",
+        "tableId": "tbl-reservas",
+        "name": "recorrencia",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 61,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-observacao": {
+        "id": "tbl-reservas-observacao",
+        "tableId": "tbl-reservas",
+        "name": "observacao",
+        "comment": "",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-user_id": {
+        "id": "tbl-reservas-user_id",
+        "tableId": "tbl-reservas",
+        "name": "user_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-validation_status": {
+        "id": "tbl-reservas-validation_status",
+        "tableId": "tbl-reservas",
+        "name": "validation_status",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 90,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-conflict_cache": {
+        "id": "tbl-reservas-conflict_cache",
+        "tableId": "tbl-reservas",
+        "name": "conflict_cache",
+        "comment": "",
+        "dataType": "JSON",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 76,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-cache_validated_at": {
+        "id": "tbl-reservas-cache_validated_at",
+        "tableId": "tbl-reservas",
+        "name": "cache_validated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 101,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-created_at": {
+        "id": "tbl-reservas-created_at",
+        "tableId": "tbl-reservas",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-reservas-updated_at": {
+        "id": "tbl-reservas-updated_at",
+        "tableId": "tbl-reservas",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-id": {
+        "id": "tbl-horarios-id",
+        "tableId": "tbl-horarios",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-agenda_id": {
+        "id": "tbl-horarios-agenda_id",
+        "tableId": "tbl-horarios",
+        "name": "agenda_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-reserva_id": {
+        "id": "tbl-horarios-reserva_id",
+        "tableId": "tbl-horarios",
+        "name": "reserva_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-horario_inicio": {
+        "id": "tbl-horarios-horario_inicio",
+        "tableId": "tbl-horarios",
+        "name": "horario_inicio",
+        "comment": "",
+        "dataType": "TIME",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 73,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-horario_fim": {
+        "id": "tbl-horarios-horario_fim",
+        "tableId": "tbl-horarios",
+        "name": "horario_fim",
+        "comment": "",
+        "dataType": "TIME",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-data": {
+        "id": "tbl-horarios-data",
+        "tableId": "tbl-horarios",
+        "name": "data",
+        "comment": "",
+        "dataType": "DATE",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-situacao": {
+        "id": "tbl-horarios-situacao",
+        "tableId": "tbl-horarios",
+        "name": "situacao",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-justificativa": {
+        "id": "tbl-horarios-justificativa",
+        "tableId": "tbl-horarios",
+        "name": "justificativa",
+        "comment": "",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 61,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-user_id": {
+        "id": "tbl-horarios-user_id",
+        "tableId": "tbl-horarios",
+        "name": "user_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-created_at": {
+        "id": "tbl-horarios-created_at",
+        "tableId": "tbl-horarios",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-horarios-updated_at": {
+        "id": "tbl-horarios-updated_at",
+        "tableId": "tbl-horarios",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espaco-user-espaco_id": {
+        "id": "tbl-espaco-user-espaco_id",
+        "tableId": "tbl-espaco-user",
+        "name": "espaco_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espaco-user-user_id": {
+        "id": "tbl-espaco-user-user_id",
+        "tableId": "tbl-espaco-user",
+        "name": "user_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espaco-user-created_at": {
+        "id": "tbl-espaco-user-created_at",
+        "tableId": "tbl-espaco-user",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-espaco-user-updated_at": {
+        "id": "tbl-espaco-user-updated_at",
+        "tableId": "tbl-espaco-user",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-id": {
+        "id": "tbl-users-id",
+        "tableId": "tbl-users",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-name": {
+        "id": "tbl-users-name",
+        "tableId": "tbl-users",
+        "name": "name",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-email": {
+        "id": "tbl-users-email",
+        "tableId": "tbl-users",
+        "name": "email",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 12,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-email_verified_at": {
+        "id": "tbl-users-email_verified_at",
+        "tableId": "tbl-users",
+        "name": "email_verified_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 90,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-password": {
+        "id": "tbl-users-password",
+        "tableId": "tbl-users",
+        "name": "password",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-telefone": {
+        "id": "tbl-users-telefone",
+        "tableId": "tbl-users",
+        "name": "telefone",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-profile_pic": {
+        "id": "tbl-users-profile_pic",
+        "tableId": "tbl-users",
+        "name": "profile_pic",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-permission_type_id": {
+        "id": "tbl-users-permission_type_id",
+        "tableId": "tbl-users",
+        "name": "permission_type_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 103,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-setor_id": {
+        "id": "tbl-users-setor_id",
+        "tableId": "tbl-users",
+        "name": "setor_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-remember_token": {
+        "id": "tbl-users-remember_token",
+        "tableId": "tbl-users",
+        "name": "remember_token",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 92,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-created_at": {
+        "id": "tbl-users-created_at",
+        "tableId": "tbl-users",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-users-updated_at": {
+        "id": "tbl-users-updated_at",
+        "tableId": "tbl-users",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-id": {
+        "id": "tbl-setors-id",
+        "tableId": "tbl-setors",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-nome": {
+        "id": "tbl-setors-nome",
+        "tableId": "tbl-setors",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-sigla": {
+        "id": "tbl-setors-sigla",
+        "tableId": "tbl-setors",
+        "name": "sigla",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-unidade_id": {
+        "id": "tbl-setors-unidade_id",
+        "tableId": "tbl-setors",
+        "name": "unidade_id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 2,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-created_at": {
+        "id": "tbl-setors-created_at",
+        "tableId": "tbl-setors",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-setors-updated_at": {
+        "id": "tbl-setors-updated_at",
+        "tableId": "tbl-setors",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-permission-types-id": {
+        "id": "tbl-permission-types-id",
+        "tableId": "tbl-permission-types",
+        "name": "id",
+        "comment": "",
+        "dataType": "INTEGER",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-permission-types-nome": {
+        "id": "tbl-permission-types-nome",
+        "tableId": "tbl-permission-types",
+        "name": "nome",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-permission-types-created_at": {
+        "id": "tbl-permission-types-created_at",
+        "tableId": "tbl-permission-types",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "tbl-permission-types-updated_at": {
+        "id": "tbl-permission-types-updated_at",
+        "tableId": "tbl-permission-types",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 62,
+          "widthComment": 60,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      }
+    },
+    "relationshipEntities": {
+      "rel-01": {
+        "id": "rel-01",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-instituicaos",
+          "columnIds": [
+            "tbl-instituicaos-id"
+          ],
+          "x": 1295.1415,
+          "y": 768.4811,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-unidades",
+          "columnIds": [
+            "tbl-unidades-instituicao_id"
+          ],
+          "x": 1740.616,
+          "y": 715.3419,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-02": {
+        "id": "rel-02",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-unidades",
+          "columnIds": [
+            "tbl-unidades-id"
+          ],
+          "x": 2121.616,
+          "y": 765.3419,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-modulos",
+          "columnIds": [
+            "tbl-modulos-unidade_id"
+          ],
+          "x": 2421.7576,
+          "y": 634.1263,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-03": {
+        "id": "rel-03",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-modulos",
+          "columnIds": [
+            "tbl-modulos-id"
+          ],
+          "x": 2793.7576,
+          "y": 634.1263,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-andars",
+          "columnIds": [
+            "tbl-andars-modulo_id"
+          ],
+          "x": 3066.7518,
+          "y": 721.8941,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-04": {
+        "id": "rel-04",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-andars",
+          "columnIds": [
+            "tbl-andars-id"
+          ],
+          "x": 3066.7518,
+          "y": 821.8941,
+          "direction": 1
+        },
+        "end": {
+          "tableId": "tbl-espacos",
+          "columnIds": [
+            "tbl-espacos-andar_id"
+          ],
+          "x": 2511.0822,
+          "y": 1679.1531,
+          "direction": 4
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-05": {
+        "id": "rel-05",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "tbl-espacos",
+          "columnIds": [
+            "tbl-espacos-id"
+          ],
+          "x": 2511.0822,
+          "y": 1951.1531,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "tbl-agendas",
+          "columnIds": [
+            "tbl-agendas-espaco_id"
+          ],
+          "x": 2114.3571,
+          "y": 2501.167,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-06": {
+        "id": "rel-06",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 2176.7929,
+          "y": 1310.5982,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "tbl-agendas",
+          "columnIds": [
+            "tbl-agendas-user_id"
+          ],
+          "x": 1928.3571,
+          "y": 2351.167,
+          "direction": 4
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-07": {
+        "id": "rel-07",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 2280.0429,
+          "y": 1052.5982,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-reservas",
+          "columnIds": [
+            "tbl-reservas-user_id"
+          ],
+          "x": 3114.4439,
+          "y": 1188.0524,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-08": {
+        "id": "rel-08",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-agendas",
+          "columnIds": [
+            "tbl-agendas-id"
+          ],
+          "x": 2114.3571,
+          "y": 2401.167,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-horarios",
+          "columnIds": [
+            "tbl-horarios-agenda_id"
+          ],
+          "x": 3119.5653,
+          "y": 2007.1852,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-09": {
+        "id": "rel-09",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-reservas",
+          "columnIds": [
+            "tbl-reservas-id"
+          ],
+          "x": 3319.9439,
+          "y": 1384.0524,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "tbl-horarios",
+          "columnIds": [
+            "tbl-horarios-reserva_id"
+          ],
+          "x": 3311.0653,
+          "y": 1767.1852,
+          "direction": 4
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-10": {
+        "id": "rel-10",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 2280.0429,
+          "y": 1224.5982,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-horarios",
+          "columnIds": [
+            "tbl-horarios-user_id"
+          ],
+          "x": 3119.5653,
+          "y": 1847.1852,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-11": {
+        "id": "rel-11",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-espacos",
+          "columnIds": [
+            "tbl-espacos-id"
+          ],
+          "x": 2302.0822,
+          "y": 1815.1531,
+          "direction": 1
+        },
+        "end": {
+          "tableId": "tbl-espaco-user",
+          "columnIds": [
+            "tbl-espaco-user-espaco_id"
+          ],
+          "x": 1456.9014,
+          "y": 1966.8012,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-12": {
+        "id": "rel-12",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 1970.2929,
+          "y": 1310.5982,
+          "direction": 8
+        },
+        "end": {
+          "tableId": "tbl-espaco-user",
+          "columnIds": [
+            "tbl-espaco-user-user_id"
+          ],
+          "x": 1456.9014,
+          "y": 1890.8012,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-13": {
+        "id": "rel-13",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-permission-types",
+          "columnIds": [
+            "tbl-permission-types-id"
+          ],
+          "x": 1326.714,
+          "y": 1582.5446,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-permission_type_id"
+          ],
+          "x": 1867.0429,
+          "y": 1224.5982,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-14": {
+        "id": "rel-14",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 1,
+        "start": {
+          "tableId": "tbl-setors",
+          "columnIds": [
+            "tbl-setors-id"
+          ],
+          "x": 1238.6001,
+          "y": 1249.4775,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-setor_id"
+          ],
+          "x": 1867.0429,
+          "y": 1052.5982,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      },
+      "rel-15": {
+        "id": "rel-15",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-unidades",
+          "columnIds": [
+            "tbl-unidades-id"
+          ],
+          "x": 1740.616,
+          "y": 815.3419,
+          "direction": 1
+        },
+        "end": {
+          "tableId": "tbl-setors",
+          "columnIds": [
+            "tbl-setors-unidade_id"
+          ],
+          "x": 1238.6001,
+          "y": 1149.4775,
+          "direction": 2
+        },
+        "meta": {
+          "updateAt": 1775343489063,
+          "createAt": 1775343489063
+        }
+      }
+    },
+    "indexEntities": {},
+    "indexColumnEntities": {},
+    "memoEntities": {}
+  }
+}
