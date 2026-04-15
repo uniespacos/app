@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\Reserva;
 use App\Models\User;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class ReservationCanceledNotification extends BaseNotification
 {
@@ -22,10 +25,17 @@ class ReservationCanceledNotification extends BaseNotification
         $this->canceler = $canceler;
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new \Illuminate\Notifications\Messages\MailMessage)
+        return (new MailMessage)
             ->subject('Reserva Cancelada: '.$this->reserva->titulo)
-            ->view('emails.reservations.reservation_canceled', ['reserva' => $this->reserva, 'canceler' => $this->canceler, 'url' => $this->url]);
+            ->view('emails.reservations.reservation_canceled', [
+                'reserva' => $this->reserva,
+                'canceler' => $this->canceler,
+                'url' => $this->url,
+            ]);
     }
 }

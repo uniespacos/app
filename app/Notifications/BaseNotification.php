@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
+use App\Models\Agenda;
+use App\Models\Horario;
+use App\Models\Reserva;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -12,23 +17,23 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $titulo; // A solicitação de reserva
+    public string $titulo;
 
-    public $descricao; // Descrição da solicitação
+    public string $descricao;
 
-    public $url;
+    public string $url;
 
-    public function __construct($titulo, $descricao, $url)
+    public function __construct(string $titulo, string $descricao, string $url)
     {
-        $this->titulo = $titulo; // Título da notificação
-        $this->descricao = $descricao; // Descrição da notificação
-        // A "mágica" da substituição
-        $baseUrlCorreta = config('app.url'); // Pega a URL do .env (ex: http://192.168.1.105)
-        $this->url = str_replace('http://localhost', $baseUrlCorreta, $url);
+        $this->titulo = $titulo;
+        $this->descricao = $descricao;
+        $this->url = str_replace('http://localhost', config('app.url'), $url);
     }
 
     /**
      * Get the notification's delivery channels.
+     * Suppresses the mail channel when the notifiable is both the reservation owner
+     * and the sole manager of all associated agendas (self-approved reservation).
      *
      * @return array<int, string>
      */
@@ -36,29 +41,21 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     {
         $channels = ['database', 'broadcast'];
 
-        // Se a notificação estiver ligada a uma reserva
-        if (property_exists($this, 'reserva') && $this->reserva instanceof \App\Models\Reserva) {
-
-            // Verifica se o usuário sendo notificado é o solicitante da reserva
+        if (property_exists($this, 'reserva') && $this->reserva instanceof Reserva) {
             $isApplicant = $this->reserva->user_id === $notifiable->id;
 
-            // Busca os IDs dos gestores das agendas associadas a esta reserva
-            $managerIds = \App\Models\Agenda::whereIn(
+            $managerIds = Agenda::whereIn(
                 'id',
-                \App\Models\Horario::where('reserva_id', $this->reserva->id)->select('agenda_id')
+                Horario::where('reserva_id', $this->reserva->id)->select('agenda_id')
             )->pluck('user_id')->unique();
 
-            // Verifica se o solicitante é o ÚNICO gestor envolvido em todos os horários da reserva
             $isSoleManager = $managerIds->count() === 1 && $managerIds->first() === $notifiable->id;
 
-            // Se um gestor cria uma reserva para a própria agenda,
-            // suprime o e-mail, enviando apenas notificação interna (database/broadcast)
             if ($isApplicant && $isSoleManager) {
                 return $channels;
             }
         }
 
-        // Para os demais casos, envia também por e-mail
         $channels[] = 'mail';
 
         return $channels;
@@ -89,6 +86,9 @@ abstract class BaseNotification extends Notification implements ShouldQueue
         ];
     }
 
+    /**
+     * Get the broadcastable representation of the notification.
+     */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
