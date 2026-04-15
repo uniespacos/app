@@ -14,6 +14,7 @@ use App\Notifications\ReservationCanceledNotification;
 use App\Repositories\AgendaRepositoryInterface;
 use App\Repositories\ReservaRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +37,7 @@ class ReservaService
     {
         [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef);
 
-        /** @var \Illuminate\Pagination\LengthAwarePaginator<Reserva> $reservas */
+        /** @var LengthAwarePaginator<Reserva> $reservas */
         $reservas = $this->repoReserva->getPaginatedForUser($user->id, $weekStart, $weekEnd, $filters, $perPage)
             ->withQueryString();
 

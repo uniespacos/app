@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\EspacoController;
 use App\Http\Controllers\Gestor\GestorReservaController;
 use App\Http\Controllers\HomeController;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 function generateReverbCredentials()
 {
     $appId = rand(100000, 999999);
