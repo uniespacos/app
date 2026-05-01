@@ -8,6 +8,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Institucional\InstitucionalEspacoController;
 use App\Http\Controllers\Institucional\InstitucionalInstituicaoController;
 use App\Http\Controllers\Institucional\InstitucionalModuloController;
+use App\Http\Controllers\Institucional\InstitucionalPermissionController;
+use App\Http\Controllers\Institucional\InstitucionalRoleController;
 use App\Http\Controllers\Institucional\InstitucionalSetorController;
 use App\Http\Controllers\Institucional\InstitucionalUnidadeController;
 use App\Http\Controllers\Institucional\InstitucionalUsuarioController;
@@ -102,6 +104,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('espacos/{espaco}/alterar-gestores', [InstitucionalEspacoController::class, 'alterarGestores'])
             ->name('espacos.alterarGestores');
         Route::resource('espacos', InstitucionalEspacoController::class);
+    });
+
+    // Gestão de Roles e Permissions
+    Route::middleware(['permission:secao.gestao-roles'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::resource('roles', InstitucionalRoleController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::put('roles/{role}/permissions', [InstitucionalRoleController::class, 'syncPermissions'])->name('roles.syncpermissions');
+        Route::get('permissions', [InstitucionalPermissionController::class, 'index'])->name('permissions.index');
     });
 });
 
