@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\Agenda;
 use App\Models\Instituicao;
-use App\Models\PermissionType;
 use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\UserAssignedAsManagerNotification;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\Log;
 
 class UserService
 {
-    private const GESTOR_PERMISSION_ID = 2;
 
     public function __construct(
         protected UserRepositoryInterface $repoUser,
@@ -45,12 +43,6 @@ class UserService
 
         $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId);
 
-        $permissionTypes = PermissionType::all()->map(fn ($type) => [
-            'id' => $type->id,
-            'nome' => $type->nome,
-            'label' => $type->nome,
-        ]);
-
         $instituicoes = Instituicao::with(['unidades.modulos.andars.espacos.agendas'])->get();
 
         $setores = Setor::with([
@@ -60,7 +52,6 @@ class UserService
 
         return [
             'users' => $users,
-            'permissionTypes' => $permissionTypes,
             'instituicoes' => $instituicoes,
             'setores' => $setores,
         ];
@@ -74,14 +65,13 @@ class UserService
      */
     public function updatePermissions(User $user, array $data): void
     {
-        $permissionTypeId = (int) $data['permission_type_id'];
+        $newRole = $data['role_name'];
         $agendaIds = $data['agendas'] ?? [];
 
-        DB::transaction(function () use ($user, $permissionTypeId, $agendaIds) {
-            $user->permission_type_id = $permissionTypeId;
-            $user->save();
+        DB::transaction(function () use ($user, $newRole, $agendaIds) {
+            $user->syncRoles([$newRole]);
 
-            if ($permissionTypeId === self::GESTOR_PERMISSION_ID) {
+            if ($newRole === 'gestor') {
                 $currentAgendaIds = Agenda::where('user_id', $user->id)->pluck('id')->toArray();
 
                 $toUnlink = array_diff($currentAgendaIds, $agendaIds);

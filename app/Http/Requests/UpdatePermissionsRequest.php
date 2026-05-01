@@ -14,7 +14,7 @@ class UpdatePermissionsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()?->permission_type_id === 1;
+        return Auth::user()?->hasPermissionTo('usuarios.gerenciar-permissoes');
     }
 
     /**
@@ -23,7 +23,7 @@ class UpdatePermissionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'permission_type_id' => ['required', 'exists:permission_types,id'],
+            'role_name' => ['required', 'string', 'in:institucional,gestor,comum'],
             'agendas' => ['nullable', 'array'],
             'agendas.*' => ['integer', 'exists:agendas,id'],
         ];

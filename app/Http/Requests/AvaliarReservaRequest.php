@@ -15,7 +15,7 @@ class AvaliarReservaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()?->permission_type_id === 2;
+        return Auth::user()?->hasPermissionTo('reservas.avaliar');
     }
 
     /**

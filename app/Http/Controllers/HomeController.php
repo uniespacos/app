@@ -23,10 +23,10 @@ class HomeController extends Controller
         $user = Auth::user();
         $data = $this->service->getDashboardData($user);
 
-        $view = match ($user->permission_type_id) {
-            1 => 'Dashboard/DashboardInstitucionalPage',
-            2 => 'Dashboard/DashboardGestorPage',
-            default => 'Dashboard/DashboardUsuarioPage',
+        $view = match (true) {
+            $user->hasPermissionTo('secao.dashboard-institucional') => 'Dashboard/DashboardInstitucionalPage',
+            $user->hasPermissionTo('secao.dashboard-gestor')        => 'Dashboard/DashboardGestorPage',
+            default                                                  => 'Dashboard/DashboardUsuarioPage',
         };
 
         return Inertia::render($view, $data);

@@ -10,12 +10,15 @@ use App\Http\Requests\StoreInstituicaoRequest;
 use App\Http\Requests\UpdateInstituicaoRequest;
 use App\Models\Instituicao;
 use App\Services\InstituicaoService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class InstitucionalInstituicaoController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected InstituicaoService $service,
     ) {}
@@ -25,6 +28,8 @@ class InstitucionalInstituicaoController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Instituicao::class);
+
         return Inertia::render('Administrativo/Instituicoes/Instituicoes', [
             'instituicoes' => $this->service->paginate(10),
         ]);
@@ -43,6 +48,8 @@ class InstitucionalInstituicaoController extends Controller
      */
     public function store(StoreInstituicaoRequest $request): RedirectResponse
     {
+        $this->authorize('create', Instituicao::class);
+
         $this->service->store($request->validated());
 
         return redirect()->route('institucional.instituicoes.index')
@@ -64,6 +71,8 @@ class InstitucionalInstituicaoController extends Controller
      */
     public function update(UpdateInstituicaoRequest $request, Instituicao $instituico): RedirectResponse
     {
+        $this->authorize('update', $instituico);
+
         try {
             $this->service->update($instituico, $request->validated());
 
@@ -81,6 +90,8 @@ class InstitucionalInstituicaoController extends Controller
      */
     public function destroy(ConfirmPasswordRequest $request, Instituicao $instituico): RedirectResponse
     {
+        $this->authorize('delete', $instituico);
+
         if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }

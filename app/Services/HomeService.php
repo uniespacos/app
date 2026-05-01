@@ -20,11 +20,13 @@ class HomeService
      */
     public function getDashboardData(User $user): array
     {
-        return match ($user->permission_type_id) {
-            1 => $this->getInstitucionalData($user),
-            2 => $this->getGestorData($user),
-            default => $this->getUserData($user),
-        };
+        if ($user->hasPermissionTo('secao.dashboard-institucional')) {
+            return $this->getInstitucionalData($user);
+        } elseif ($user->hasPermissionTo('secao.dashboard-gestor')) {
+            return $this->getGestorData($user);
+        }
+
+        return $this->getUserData($user);
     }
 
     /**
@@ -38,12 +40,12 @@ class HomeService
         $espacosFavoritos = $user->favoritos()->with('andar.modulo')->get();
         $users = User::latest()->take(5)->with(['agendas'])->get();
         $espacos = Espaco::latest()->take(5)->with(['andar.modulo.unidade', 'agendas.user'])->get();
-        $gestores = User::where('permission_type_id', 2)->latest()->take(5)->get();
+        $gestores = User::permission('secao.gestao-reservas')->latest()->take(5)->get();
         $unidades = Unidade::latest()->take(5)->with('modulos.andars.espacos')->get();
 
         $estatisticasPainel = [
             'total_espacos' => Espaco::count(),
-            'total_gestores' => User::where('permission_type_id', 2)->count(),
+            'total_gestores' => User::permission('secao.gestao-reservas')->count(),
             'reservas_mes' => Reserva::whereMonth('created_at', now()->month)->count(),
         ];
 

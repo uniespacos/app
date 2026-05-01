@@ -14,7 +14,7 @@ class ReservaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('reservas.listar');
     }
 
     /**
@@ -22,7 +22,7 @@ class ReservaPolicy
      */
     public function view(User $user, Reserva $reserva): bool
     {
-        return false;
+        return $user->hasPermissionTo('reservas.visualizar') || $user->id === $reserva->user_id;
     }
 
     /**
@@ -36,10 +36,14 @@ class ReservaPolicy
     /**
      * Determine whether the user can update the model.
      * Allowed only for the reservation owner while the situacao is 'em_analise'
-     * and no horarios have been individually evaluated yet.
+     * and no horarios have been individually evaluated yet, or if user has update permission.
      */
     public function update(User $user, Reserva $reserva): bool
     {
+        if ($user->hasPermissionTo('reservas.atualizar')) {
+            return true;
+        }
+
         if ($user->id !== $reserva->user_id || $reserva->situacao !== 'em_analise') {
             return false;
         }
@@ -56,7 +60,7 @@ class ReservaPolicy
      */
     public function delete(User $user, Reserva $reserva): bool
     {
-        return $user->id === $reserva->user_id;
+        return $user->hasPermissionTo('reservas.deletar') || $user->id === $reserva->user_id;
     }
 
     /**
@@ -77,10 +81,14 @@ class ReservaPolicy
 
     /**
      * Determine whether a gestor can view the reservation for evaluation.
-     * Returns true only if the gestor manages at least one agenda associated with the reservation.
+     * Requires the user to have reservas.avaliar permission or manage at least one agenda associated with the reservation.
      */
     public function viewForGestor(User $user, Reserva $reserva): bool
     {
+        if (! $user->hasPermissionTo('reservas.avaliar')) {
+            return false;
+        }
+
         $agendasDaReservaIds = $reserva->horarios()->pluck('agenda_id')->unique();
         $agendasDoGestorIds = $user->agendas()->pluck('id');
 
