@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Instituicao;
+use App\Models\Modulo;
 use App\Models\Reserva;
+use App\Models\Setor;
+use App\Models\Unidade;
+use App\Policies\InstituicaoPolicy;
+use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
+use App\Policies\SetorPolicy;
+use App\Policies\UnidadePolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Reserva::class, ReservaPolicy::class);
+        Gate::policy(Instituicao::class, InstituicaoPolicy::class);
+        Gate::policy(Unidade::class, UnidadePolicy::class);
+        Gate::policy(Modulo::class, ModuloPolicy::class);
+        Gate::policy(Setor::class, SetorPolicy::class);
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
@@ -50,6 +62,8 @@ class AppServiceProvider extends ServiceProvider
                 if ($user) {
                     return array_merge($user->toArray(), [
                         'unread_notifications_count' => $user->unreadNotifications->count(),
+                        'roles' => $user->getRoleNames(),
+                        'permissions' => $user->getPermissionNames(),
                     ]);
                 }
 
