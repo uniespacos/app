@@ -10,16 +10,18 @@ use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Notifications\UserRemovedAsManagerNotification;
+use App\Repositories\PermissionRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\PermissionRegistrar;
 
 class UserService
 {
-
     public function __construct(
         protected UserRepositoryInterface $repoUser,
+        protected PermissionRepositoryInterface $repoPermission,
     ) {}
 
     /**
@@ -41,7 +43,12 @@ class UserService
     {
         $instituicaoId = $authUser->setor->unidade->instituicao_id;
 
-        $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId);
+        $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId)
+            ->map(fn (User $user) => array_merge($user->toArray(), [
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+                'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            ]));
 
         $instituicoes = Instituicao::with(['unidades.modulos.andars.espacos.agendas'])->get();
 
@@ -54,6 +61,7 @@ class UserService
             'users' => $users,
             'instituicoes' => $instituicoes,
             'setores' => $setores,
+            'permissionCatalog' => $this->repoPermission->getAllGroupedByPrefix(),
         ];
     }
 
@@ -68,8 +76,12 @@ class UserService
         $newRole = $data['role_name'];
         $agendaIds = $data['agendas'] ?? [];
 
-        DB::transaction(function () use ($user, $newRole, $agendaIds) {
+        DB::transaction(function () use ($user, $newRole, $agendaIds, $data) {
             $user->syncRoles([$newRole]);
+
+            if (array_key_exists('direct_permissions', $data)) {
+                $user->syncPermissions($data['direct_permissions']);
+            }
 
             if ($newRole === 'gestor') {
                 $currentAgendaIds = Agenda::where('user_id', $user->id)->pluck('id')->toArray();
@@ -97,6 +109,8 @@ class UserService
                     Log::warning("Failed to notify user {$user->id} of manager removal: ".$e->getMessage());
                 }
             }
+
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
     }
 
