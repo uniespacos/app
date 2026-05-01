@@ -14,23 +14,31 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::create([
-            'name' => 'Institucional',
-            'email' => 'institucional@gmail.com',
-            'email_verified_at' => now(),
-            'profile_pic' => fake()->name(),
-            'telefone' => fake()->phoneNumber(),
-            'password' => Hash::make('123123123'),
-            'setor_id' => Setor::pluck('id')->random(),
-            'remember_token' => Str::random(10),
-        ]);
+        $setorId = Setor::pluck('id')->random();
 
-        $user->assignRole('institucional');
+        $users = [
+            ['name' => 'Institucional', 'email' => 'institucional@gmail.com', 'role' => 'institucional'],
+            ['name' => 'Gestor',        'email' => 'gestor@gmail.com',        'role' => 'gestor'],
+            ['name' => 'Comum',         'email' => 'comum@gmail.com',         'role' => 'comum'],
+        ];
 
-        User::factory()->count(10)->create([
+        foreach ($users as $data) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'email_verified_at' => now(),
+                'profile_pic' => fake()->name(),
+                'telefone' => fake()->phoneNumber(),
+                'password' => Hash::make('123123123'),
+                'setor_id' => $setorId,
+                'remember_token' => Str::random(10),
+            ]);
+
+            $user->assignRole($data['role']);
+        }
+
+        User::factory()->count(15)->create([
             'password' => Hash::make('123123123'),
-        ])->each(function (User $user) {
-            $user->assignRole('comum');
-        });
+        ])->each(fn (User $user) => $user->assignRole('comum'));
     }
 }

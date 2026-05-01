@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Database\Seeders\Development\EspacoSeeder;
 use Database\Seeders\Development\ReservaSeeder;
 use Database\Seeders\Development\UserSeeder;
@@ -31,5 +32,18 @@ class DatabaseSeeder extends Seeder
             EspacoSeeder::class,
             ReservaSeeder::class,
         ]);
+
+        // Sincroniza as roles dos usuários nomeados de teste após EspacoSeeder
+        // (que pode ter atribuído role 'gestor' extra a esses usuários).
+        $namedUsers = [
+            'institucional@gmail.com' => 'institucional',
+            'gestor@gmail.com' => 'gestor',
+            'comum@gmail.com' => 'comum',
+        ];
+
+        foreach ($namedUsers as $email => $role) {
+            $user = User::where('email', $email)->first();
+            $user?->syncRoles([$role]);
+        }
     }
 }
