@@ -2,18 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace Database\Seeders\Development;
 
 use App\Models\Espaco;
 use Illuminate\Database\Seeder;
 
 class EspacoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Espaco::factory(10)->create();
+        Espaco::factory()->count(5)->create();
     }
 }
