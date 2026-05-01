@@ -13,8 +13,6 @@ use App\Http\Controllers\Institucional\InstitucionalUnidadeController;
 use App\Http\Controllers\Institucional\InstitucionalUsuarioController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReservaController;
-use App\Http\Middleware\GestorMiddleware;
-use App\Http\Middleware\InstitucionalMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -57,40 +55,52 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ---------------------------
     // Rotas para Usuário Gestor
     // ---------------------------
-    Route::middleware([GestorMiddleware::class])->prefix('gestor')->name('gestor.')->group(function () {
+    Route::middleware(['permission:secao.gestao-reservas'])->prefix('gestor')->name('gestor.')->group(function () {
         Route::resource('reservas', GestorReservaController::class);
     });
 
     // ---------------------------
     // Rotas Institucionais
     // ---------------------------
-    Route::middleware([InstitucionalMiddleware::class])->prefix('institucional')->name('institucional.')->group(function () {
 
+    // Dashboard institucional
+    Route::middleware(['permission:secao.dashboard-institucional'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::get('/', function () {
             return Inertia::render('Administrativo/Dashboard');
         })->name('dashboard');
+    });
 
-        // Usuários
-        Route::resource('usuarios', InstitucionalUsuarioController::class);
+    // Gestão de Usuários
+    Route::middleware(['permission:secao.gestao-usuarios'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::resource('usuarios', InstitucionalUsuarioController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::put('usuarios/{user}/edit-permissions', [InstitucionalUsuarioController::class, 'updatePermissions'])
             ->name('usuarios.updatepermissions');
+    });
 
-        // Instituições
+    // Gestão de Instituições
+    Route::middleware(['permission:secao.gestao-instituicoes'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::resource('instituicoes', InstitucionalInstituicaoController::class)->except(['show']);
+    });
 
-        // Unidades
+    // Gestão de Unidades
+    Route::middleware(['permission:secao.gestao-unidades'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::resource('unidades', InstitucionalUnidadeController::class);
+    });
 
-        // Módulos
+    // Gestão de Módulos
+    Route::middleware(['permission:secao.gestao-modulos'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::resource('modulos', InstitucionalModuloController::class);
+    });
 
-        // Setores
+    // Gestão de Setores
+    Route::middleware(['permission:secao.gestao-setores'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::resource('setors', InstitucionalSetorController::class);
+    });
 
-        // Espaços
+    // Gestão de Espaços
+    Route::middleware(['permission:secao.gestao-espacos'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::patch('espacos/{espaco}/alterar-gestores', [InstitucionalEspacoController::class, 'alterarGestores'])
             ->name('espacos.alterarGestores');
-
         Route::resource('espacos', InstitucionalEspacoController::class);
     });
 });
