@@ -10,6 +10,7 @@ export const PERMISSION_USUARIOS_CRIAR = 'usuarios.criar';
 export const PERMISSION_USUARIOS_ATUALIZAR = 'usuarios.atualizar';
 export const PERMISSION_USUARIOS_DELETAR = 'usuarios.deletar';
 export const PERMISSION_USUARIOS_GERENCIAR_PERMISSOES = 'usuarios.gerenciar-permissoes';
+export const PERMISSION_USUARIOS_GERENCIAR_PERMISSOES_DIRETAS = 'usuarios.gerenciar-permissoes-diretas';
 
 // Espaços
 export const PERMISSION_ESPACOS_LISTAR = 'espacos.listar';
@@ -25,6 +26,14 @@ export const PERMISSION_RESERVAS_VISUALIZAR = 'reservas.visualizar';
 export const PERMISSION_RESERVAS_ATUALIZAR = 'reservas.atualizar';
 export const PERMISSION_RESERVAS_DELETAR = 'reservas.deletar';
 export const PERMISSION_RESERVAS_AVALIAR = 'reservas.avaliar';
+
+// Roles
+export const PERMISSION_ROLES_LISTAR = 'roles.listar';
+export const PERMISSION_ROLES_VISUALIZAR = 'roles.visualizar';
+export const PERMISSION_ROLES_CRIAR = 'roles.criar';
+export const PERMISSION_ROLES_ATUALIZAR = 'roles.atualizar';
+export const PERMISSION_ROLES_DELETAR = 'roles.deletar';
+export const PERMISSION_ROLES_GERENCIAR_PERMISSOES = 'roles.gerenciar-permissoes';
 
 // Instituições
 export const PERMISSION_INSTITUICOES_LISTAR = 'instituicoes.listar';
@@ -71,3 +80,4 @@ export const PERMISSION_SECAO_GESTAO_INSTITUICOES = 'secao.gestao-instituicoes';
 export const PERMISSION_SECAO_GESTAO_UNIDADES = 'secao.gestao-unidades';
 export const PERMISSION_SECAO_GESTAO_MODULOS = 'secao.gestao-modulos';
 export const PERMISSION_SECAO_GESTAO_SETORES = 'secao.gestao-setores';
+export const PERMISSION_SECAO_GESTAO_ROLES = 'secao.gestao-roles';

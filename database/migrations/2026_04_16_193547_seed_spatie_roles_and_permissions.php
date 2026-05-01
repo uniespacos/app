@@ -9,16 +9,14 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
-// Dependency: Must run BEFORE 2026_04_16_230945_remove_legacy_permission_columns.php
-// This migration uses permission_type_id column to migrate users to roles.
-// The remove_legacy migration will drop permission_type_id after this migration completes.
 return new class extends Migration
 {
     private const PERMISSIONS = [
         'usuarios.listar', 'usuarios.visualizar', 'usuarios.criar',
-        'usuarios.atualizar', 'usuarios.deletar', 'usuarios.gerenciar-permissoes',
+        'usuarios.atualizar', 'usuarios.deletar', 'usuarios.gerenciar-permissoes', 'usuarios.gerenciar-permissoes-diretas',
         'espacos.listar', 'espacos.visualizar', 'espacos.criar', 'espacos.atualizar', 'espacos.deletar', 'espacos.alterar-gestores',
         'reservas.listar', 'reservas.visualizar', 'reservas.atualizar', 'reservas.deletar', 'reservas.avaliar',
+        'roles.listar', 'roles.visualizar', 'roles.criar', 'roles.atualizar', 'roles.deletar', 'roles.gerenciar-permissoes',
         'instituicoes.listar', 'instituicoes.visualizar', 'instituicoes.criar', 'instituicoes.atualizar', 'instituicoes.deletar',
         'unidades.listar', 'unidades.visualizar', 'unidades.criar', 'unidades.atualizar', 'unidades.deletar',
         'modulos.listar', 'modulos.visualizar', 'modulos.criar', 'modulos.atualizar', 'modulos.deletar',

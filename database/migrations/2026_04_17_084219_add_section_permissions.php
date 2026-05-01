@@ -19,6 +19,7 @@ return new class extends Migration
         'secao.gestao-unidades',
         'secao.gestao-modulos',
         'secao.gestao-setores',
+        'secao.gestao-roles',
     ];
 
     public function up(): void

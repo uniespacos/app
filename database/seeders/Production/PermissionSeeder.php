@@ -18,6 +18,7 @@ class PermissionSeeder extends Seeder
         'usuarios.atualizar',
         'usuarios.deletar',
         'usuarios.gerenciar-permissoes',
+        'usuarios.gerenciar-permissoes-diretas',
         // Espaços
         'espacos.listar',
         'espacos.visualizar',
@@ -31,6 +32,13 @@ class PermissionSeeder extends Seeder
         'reservas.atualizar',
         'reservas.deletar',
         'reservas.avaliar',
+        // Roles
+        'roles.listar',
+        'roles.visualizar',
+        'roles.criar',
+        'roles.atualizar',
+        'roles.deletar',
+        'roles.gerenciar-permissoes',
         // Instituições
         'instituicoes.listar',
         'instituicoes.visualizar',
@@ -70,6 +78,7 @@ class PermissionSeeder extends Seeder
         'secao.gestao-unidades',
         'secao.gestao-modulos',
         'secao.gestao-setores',
+        'secao.gestao-roles',
     ];
 
     public function run(): void
