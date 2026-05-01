@@ -17,7 +17,8 @@ import GenericHeader from '@/components/generic-header';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { Instituicao, PermissionType, Setor, User } from '@/types';
+import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
+import { Instituicao, Setor, User } from '@/types';
 import { toast } from 'sonner';
 const breadcrumbs = [
     {
@@ -29,11 +30,10 @@ const breadcrumbs = [
 export default function UsuariosPage() {
     const { props } = usePage<{
         users: User[];
-        permissionTypes: PermissionType[];
         instituicoes: Instituicao[];
         setores: Setor[];
     }>();
-    const { users: initialUsers, permissionTypes, instituicoes, setores } = props;
+    const { users: initialUsers, instituicoes, setores } = props;
 
     const [users, setUsers] = useState<User[]>(initialUsers);
     const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
@@ -62,19 +62,25 @@ export default function UsuariosPage() {
         const filtered = users.filter((user) => user.setor?.id === selectedSetor?.id);
         setFilteredUsers(filtered);
     }, [users, selectedSetor]);
-    const getPermissionLabel = (permissionTypeId: number) => {
-        const permission = permissionTypes.find((p) => p.id === permissionTypeId);
-        return permission?.label || 'Desconhecido';
+    const getPermissionLabel = (roleName: string): string => {
+        switch (roleName) {
+            case ROLE_INSTITUCIONAL:
+                return 'Institucional';
+            case ROLE_GESTOR:
+                return 'Gestor';
+            case ROLE_COMUM:
+                return 'Comum';
+            default:
+                return roleName || 'Desconhecido';
+        }
     };
 
-    const getPermissionColor = (permissionTypeId: number) => {
-        switch (permissionTypeId) {
-            case 1:
+    const getPermissionColor = (roleName: string): string => {
+        switch (roleName) {
+            case ROLE_INSTITUCIONAL:
                 return 'bg-red-100 text-red-800';
-            case 2:
+            case ROLE_GESTOR:
                 return 'bg-blue-100 text-blue-800';
-            case 3:
-                return 'bg-gray-100 text-gray-800';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -90,17 +96,17 @@ export default function UsuariosPage() {
         toast('Funcionalidade de edição ainda não implementada. ' + user.name);
     };
 
-    const handlePermissionUpdate = (userId: number, newPermissionTypeId: number, agendas?: number[]) => {
+    const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[]) => {
         setProcessing(true);
         router.put(
             route('institucional.usuarios.updatepermissions', { user: userId }),
             {
-                permission_type_id: newPermissionTypeId,
+                role_name: roleName,
                 agendas: agendas || [],
             },
             {
                 onSuccess: () => {
-                    setUsers(users.map((user) => (user.id === userId ? { ...user, permission_type_id: newPermissionTypeId } : user)));
+                    setUsers(users.map((user) => (user.id === userId ? { ...user, roles: [roleName] } : user)));
                     setIsModalOpen(false);
                     setSelectedUser(undefined);
                 },
@@ -178,8 +184,8 @@ export default function UsuariosPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
-                                                    <Badge className={getPermissionColor(user.permission_type_id)}>
-                                                        {getPermissionLabel(user.permission_type_id)}
+                                                    <Badge className={getPermissionColor(user.roles?.[0] ?? ROLE_COMUM)}>
+                                                        {getPermissionLabel(user.roles?.[0] ?? ROLE_COMUM)}
                                                     </Badge>
                                                     <div className="flex items-center space-x-2">
                                                         <div
@@ -243,7 +249,6 @@ export default function UsuariosPage() {
                                     setSelectedUser(undefined);
                                 }}
                                 onUpdate={handlePermissionUpdate}
-                                permissionTypes={permissionTypes}
                                 instituicoes={instituicoes}
                                 processing={processing}
                             />

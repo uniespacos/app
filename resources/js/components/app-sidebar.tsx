@@ -1,9 +1,19 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { PermissionId } from '@/constants/permissions';
 import { Link, usePage } from '@inertiajs/react';
+import { hasPermission } from '@/lib/auth';
 import AppLogo from './app-logo';
+import type { User } from '@/types';
+import {
+    PERMISSION_SECAO_GESTAO_RESERVAS,
+    PERMISSION_SECAO_GESTAO_ESPACOS,
+    PERMISSION_SECAO_GESTAO_USUARIOS,
+    PERMISSION_SECAO_GESTAO_INSTITUICOES,
+    PERMISSION_SECAO_GESTAO_UNIDADES,
+    PERMISSION_SECAO_GESTAO_MODULOS,
+    PERMISSION_SECAO_GESTAO_SETORES,
+} from '@/constants/permissions';
 
 /* Ícones ---------------------------------------------------------------- */
 import { BookOpen, Briefcase, Building, Calendar, Eye, Grid3X3, LayoutGrid, MapPin, School, Users } from 'lucide-react';
@@ -24,30 +34,23 @@ const commonNav: MenuItem[] = [
     { title: 'Minhas Reservas', href: '/reservas', icon: BookOpen },
 ];
 
-const gestorExtras: MenuItem[] = [{ title: 'Gerir Reservas', href: '/gestor/reservas', icon: Eye }];
-
-const institucionalExtras: MenuItem[] = [
-    { title: 'Gerir Espaços', href: '/institucional/espacos', icon: Building },
-    { title: 'Gerenciar Usuários', href: '/institucional/usuarios', icon: Users },
-    { title: 'Gerenciar Instituições', href: '/institucional/instituicoes', icon: School },
-    { title: 'Gerenciar Unidades', href: '/institucional/unidades', icon: MapPin },
-    { title: 'Gerenciar Modulos', href: '/institucional/modulos', icon: Grid3X3 },
-    { title: 'Gerenciar Setores', href: '/institucional/setors', icon: Briefcase },
-];
-
-/* Mapeia ID → itens extras --------------------------------------------- */
-const roleExtrasMap: Record<PermissionId, MenuItem[]> = {
-    [PermissionId.COMUM]: [],
-    [PermissionId.GESTOR]: gestorExtras,
-    [PermissionId.INSTITUCIONAL]: institucionalExtras,
-};
 
 /* --------------------------- Componente -------------------------------- */
 export function AppSidebar() {
-    const { props } = usePage<{ auth: { user: { permission_type_id: number } } }>();
-    const permissionId = (props.auth.user?.permission_type_id as PermissionId) ?? PermissionId.COMUM;
+    const { props } = usePage<{ auth: { user: User } }>();
+    const user = props.auth.user;
 
-    const extraItems = roleExtrasMap[permissionId];
+    const extraItems: MenuItem[] = user
+        ? [
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_RESERVAS)     ? [{ title: 'Gerir Reservas',          href: '/gestor/reservas',            icon: Eye      }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Gerir Espaços',            href: '/institucional/espacos',      icon: Building }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_USUARIOS)     ? [{ title: 'Gerenciar Usuários',       href: '/institucional/usuarios',     icon: Users    }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_INSTITUICOES) ? [{ title: 'Gerenciar Instituições',   href: '/institucional/instituicoes', icon: School   }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_UNIDADES)     ? [{ title: 'Gerenciar Unidades',       href: '/institucional/unidades',     icon: MapPin   }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_MODULOS)      ? [{ title: 'Gerenciar Modulos',        href: '/institucional/modulos',      icon: Grid3X3  }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_SETORES)      ? [{ title: 'Gerenciar Setores',        href: '/institucional/setors',       icon: Briefcase}] : []),
+          ]
+        : [];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

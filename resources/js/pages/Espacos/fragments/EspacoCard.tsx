@@ -3,14 +3,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Espaco } from '@/types';
+import { hasPermission } from '@/lib/auth';
+import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
+import type { Espaco, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 
 type CardEspacoProps = {
     espaco: Espaco;
-    userType: number;
+    user: User | null;
     isGerenciarEspacos?: boolean;
     handleSolicitarReserva?: (espacoId: string) => void;
     handleEditarEspaco?: (espacoId: string) => void;
@@ -20,7 +22,7 @@ type CardEspacoProps = {
 
 export default function EspacoCard({
     espaco,
-    userType,
+    user,
     isGerenciarEspacos,
     handleSolicitarReserva,
     handleEditarEspaco,
@@ -145,7 +147,7 @@ export default function EspacoCard({
 
             {/* O rodapé se alinha na parte inferior do card */}
             <CardFooter className="flex flex-wrap gap-2 pt-4">
-                {isGerenciarEspacos && userType === 1 ? (
+                {isGerenciarEspacos && hasPermission(user, PERMISSION_ESPACOS_ATUALIZAR) ? (
                     <>
                         <Button
                             variant="outline"

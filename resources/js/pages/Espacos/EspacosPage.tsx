@@ -16,7 +16,7 @@ export default function EspacosPage() {
         andares,
         modulos,
         unidades,
-        user: { permission_type_id },
+        user,
         espacos: { data: espacos, links },
         filters,
         capacidadeEspacos,
@@ -71,7 +71,7 @@ export default function EspacosPage() {
                                     <EspacoCard
                                         key={espaco.id}
                                         espaco={espaco}
-                                        userType={permission_type_id}
+                                        user={user}
                                         handleSolicitarReserva={handleSolicitarReserva}
                                     />
                                 ))}

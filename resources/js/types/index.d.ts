@@ -34,7 +34,8 @@ export interface User {
     email_verified_at: string | null;
     telefone: string;
     profile_pic?: string;
-    permission_type_id: number;
+    roles: string[]; // Array de nomes de roles (ex: ['institucional', 'gestor'])
+    permissions: string[]; // Array de nomes de permissões
     setor_id: number | null;
     setor?: Setor; // Opcional, carregar com with('setor')
     agendas?: Agenda[]; // Relação aninhada, array de agendas
@@ -325,12 +326,6 @@ export type AgendaDiasSemanaType = {
 };
 
 export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>;
-export interface PermissionType {
-    id: number;
-    name: 'institucional' | 'gestor' | 'comum';
-    label: string;
-}
-
 export interface SelectedAgenda {
     agenda: Agenda;
     espaco: Espaco;

@@ -1,24 +1,32 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Agenda, Instituicao, PermissionType, SelectedAgenda, User } from '@/types';
+import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
+import { Agenda, Instituicao, SelectedAgenda, User } from '@/types';
 import { useEffect, useState } from 'react';
 import FiltroBuscaPermission from './FiltroBuscaPermission';
+
+const ROLE_OPTIONS = [
+    { value: ROLE_INSTITUCIONAL, label: 'Institucional' },
+    { value: ROLE_GESTOR, label: 'Gestor' },
+    { value: ROLE_COMUM, label: 'Comum' },
+];
 
 interface PermissionModalProps {
     user: User | undefined;
     isOpen: boolean;
     processing?: boolean;
     onClose: () => void;
-    onUpdate: (userId: number, permissionTypeId: number, agendas?: number[]) => void;
-    permissionTypes: PermissionType[];
+    onUpdate: (userId: number, roleName: string, agendas?: number[]) => void;
     instituicoes: Instituicao[];
     initialAgendas?: Agenda[];
 }
 
-export function PermissionModal({ user, isOpen, onClose, onUpdate, permissionTypes, instituicoes, processing = false }: PermissionModalProps) {
-    const [selectedPermissionType, setSelectedPermissionType] = useState<number>(0);
+export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes, processing = false }: PermissionModalProps) {
+    const [selectedRole, setSelectedRole] = useState<string>(ROLE_COMUM);
     const [selectedAgendas, setSelectedAgendas] = useState<SelectedAgenda[]>(
         user?.agendas!.map(
             (agenda) =>
@@ -35,7 +43,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, permissionTyp
 
     useEffect(() => {
         if (user) {
-            setSelectedPermissionType(user.permission_type_id);
+            setSelectedRole(user.roles?.[0] ?? ROLE_COMUM);
         }
     }, [user]);
 
@@ -43,7 +51,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, permissionTyp
         if (!user) return;
 
         const agendaIds = selectedAgendas.map((sa) => sa.agenda.id);
-        onUpdate(user.id, selectedPermissionType, agendaIds);
+        onUpdate(user.id, selectedRole, agendaIds);
     };
 
     if (!user) return null;
@@ -58,24 +66,21 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, permissionTyp
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <Label htmlFor="permission-type">Tipo de Permissão</Label>
-                        <Select
-                            value={selectedPermissionType.toString()}
-                            onValueChange={(value) => setSelectedPermissionType(Number.parseInt(value))}
-                        >
+                        <Select value={selectedRole} onValueChange={setSelectedRole}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Selecione o tipo de permissão" />
                             </SelectTrigger>
                             <SelectContent>
-                                {permissionTypes.map((type) => (
-                                    <SelectItem key={type.id} value={type.id.toString()}>
-                                        {type.label}
+                                {ROLE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
 
-                    {selectedPermissionType === 2 && (
+                    {selectedRole === ROLE_GESTOR && (
                         <FiltroBuscaPermission
                             instituicoes={instituicoes}
                             selectedAgendas={selectedAgendas}
