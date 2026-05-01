@@ -13,10 +13,11 @@ import {
     PERMISSION_SECAO_GESTAO_UNIDADES,
     PERMISSION_SECAO_GESTAO_MODULOS,
     PERMISSION_SECAO_GESTAO_SETORES,
+    PERMISSION_SECAO_GESTAO_ROLES,
 } from '@/constants/permissions';
 
 /* Ícones ---------------------------------------------------------------- */
-import { BookOpen, Briefcase, Building, Calendar, Eye, Grid3X3, LayoutGrid, MapPin, School, Users } from 'lucide-react';
+import { BookOpen, Briefcase, Building, Calendar, Eye, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
 
 /* ------------- Tipo local de item de menu (não exportado) ------------- */
 import type { LucideIcon } from 'lucide-react';
@@ -42,13 +43,14 @@ export function AppSidebar() {
 
     const extraItems: MenuItem[] = user
         ? [
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_RESERVAS)     ? [{ title: 'Gerir Reservas',          href: '/gestor/reservas',            icon: Eye      }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Gerir Espaços',            href: '/institucional/espacos',      icon: Building }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_USUARIOS)     ? [{ title: 'Gerenciar Usuários',       href: '/institucional/usuarios',     icon: Users    }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_INSTITUICOES) ? [{ title: 'Gerenciar Instituições',   href: '/institucional/instituicoes', icon: School   }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_UNIDADES)     ? [{ title: 'Gerenciar Unidades',       href: '/institucional/unidades',     icon: MapPin   }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_MODULOS)      ? [{ title: 'Gerenciar Modulos',        href: '/institucional/modulos',      icon: Grid3X3  }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_SETORES)      ? [{ title: 'Gerenciar Setores',        href: '/institucional/setors',       icon: Briefcase}] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_RESERVAS)     ? [{ title: 'Gerir Reservas',          href: '/gestor/reservas',            icon: Eye        }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Gerir Espaços',            href: '/institucional/espacos',      icon: Building   }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_USUARIOS)     ? [{ title: 'Gerenciar Usuários',       href: '/institucional/usuarios',     icon: Users      }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ROLES)        ? [{ title: 'Gerenciar Papéis',         href: '/institucional/roles',        icon: ShieldCheck}] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_INSTITUICOES) ? [{ title: 'Gerenciar Instituições',   href: '/institucional/instituicoes', icon: School     }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_UNIDADES)     ? [{ title: 'Gerenciar Unidades',       href: '/institucional/unidades',     icon: MapPin     }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_MODULOS)      ? [{ title: 'Gerenciar Modulos',        href: '/institucional/modulos',      icon: Grid3X3    }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_SETORES)      ? [{ title: 'Gerenciar Setores',        href: '/institucional/setors',       icon: Briefcase  }] : []),
           ]
         : [];
 

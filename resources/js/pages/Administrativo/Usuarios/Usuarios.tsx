@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
-import { Instituicao, Setor, User } from '@/types';
+import { Instituicao, Permission, Setor, User } from '@/types';
 import { toast } from 'sonner';
 const breadcrumbs = [
     {
@@ -32,8 +32,9 @@ export default function UsuariosPage() {
         users: User[];
         instituicoes: Instituicao[];
         setores: Setor[];
+        permissionCatalog: Record<string, Permission[]>;
     }>();
-    const { users: initialUsers, instituicoes, setores } = props;
+    const { users: initialUsers, instituicoes, setores, permissionCatalog } = props;
 
     const [users, setUsers] = useState<User[]>(initialUsers);
     const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
@@ -96,25 +97,31 @@ export default function UsuariosPage() {
         toast('Funcionalidade de edição ainda não implementada. ' + user.name);
     };
 
-    const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[]) => {
+    const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[], directPermissions?: string[]) => {
         setProcessing(true);
-        router.put(
-            route('institucional.usuarios.updatepermissions', { user: userId }),
-            {
-                role_name: roleName,
-                agendas: agendas || [],
+        const payload: { role_name: string; agendas: number[]; direct_permissions?: string[] } = {
+            role_name: roleName,
+            agendas: agendas || [],
+        };
+        if (directPermissions !== undefined) {
+            payload.direct_permissions = directPermissions;
+        }
+        router.put(route('institucional.usuarios.updatepermissions', { user: userId }), payload, {
+            onSuccess: () => {
+                setUsers(
+                    users.map((user) =>
+                        user.id === userId
+                            ? { ...user, roles: [roleName], direct_permissions: directPermissions ?? user.direct_permissions }
+                            : user,
+                    ),
+                );
+                setIsModalOpen(false);
+                setSelectedUser(undefined);
             },
-            {
-                onSuccess: () => {
-                    setUsers(users.map((user) => (user.id === userId ? { ...user, roles: [roleName] } : user)));
-                    setIsModalOpen(false);
-                    setSelectedUser(undefined);
-                },
-                onFinish: () => {
-                    setProcessing(false);
-                },
+            onFinish: () => {
+                setProcessing(false);
             },
-        );
+        });
     };
 
     return (
@@ -250,6 +257,7 @@ export default function UsuariosPage() {
                                 }}
                                 onUpdate={handlePermissionUpdate}
                                 instituicoes={instituicoes}
+                                permissionCatalog={permissionCatalog}
                                 processing={processing}
                             />
                         )}
