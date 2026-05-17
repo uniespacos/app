@@ -41,8 +41,9 @@ class RegisteredUserController extends Controller
             'telefone' => $validated['phone'] ?? 'XX XXXXXXXXX',
             'profile_pic' => 'aushaushuahsas',
             'setor_id' => $validated['setor_id'],
-            'permission_type_id' => 3,
         ]);
+
+        $user->assignRole('comum');
 
         event(new Registered($user));
 

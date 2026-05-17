@@ -313,9 +313,8 @@ class EspacoService
 
                 if ($userId) {
                     $newUser = $this->repoUser->get($userId);
-                    if ($newUser && $newUser->permission_type_id !== 2) {
-                        $newUser->permission_type_id = 2;
-                        $newUser->save();
+                    if ($newUser && ! $newUser->hasPermissionTo('reservas.avaliar')) {
+                        $newUser->assignRole('gestor');
                         $newUser->notify(new UserAssignedAsManagerNotification($newUser, $espaco->nome, $turno));
                     }
                 }
@@ -323,8 +322,7 @@ class EspacoService
                 if ($oldUserId) {
                     $oldUser = $this->repoUser->get($oldUserId);
                     if ($oldUser && ! Agenda::where('user_id', $oldUserId)->exists()) {
-                        $oldUser->permission_type_id = 3;
-                        $oldUser->save();
+                        $oldUser->removeRole('gestor');
                         $oldUser->notify(new UserRemovedAsManagerNotification($oldUser, $espaco->nome, $turno));
                     }
                 }

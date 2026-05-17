@@ -39,7 +39,7 @@ export default function TabsItemEspacosFavoritos({
                         <EspacoCard
                             key={espaco.id}
                             espaco={espaco}
-                            userType={user.permission_type_id}
+                            user={user}
                             handleSolicitarReserva={() => router.get(`/espacos/${espaco.id}`)}
                         />
                     ))}

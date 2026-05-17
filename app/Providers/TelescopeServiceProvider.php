@@ -43,10 +43,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     /**
      * Register the Telescope gate.
-     * Access is restricted to admin users (permission_type_id === 1).
+     * Access is restricted to users with the 'sistema.telescope' permission.
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', fn (User $user) => $user->permission_type_id === 1);
+        Gate::define('viewTelescope', fn (User $user) => $user->hasPermissionTo('sistema.telescope'));
     }
 }

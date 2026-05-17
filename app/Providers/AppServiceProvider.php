@@ -4,16 +4,28 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Instituicao;
+use App\Models\Modulo;
 use App\Models\Reserva;
+use App\Models\Role;
+use App\Models\Setor;
+use App\Models\Unidade;
+use App\Policies\InstituicaoPolicy;
+use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
-use Illuminate\Support\Facades\Auth;
+use App\Policies\RolePolicy;
+use App\Policies\SetorPolicy;
+use App\Policies\UnidadePolicy;
+use App\Repositories\PermissionRepositoryEloquent;
+use App\Repositories\PermissionRepositoryInterface;
+use App\Repositories\RoleRepositoryEloquent;
+use App\Repositories\RoleRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepositoryEloquent::class);
+        $this->app->bind(PermissionRepositoryInterface::class, PermissionRepositoryEloquent::class);
+
         if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
@@ -34,6 +49,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Reserva::class, ReservaPolicy::class);
+        Gate::policy(Instituicao::class, InstituicaoPolicy::class);
+        Gate::policy(Unidade::class, UnidadePolicy::class);
+        Gate::policy(Modulo::class, ModuloPolicy::class);
+        Gate::policy(Setor::class, SetorPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
@@ -42,20 +62,6 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('development')) {
             DB::listen(fn ($query) => Log::info($query->sql, $query->bindings));
         }
-
-        Inertia::share([
-            'auth.user' => function () {
-                $user = Auth::user();
-
-                if ($user) {
-                    return array_merge($user->toArray(), [
-                        'unread_notifications_count' => $user->unreadNotifications->count(),
-                    ]);
-                }
-
-                return null;
-            },
-        ]);
 
         if ($this->app->environment('testing')) {
             Vite::macro('shouldBeIgnored', fn () => true);

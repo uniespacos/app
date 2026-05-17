@@ -11,6 +11,7 @@ use App\Http\Requests\UpdatePermissionsRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,8 @@ use Inertia\Response;
 
 class InstitucionalUsuarioController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected UserService $service,
     ) {}
@@ -28,23 +31,11 @@ class InstitucionalUsuarioController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', User::class);
+
         $data = $this->service->getIndexData(Auth::user());
 
         return Inertia::render('Administrativo/Usuarios/Usuarios', $data);
-    }
-
-    /**
-     * Show the form for creating a new user.
-     */
-    public function create(): Response
-    {
-        $roles = ['admin', 'gestor', 'user'];
-        $statuses = ['active', 'inactive', 'suspended'];
-
-        return Inertia::render('Editar/UserController', [
-            'roles' => $roles,
-            'statuses' => $statuses,
-        ]);
     }
 
     /**
@@ -52,6 +43,8 @@ class InstitucionalUsuarioController extends Controller
      */
     public function store(StoreUserRequest $request): RedirectResponse
     {
+        $this->authorize('create', User::class);
+
         User::create($request->validated());
 
         return redirect()->route('institucional.usuarios.index')
@@ -59,35 +52,12 @@ class InstitucionalUsuarioController extends Controller
     }
 
     /**
-     * Display the specified user.
-     */
-    public function show(User $usuario): Response
-    {
-        return Inertia::render('Editar/UserDetail', [
-            'user' => $usuario,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified user.
-     */
-    public function edit(User $usuario): Response
-    {
-        $roles = ['admin', 'gestor', 'user'];
-        $statuses = ['active', 'inactive', 'suspended'];
-
-        return Inertia::render('Editar/UserController', [
-            'user' => $usuario,
-            'roles' => $roles,
-            'statuses' => $statuses,
-        ]);
-    }
-
-    /**
      * Update the specified user in storage.
      */
     public function update(UpdateUserRequest $request, User $usuario): RedirectResponse
     {
+        $this->authorize('update', $usuario);
+
         $usuario->update($request->validated());
 
         return redirect()->route('institucional.usuarios.index')
@@ -99,6 +69,8 @@ class InstitucionalUsuarioController extends Controller
      */
     public function updatePermissions(UpdatePermissionsRequest $request, User $user): RedirectResponse
     {
+        $this->authorize('updatePermissions', $user);
+
         try {
             $this->service->updatePermissions($user, $request->validated());
 
@@ -117,6 +89,8 @@ class InstitucionalUsuarioController extends Controller
      */
     public function destroy(ConfirmPasswordRequest $request, User $usuario): RedirectResponse
     {
+        $this->authorize('delete', $usuario);
+
         if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }

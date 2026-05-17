@@ -12,6 +12,7 @@ use App\Models\Setor;
 use App\Services\SetorService;
 use App\Services\UnidadeService;
 use App\Services\UserService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -19,6 +20,8 @@ use Inertia\Response;
 
 class InstitucionalSetorController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected SetorService $service,
         protected UnidadeService $unidadeService,
@@ -30,6 +33,8 @@ class InstitucionalSetorController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Setor::class);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao->load(['unidades']);
         $instituicaoId = $instituicao->id;
@@ -56,6 +61,8 @@ class InstitucionalSetorController extends Controller
      */
     public function store(StoreSetorRequest $request): RedirectResponse
     {
+        $this->authorize('create', Setor::class);
+
         try {
             $this->service->store($request->validated());
 
@@ -80,6 +87,8 @@ class InstitucionalSetorController extends Controller
      */
     public function update(UpdateSetorRequest $request, Setor $setor): RedirectResponse
     {
+        $this->authorize('update', $setor);
+
         try {
             $this->service->update($setor, $request->validated());
 
@@ -96,6 +105,8 @@ class InstitucionalSetorController extends Controller
      */
     public function destroy(ConfirmPasswordRequest $request, Setor $setor): RedirectResponse
     {
+        $this->authorize('delete', $setor);
+
         if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }

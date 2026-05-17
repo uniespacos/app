@@ -39,10 +39,16 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'telefone' => fake()->phoneNumber(),
             'profile_pic' => '[https://placehold.co/400x400/000000/FFFFFF?text=](https://placehold.co/400x400/000000/FFFFFF?text=)'.fake()->lexify('??'),
-            'permission_type_id' => 3, // Default permission
-            'setor_id' => Setor::pluck('id')->random(), // Assign a random setor
+            'setor_id' => Setor::pluck('id')->random(),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function comRole(string $roleName): static
+    {
+        return $this->afterCreating(function (User $user) use ($roleName) {
+            $user->assignRole($roleName);
+        });
     }
 
     /**

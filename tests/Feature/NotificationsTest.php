@@ -42,7 +42,6 @@ class NotificationsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
 
         $this->user = User::factory()->create();
         $this->manager = User::factory()->create();

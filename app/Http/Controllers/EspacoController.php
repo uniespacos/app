@@ -84,7 +84,7 @@ class EspacoController extends Controller
 
         return Inertia::render('Espacos/FavoritosPage', [
             'favoritos' => $this->service->getFavoritedByUser($user, 10),
-            'user' => ['permission_type_id' => $user->permission_type_id],
+            'user' => $user,
         ]);
     }
 }

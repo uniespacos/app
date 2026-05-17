@@ -34,11 +34,41 @@ export interface User {
     email_verified_at: string | null;
     telefone: string;
     profile_pic?: string;
-    permission_type_id: number;
+    roles: string[]; // Array de nomes de roles (ex: ['institucional', 'gestor'])
+    permissions: string[]; // Array de nomes de permissões (todas: herdadas via role + diretas)
+    direct_permissions?: string[]; // Apenas permissões atribuídas diretamente ao usuário (model_has_permissions)
     setor_id: number | null;
     setor?: Setor; // Opcional, carregar com with('setor')
     agendas?: Agenda[]; // Relação aninhada, array de agendas
     unread_notifications: []; // Adicionado no AppServiceProvider
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Modelo de Role (Papel/Função).
+ */
+export interface Role {
+    id: number;
+    name: string;
+    description: string | null;
+    is_system: boolean;
+    guard_name: string;
+    permissions?: string[]; // Array de nomes de permissões
+    users_count?: number; // Contagem de usuários com esta role
+    permissions_count?: number; // Contagem de permissões
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Modelo de Permission (Permissão).
+ */
+export interface Permission {
+    id: number;
+    name: string;
+    group: string; // Grupo derivado do prefixo (ex: 'usuarios', 'espacos')
+    guard_name: string;
     created_at: string;
     updated_at: string;
 }
@@ -325,12 +355,6 @@ export type AgendaDiasSemanaType = {
 };
 
 export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>;
-export interface PermissionType {
-    id: number;
-    name: 'institucional' | 'gestor' | 'comum';
-    label: string;
-}
-
 export interface SelectedAgenda {
     agenda: Agenda;
     espaco: Espaco;

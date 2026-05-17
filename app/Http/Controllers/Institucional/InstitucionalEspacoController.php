@@ -11,6 +11,7 @@ use App\Http\Requests\StoreEspacoRequest;
 use App\Http\Requests\UpdateEspacoRequest;
 use App\Models\Espaco;
 use App\Services\EspacoService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,8 @@ use Inertia\Response;
 
 class InstitucionalEspacoController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected EspacoService $service,
     ) {}
@@ -28,6 +31,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Espaco::class);
+
         $user = Auth::user();
         $instituicaoId = $user->setor->unidade->instituicao_id;
         $formData = $this->service->getFormData($instituicaoId);
@@ -57,6 +62,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function store(StoreEspacoRequest $request): RedirectResponse
     {
+        $this->authorize('create', Espaco::class);
+
         try {
             $this->service->store(
                 $request->validated(),
@@ -109,6 +116,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function update(UpdateEspacoRequest $request, Espaco $espaco): RedirectResponse
     {
+        $this->authorize('update', $espaco);
+
         try {
             $this->service->update(
                 $espaco,
@@ -134,6 +143,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function destroy(ConfirmPasswordRequest $request, Espaco $espaco): RedirectResponse
     {
+        $this->authorize('delete', $espaco);
+
         if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
@@ -153,6 +164,8 @@ class InstitucionalEspacoController extends Controller
      */
     public function alterarGestores(AlterarGestoresEspacoRequest $request, Espaco $espaco): RedirectResponse
     {
+        $this->authorize('updateGestores', $espaco);
+
         try {
             $this->service->updateGestores($espaco, $request->validated());
 

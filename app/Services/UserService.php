@@ -6,22 +6,22 @@ namespace App\Services;
 
 use App\Models\Agenda;
 use App\Models\Instituicao;
-use App\Models\PermissionType;
 use App\Models\Setor;
 use App\Models\User;
 use App\Notifications\UserAssignedAsManagerNotification;
 use App\Notifications\UserRemovedAsManagerNotification;
+use App\Repositories\PermissionRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\PermissionRegistrar;
 
 class UserService
 {
-    private const GESTOR_PERMISSION_ID = 2;
-
     public function __construct(
         protected UserRepositoryInterface $repoUser,
+        protected PermissionRepositoryInterface $repoPermission,
     ) {}
 
     /**
@@ -43,13 +43,12 @@ class UserService
     {
         $instituicaoId = $authUser->setor->unidade->instituicao_id;
 
-        $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId);
-
-        $permissionTypes = PermissionType::all()->map(fn ($type) => [
-            'id' => $type->id,
-            'nome' => $type->nome,
-            'label' => $type->nome,
-        ]);
+        $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId)
+            ->map(fn (User $user) => array_merge($user->toArray(), [
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+                'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            ]));
 
         $instituicoes = Instituicao::with(['unidades.modulos.andars.espacos.agendas'])->get();
 
@@ -60,9 +59,9 @@ class UserService
 
         return [
             'users' => $users,
-            'permissionTypes' => $permissionTypes,
             'instituicoes' => $instituicoes,
             'setores' => $setores,
+            'permissionCatalog' => $this->repoPermission->getAllGroupedByPrefix(),
         ];
     }
 
@@ -74,14 +73,17 @@ class UserService
      */
     public function updatePermissions(User $user, array $data): void
     {
-        $permissionTypeId = (int) $data['permission_type_id'];
+        $newRole = $data['role_name'];
         $agendaIds = $data['agendas'] ?? [];
 
-        DB::transaction(function () use ($user, $permissionTypeId, $agendaIds) {
-            $user->permission_type_id = $permissionTypeId;
-            $user->save();
+        DB::transaction(function () use ($user, $newRole, $agendaIds, $data) {
+            $user->syncRoles([$newRole]);
 
-            if ($permissionTypeId === self::GESTOR_PERMISSION_ID) {
+            if (array_key_exists('direct_permissions', $data)) {
+                $user->syncPermissions($data['direct_permissions']);
+            }
+
+            if ($newRole === 'gestor') {
                 $currentAgendaIds = Agenda::where('user_id', $user->id)->pluck('id')->toArray();
 
                 $toUnlink = array_diff($currentAgendaIds, $agendaIds);
@@ -107,6 +109,8 @@ class UserService
                     Log::warning("Failed to notify user {$user->id} of manager removal: ".$e->getMessage());
                 }
             }
+
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
     }
 

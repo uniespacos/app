@@ -45,12 +45,12 @@ class EspacoFactory extends Factory
                 Agenda::factory()->create([
                     'espaco_id' => $espaco->id,
                     'turno' => $turno,
-                    'user_id' => $gestor, // Inicia sem usuário responsável
+                    'user_id' => $gestor,
                 ]);
                 $user = User::where('id', $gestor)->first();
-                if ($user->permission_type_id != 2) {
-                    $user->update(['permission_type_id' => 2]);
-                } // Define o tipo de permissão como gestor
+                if (! $user->hasRole('gestor')) {
+                    $user->assignRole('gestor');
+                }
             }
 
         });

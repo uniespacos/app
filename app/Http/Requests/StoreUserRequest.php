@@ -15,7 +15,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()?->permission_type_id === 1;
+        return Auth::user()?->hasPermissionTo('usuarios.criar');
     }
 
     /**
@@ -26,8 +26,6 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role' => ['required', 'string', Rule::in(['admin', 'gestor', 'user'])],
-            'status' => ['required', 'string', Rule::in(['active', 'inactive', 'suspended'])],
         ];
     }
 }

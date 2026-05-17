@@ -1,6 +1,6 @@
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
-import { Espaco } from '@/types';
+import { Espaco, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import EspacoCard from '../Espacos/fragments/EspacoCard'; // Caminho ajustado para o seu EspacoCard
 
@@ -15,16 +15,14 @@ export default function FavoritosPage() {
     // Desestruturamos as props que vêm do controller Laravel
     const {
         favoritos: { data: espacosFavoritos, links }, // Renomeamos 'data' para 'espacosFavoritos' para clareza
-        user: { permission_type_id },
+        user,
     } = usePage<{
         favoritos: {
             data: Espaco[];
             links: { url: string | null; label: string; active: boolean }[];
             meta: object;
         };
-        user: {
-            permission_type_id: number;
-        };
+        user: User;
     }>().props;
 
     // Função para solicitar reserva (mantida igual à página de Espaços)
@@ -50,7 +48,7 @@ export default function FavoritosPage() {
                                     <EspacoCard
                                         key={espaco.id}
                                         espaco={espaco}
-                                        userType={permission_type_id}
+                                        user={user}
                                         handleSolicitarReserva={handleSolicitarReserva}
                                     />
                                 ))}

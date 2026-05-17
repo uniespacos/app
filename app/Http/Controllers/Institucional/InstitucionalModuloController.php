@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateModuloRequest;
 use App\Models\Modulo;
 use App\Services\ModuloService;
 use App\Services\UnidadeService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,6 +19,8 @@ use Inertia\Response;
 
 class InstitucionalModuloController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected ModuloService $service,
         protected UnidadeService $unidadeService,
@@ -28,6 +31,8 @@ class InstitucionalModuloController extends Controller
      */
     public function index(): Response
     {
+        $this->authorize('viewAny', Modulo::class);
+
         $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
 
         return Inertia::render('Administrativo/Modulos/Modulos', [
@@ -54,6 +59,8 @@ class InstitucionalModuloController extends Controller
      */
     public function store(StoreModuloRequest $request): RedirectResponse
     {
+        $this->authorize('create', Modulo::class);
+
         try {
             $this->service->store($request->validated());
 
@@ -86,6 +93,8 @@ class InstitucionalModuloController extends Controller
      */
     public function update(UpdateModuloRequest $request, Modulo $modulo): RedirectResponse
     {
+        $this->authorize('update', $modulo);
+
         try {
             $this->service->update($modulo, $request->validated());
 
@@ -102,6 +111,8 @@ class InstitucionalModuloController extends Controller
      */
     public function destroy(ConfirmPasswordRequest $request, Modulo $modulo): RedirectResponse
     {
+        $this->authorize('delete', $modulo);
+
         if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }

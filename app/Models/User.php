@@ -15,6 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $unreadNotifications
@@ -22,7 +23,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, MustVerifyEmailTrait, Notifiable;
+    use HasFactory, MustVerifyEmailTrait, Notifiable, HasRoles;
 
     /**
      * @var list<string>
@@ -33,7 +34,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'telefone',
         'profile_pic',
-        'permission_type_id',
         'setor_id',
     ];
 

@@ -14,7 +14,7 @@ class StoreInstituicaoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()->permission_type_id === 1;
+        return Auth::user()?->hasPermissionTo('instituicoes.criar');
     }
 
     /**
