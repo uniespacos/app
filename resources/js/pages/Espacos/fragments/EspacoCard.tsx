@@ -6,9 +6,14 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { hasPermission } from '@/lib/auth';
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
 import type { Espaco, User } from '@/types';
-import { router } from '@inertiajs/react';
 import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
+
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
+import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
+import { useFavoritarEspacoUseCase } from '@/application/espacos/use-cases/use-favoritar-espaco-usecase';
+
+const httpGateway = new InertiaHttpGateway();
+const espacosRepository = new InertiaEspacosRepository(httpGateway);
 
 type CardEspacoProps = {
     espaco: Espaco;
@@ -29,42 +34,13 @@ export default function EspacoCard({
     handleExcluirEspaco,
     showFavoritar = true,
 }: CardEspacoProps) {
-    const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
-    const [processing, setProcessing] = useState(false);
+    const { isFavorited, processing, toggleFavorito } = useFavoritarEspacoUseCase({
+        repository: espacosRepository,
+        espaco,
+    });
     const modulo = espaco.andar?.modulo?.nome;
     const handleFavoritarEspaco = () => {
-        setProcessing(true);
-        if (isFavorited) {
-            router.delete(route('espacos.desfavoritar', espaco.id), {
-                preserveState: true, // Mantém o estado dos filtros na página
-                preserveScroll: true, // Não rola a página para o topo
-                replace: true,
-                onSuccess: () => {
-                    router.reload();
-                    setIsFavorited(false); // Atualiza o estado local para refletir a mudança
-                },
-                onFinish: () => {
-                    setProcessing(false); // Reseta o estado de processamento após a ação
-                },
-            });
-        } else {
-            router.post(
-                route('espacos.favoritar', espaco.id),
-                {},
-                {
-                    preserveScroll: true, // Não rola a página para o topo
-                    preserveState: true, // Mantém o estado dos filtros na página
-                    replace: true,
-                    onSuccess: () => {
-                        router.reload();
-                        setIsFavorited(true); // Atualiza o estado local para refletir a mudança
-                    },
-                    onFinish: () => {
-                        setProcessing(false); // Reseta o estado de processamento após a ação
-                    },
-                },
-            );
-        }
+        toggleFavorito();
     };
     const imageSources =
         espaco.imagens && espaco.imagens.length > 0
