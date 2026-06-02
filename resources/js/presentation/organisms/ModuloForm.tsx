@@ -9,7 +9,7 @@ import { isEditMode, transformModuloToFormData } from '@/lib/utils/andars/Modulo
 import { Instituicao, Modulo, Unidade } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
-import { CadastrarModuloForm } from '../CadastrarModulo';
+import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import AndaresManager from '@/presentation/organisms/AndarManager';
 import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
@@ -57,7 +57,7 @@ export default function ModuloForm({
             });
         } else if (data.andares.length === 0) {
             // Se não é edição e não tem andares, criar térreo inicial
-            setData((prev) => ({
+            setData((prev: CadastrarModuloForm) => ({
                 ...prev,
                 andares: [criarTerreoInicial()],
             }));
@@ -69,7 +69,7 @@ export default function ModuloForm({
     }, [instituicao.id, unidades]);
 
     const handleAddAndar = (novoAndar: AndarFormData) => {
-        setData((prev) => {
+        setData((prev: CadastrarModuloForm) => {
             const novosAndares = [...prev.andares, novoAndar];
             // Sempre garantir que tem térreo
             return {
@@ -85,16 +85,16 @@ export default function ModuloForm({
     };
 
     const handleUpdateAndar = (andarId: string, andarAtualizado: AndarFormData) => {
-        setData((prev) => ({
+        setData((prev: CadastrarModuloForm) => ({
             ...prev,
-            andares: prev.andares.map((a) => (a.id === andarId ? andarAtualizado : a)),
+            andares: prev.andares.map((a: AndarFormData) => (a.id === andarId ? andarAtualizado : a)),
         }));
     };
 
     const handleRemoveAndar = (andarId: string) => {
-        setData((prev) => {
+        setData((prev: CadastrarModuloForm) => {
             // Encontrar o andar que está sendo removido
-            const andarParaRemover = prev.andares.find((a) => a.id === andarId);
+            const andarParaRemover = prev.andares.find((a: AndarFormData) => a.id === andarId);
 
             // PROTEÇÃO EXTRA: Nunca permitir remover térreo
             if (andarParaRemover && andarParaRemover.nivel === 0) {
@@ -102,7 +102,7 @@ export default function ModuloForm({
                 return prev; // Não fazer nada
             }
 
-            const novosAndares = prev.andares.filter((a) => a.id !== andarId);
+            const novosAndares = prev.andares.filter((a: AndarFormData) => a.id !== andarId);
 
             // Sempre garantir que tem térreo após remoção
             return {
@@ -140,7 +140,7 @@ export default function ModuloForm({
                             <Label htmlFor="unidade_id">Unidade</Label>
                             <SelectUI
                                 value={data.unidade_id}
-                                onValueChange={(value) => setData((prev) => ({ ...prev, unidade_id: value }))}
+                                onValueChange={(value) => setData((prev: CadastrarModuloForm) => ({ ...prev, unidade_id: value }))}
                                 disabled={processing}
                             >
                                 <SelectTrigger>
@@ -163,7 +163,7 @@ export default function ModuloForm({
                             <Input
                                 id="nome"
                                 value={data.nome}
-                                onChange={(e) => setData((prev) => ({ ...prev, nome: e.target.value }))}
+                                onChange={(e) => setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value }))}
                                 placeholder="Ex: Bloco Administrativo"
                             />
                             {errors.nome && <p className="mt-1 text-sm text-red-500">{errors.nome}</p>}

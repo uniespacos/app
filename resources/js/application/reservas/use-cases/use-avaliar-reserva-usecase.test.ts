@@ -55,11 +55,11 @@ describe('useAvaliarReservaUseCase', () => {
         };
 
         (useForm as jest.Mock).mockReturnValue(mockForm);
-        (global as unknown as { route: jest.Mock }).route = jest.fn((name) => name);
+        (globalThis as unknown as { route: jest.Mock }).route = jest.fn((name) => name);
     });
 
     afterEach(() => {
-        delete (global as unknown as { route?: unknown }).route;
+        delete (globalThis as unknown as { route?: unknown }).route;
     });
 
     it('should initialize form with reservation details', () => {

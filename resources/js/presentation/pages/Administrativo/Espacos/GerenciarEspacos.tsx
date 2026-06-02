@@ -48,8 +48,9 @@ export default function GerenciarEspacos() {
         let espacosFiltradosTemp = [...espacos];
 
         // 1. Filtro de busca por nome
-        if (filtros.search) {
-            espacosFiltradosTemp = espacosFiltradosTemp.filter((espaco) => espaco.nome.toLowerCase().includes(filtros.search.toLowerCase()));
+        const search = filtros.search;
+        if (search) {
+            espacosFiltradosTemp = espacosFiltradosTemp.filter((espaco) => espaco.nome.toLowerCase().includes(search.toLowerCase()));
         }
 
         // 2. Filtro por capacidade mínima

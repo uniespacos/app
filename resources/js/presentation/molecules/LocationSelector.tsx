@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 
@@ -41,9 +42,9 @@ export function LocationSelector({
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Seleção de Unidade */}
                 <div className="space-y-2">
-                    <label htmlFor="unidade_id" className="text-sm font-medium">
+                    <Label htmlFor="unidade_id">
                         Unidade
-                    </label>
+                    </Label>
                     <SelectUI
                         value={unidadeSelecionada?.toString()}
                         onValueChange={(value) => setUnidadeSelecionada(parseInt(value))}
@@ -65,9 +66,9 @@ export function LocationSelector({
 
                 {/* Seleção de Módulo */}
                 <div className="space-y-2">
-                    <label htmlFor="module_id" className="text-sm font-medium">
+                    <Label htmlFor="module_id">
                         Módulo
-                    </label>
+                    </Label>
                     <SelectUI
                         value={moduloSelecionado?.toString()}
                         onValueChange={(value) => handleModuloChange(parseInt(value))}
@@ -93,9 +94,9 @@ export function LocationSelector({
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Seleção de Andar */}
                 <div className="space-y-2">
-                    <label htmlFor="andar_id" className="text-sm font-medium">
+                    <Label htmlFor="andar_id">
                         Andar
-                    </label>
+                    </Label>
                     <div className="flex gap-2">
                         <SelectUI value={andarSelecionado?.toString()} onValueChange={handleAndarChange} disabled={!moduloSelecionado || processing}>
                             <SelectTrigger>
@@ -117,7 +118,7 @@ export function LocationSelector({
 
                 {/* Tipos de Acesso do Andar */}
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Tipos de Acesso do Andar</label>
+                    <Label>Tipos de Acesso do Andar</Label>
                     <div className="border-input flex min-h-[40px] flex-wrap items-center gap-2 rounded-md border bg-slate-50 px-3 py-2">
                         {tiposDeAcessoDoAndar.length > 0 ? (
                             tiposDeAcessoDoAndar.map((tipo) => (

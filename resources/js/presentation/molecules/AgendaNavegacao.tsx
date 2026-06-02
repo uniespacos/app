@@ -7,9 +7,18 @@ type AgendaNavegacaoProps = {
     semanaAtual: Date;
     onAnterior: () => void;
     onProxima: () => void;
-    onReset: () => void;
+    onReset?: () => void;
+    desabilitarAnterior?: boolean;
+    desabilitarProxima?: boolean;
 };
-export default function AgendaNavegacao({ semanaAtual, onAnterior, onProxima, onReset }: AgendaNavegacaoProps) {
+export default function AgendaNavegacao({
+    semanaAtual,
+    onAnterior,
+    onProxima,
+    onReset,
+    desabilitarAnterior = false,
+    desabilitarProxima = false,
+}: AgendaNavegacaoProps) {
     // --- LÓGICA CORRIGIDA ---
     // 1. Calcula o início real da semana (Segunda-feira)
     const inicioDaSemana = startOfWeek(semanaAtual, { weekStartsOn: 1 });
@@ -22,19 +31,21 @@ export default function AgendaNavegacao({ semanaAtual, onAnterior, onProxima, on
 
     return (
         <div className="flex items-center justify-between">
-            <Button variant="outline" size="sm" onClick={onAnterior}>
+            <Button variant="outline" size="sm" onClick={onAnterior} disabled={desabilitarAnterior}>
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 <span className="hidden sm:inline">Semana Anterior</span>
                 <span className="sm:hidden">Anterior</span>
             </Button>
             <div className="flex items-center justify-center gap-4">
                 <h2 className="text-sm font-medium sm:text-base">{textoIntervalo}</h2>
-                <Button variant="outline" size="sm" onClick={onReset}>
-                    <span className="hidden sm:inline">Voltar para semana atual</span>
-                    <span className="sm:hidden">Voltar</span>
-                </Button>
+                {onReset && (
+                    <Button variant="outline" size="sm" onClick={onReset}>
+                        <span className="hidden sm:inline">Voltar para semana atual</span>
+                        <span className="sm:hidden">Voltar</span>
+                    </Button>
+                )}
             </div>
-            <Button variant="outline" size="sm" onClick={onProxima}>
+            <Button variant="outline" size="sm" onClick={onProxima} disabled={desabilitarProxima}>
                 <span className="hidden sm:inline">Próxima Semana</span>
                 <span className="sm:hidden">Próxima</span>
                 <ChevronRight className="ml-1 h-4 w-4" />

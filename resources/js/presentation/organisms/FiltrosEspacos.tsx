@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, FiltrosEspacosType, Modulo, Unidade } from '@/types';
@@ -60,7 +61,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     {/* Filtro por Unidade */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Unidade</label>
+                        <Label>Unidade</Label>
                         <Select value={filtros.unidade || '0'} onValueChange={handleUnidadeChange}>
                             <SelectTrigger>
                                 <SelectValue placeholder={filtros.unidade ? 'Selecione uma unidade' : 'Selecione uma instituição primeiro'} />
@@ -78,7 +79,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
 
                     {/* Filtro por Módulo */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Módulo</label>
+                        <Label>Módulo</Label>
                         <Select value={filtros.modulo || '0'} onValueChange={handleModuloChange} disabled={!filtros.unidade}>
                             <SelectTrigger>
                                 <SelectValue placeholder={filtros.unidade ? 'Selecione um módulo' : 'Selecione uma unidade primeiro'} />
@@ -96,7 +97,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
 
                     {/* Filtro por Andar */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Andar</label>
+                        <Label>Andar</Label>
                         <Select value={filtros.andar || '0'} onValueChange={handleAndarChange} disabled={!filtros.modulo}>
                             <SelectTrigger>
                                 <SelectValue placeholder={filtros.modulo ? 'Selecione um andar' : 'Selecione um módulo primeiro'} />
@@ -114,7 +115,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
 
                     {/* Filtro por Capacidade */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Capacidade mín.</label>
+                        <Label>Capacidade mín.</Label>
                         <Input
                             type="number"
                             placeholder="Ex: 20"
@@ -128,7 +129,7 @@ export function FiltrosEspacos({ filtros, setFiltros, unidades, modulos, andares
                 <div className="mt-4 grid grid-cols-2 gap-2">
                     {/* Busca por nome */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Buscar</label>
+                        <Label>Buscar</Label>
                         <Input
                             placeholder="Nome do espaço..."
                             value={filtros.search || ''}

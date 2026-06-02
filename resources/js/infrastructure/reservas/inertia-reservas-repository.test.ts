@@ -15,13 +15,13 @@ describe('InertiaReservasRepository', () => {
             delete: jest.fn()
         } as unknown as jest.Mocked<IHttpGateway>;
 
-        (global as unknown as { route: jest.Mock }).route = jest.fn((name) => name);
+        (globalThis as unknown as { route: jest.Mock }).route = jest.fn((name) => name);
 
         repository = new InertiaReservasRepository(mockGateway);
     });
 
     afterEach(() => {
-        delete (global as unknown as { route?: unknown }).route;
+        delete (globalThis as unknown as { route?: unknown }).route;
     });
 
     it('should call httpGateway.get with correct arguments in getReservas', async () => {

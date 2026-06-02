@@ -3,6 +3,7 @@ import { diasDaSemana } from '@/lib/utils';
 import { Espaco, OpcoesRecorrencia, Reserva, ReservaFormData, SlotCalendario } from '@/types';
 import { router, useForm } from '@inertiajs/react'; // ALTERADO: Importar useForm
 import { addDays, addMonths, addWeeks, format, parse, parseISO, subWeeks } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
 import { Loader2 } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -135,7 +136,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             let novaDataFinal = prevData.data_final;
             if (slotsSelecao.length > 0 && prevData.recorrencia !== 'personalizado') {
                 const opcaoRecorrencia = opcoesRecorrencia.find((op) => op.valor === prevData.recorrencia);
-                if (opcaoRecorrencia) {
+                if (opcaoRecorrencia && novaDataInicial) {
                     novaDataFinal =
                         prevData.recorrencia === 'unica'
                             ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
@@ -167,7 +168,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             const novaDataFinal =
                 prevData.recorrencia === 'unica'
                     ? new Date(Math.max(...slotsSelecao.map((s) => s.data.getTime())))
-                    : opcaoRecorrencia.calcularDataFinal(prevData.data_inicial);
+                    : opcaoRecorrencia.calcularDataFinal(prevData.data_inicial || new Date());
 
             return { ...prevData, data_final: novaDataFinal };
         });

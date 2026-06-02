@@ -7,7 +7,7 @@ import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
-import { FormCadastroValues } from '../CadastroEspaco';
+import { FormCadastroValues } from '@/presentation/pages/Administrativo/Espacos/CadastroEspaco';
 export interface ImageWithPreview {
     file: File;
     preview: string;
@@ -56,9 +56,9 @@ export function ImageUpload({
 
         setImagesWithPreviews((prev) => {
             const updatedPreviews = [...prev, ...newImagePreviews];
-            setData((prevData) => ({ ...prevData, imagens: updatedPreviews.map((p) => p.file) }));
+            setData((prevData: FormCadastroValues) => ({ ...prevData, imagens: updatedPreviews.map((p) => p.file) }));
             if (mainImageIndex === undefined && updatedPreviews.length > 0) {
-                setData((prevData) => ({ ...prevData, main_image_index: 0 }));
+                setData((prevData: FormCadastroValues) => ({ ...prevData, main_image_index: 0 }));
             }
             return updatedPreviews;
         });
@@ -71,13 +71,13 @@ export function ImageUpload({
 
         const updatedPreviews = imagesWithPreviews.filter((_, i) => i !== index);
         setImagesWithPreviews(updatedPreviews);
-        setData((prevData) => ({ ...prevData, imagens: updatedPreviews.map((p) => p.file) }));
+        setData((prevData: FormCadastroValues) => ({ ...prevData, imagens: updatedPreviews.map((p) => p.file) }));
 
         if (mainImageIndex !== undefined) {
             if (index === mainImageIndex) {
-                setData((prevData) => ({ ...prevData, main_image_index: updatedPreviews.length > 0 ? 0 : undefined }));
+                setData((prevData: FormCadastroValues) => ({ ...prevData, main_image_index: updatedPreviews.length > 0 ? 0 : undefined }));
             } else if (index < mainImageIndex) {
-                setData((prevData) => ({ ...prevData, main_image_index: mainImageIndex - 1 }));
+                setData((prevData: FormCadastroValues) => ({ ...prevData, main_image_index: mainImageIndex - 1 }));
             }
         }
     };

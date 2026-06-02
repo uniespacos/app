@@ -230,9 +230,9 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                         <CollapsibleContent>
                                             <div className="border-t bg-muted/20 p-3 space-y-2">
                                                 {perms.map((perm) => (
-                                                    <label
+                                                    <Label
                                                         key={perm.name}
-                                                        className="flex items-start gap-3 p-2 rounded hover:bg-background cursor-pointer"
+                                                        className="flex items-start gap-3 p-2 rounded hover:bg-background cursor-pointer text-foreground font-normal leading-normal select-none"
                                                     >
                                                         <Checkbox
                                                             checked={selectedPermissions.includes(perm.name)}
@@ -243,7 +243,7 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                                             <div className="text-sm">{getPermissionLabel(perm.name)}</div>
                                                             <div className="text-xs text-muted-foreground font-mono">{perm.name}</div>
                                                         </div>
-                                                    </label>
+                                                    </Label>
                                                 ))}
                                             </div>
                                         </CollapsibleContent>

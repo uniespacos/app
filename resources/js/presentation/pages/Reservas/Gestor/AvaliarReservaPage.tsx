@@ -77,7 +77,7 @@ export default function AvaliarReserva({
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
 
     // O hook useReservationSlots precisa ser ajustado para receber a reserva que muda
-    const { slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva, agendas);
+    const { slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva);
 
     const { form, submitEvaluation } = useAvaliarReservaUseCase({
         reserva,
@@ -177,7 +177,9 @@ export default function AvaliarReserva({
 
     const handleDecisaoChange = (novaDecisao: SituacaoReserva) => {
         setDecisao(novaDecisao);
-        handleDecisaoGlobalChange(novaDecisao);
+        if (novaDecisao === 'deferida' || novaDecisao === 'indeferida') {
+            handleDecisaoGlobalChange(novaDecisao);
+        }
     };
 
     const situacaoHeader = verificarStatusReserva(slotsSelecao);

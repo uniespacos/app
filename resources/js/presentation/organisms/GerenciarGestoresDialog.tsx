@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import type { Espaco, User } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserSearchCombobox } from '@/presentation/molecules/UserSearchComboBox';
@@ -84,7 +85,7 @@ export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: G
                 <div className="space-y-4">
                     {Object.entries(turnos).map(([turno, label]) => (
                         <div key={turno} className="space-y-2">
-                            <label className="block text-sm font-medium">{label}</label>
+                            <Label className="block">{label}</Label>
                             <UserSearchCombobox
                                 usuarios={usuarios}
                                 value={gestores[turno]}

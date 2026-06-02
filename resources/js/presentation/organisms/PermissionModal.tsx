@@ -178,9 +178,9 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                                         const isDirect = directPermissions.includes(perm.name);
 
                                                         return (
-                                                            <label
+                                                            <Label
                                                                 key={perm.name}
-                                                                className={`flex items-start gap-3 p-2 rounded ${isInherited ? 'opacity-60' : 'hover:bg-background cursor-pointer'}`}
+                                                                className={`flex items-start gap-3 p-2 rounded ${isInherited ? 'opacity-60' : 'hover:bg-background cursor-pointer'} text-foreground font-normal leading-normal select-none`}
                                                             >
                                                                 <Checkbox
                                                                     checked={isInherited || isDirect}
@@ -197,7 +197,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                                                     </div>
                                                                     <div className="text-xs text-muted-foreground font-mono">{perm.name}</div>
                                                                 </div>
-                                                            </label>
+                                                            </Label>
                                                         );
                                                     })}
                                                 </div>

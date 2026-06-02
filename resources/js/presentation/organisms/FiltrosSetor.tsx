@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Unidade } from '@/types';
 import { MapPin, Search } from 'lucide-react';
@@ -21,7 +22,7 @@ export function FiltrosSetor({ searchTerm, setSearchTerm, selectedUnidade, setSe
             <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Buscar</label>
+                        <Label>Buscar</Label>
                         <div className="relative">
                             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                             <Input
@@ -34,7 +35,7 @@ export function FiltrosSetor({ searchTerm, setSearchTerm, selectedUnidade, setSe
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Unidade</label>
+                        <Label>Unidade</Label>
                         <Select value={selectedUnidade} onValueChange={setSelectedUnidade}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Todas as unidades" />

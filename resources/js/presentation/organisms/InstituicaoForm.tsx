@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CadastrarInstituicaoForm } from '../CadastrarInstituicao';
+import { CadastrarInstituicaoForm } from '@/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao';
 import { IFormHandler } from '@/application/ports/form-handler.interface';
 
 type InstituicaoFormProps = {
