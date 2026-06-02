@@ -1,8 +1,8 @@
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
-import InstituicaoForm from './fragments/InstituicaoForm';
+import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
 import { useAgnosticForm } from '@/hooks/use-agnostic-form';
 
 const breadcrumbs = [

@@ -1,11 +1,11 @@
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
 import { Instituicao, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { CadastrarModuloForm } from './CadastrarModulo';
-import ModuloForm from './fragments/ModuloForm';
+import ModuloForm from '@/presentation/organisms/ModuloForm';
 
 export default function EditarModulo() {
     const { instituicao, unidades, modulo } = usePage<{ instituicao: Instituicao; unidades: Unidade[]; modulo: Modulo }>().props;

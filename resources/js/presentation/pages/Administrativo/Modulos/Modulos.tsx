@@ -1,5 +1,5 @@
-import DeleteItem from '@/components/delete-item';
-import GenericHeader from '@/components/generic-header';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

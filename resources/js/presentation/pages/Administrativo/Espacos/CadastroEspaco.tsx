@@ -1,4 +1,4 @@
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
@@ -8,10 +8,10 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { AddAndarDialog } from '../Espacos/fragments/AddAndarDialog';
-import { LocationSelector } from '../Espacos/fragments/LocationSelector';
-import { EspacoFormFields } from './fragments/EspacoFormFields';
-import { ImageUpload, ImageWithPreview } from './fragments/ImageUpload';
+import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
+import { LocationSelector } from '@/presentation/molecules/LocationSelector';
+import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
+import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 
 const breadcrumbs = [
     { title: 'Espaço', href: '/institucional/espacos' },

@@ -1,5 +1,5 @@
 import AppLayout from '@/presentation/templates/app-layout';
-import AgendaEspaço from '@/presentation/pages/Espacos/fragments/EspacoAgenda';
+import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head } from '@inertiajs/react';
 

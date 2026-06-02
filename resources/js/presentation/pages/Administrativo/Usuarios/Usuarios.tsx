@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { PermissionModal } from './fragments/PermissionModal';
+import { PermissionModal } from '@/presentation/organisms/PermissionModal';
 
 import { Head, router, usePage } from '@inertiajs/react';
 import { Edit, Settings, Shield, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import DeleteItem from '@/components/delete-item';
-import GenericHeader from '@/components/generic-header';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/presentation/templates/app-layout';

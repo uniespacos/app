@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
 import { Instituicao, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { AndarFormData } from './fragments/AndarFormCard';
-import ModuloForm from './fragments/ModuloForm';
+import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
+import ModuloForm from '@/presentation/organisms/ModuloForm';
 const breadcrumbs = [
     {
         title: 'Gerenciar Modulos',

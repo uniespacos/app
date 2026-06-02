@@ -1,12 +1,12 @@
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Suspense } from 'react';
-import { ReservasEmpty } from '../fragments/ReservasEmpty';
-import { ReservasFilters } from '../fragments/ReservasFilters';
-import { ReservasList } from '../fragments/ReservasList';
-import { ReservasLoading } from '../fragments/reservasLoading';
+import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
+import { ReservasFilters } from '@/presentation/organisms/ReservasFilters';
+import { ReservasList } from '@/presentation/organisms/ReservasList';
+import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
 
 import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';

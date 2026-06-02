@@ -1,4 +1,4 @@
-import TabsContentDashboard, { TabsItens } from '@/components/tabs-contents-dashboard';
+import TabsContentDashboard, { TabsItens } from '@/presentation/molecules/tabs-contents-dashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/presentation/templates/app-layout';

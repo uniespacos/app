@@ -1,4 +1,4 @@
-import InputError from '@/components/input-error';
+import InputError from '@/presentation/atoms/input-error';
 import AppLayout from '@/presentation/templates/app-layout';
 import SettingsLayout from '@/presentation/templates/settings/layout';
 import { type BreadcrumbItem } from '@/types';
@@ -6,7 +6,7 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-import HeadingSmall from '@/components/heading-small';
+import HeadingSmall from '@/presentation/atoms/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

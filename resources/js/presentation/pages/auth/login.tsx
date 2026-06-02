@@ -2,7 +2,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';

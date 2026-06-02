@@ -1,8 +1,8 @@
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Espaco, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import EspacoCard from '../Espacos/fragments/EspacoCard'; // Caminho ajustado para o seu EspacoCard
+import EspacoCard from '@/presentation/organisms/EspacoCard'; // Caminho ajustado para o seu EspacoCard
 
 const breadcrumbs = [
     {

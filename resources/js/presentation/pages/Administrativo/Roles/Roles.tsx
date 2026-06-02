@@ -5,15 +5,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import GenericHeader from '@/components/generic-header';
+import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Head, usePage } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { Permission, Role } from '@/types';
 
-import { DeleteRoleConfirmation } from './fragments/DeleteRoleConfirmation';
-import { RoleFormModal } from './fragments/RoleFormModal';
+import { DeleteRoleConfirmation } from '@/presentation/molecules/DeleteRoleConfirmation';
+import { RoleFormModal } from '@/presentation/molecules/RoleFormModal';
 
 interface RolesPageProps {
     roles: Role[];

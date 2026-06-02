@@ -10,10 +10,10 @@ import { Head, router } from '@inertiajs/react'; // Removido usePage
 import { addWeeks, endOfWeek, format, isAfter, isBefore, parse, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, Loader2, User, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
-import AgendaNavegacao from './fragments/AgendaNavegacao';
+import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
 import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
-import EvaluationForm from './fragments/EvaluationForm';
+import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
