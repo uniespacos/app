@@ -1,5 +1,6 @@
 import { InertiaReservasRepository } from './inertia-reservas-repository';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
+import { FormAvaliacaoPayload } from '../../application/reservas/ports/reservas-repository.interface';
 
 describe('InertiaReservasRepository', () => {
     let repository: InertiaReservasRepository;
@@ -28,8 +29,25 @@ describe('InertiaReservasRepository', () => {
         expect(mockGateway.get).toHaveBeenCalledWith('reservas.index', { search: 'room' }, expect.any(Object));
     });
 
+    it('should call httpGateway.get with correct arguments in getReservasGestor', async () => {
+        await repository.getReservasGestor({ search: 'room' });
+        expect(mockGateway.get).toHaveBeenCalledWith('gestor.reservas.index', { search: 'room' }, expect.any(Object));
+    });
+
     it('should call httpGateway.delete with correct arguments in deleteReserva', async () => {
         await repository.deleteReserva(123);
         expect(mockGateway.delete).toHaveBeenCalledWith('reservas.destroy');
+    });
+
+    it('should call httpGateway.patch with correct arguments in avaliarReserva', async () => {
+        const payload: FormAvaliacaoPayload = {
+            situacao: 'deferida',
+            motivo: 'motivo',
+            observacao: 'obs',
+            horarios_avaliados: [],
+            evaluation_scope: 'single'
+        };
+        await repository.avaliarReserva(456, payload);
+        expect(mockGateway.patch).toHaveBeenCalledWith('gestor.reservas.update', payload);
     });
 });

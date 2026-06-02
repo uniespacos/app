@@ -6,27 +6,19 @@ import { useReservationSlots } from '@/hooks/use-reservation-slots';
 import AppLayout from '@/layouts/app-layout';
 import { diasDaSemana, formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, SlotCalendario, User as UserType } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react'; // Removido usePage
+import { Head, router } from '@inertiajs/react'; // Removido usePage
 import { addWeeks, endOfWeek, format, isAfter, isBefore, parse, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { AlertCircle, CalendarDays, CheckCircle, Clock, FileText, Loader2, User, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import CalendarReservationDetails from '../fragments/CalendarReservationDetails';
 import AgendaNavegacao from './fragments/AgendaNavegacao';
+import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
 import EvaluationForm from './fragments/EvaluationForm';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
     { title: 'Avaliar reserva', href: '#' },
 ];
-
-type FormAvaliacaoType = {
-    situacao: SituacaoReserva;
-    motivo: string;
-    horarios_avaliados: { id: number; status: string }[];
-    observacao: string;
-    evaluation_scope: 'single' | 'recurring';
-};
 
 const getSituacaoIcon = (situacao: string) => {
     switch (situacao) {
@@ -87,12 +79,8 @@ export default function AvaliarReserva({
     // O hook useReservationSlots precisa ser ajustado para receber a reserva que muda
     const { slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva, agendas);
 
-    const { data, setData, patch, processing } = useForm<FormAvaliacaoType>({
-        situacao: reserva.situacao,
-        motivo: (reserva as any).existing_justification || '',
-        observacao: reserva.observacao || '',
-        horarios_avaliados: [],
-        evaluation_scope: 'recurring',
+    const { form, submitEvaluation } = useAvaliarReservaUseCase({
+        reserva,
     });
 
     useEffect(() => {
@@ -120,10 +108,10 @@ export default function AvaliarReserva({
                 .join('\n');
 
             // 3. Atualiza o estado do formulário com a justificativa completa.
-            setData('motivo', motivoConflitos);
+            form.setData('motivo', motivoConflitos);
         }
         // A dependência agora é a prop 'todosOsConflitos'.
-    }, [setData, reserva.horarios, todosOsConflitos]);
+    }, [form, reserva.horarios, todosOsConflitos]);
 
     useEffect(() => {
         const horariosParaEnviar = slotsSelecao
@@ -133,12 +121,12 @@ export default function AvaliarReserva({
                 status: slot.status,
             }));
 
-        setData((prevData) => ({
+        form.setData((prevData) => ({
             ...prevData,
             situacao: verificarStatusReserva(slotsSelecao),
             horarios_avaliados: horariosParaEnviar,
         }));
-    }, [setData, slotsSelecao]);
+    }, [form, slotsSelecao]);
 
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
 
@@ -184,15 +172,7 @@ export default function AvaliarReserva({
     const irParaProximaSemana = () => podeAvancar && navegarParaSemana(addWeeks(semanaVisivel, 1));
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (data.situacao === 'indeferida' && !data.motivo.trim()) {
-            toast.error('Motivo é obrigatório para reservas indeferidas');
-            return;
-        }
-        patch(route('gestor.reservas.update', reserva.id), {
-            onSuccess: () => toast.success('Reserva avaliada com sucesso!'),
-            onError: (errors) => toast.error(Object.values(errors)[0] || 'Ocorreu um erro.'),
-        });
+        submitEvaluation(e);
     };
 
     const handleDecisaoChange = (novaDecisao: SituacaoReserva) => {
@@ -289,10 +269,10 @@ export default function AvaliarReserva({
 
                         <EvaluationForm
                             isReavaliacao={isReavaliacao}
-                            data={data}
-                            setData={setData}
+                            data={form.data}
+                            setData={form.setData}
                             decisao={decisao}
-                            isSubmitting={processing}
+                            isSubmitting={form.processing}
                             isRadioGroupDisabled={isRadioGroupDisabled}
                             slotsSelecao={slotsSelecao}
                             onDecisaoChange={handleDecisaoChange}

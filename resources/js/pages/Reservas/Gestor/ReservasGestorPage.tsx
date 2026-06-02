@@ -1,14 +1,16 @@
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
-import { useDebounce } from '@/lib/utils';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Head } from '@inertiajs/react';
+import { Suspense } from 'react';
 import { ReservasEmpty } from '../fragments/ReservasEmpty';
 import { ReservasFilters } from '../fragments/ReservasFilters';
 import { ReservasList } from '../fragments/ReservasList';
 import { ReservasLoading } from '../fragments/reservasLoading';
+
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
+import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
+import { useReservasGestorUseCase } from '@/application/reservas/use-cases/use-reservas-gestor-usecase';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,6 +18,9 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/gestor/reservas',
     },
 ];
+
+const httpGateway = new InertiaHttpGateway();
+const reservasRepository = new InertiaReservasRepository(httpGateway);
 
 export default function MinhasReservas({
     reservas: paginator,
@@ -28,33 +33,20 @@ export default function MinhasReservas({
     reservas: Paginator<Reserva>;
     filters: { search?: string; situacao?: string };
     reservaToShow?: Reserva;
-    semana: { referencia: string }; // NOVO: Tipagem para a prop 'semana'
+    semana: { referencia: string };
 }) {
-    // 2. O estado dos filtros agora "mora" aqui, no componente pai
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const [selectedSituacao, setSelectedSituacao] = useState(filters.situacao || '');
-    const [data, setData] = useState<Date | undefined>(new Date(semana.referencia + 'T12:00:00')); // 3. Debounce para o campo de busca
-    const [debouncedSearch] = useDebounce(searchTerm, 500);
-    // 4. useEffect para buscar os dados quando os filtros mudam
-    const isInitialMount = useRef(true);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        const params: { search?: string; situacao?: string; semana?: string } = {
-            search: debouncedSearch || undefined,
-            situacao: selectedSituacao || undefined,
-            semana: data ? format(data, 'yyyy-MM-dd') : undefined, // NOVO: Adiciona o parâmetro 'semana'
-        };
-
-        router.get(route('gestor.reservas.index'), params, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
-    }, [data, debouncedSearch, selectedSituacao]);
+    const {
+        searchTerm,
+        setSearchTerm,
+        selectedSituacao,
+        setSelectedSituacao,
+        selectedDate,
+        setSelectedDate,
+    } = useReservasGestorUseCase({
+        repository: reservasRepository,
+        initialFilters: filters,
+        initialSemana: semana,
+    });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -68,8 +60,8 @@ export default function MinhasReservas({
                             onSearchTermChange={setSearchTerm}
                             selectedSituacao={selectedSituacao}
                             onSituacaoChange={setSelectedSituacao}
-                            selectedDate={data}
-                            onDateChange={setData}
+                            selectedDate={selectedDate}
+                            onDateChange={setSelectedDate}
                             isGestor={true}
                         />
                         <Suspense fallback={<ReservasLoading />}>
