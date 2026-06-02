@@ -11,6 +11,8 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from './ReservasDetalhes';
 
+import { sortReservasForGestor, sortReservasForUser } from '@/domain/reservas/reserva-rules';
+
 // Tipos baseados no modelo de dados fornecido
 export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
     return (
@@ -76,11 +78,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
     const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
-        reservas.sort((a, b) => {
-            if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-            if (b.situacao === 'em_analise' && a.situacao !== 'parcialmente_deferida') return 1;
-            return 0;
-        }),
+        isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
     );
 
     useEffect(() => {
@@ -92,42 +90,9 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     }, [reservaToShow]);
 
     useEffect(() => {
-        if (isGestor) {
-            const reservasParaExibir = reservas.map((reserva) => {
-                if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
-                    const situacoes = reserva.horarios.map((horario) => horario.situacao);
-                    if (situacoes.includes('em_analise')) {
-                        return {
-                            ...reserva,
-                            situacao: 'em_analise' as SituacaoReserva,
-                        };
-                    }
-                    if (situacoes.every((situacao) => situacao === 'deferida')) {
-                        return {
-                            ...reserva,
-                            situacao: 'deferida' as SituacaoReserva,
-                        };
-                    }
-                    if (situacoes.every((situacao) => situacao === 'indeferida')) {
-                        return {
-                            ...reserva,
-                            situacao: 'indeferida' as SituacaoReserva,
-                        };
-                    }
-                }
-
-                return reserva;
-            });
-            setReservasFiltradas(
-                reservasParaExibir.sort((a, b) => {
-                    if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-                    if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
-                    return 0;
-                }),
-            );
-        } else {
-            setReservasFiltradas(reservas);
-        }
+        setReservasFiltradas(
+            isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
+        );
     }, [isGestor, reservas, user?.id]);
 
     if (reservas.length === 0) {
