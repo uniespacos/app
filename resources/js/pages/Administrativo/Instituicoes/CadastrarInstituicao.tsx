@@ -1,8 +1,10 @@
 import GenericHeader from '@/components/generic-header';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import InstituicaoForm from './fragments/InstituicaoForm';
+import { useAgnosticForm } from '@/hooks/use-agnostic-form';
+
 const breadcrumbs = [
     {
         title: 'Gerenciar Instituicão',
@@ -13,19 +15,25 @@ const breadcrumbs = [
         href: `/institucional/instituicao/create`,
     },
 ];
-export interface CadastrarInstituicaoForm {
+
+export interface CadastrarInstituicaoForm extends Record<string, unknown> {
     nome: string;
     sigla: string;
     endereco: string;
-    [key: string]: string; // Permite campos adicionais
 }
 
+declare function route(name: string, params?: unknown): string;
+
 export default function CadastrarInstituicaoPage() {
-    const { data, setData, post, processing, errors } = useForm<CadastrarInstituicaoForm>();
+    const form = useAgnosticForm<CadastrarInstituicaoForm>({
+        nome: '',
+        sigla: '',
+        endereco: '',
+    });
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('institucional.instituicoes.store'));
+        form.submit('post', route('institucional.instituicoes.store'));
     };
 
     return (
@@ -33,7 +41,6 @@ export default function CadastrarInstituicaoPage() {
             <Head title="Criar Instituição" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="container mx-auto space-y-6 py-6">
-                    {' '}
                     <div className="container mx-auto space-y-6 p-6">
                         <GenericHeader
                             titulo="Cadastrar Instituição"
@@ -43,11 +50,11 @@ export default function CadastrarInstituicaoPage() {
                             ButtonIcon={PlusCircle}
                         />
                         <InstituicaoForm
-                            data={data}
-                            setData={setData}
+                            data={form.data}
+                            setData={form.setData}
                             submit={submit}
-                            errors={errors}
-                            processing={processing}
+                            errors={form.errors as Record<string, string>}
+                            processing={form.processing}
                             title="Criar Nova Instituição"
                             description="Preencha os dados abaixo para cadastrar uma nova instituição."
                         />
