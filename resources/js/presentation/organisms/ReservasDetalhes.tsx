@@ -11,7 +11,7 @@ import { CalendarDays, Clock, Edit, FileText, Home, Loader2, User, XCircle } fro
 import { useMemo, useState } from 'react';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
-import { SituacaoIndicator } from '@/presentation/organisms/ReservasList';
+import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 type ReservaDetalhesProps = {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;

@@ -2,7 +2,7 @@
 
 import type React from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -57,16 +57,7 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                 <Button variant="outline" role="combobox" className="w-full justify-between bg-transparent" disabled={disabled} type="button">
                     {selectedUser ? (
                         <div className="flex min-w-0 flex-1 items-center gap-2">
-                            <Avatar className="h-5 w-5">
-                                <AvatarImage src={''} />
-                                <AvatarFallback className="text-xs">
-                                    {selectedUser.name
-                                        .split(' ')
-                                        .map((n) => n[0])
-                                        .join('')
-                                        .slice(0, 2)}
-                                </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar user={selectedUser} className="h-5 w-5" fallbackClassName="text-xs" />
                             <div className="flex min-w-0 flex-col items-start">
                                 <span className="truncate text-sm font-medium">{selectedUser.name}</span>
                                 <span className="text-muted-foreground truncate text-xs">{selectedUser.email}</span>
@@ -122,15 +113,7 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                                     onClick={() => handleSelect(user.id)}
                                 >
                                     <Check className={cn('mr-2 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')} />
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarFallback className="text-xs">
-                                            {user.name
-                                                .split(' ')
-                                                .map((n) => n[0])
-                                                .join('')
-                                                .slice(0, 2)}
-                                        </AvatarFallback>
-                                    </Avatar>
+                                    <UserAvatar user={user} className="h-8 w-8" fallbackClassName="text-xs" />
                                     <div className="flex min-w-0 flex-1 flex-col">
                                         <span className="truncate text-sm font-medium">{user.name}</span>
                                         <span className="text-muted-foreground truncate text-xs">{user.email}</span>

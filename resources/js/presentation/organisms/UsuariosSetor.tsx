@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,15 +11,6 @@ interface Props {
 }
 
 export function UsuariosSetor({ setor, usuarios }: Props) {
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map((word) => word.charAt(0))
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
-    };
-
     return (
         <div className="space-y-4">
             {/* Informações do Setor */}
@@ -62,10 +53,7 @@ export function UsuariosSetor({ setor, usuarios }: Props) {
                                         <TableRow key={usuario.id}>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarImage src={usuario.profile_pic || '/placeholder.svg'} alt={usuario.name} />
-                                                        <AvatarFallback className="text-xs">{getInitials(usuario.name)}</AvatarFallback>
-                                                    </Avatar>
+                                                    <UserAvatar user={usuario} className="h-8 w-8" fallbackClassName="text-xs" />
                                                     <div>
                                                         <div className="font-medium">{usuario.name}</div>
                                                         <div className="text-muted-foreground text-sm">ID: {usuario.id}</div>

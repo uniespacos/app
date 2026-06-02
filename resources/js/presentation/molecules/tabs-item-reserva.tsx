@@ -1,4 +1,4 @@
-import { SituacaoBadge } from '@/presentation/organisms/ReservasList';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { router } from '@inertiajs/react';
 import { CheckCircle } from 'lucide-react';

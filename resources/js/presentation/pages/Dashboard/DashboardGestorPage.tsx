@@ -9,7 +9,7 @@ import { Head, router } from '@inertiajs/react';
 import { CheckCircle, Clock, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
-import { SituacaoBadge } from '@/presentation/organisms/ReservasList';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',

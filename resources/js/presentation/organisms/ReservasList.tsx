@@ -1,69 +1,19 @@
 import DeleteItem from '@/presentation/molecules/delete-item';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDate, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
-import { Paginator, Reserva, SituacaoReserva, User as UserType } from '@/types';
-import { Link, router } from '@inertiajs/react';
+import { formatDate } from '@/lib/utils';
+import { Paginator, Reserva, User as UserType } from '@/types';
+import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CheckCircle, Clock, Edit, FileText, XCircle, XSquare } from 'lucide-react';
+import { Edit, FileText, XCircle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
 import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
 
-// Tipos baseados no modelo de dados fornecido
-export function SituacaoIndicator({ situacao }: { situacao: SituacaoReserva }) {
-    return (
-        <span className="flex items-center gap-2">
-            <span className={`h-3 w-3 rounded-full ${getStatusReservaColor(situacao)}`}></span>
-            <span className="text-sm font-medium">{getStatusReservaText(situacao)}</span>
-        </span>
-    );
-}
-// Componente para exibir o status da reserva com cores e ícones apropriados
-export function SituacaoBadge({ situacao }: { situacao: SituacaoReserva }) {
-    switch (situacao) {
-        case 'em_analise':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-yellow-200 bg-yellow-50 text-yellow-700">
-                    <Clock className="h-3 w-3" />
-                    Em analise
-                </Badge>
-            );
-        case 'parcialmente_deferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-blue-200 bg-blue-50 text-blue-700">
-                    <CheckCircle className="h-3 w-3" />
-                    Parcialmente Deferida
-                </Badge>
-            );
-        case 'deferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-green-200 bg-green-50 text-green-700">
-                    <CheckCircle className="h-3 w-3" />
-                    Deferida
-                </Badge>
-            );
-        case 'indeferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-red-200 bg-red-50 text-red-700">
-                    <XSquare className="h-3 w-3" />
-                    Indeferida
-                </Badge>
-            );
-        case 'inativa':
-            return (
-                <Badge variant="outline" className="border-black-200 text-black-700 flex items-center gap-1 bg-gray-50">
-                    <XSquare className="h-3 w-3" />
-                    Inativa / Cancelada
-                </Badge>
-            );
-        default:
-            return null;
-    }
-}
 interface ReservasListProps {
     reservaToShow?: Reserva | undefined;
     paginator: Paginator<Reserva>;
@@ -246,31 +196,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                 />
             )}
 
-            <div className="mt-4 flex justify-center">
-                <div className="flex flex-wrap justify-center gap-1">
-                    {links.map((link, index) =>
-                        // Renderiza o link apenas se a URL não for nula
-                        link.url ? (
-                            <Link
-                                key={index}
-                                href={link.url}
-                                preserveScroll
-                                className={`rounded-md border px-4 py-2 text-sm transition-colors ${
-                                    link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
-                                }`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ) : (
-                            // Renderiza um span não clicável para "..." ou links desativados
-                            <span
-                                key={index}
-                                className="text-muted-foreground rounded-md border px-4 py-2 text-sm"
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ),
-                    )}
-                </div>
-            </div>
+            <PaginacaoListas links={links} />
         </div>
     );
 }
