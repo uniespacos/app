@@ -1,4 +1,4 @@
-import EspacoCard from '@/pages/Espacos/fragments/EspacoCard';
+import EspacoCard from '@/presentation/pages/Espacos/fragments/EspacoCard';
 import { Espaco, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Search } from 'lucide-react';

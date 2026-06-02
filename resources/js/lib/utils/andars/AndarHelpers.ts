@@ -1,4 +1,4 @@
-import { AndarFormData } from '@/pages/Administrativo/Modulos/fragments/AndarFormCard';
+import { AndarFormData } from '@/presentation/pages/Administrativo/Modulos/fragments/AndarFormCard';
 
 // Função para gerar ID único
 function generateId(): string {

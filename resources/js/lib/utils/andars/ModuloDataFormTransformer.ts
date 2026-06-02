@@ -1,5 +1,5 @@
-import { CadastrarModuloForm } from '@/pages/Administrativo/Modulos/CadastrarModulo';
-import { AndarFormData } from '@/pages/Administrativo/Modulos/fragments/AndarFormCard';
+import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
+import { AndarFormData } from '@/presentation/pages/Administrativo/Modulos/fragments/AndarFormCard';
 import { Modulo } from '@/types';
 import { criarTerreoInicial, nivelParaNome, nomeParaNivel } from './AndarHelpers';
 
