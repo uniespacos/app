@@ -9,7 +9,7 @@ import { Instituicao, Unidade } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { UnidadeFilters } from '@/presentation/organisms/UnidadeFilters';
+import { UnidadeFilters } from '@/presentation/molecules/UnidadeFilters';
 const breadcrumbs = [
     {
         title: 'Gerenciar Unidades',

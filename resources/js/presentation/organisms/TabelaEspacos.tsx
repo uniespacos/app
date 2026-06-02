@@ -9,7 +9,7 @@ import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import { GestoresEspaco } from '@/presentation/organisms/GestoresEspaco';
+import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
 
 interface TabelaEspacosProps {
     espacos: Espaco[]; // Agora recebe os espaços já filtrados e paginados

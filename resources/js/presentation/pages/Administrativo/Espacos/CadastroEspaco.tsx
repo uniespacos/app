@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
 import { LocationSelector } from '@/presentation/molecules/LocationSelector';
-import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
+import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
 import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 
 const breadcrumbs = [

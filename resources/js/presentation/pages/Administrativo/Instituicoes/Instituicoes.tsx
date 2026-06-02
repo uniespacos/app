@@ -9,7 +9,7 @@ import { Instituicao } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { InstituicaoFilters } from '@/presentation/organisms/InstituicaoFilter';
+import { InstituicaoFilters } from '@/presentation/molecules/InstituicaoFilter';
 const breadcrumbs = [
     {
         title: 'Gerenciar Instituições',

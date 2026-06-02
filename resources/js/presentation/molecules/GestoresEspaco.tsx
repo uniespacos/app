@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Badge } from '@/components/ui/badge';
 import type { Agenda } from '@/types';
 
@@ -26,15 +26,7 @@ export function GestoresEspaco({ agendas }: GestoresEspacoProps) {
                     </Badge>
                     {agenda.user ? (
                         <div className="flex items-center gap-1">
-                            <Avatar className="h-5 w-5">
-                                <AvatarFallback className="text-xs">
-                                    {agenda.user.name
-                                        .split(' ')
-                                        .map((n) => n[0])
-                                        .join('')
-                                        .slice(0, 2)}
-                                </AvatarFallback>
-                            </Avatar>
+                            <UserAvatar user={agenda.user} className="h-5 w-5" fallbackClassName="text-[10px]" />
                             <span className="max-w-[120px] truncate text-sm">{agenda.user.name}</span>
                         </div>
                     ) : (

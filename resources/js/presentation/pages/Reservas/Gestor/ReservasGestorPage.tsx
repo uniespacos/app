@@ -4,7 +4,7 @@ import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Suspense } from 'react';
 import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
-import { ReservasFilters } from '@/presentation/organisms/ReservasFilters';
+import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
 import { ReservasList } from '@/presentation/organisms/ReservasList';
 import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
 
