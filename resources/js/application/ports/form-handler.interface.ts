@@ -1,4 +1,4 @@
-export interface IFormHandler<T extends Record<string, unknown>> {
+export interface IFormHandler<T extends Record<string, any>> {
     data: T;
     setData: {
         <K extends keyof T>(key: K, value: T[K]): void;

@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { IFormHandler } from '../application/ports/form-handler.interface';
 
-export function useAgnosticForm<T extends Record<string, unknown>>(initialValues?: T): IFormHandler<T> {
+export function useAgnosticForm<T extends Record<string, any>>(initialValues?: T): IFormHandler<T> {
     const form = useForm(initialValues as unknown as Record<string, string>);
 
     const submit = (method: 'get' | 'post' | 'put' | 'patch' | 'delete', url: string, options?: unknown) => {

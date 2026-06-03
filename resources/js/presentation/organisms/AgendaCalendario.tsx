@@ -1,4 +1,4 @@
-import CalendarShiftSection from '@/presentation/organisms/calendar-shift-section'; // Importa o componente que corrigimos
+import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';

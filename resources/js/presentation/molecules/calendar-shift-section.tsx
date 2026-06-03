@@ -1,6 +1,7 @@
 import { Agenda, AgendaDiasSemanaType, Horario, SlotCalendario } from '@/types';
 import { format } from 'date-fns';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
+import { HORARIOS_PADRAO } from '@/constants/turnos';
 import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
 
 type CalendarShiftSectionProps = {
@@ -53,17 +54,7 @@ export default function CalendarShiftSection({
         return map;
     }, [slotsSolicitados]);
 
-    // Define os horários padrão para cada turno
-    const horariosPadrao = useCallback(
-        () => ({
-            manha: ['07:30 - 08:20', '08:20 - 09:10', '09:10 - 10:00', '10:10 - 11:00', '11:00 - 11:50', '11:50 - 12:40'],
-            tarde: ['13:10 - 14:00', '14:00 - 14:50', '14:50 - 15:40', '15:50 - 16:40', '16:40 - 17:30', '17:30 - 18:20'],
-            noite: ['18:20 - 19:10', '19:10 - 20:00', '20:00 - 20:50', '20:50 - 21:40', '21:40 - 22:30'],
-        }),
-        [],
-    );
-
-    const horariosDoTurno = horariosPadrao()[agenda.turno];
+    const horariosDoTurno = HORARIOS_PADRAO[agenda.turno as keyof typeof HORARIOS_PADRAO];
 
     return (
         <div key={agenda.id}>

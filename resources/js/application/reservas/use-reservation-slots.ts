@@ -1,27 +1,11 @@
-import { Horario, Reserva, SlotCalendario } from '@/types';
+import { Reserva, SlotCalendario } from '@/types';
 import { parse } from 'date-fns';
-import { useEffect, useMemo, useState } from 'react';
-
-/**
- * Mapeia o status do Horario (backend) para o status do SlotCalendario (frontend).
- */
-function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCalendario['status'] {
-    switch (status) {
-        case 'em_analise':
-            return 'solicitado';
-        case 'deferida':
-            return 'deferida';
-        case 'indeferida':
-            return 'indeferida';
-        default:
-            return 'reservado'; // 'inativa' ou outros casos
-    }
-}
+import { useEffect, useMemo, useState, useRef } from 'react';
+import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 
 /**
  * Hook customizado para gerenciar a lógica de estado dos slots de uma reserva.
  * @param reserva - O objeto da reserva (com as etiquetas de conflito do backend).
- * @param agendas - A lista de agendas relacionadas à reserva.
  * @returns Um objeto contendo o estado dos slots e as funções para manipulá-los.
  */
 export function useReservationSlots(reserva: Reserva) {
@@ -54,10 +38,20 @@ export function useReservationSlots(reserva: Reserva) {
     }, [reserva]); // A dependência é a reserva. Se ela mudar (nova semana), os slots são recalculados.
 
     const [slotsSelecao, setSlotsSelecao] = useState<SlotCalendario[]>(initialSlots);
+    const lastInitialSlotsRef = useRef(initialSlots);
 
     // Efeito para resetar a seleção se a reserva (e os horários) mudar.
     useEffect(() => {
-        setSlotsSelecao(initialSlots);
+        const hasChanged = initialSlots.length !== lastInitialSlotsRef.current.length ||
+            initialSlots.some((slot, idx) => {
+                const prev = lastInitialSlotsRef.current[idx];
+                return !prev || slot.id !== prev.id || slot.status !== prev.status;
+            });
+
+        if (hasChanged) {
+            lastInitialSlotsRef.current = initialSlots;
+            setSlotsSelecao(initialSlots);
+        }
     }, [initialSlots]);
 
     /**

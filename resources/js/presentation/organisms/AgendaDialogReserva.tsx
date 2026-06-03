@@ -9,10 +9,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Espaco, OpcoesRecorrencia, ReservaFormData, SlotCalendario } from '@/types';
-import { addDays, addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
+import { Espaco, ReservaFormData, SlotCalendario } from '@/types';
+import { addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
+import { opcoesRecorrencia } from '@/constants/recorrencia';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 // Tipagem das props foi atualizada
@@ -46,35 +47,7 @@ export default function AgendaDialogReserva({
     const [showRecurrenceAlert, setShowRecurrenceAlert] = useState(false);
     const [datasComConflito, setDatasComConflito] = useState<string[]>([]);
 
-    const opcoesRecorrencia: OpcoesRecorrencia[] = useMemo(
-        () => [
-            {
-                valor: 'unica',
-                label: 'Apenas esta semana',
-                descricao: 'A reserva será feita apenas para os dias selecionados nesta semana',
-                calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 6),
-            },
-            {
-                valor: '15dias',
-                label: 'Próximos 15 dias',
-                descricao: 'A reserva será replicada pelos próximos 15 dias',
-                calcularDataFinal: (dataInicial: Date) => addDays(dataInicial, 14),
-            },
-            {
-                valor: '1mes',
-                label: '1 mês',
-                descricao: 'A reserva será replicada por 1 mês',
-                calcularDataFinal: (dataInicial: Date) => addMonths(dataInicial, 1),
-            },
-            {
-                valor: 'personalizado',
-                label: 'Período personalizado',
-                descricao: 'Defina um período personalizado para a recorrência',
-                calcularDataFinal: (dataInicial: Date) => dataInicial,
-            },
-        ],
-        [],
-    );
+
 
     const verificarConflitos = useCallback(
         (horarios: any[]) => {
@@ -157,7 +130,6 @@ export default function AgendaDialogReserva({
             setSlotsSelecao,
             slotsSelecao,
             verificarConflitos,
-            opcoesRecorrencia,
         ],
     );
 
