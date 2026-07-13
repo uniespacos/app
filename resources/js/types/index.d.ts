@@ -14,6 +14,11 @@ export interface SharedData {
     ziggy: Config & { location: string };
     flash: FlashMessages;
     sidebarOpen: boolean;
+    name?: string;
+    quote?: {
+        message: string;
+        author: string;
+    } | null;
     [key: string]: unknown;
 }
 
@@ -241,6 +246,7 @@ export interface Reserva {
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
     can_update?: boolean; // Permissão de edição dinâmica
+    validation_status?: 'processing' | 'pending' | 'completed' | string; // Validação de conflitos em segundo plano
 }
 
 // =============================================================================

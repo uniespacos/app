@@ -1,4 +1,4 @@
-export type Appearance = 'light'; // Removidos 'dark' e 'system'
+export type Appearance = 'light' | 'dark' | 'system';
 
 export function initializeTheme() {
     // Força sempre o tema light
@@ -13,8 +13,9 @@ export function initializeTheme() {
 export function useAppearance() {
     // Retorna sempre 'light' e função vazia
     return {
-        appearance: 'light' as const,
-        updateAppearance: () => {
+        appearance: 'light' as Appearance,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        updateAppearance: (_: Appearance) => {
             // Não faz nada - mantém sempre light
             //console.log('Theme switching is disabled');
         },

@@ -10,6 +10,8 @@ jest.mock('@/hooks/use-mobile', () => ({
 // Import storedCookies from jest.setup.js
 import { storedCookies } from '../../../../jest.setup';
 
+const cookies = storedCookies as Record<string, string>;
+
 
 
 
@@ -29,8 +31,8 @@ describe('SidebarProvider', () => {
 
   // Clear cookies before each test
   beforeEach(() => {
-    // This will now use the storedCookies exported from jest.setup.js
-    storedCookies[SIDEBAR_COOKIE_NAME] = ''; // Reset the specific cookie
+    // This will now use the cookies exported from jest.setup.js
+    cookies[SIDEBAR_COOKIE_NAME] = ''; // Reset the specific cookie
   });
 
                       it('should initialize with defaultOpen prop if no cookie is set', () => {
@@ -68,7 +70,7 @@ describe('SidebarProvider', () => {
 
           it('should initialize with state from cookie if cookie is set to "false"', () => {
 
-              storedCookies[SIDEBAR_COOKIE_NAME] = 'false'; // Set cookie directly in mock
+              cookies[SIDEBAR_COOKIE_NAME] = 'false'; // Set cookie directly in mock
 
               render(
 
@@ -88,7 +90,7 @@ describe('SidebarProvider', () => {
 
           it('should initialize with state from cookie if cookie is set to "true"', () => {
 
-              storedCookies[SIDEBAR_COOKIE_NAME] = 'true'; // Set cookie directly in mock
+              cookies[SIDEBAR_COOKIE_NAME] = 'true'; // Set cookie directly in mock
 
               render(
 
@@ -154,7 +156,7 @@ describe('SidebarProvider', () => {
 
       
 
-                  expect(storedCookies[SIDEBAR_COOKIE_NAME]).toBe('');
+                  expect(cookies[SIDEBAR_COOKIE_NAME]).toBe('');
 
       
 
@@ -178,7 +180,7 @@ describe('SidebarProvider', () => {
 
       
 
-                  expect(storedCookies[SIDEBAR_COOKIE_NAME]).toBe('true');
+                  expect(cookies[SIDEBAR_COOKIE_NAME]).toBe('true');
 
       
 
@@ -198,7 +200,7 @@ describe('SidebarProvider', () => {
 
       
 
-                  expect(storedCookies[SIDEBAR_COOKIE_NAME]).toBe('false');
+                  expect(cookies[SIDEBAR_COOKIE_NAME]).toBe('false');
 
       
 
