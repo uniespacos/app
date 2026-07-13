@@ -23,6 +23,7 @@ return new class extends Migration
         'setores.listar', 'setores.visualizar', 'setores.criar', 'setores.atualizar', 'setores.deletar',
         'andares.criar', 'andares.atualizar',
         'sistema.telescope',
+        'relatorios.reservas-periodo', 'relatorios.ocupacao-espacos', 'relatorios.inventario-espacos', 'relatorios.indicadores-consolidados',
     ];
 
     public function up(): void
@@ -38,7 +39,7 @@ return new class extends Migration
         $comum = Role::firstOrCreate(['name' => 'comum',         'guard_name' => 'web'], ['is_system' => true]);
 
         $institucional->syncPermissions(Permission::all());
-        $gestor->syncPermissions(['usuarios.listar', 'usuarios.visualizar', 'reservas.avaliar']);
+        $gestor->syncPermissions(['usuarios.listar', 'usuarios.visualizar', 'reservas.avaliar', 'relatorios.reservas-periodo', 'relatorios.ocupacao-espacos', 'relatorios.inventario-espacos']);
 
         User::where('permission_type_id', 1)->each(fn ($u) => $u->assignRole('institucional'));
         User::where('permission_type_id', 2)->each(fn ($u) => $u->assignRole('gestor'));
