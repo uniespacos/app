@@ -385,3 +385,28 @@ interface ReservaAvaliadaNotificationPayload {
     mensagem: string;
     url: string;
 }
+
+export type TipoRelatorio =
+    | 'reservas_periodo'
+    | 'ocupacao_espacos'
+    | 'inventario_espacos'
+    | 'indicadores_consolidados';
+
+export type FormatoRelatorio = 'pdf' | 'csv' | 'xlsx';
+
+export interface FiltrosRelatorio {
+    data_inicio?: string;
+    data_fim?: string;
+    situacoes?: SituacaoReserva[];
+    turnos?: Array<'manha' | 'tarde' | 'noite'>;
+    unidade_id?: number;
+    modulo_id?: number;
+    andar_id?: number;
+    espaco_id?: number;
+    setor_id?: number;
+}
+
+export interface TipoRelatorioOption {
+    value: TipoRelatorio;
+    label: string;
+}
