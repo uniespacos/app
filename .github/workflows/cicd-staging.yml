@@ -1,0 +1,224 @@
+name: CI/CD - Staging
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    name: 🔍 Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          npm ci --no-optional
+
+      - name: Run Pint (PHP Code Style)
+        run: vendor/bin/pint --test
+
+      - name: Run ESLint (Frontend Linting)
+        run: npm run lint
+
+  test-backend:
+    name: 🐘 Backend Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Expose UID and GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+      - name: Start Services
+        run: UID=${{ env.UID }} GID=${{ env.GID }} docker compose -f compose.test.yml up -d
+      - name: Setup Environment
+        run: |
+          docker compose -f compose.test.yml exec -T workspace /bin/bash -c "
+            cp .env.testing .env
+            composer install --no-interaction --no-progress --prefer-dist
+            php artisan key:generate
+            php artisan migrate --seed --force
+          "
+      - name: Run Tests
+        env:
+          APP_ENV: testing
+        run: |
+          docker compose -f compose.test.yml exec -T workspace php artisan test | tee phpunit_output.txt
+          grep -q "Tests:    [0-9]\+ passed" phpunit_output.txt
+      - name: Stop Services
+        if: always()
+        run: docker compose -f compose.test.yml down
+
+  test-frontend:
+    name: ⚛️ Frontend Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Tests
+        run: npm test
+
+  build-and-push:
+    name: 🐳 Build & Push to GHCR
+    if: github.event_name == 'push'
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker meta for app image
+        id: meta_app
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/app
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/develop' }}
+
+      - name: Generate Docker meta for web image
+        id: meta_web
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/web
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/develop' }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & Build Frontend
+        env:
+          VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY_STAGING }}
+        run: npm ci && npm run build
+
+      - name: Build and push PHP App Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME }}
+          APP_ENV: staging
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/php-fpm/Dockerfile
+          target: production
+          push: true
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
+          build-args: |
+            VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY_STAGING }}
+            VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST_STAGING }}
+            VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT_STAGING }}
+            VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME_STAGING }}
+
+      - name: Build and push Caddy Web Image
+        env:
+          APP_NAME: ${{ secrets.APP_NAME }}
+          APP_ENV: staging
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/production/caddy/Dockerfile
+          push: true
+          tags: ${{ steps.meta_web.outputs.tags }}
+          labels: ${{ steps.meta_web.outputs.labels }}
+          build-args: |
+            APP_IMAGE=ghcr.io/${{ github.repository }}/app:${{ steps.meta_app.outputs.version }}
+
+  deploy_staging:
+    name: 🚀 Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    env:
+      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
+      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_STAGING }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "Host ${{ secrets.SSH_HOST_STAGING }}
+            User ${{ secrets.SSH_USER_STAGING }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy to Staging via SSH
+        run: |
+          STAGING_PATH="${{ secrets.PATH_TO_APP_FOLDER_STAGING }}"
+          IMAGE_TAG=$(echo ${{ github.ref_name }} | sed 's/^v//')
+
+          scp ./compose.prod.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.prod.yml
+          scp ./docker/production/scripts/deploy.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.staging.sh
+          scp ./docker/production/scripts/rollback.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/rollback.staging.sh
+
+          ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
+            mkdir -p ${STAGING_PATH}/docker/production/caddy
+            cat > ${STAGING_PATH}/docker/production/caddy/Caddyfile
+          " < ./docker/production/caddy/Caddyfile
+
+          ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
+            set -e
+            cd ${STAGING_PATH}
+            chmod +x deploy.staging.sh rollback.staging.sh
+            echo '${{ secrets.PAT_STAGING }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+            set -a
+            source .env
+            set +a
+            ./deploy.staging.sh ${IMAGE_TAG}
+          "
