@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/bootstrap.php"
          colors="true"
 >
     <testsuites>
@@ -23,10 +23,13 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="pgsql"/>
-        <env name="DB_DATABASE" value="uniespacos"/>
-        <env name="DB_USERNAME" value="uniespacos"/>
-        <env name="DB_PASSWORD" value="uniespacossecretkey"/>
+        <!-- force="true" e obrigatorio: o container ja define DB_* no ambiente
+             e, sem ele, o PHPUnit mantem o valor existente e a suite roda
+             (e apaga, via RefreshDatabase) o banco de desenvolvimento. -->
+        <env name="DB_CONNECTION" value="pgsql" force="true"/>
+        <env name="DB_DATABASE" value="uniespacos_test" force="true"/>
+        <env name="DB_USERNAME" value="uniespacos" force="true"/>
+        <env name="DB_PASSWORD" value="uniespacossecretkey" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
