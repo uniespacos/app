@@ -119,11 +119,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:secao.relatorios'])->prefix('gestor')->name('gestor.')->group(function () {
         Route::get('relatorios', [GestorRelatorioController::class, 'index'])->name('relatorios.index');
         Route::post('relatorios/gerar', [GestorRelatorioController::class, 'gerar'])->name('relatorios.gerar');
+        Route::post('relatorios/dados', [GestorRelatorioController::class, 'dados'])->name('relatorios.dados');
     });
 
     Route::middleware(['permission:secao.relatorios'])->prefix('institucional')->name('institucional.')->group(function () {
         Route::get('relatorios', [InstitucionalRelatorioController::class, 'index'])->name('relatorios.index');
         Route::post('relatorios/gerar', [InstitucionalRelatorioController::class, 'gerar'])->name('relatorios.gerar');
+        Route::post('relatorios/dados', [InstitucionalRelatorioController::class, 'dados'])->name('relatorios.dados');
     });
 });
 

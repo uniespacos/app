@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Relatorio\Reports;
 
 use App\Enums\Relatorio\TipoRelatorioEnum;
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Models\Reserva;
 use App\Models\User;
 use App\Services\Relatorio\Data\ColunaRelatorio;
@@ -16,7 +17,7 @@ final class ReservasPeriodoRelatorio implements RelatorioInterface
 {
     public function gerar(User $usuario, FiltrosRelatorio $filtros): DadosRelatorio
     {
-        $query = Reserva::query()->with(['user', 'horarios.agenda.espaco']);
+        $query = Reserva::query()->with('user')->withCount('horarios');
 
         if ($filtros->dataInicio !== null || $filtros->dataFim !== null) {
             $query->whereHas('horarios', function ($h) use ($filtros) {
@@ -40,6 +41,10 @@ final class ReservasPeriodoRelatorio implements RelatorioInterface
             });
         }
 
+        if ($filtros->turnos !== null) {
+            $query->whereHas('horarios.agenda', fn ($q) => $q->whereIn('turno', $filtros->turnos));
+        }
+
         if ($filtros->instituicaoId !== null && $filtros->agendaIds === null) {
             $query->whereHas('horarios.agenda.espaco.andar.modulo.unidade', function ($u) use ($filtros) {
                 $u->where('instituicao_id', $filtros->instituicaoId);
@@ -54,9 +59,9 @@ final class ReservasPeriodoRelatorio implements RelatorioInterface
             'solicitante' => $r->user->name ?? '—',
             'data_inicial' => CarbonImmutable::parse($r->data_inicial)->setTimezone('America/Bahia')->format('d/m/Y H:i'),
             'data_final' => CarbonImmutable::parse($r->data_final)->setTimezone('America/Bahia')->format('d/m/Y H:i'),
-            'situacao' => $r->situacao,
+            'situacao' => SituacaoReservaEnum::labelDe($r->situacao),
             'recorrencia' => $r->recorrencia ?? '—',
-            'total_slots' => $r->horarios->count(),
+            'total_slots' => (int) $r->getAttribute('horarios_count'),
         ])->toArray();
 
         $colunas = [

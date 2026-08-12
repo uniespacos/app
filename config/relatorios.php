@@ -26,4 +26,9 @@ return [
         'delimiter' => ';',
         'use_bom' => true,
     ],
+    'slots_por_turno' => [
+        'manha' => 6,
+        'tarde' => 6,
+        'noite' => 5,
+    ],
 ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Relatorio\Reports;
 
 use App\Enums\Relatorio\TipoRelatorioEnum;
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\Reserva;
@@ -46,44 +47,42 @@ final class IndicadoresConsolidadosRelatorio implements RelatorioInterface
 
         $totalReservas = $reservasQuery->count();
 
-        $distribuicaoSituacoes = $reservasQuery->get()
+        $distribuicaoSituacoes = (clone $reservasQuery)
+            ->selectRaw('situacao, count(*) as total')
             ->groupBy('situacao')
-            ->map(fn ($group) => $group->count())
+            ->pluck('total', 'situacao')
+            ->map(fn ($total) => (int) $total)
             ->all();
 
         $top5Espacos = Horario::query()
-            ->where('situacao', 'deferida')
+            ->where('horarios.situacao', 'deferida')
             ->whereHas('agenda.espaco.andar.modulo.unidade', fn ($q) => $q->where('instituicao_id', $instituicaoId))
-            ->with('agenda.espaco')
+            ->join('agendas', 'horarios.agenda_id', '=', 'agendas.id')
+            ->join('espacos', 'agendas.espaco_id', '=', 'espacos.id')
+            ->groupBy('espacos.id', 'espacos.nome')
+            ->selectRaw('espacos.nome as nome, count(*) as count')
+            ->orderByDesc('count')
+            ->limit(5)
             ->get()
-            ->groupBy(fn ($h) => $h->agenda->espaco_id)
-            ->map(function ($horarios) {
-                $espaco = $horarios->first()->agenda->espaco;
-
-                return [
-                    'nome' => $espaco->nome,
-                    'count' => $horarios->count(),
-                ];
-            })
-            ->sortByDesc('count')
-            ->take(5)
+            ->map(fn ($row) => [
+                'nome' => $row->getAttribute('nome'),
+                'count' => (int) $row->getAttribute('count'),
+            ])
             ->all();
 
         $top5Setores = Reserva::query()
             ->whereHas('user.setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicaoId))
-            ->with('user.setor')
+            ->join('users', 'reservas.user_id', '=', 'users.id')
+            ->join('setors', 'users.setor_id', '=', 'setors.id')
+            ->groupBy('setors.id', 'setors.nome')
+            ->selectRaw('setors.nome as nome, count(*) as count')
+            ->orderByDesc('count')
+            ->limit(5)
             ->get()
-            ->groupBy(fn ($r) => $r->user->setor_id)
-            ->map(function ($reservas) {
-                $setor = $reservas->first()->user->setor;
-
-                return [
-                    'nome' => $setor->nome ?? '—',
-                    'count' => $reservas->count(),
-                ];
-            })
-            ->sortByDesc('count')
-            ->take(5)
+            ->map(fn ($row) => [
+                'nome' => $row->getAttribute('nome') ?? '—',
+                'count' => (int) $row->getAttribute('count'),
+            ])
             ->all();
 
         $linhas = [
@@ -94,7 +93,7 @@ final class IndicadoresConsolidadosRelatorio implements RelatorioInterface
 
         foreach ($distribuicaoSituacoes as $situacao => $count) {
             $linhas[] = [
-                'metrica' => 'Reservas '.ucfirst(str_replace('_', ' ', $situacao)),
+                'metrica' => 'Reservas '.SituacaoReservaEnum::labelDe((string) $situacao),
                 'valor' => $count,
             ];
         }

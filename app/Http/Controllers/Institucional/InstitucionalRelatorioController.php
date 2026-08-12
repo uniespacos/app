@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Institucional;
 use App\Enums\Relatorio\FormatoRelatorioEnum;
 use App\Enums\Relatorio\TipoRelatorioEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Relatorio\DadosRelatorioRequest;
 use App\Http\Requests\Relatorio\GerarRelatorioRequest;
 use App\Services\Relatorio\Data\FiltrosRelatorio;
 use App\Services\Relatorio\RelatorioService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,11 +29,12 @@ final class InstitucionalRelatorioController extends Controller
         $tipos = TipoRelatorioEnum::disponiveisPara(Auth::user());
         $tiposDisponiveis = array_map(fn (TipoRelatorioEnum $tipo) => [
             'value' => $tipo->value,
-            'label' => $tipo->titulo(),
+            'label' => $tipo->tituloCurto(),
         ], $tipos);
 
         return Inertia::render('Administrativo/Relatorios/RelatoriosInstitucionalPage', [
             'tipos_disponiveis' => $tiposDisponiveis,
+            'opcoes_inventario' => $this->service->opcoesInventario(Auth::user()),
         ]);
     }
 
@@ -43,5 +46,16 @@ final class InstitucionalRelatorioController extends Controller
             FormatoRelatorioEnum::from($request->string('formato')->toString()),
             FiltrosRelatorio::fromArray($request->validated()),
         );
+    }
+
+    public function dados(DadosRelatorioRequest $request): JsonResponse
+    {
+        $dados = $this->service->agregar(
+            Auth::user(),
+            TipoRelatorioEnum::from($request->string('tipo')->toString()),
+            FiltrosRelatorio::fromArray($request->validated()),
+        );
+
+        return response()->json($dados);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Services\Relatorio;
 
 use App\Enums\Relatorio\FormatoRelatorioEnum;
 use App\Enums\Relatorio\TipoRelatorioEnum;
+use App\Models\Espaco;
 use App\Models\User;
 use App\Services\Relatorio\Data\DadosRelatorio;
 use App\Services\Relatorio\Data\FiltrosRelatorio;
@@ -22,19 +23,99 @@ final class RelatorioService
 
     public function gerar(User $usuario, TipoRelatorioEnum $tipo, FormatoRelatorioEnum $formato, FiltrosRelatorio $filtros): BinaryFileResponse|StreamedResponse
     {
-        if (! $usuario->hasPermissionTo($tipo->permissao())) {
-            abort(403, 'Tipo de relatório não disponível para este perfil.');
-        }
-
-        $filtros = $this->aplicarEscopo($usuario, $filtros);
-
-        $dados = $this->relatorios->make($tipo)->gerar($usuario, $filtros);
+        $dados = $this->agregar($usuario, $tipo, $filtros);
 
         $this->validarLimites($dados, $formato);
 
         $nomeArquivo = sprintf('%s-%s.%s', $tipo->value, now()->format('Ymd-His'), $formato->value);
 
         return $this->exporters->make($formato)->exportar($dados, $nomeArquivo);
+    }
+
+    public function agregar(User $usuario, TipoRelatorioEnum $tipo, FiltrosRelatorio $filtros): DadosRelatorio
+    {
+        if (! $usuario->hasPermissionTo($tipo->permissao())) {
+            abort(403, 'Tipo de relatório não disponível para este perfil.');
+        }
+
+        $filtros = $this->aplicarEscopo($usuario, $filtros);
+
+        return $this->relatorios->make($tipo)->gerar($usuario, $filtros);
+    }
+
+    /**
+     * Opcoes de localizacao para os filtros do inventario, ja restritas ao
+     * escopo do usuario. Cada nivel carrega a chave do pai para permitir o
+     * encadeamento dos comboboxes no frontend.
+     *
+     * @return array{
+     *     unidades: array<int, array{id: int, nome: string}>,
+     *     modulos: array<int, array{id: int, nome: string, unidade_id: int}>,
+     *     andares: array<int, array{id: int, nome: string, modulo_id: int}>,
+     *     espacos: array<int, array{id: int, nome: string, andar_id: int}>
+     * }
+     */
+    public function opcoesInventario(User $usuario): array
+    {
+        $espacosQuery = Espaco::query()->with('andar.modulo.unidade');
+
+        if ($usuario->hasRole('institucional')) {
+            $instituicaoId = $usuario->setor->unidade->instituicao_id;
+            $espacosQuery->whereHas(
+                'andar.modulo.unidade',
+                fn ($u) => $u->where('instituicao_id', $instituicaoId)
+            );
+        } elseif ($usuario->hasRole('gestor')) {
+            $agendaIds = $usuario->agendas()->pluck('id')->all();
+            $espacosQuery->whereHas('agendas', fn ($q) => $q->whereIn('id', $agendaIds));
+        } else {
+            abort(403);
+        }
+
+        $espacos = $espacosQuery->get()->filter(
+            fn (Espaco $espaco) => $espaco->andar?->modulo?->unidade !== null
+        );
+
+        $unidades = [];
+        $modulos = [];
+        $andares = [];
+        $listaEspacos = [];
+
+        foreach ($espacos as $espaco) {
+            $andar = $espaco->andar;
+            $modulo = $andar->modulo;
+            $unidade = $modulo->unidade;
+
+            $unidades[$unidade->id] = ['id' => $unidade->id, 'nome' => $unidade->nome];
+            $modulos[$modulo->id] = [
+                'id' => $modulo->id,
+                'nome' => $modulo->nome,
+                'unidade_id' => $unidade->id,
+            ];
+            $andares[$andar->id] = [
+                'id' => $andar->id,
+                'nome' => $andar->nome,
+                'modulo_id' => $modulo->id,
+            ];
+            $listaEspacos[$espaco->id] = [
+                'id' => $espaco->id,
+                'nome' => $espaco->nome,
+                'andar_id' => $andar->id,
+            ];
+        }
+
+        $ordenarPorNome = function (array $itens): array {
+            usort($itens, fn ($a, $b) => strnatcasecmp($a['nome'], $b['nome']));
+
+            return $itens;
+        };
+
+        return [
+            'unidades' => $ordenarPorNome(array_values($unidades)),
+            'modulos' => $ordenarPorNome(array_values($modulos)),
+            'andares' => $ordenarPorNome(array_values($andares)),
+            'espacos' => $ordenarPorNome(array_values($listaEspacos)),
+        ];
     }
 
     private function aplicarEscopo(User $usuario, FiltrosRelatorio $filtros): FiltrosRelatorio

@@ -23,6 +23,20 @@ enum TipoRelatorioEnum: string
         };
     }
 
+    /**
+     * Titulo sem o prefixo "Relatorio de", para uso dentro da tela de
+     * relatorios, onde o contexto ja esta dado pelas abas.
+     */
+    public function tituloCurto(): string
+    {
+        return match ($this) {
+            self::RESERVAS_PERIODO => 'Reservas por Período',
+            self::OCUPACAO_ESPACOS => 'Ocupação de Espaços',
+            self::INVENTARIO_ESPACOS => 'Inventário de Espaços',
+            self::INDICADORES_CONSOLIDADOS => 'Indicadores Consolidados',
+        };
+    }
+
     public function permissao(): string
     {
         return match ($this) {
