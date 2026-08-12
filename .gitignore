@@ -31,6 +31,12 @@ gha-creds-*.json
 
 .gemini/
 
+# Claude
+.claude
+CLAUDE.md
+/docs/claude/
+/.playwright-mcp/
+
 # Mailpit
 docker/development/mailpit/*
 
