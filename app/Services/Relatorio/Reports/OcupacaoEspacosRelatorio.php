@@ -5,30 +5,25 @@ declare(strict_types=1);
 namespace App\Services\Relatorio\Reports;
 
 use App\Enums\Relatorio\TipoRelatorioEnum;
+use App\Models\Espaco;
 use App\Models\Horario;
 use App\Models\User;
 use App\Services\Relatorio\Data\ColunaRelatorio;
 use App\Services\Relatorio\Data\DadosRelatorio;
 use App\Services\Relatorio\Data\FiltrosRelatorio;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonPeriod;
 
 final class OcupacaoEspacosRelatorio implements RelatorioInterface
 {
     public function gerar(User $usuario, FiltrosRelatorio $filtros): DadosRelatorio
     {
+        $inicio = $filtros->dataInicio ?? CarbonImmutable::now()->startOfMonth();
+        $fim = $filtros->dataFim ?? CarbonImmutable::now()->endOfMonth();
+
         $query = Horario::query()
             ->where('situacao', 'deferida')
-            ->with('agenda.espaco.andar.modulo.unidade');
-
-        if ($filtros->dataInicio !== null || $filtros->dataFim !== null) {
-            if ($filtros->dataInicio !== null && $filtros->dataFim !== null) {
-                $query->whereBetween('data', [$filtros->dataInicio, $filtros->dataFim]);
-            } elseif ($filtros->dataInicio !== null) {
-                $query->where('data', '>=', $filtros->dataInicio);
-            } elseif ($filtros->dataFim !== null) {
-                $query->where('data', '<=', $filtros->dataFim);
-            }
-        }
+            ->whereBetween('data', [$inicio, $fim]);
 
         if ($filtros->agendaIds !== null) {
             $query->whereIn('agenda_id', $filtros->agendaIds);
@@ -40,51 +35,71 @@ final class OcupacaoEspacosRelatorio implements RelatorioInterface
             });
         }
 
-        $horarios = $query->get();
+        if ($filtros->turnos !== null) {
+            $query->whereHas('agenda', fn ($q) => $q->whereIn('turno', $filtros->turnos));
+        }
 
-        $ocupacaoPorEspaco = $horarios->groupBy(function ($h) {
-            return $h->agenda->espaco_id;
-        })->map(function ($horariosEspaco) {
-            $espaco = $horariosEspaco->first()->agenda->espaco;
+        // Conta slots distintos, nao registros: o mesmo par (data, horario_inicio)
+        // pode ter varias linhas em horarios para uma unica reserva, e contar as
+        // repeticoes levava a taxa de ocupacao acima de 100%.
+        $contagens = $query
+            ->join('agendas', 'horarios.agenda_id', '=', 'agendas.id')
+            ->groupBy('agendas.espaco_id')
+            ->selectRaw('agendas.espaco_id as espaco_id, count(distinct (horarios.data, horarios.horario_inicio)) as total')
+            ->pluck('total', 'espaco_id');
 
-            return [
-                'espaco_id' => $espaco->id,
-                'nome_espaco' => $espaco->nome,
-                'capacidade_pessoas' => $espaco->capacidade_pessoas,
-                'localizacao' => sprintf(
-                    '%s / %s / %s',
-                    $espaco->andar->nome ?? '—',
-                    $espaco->andar->modulo->nome ?? '—',
-                    $espaco->andar->modulo->unidade->nome ?? '—',
-                ),
-                'total_horarios_ocupados' => $horariosEspaco->count(),
-            ];
-        })->values();
+        $espacos = Espaco::query()
+            ->with('andar.modulo.unidade')
+            ->whereIn('id', $contagens->keys())
+            ->get()
+            ->keyBy('id');
 
-        $linhas = $ocupacaoPorEspaco->map(function ($ocupacao) {
-            $totalDias = 22;
-            $turnosPorAgenda = 3;
-            $totalCapacidade = $totalDias * $turnosPorAgenda;
+        $linhas = $contagens
+            ->filter(fn ($total, $espacoId) => $espacos->has($espacoId))
+            ->map(function ($total, $espacoId) use ($espacos, $filtros, $inicio, $fim) {
+                $espaco = $espacos->get($espacoId);
 
-            $taxaOcupacao = ($ocupacao['total_horarios_ocupados'] / $totalCapacidade) * 100;
+                $turnosSel = $filtros->turnos ?: ['manha', 'tarde', 'noite'];
+                $slots = array_sum(array_map(
+                    fn ($t) => config("relatorios.slots_por_turno.$t", 0),
+                    $turnosSel
+                ));
+                $diasLetivos = 0;
+                $periodo = CarbonPeriod::create($inicio, $fim);
+                foreach ($periodo as $dia) {
+                    if (! $dia->isSunday()) {
+                        $diasLetivos++;
+                    }
+                }
+                $capacidade = $diasLetivos * $slots;
+                $totalOcupados = (int) $total;
+                $taxaOcupacao = $capacidade > 0 ? ($totalOcupados / $capacidade) * 100 : 0;
 
-            return [
-                'espaco_id' => $ocupacao['espaco_id'],
-                'nome_espaco' => $ocupacao['nome_espaco'],
-                'capacidade_pessoas' => $ocupacao['capacidade_pessoas'],
-                'localizacao' => $ocupacao['localizacao'],
-                'total_horarios_ocupados' => $ocupacao['total_horarios_ocupados'],
-                'total_dias_no_periodo' => $totalDias,
-                'taxa_ocupacao' => number_format($taxaOcupacao, 2, '.', '').'%',
-            ];
-        })->toArray();
+                return [
+                    'espaco_id' => $espaco->id,
+                    'nome_espaco' => $espaco->nome,
+                    'capacidade_pessoas' => $espaco->capacidade_pessoas,
+                    'localizacao' => sprintf(
+                        '%s / %s / %s',
+                        $espaco->andar->nome ?? '—',
+                        $espaco->andar->modulo->nome ?? '—',
+                        $espaco->andar->modulo->unidade->nome ?? '—',
+                    ),
+                    'total_horarios_ocupados' => $totalOcupados,
+                    'total_dias_no_periodo' => $diasLetivos,
+                    'taxa_ocupacao' => number_format($taxaOcupacao, 2, '.', '').'%',
+                    'taxa_ocupacao_num' => $taxaOcupacao,
+                ];
+            })
+            ->values()
+            ->toArray();
 
         $colunas = [
             new ColunaRelatorio('espaco_id', 'ID Espaço', 'integer', 8),
             new ColunaRelatorio('nome_espaco', 'Espaço', 'string', 20),
             new ColunaRelatorio('capacidade_pessoas', 'Capacidade', 'integer', 10),
             new ColunaRelatorio('localizacao', 'Localização', 'string', 25),
-            new ColunaRelatorio('total_horarios_ocupados', 'Horários', 'integer', 8),
+            new ColunaRelatorio('total_horarios_ocupados', 'Slots', 'integer', 8),
             new ColunaRelatorio('total_dias_no_periodo', 'Dias', 'integer', 6),
             new ColunaRelatorio('taxa_ocupacao', 'Taxa %', 'string', 8),
         ];
