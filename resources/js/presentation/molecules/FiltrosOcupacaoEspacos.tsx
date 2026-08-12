@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { FiltroChips } from '@/presentation/molecules/FiltroChips';
 import { FiltrosRelatorio } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -44,8 +45,8 @@ export function FiltrosOcupacaoEspacos({ filtros, onChange }: Props) {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <Label className="mb-2 block">Data Início</Label>
                     <Popover>
@@ -77,34 +78,18 @@ export function FiltrosOcupacaoEspacos({ filtros, onChange }: Props) {
                 </div>
             </div>
 
-            <div>
-                <Label className="mb-2 block">Turnos</Label>
-                <div className="space-y-2">
-                    {turnos.map((turno) => (
-                        <label key={turno.value} className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                checked={(filtros.turnos || []).includes(turno.value as 'manha' | 'tarde' | 'noite')}
-                                onChange={(e) => {
-                                    const turnosSelecionados = filtros.turnos || [];
-                                    if (e.target.checked) {
-                                        onChange({
-                                            ...filtros,
-                                            turnos: [...turnosSelecionados, turno.value as 'manha' | 'tarde' | 'noite'],
-                                        });
-                                    } else {
-                                        onChange({
-                                            ...filtros,
-                                            turnos: turnosSelecionados.filter((t) => t !== turno.value),
-                                        });
-                                    }
-                                }}
-                                className="h-4 w-4"
-                            />
-                            <span>{turno.label}</span>
-                        </label>
-                    ))}
-                </div>
+            <div className="pt-2">
+                <FiltroChips
+                    label="Turnos"
+                    opcoes={turnos}
+                    selecionados={filtros.turnos ?? []}
+                    onChange={(valores) =>
+                        onChange({
+                            ...filtros,
+                            turnos: valores as Array<'manha' | 'tarde' | 'noite'>,
+                        })
+                    }
+                />
             </div>
         </div>
     );

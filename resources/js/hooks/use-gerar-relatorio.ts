@@ -15,18 +15,32 @@ export function useGerarRelatorio(endpoint: string) {
         setEstaGerando(true);
 
         try {
-            const csrfToken =
-                document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
+            const metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+            const xsrfCookie = decodeURIComponent(
+                document.cookie
+                    .split('; ')
+                    .find((r) => r.startsWith('XSRF-TOKEN='))
+                    ?.split('=')[1] ?? ''
+            );
+
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                Accept: 'application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            };
+
+            // Prioriza o cookie XSRF-TOKEN (renovado pelo Laravel a cada resposta) sobre a
+            // meta tag, que fica desatualizada apos o login numa SPA Inertia (sem reload).
+            if (xsrfCookie) {
+                headers['X-XSRF-TOKEN'] = xsrfCookie;
+            } else if (metaToken) {
+                headers['X-CSRF-TOKEN'] = metaToken;
+            }
 
             const response = await fetch(endpoint, {
                 method: 'POST',
                 credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                    Accept: 'application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                },
+                headers,
                 body: JSON.stringify({
                     tipo: payload.tipo,
                     formato: payload.formato,
@@ -51,12 +65,15 @@ export function useGerarRelatorio(endpoint: string) {
             const blob = await response.blob();
 
             const contentDisposition = response.headers.get('content-disposition');
-            let filename = 'relatorio.pdf';
+            // Fallback com a extensao do formato solicitado: o header pode faltar ou
+            // vir sem aspas, e nunca devemos salvar CSV/XLSX com extensao .pdf.
+            let filename = `relatorio.${payload.formato}`;
 
             if (contentDisposition) {
-                const match = contentDisposition.match(/filename="([^"]+)"/);
+                // Aceita filename com ou sem aspas (o backend envia sem aspas).
+                const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
                 if (match && match[1]) {
-                    filename = match[1];
+                    filename = decodeURIComponent(match[1].trim());
                 }
             }
 
