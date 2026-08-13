@@ -48,6 +48,27 @@ interface EspacoRepositoryInterface
     public function getDistinctCapacidadesByInstituicao(int $instituicaoId): SupportCollection;
 
     /**
+     * Returns the ids of the Espacos managed by a user through any of its agendas.
+     *
+     * @return list<int>
+     */
+    public function getIdsGeridosPor(int $userId): array;
+
+    /**
+     * Returns the distinct ids of the users managing an Espaco across all shifts.
+     *
+     * @return list<int>
+     */
+    public function getGestorIdsDoEspaco(int $espacoId): array;
+
+    /**
+     * Returns Espacos for QR Code sticker generation, optionally scoped by unidade/modulo.
+     *
+     * @return Collection<int, Espaco>
+     */
+    public function getParaAdesivos(?int $unidadeId = null, ?int $moduloId = null): Collection;
+
+    /**
      * Returns an instance of Espaco from the given id
      */
     public function get(int|string $id): ?Espaco;

@@ -46,6 +46,21 @@ interface UserRepositoryInterface
     public function getAllForAdminByInstituicao(int $instituicaoId): Collection;
 
     /**
+     * Returns all User records holding the given permission, directly or through a role
+     *
+     * @return Collection<int, User>
+     */
+    public function getComPermissao(string $permission): Collection;
+
+    /**
+     * Returns the User records for the given ids
+     *
+     * @param  list<int>  $ids
+     * @return Collection<int, User>
+     */
+    public function getPorIds(array $ids): Collection;
+
+    /**
      * Returns an instance of User from the given id
      */
     public function get(int|string $id): ?User;

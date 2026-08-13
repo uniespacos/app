@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Models\Agenda;
 use App\Models\Espaco;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -95,6 +96,54 @@ class EspacoRepositoryEloquent implements EspacoRepositoryInterface
             ->distinct()
             ->orderBy('capacidade_pessoas')
             ->pluck('capacidade_pessoas');
+    }
+
+    /**
+     * Returns the ids of the Espacos managed by a user through any of its agendas.
+     *
+     * O vinculo gestor-espaco passa pela Agenda (um gestor por turno), entao
+     * gerir qualquer turno significa gerir o espaco.
+     *
+     * @return list<int>
+     */
+    public function getIdsGeridosPor(int $userId): array
+    {
+        /** @var list<int> */
+        return $this->espaco->newQuery()
+            ->whereHas('agendas', fn ($q) => $q->where('user_id', $userId))
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
+     * Returns the distinct ids of the users managing an Espaco across all shifts.
+     *
+     * @return list<int>
+     */
+    public function getGestorIdsDoEspaco(int $espacoId): array
+    {
+        /** @var list<int> */
+        return Agenda::query()
+            ->where('espaco_id', $espacoId)
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id')
+            ->all();
+    }
+
+    /**
+     * Returns Espacos for QR Code sticker generation, optionally scoped by unidade/modulo.
+     *
+     * @return Collection<int, Espaco>
+     */
+    public function getParaAdesivos(?int $unidadeId = null, ?int $moduloId = null): Collection
+    {
+        return $this->espaco->newQuery()
+            ->with('andar.modulo.unidade')
+            ->when($unidadeId, fn ($q, $unidade) => $q->whereHas('andar.modulo', fn ($sub) => $sub->where('unidade_id', $unidade)))
+            ->when($moduloId, fn ($q, $modulo) => $q->whereHas('andar', fn ($sub) => $sub->where('modulo_id', $modulo)))
+            ->orderBy('nome')
+            ->get();
     }
 
     /**

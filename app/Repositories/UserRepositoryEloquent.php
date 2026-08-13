@@ -81,6 +81,35 @@ class UserRepositoryEloquent implements UserRepositoryInterface
     }
 
     /**
+     * Returns all User records holding the given permission, directly or through a role
+     *
+     * @return Collection<int, User>
+     */
+    public function getComPermissao(string $permission): Collection
+    {
+        return $this->user->newQuery()
+            ->permission($permission)
+            ->get();
+    }
+
+    /**
+     * Returns the User records for the given ids
+     *
+     * @param  list<int>  $ids
+     * @return Collection<int, User>
+     */
+    public function getPorIds(array $ids): Collection
+    {
+        if ($ids === []) {
+            return new Collection;
+        }
+
+        return $this->user->newQuery()
+            ->whereIn('id', $ids)
+            ->get();
+    }
+
+    /**
      * Returns an instance of User from the given id
      */
     public function get(int|string $id): ?User
