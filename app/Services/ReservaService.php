@@ -28,6 +28,7 @@ class ReservaService
         protected AgendaRepositoryInterface $repoAgenda,
         protected EspacoService $espacoService,
         protected ConflictDetectionService $conflictService,
+        protected ChamadoService $chamadoService,
     ) {}
 
     /**
@@ -135,6 +136,9 @@ class ReservaService
             'reserva' => $reserva,
             'isEditMode' => true,
             'semana' => ['inicio' => $weekStart, 'fim' => $weekEnd, 'referencia' => $reference],
+            // Mesmo alerta da tela de reserva: quem esta editando ainda pode
+            // trocar de espaco se souber que ha problema reportado.
+            'chamadosAbertos' => $this->chamadoService->getResumoAbertosParaEspaco($espaco),
         ];
     }
 

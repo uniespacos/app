@@ -29,6 +29,7 @@ class EspacoService
         protected ModuloRepositoryInterface $repoModulo,
         protected UnidadeRepositoryInterface $repoUnidade,
         protected UserRepositoryInterface $repoUser,
+        protected ChamadoService $chamadoService,
     ) {}
 
     /**
@@ -122,6 +123,9 @@ class EspacoService
                 'fim' => $weekEnd,
                 'referencia' => $reference->format('Y-m-d'),
             ],
+            // Alerta informativo: quem vai reservar precisa saber que o espaco
+            // tem problema reportado, mas a reserva nao e bloqueada.
+            'chamadosAbertos' => $this->chamadoService->getResumoAbertosParaEspaco($espaco),
         ];
     }
 
