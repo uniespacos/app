@@ -66,6 +66,9 @@ class PermissionSeeder extends Seeder
         // Andares
         'andares.criar',
         'andares.atualizar',
+        // Chamados
+        'chamados.listar',
+        'chamados.triar',
         // Sistema
         'sistema.telescope',
         // Relatórios
@@ -84,6 +87,7 @@ class PermissionSeeder extends Seeder
         'secao.gestao-modulos',
         'secao.gestao-setores',
         'secao.gestao-roles',
+        'secao.gestao-chamados',
         'secao.relatorios',
     ];
 

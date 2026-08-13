@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Chamado;
 use App\Models\Instituicao;
 use App\Models\Modulo;
 use App\Models\Reserva;
 use App\Models\Role;
 use App\Models\Setor;
 use App\Models\Unidade;
+use App\Policies\ChamadoPolicy;
 use App\Policies\InstituicaoPolicy;
 use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
@@ -28,6 +30,8 @@ use App\Repositories\InstituicaoRepositoryEloquent;
 use App\Repositories\InstituicaoRepositoryInterface;
 use App\Repositories\ModuloRepositoryEloquent;
 use App\Repositories\ModuloRepositoryInterface;
+use App\Repositories\ChamadoRepositoryEloquent;
+use App\Repositories\ChamadoRepositoryInterface;
 use App\Repositories\PermissionRepositoryEloquent;
 use App\Repositories\PermissionRepositoryInterface;
 use App\Repositories\ReservaRepositoryEloquent;
@@ -40,9 +44,12 @@ use App\Repositories\UnidadeRepositoryEloquent;
 use App\Repositories\UnidadeRepositoryInterface;
 use App\Repositories\UserRepositoryEloquent;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -66,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SetorRepositoryInterface::class, SetorRepositoryEloquent::class);
         $this->app->bind(UnidadeRepositoryInterface::class, UnidadeRepositoryEloquent::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepositoryEloquent::class);
+        $this->app->bind(ChamadoRepositoryInterface::class, ChamadoRepositoryEloquent::class);
 
         if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -78,12 +86,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Chamado::class, ChamadoPolicy::class);
         Gate::policy(Reserva::class, ReservaPolicy::class);
         Gate::policy(Instituicao::class, InstituicaoPolicy::class);
         Gate::policy(Unidade::class, UnidadePolicy::class);
         Gate::policy(Modulo::class, ModuloPolicy::class);
         Gate::policy(Setor::class, SetorPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+
+        // Report publico de chamados: rota anonima, protegida por IP.
+        RateLimiter::for('chamados-publico', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');

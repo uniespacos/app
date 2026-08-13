@@ -2,14 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ChamadoPublicoController;
 use App\Http\Controllers\EspacoController;
+use App\Http\Controllers\Gestor\GestorChamadoController;
 use App\Http\Controllers\Gestor\GestorRelatorioController;
 use App\Http\Controllers\Gestor\GestorReservaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Institucional\InstitucionalChamadoController;
 use App\Http\Controllers\Institucional\InstitucionalEspacoController;
 use App\Http\Controllers\Institucional\InstitucionalInstituicaoController;
 use App\Http\Controllers\Institucional\InstitucionalModuloController;
 use App\Http\Controllers\Institucional\InstitucionalPermissionController;
+use App\Http\Controllers\Institucional\InstitucionalQrCodeController;
 use App\Http\Controllers\Institucional\InstitucionalRelatorioController;
 use App\Http\Controllers\Institucional\InstitucionalRoleController;
 use App\Http\Controllers\Institucional\InstitucionalSetorController;
@@ -20,6 +24,7 @@ use App\Http\Controllers\ReservaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Spatie\Honeypot\ProtectAgainstSpam;
 
 // Página inicial: redireciona para dashboard se autenticado, senão para login
 Route::get('/', function () {
@@ -27,6 +32,17 @@ Route::get('/', function () {
         ? redirect()->route('dashboard')
         : redirect()->route('login');
 })->name('home');
+
+// ---------------------------
+// Report publico de chamados (QR Code) — SEM autenticacao
+// ---------------------------
+Route::get('/reportar/{espaco:public_id}', [ChamadoPublicoController::class, 'create'])
+    ->name('chamados.reportar');
+Route::post('/reportar/{espaco:public_id}', [ChamadoPublicoController::class, 'store'])
+    ->middleware(['throttle:chamados-publico', ProtectAgainstSpam::class])
+    ->name('chamados.reportar.store');
+Route::get('/reportar/sucesso/{chamado:protocolo}', [ChamadoPublicoController::class, 'sucesso'])
+    ->name('chamados.reportar.sucesso');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -64,6 +80,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // only(), as rotas create/store/edit/destroy eram registradas apontando
         // para métodos inexistentes e retornavam 500 em vez de 404.
         Route::resource('reservas', GestorReservaController::class)->only(['index', 'show', 'update']);
+    });
+
+    // Fila de chamados do gestor
+    Route::middleware(['permission:secao.gestao-chamados'])->prefix('gestor')->name('gestor.')->group(function () {
+        Route::get('chamados', [GestorChamadoController::class, 'index'])->name('chamados.index');
+        Route::patch('chamados/{chamado}', [GestorChamadoController::class, 'update'])->name('chamados.update');
     });
 
     // ---------------------------
@@ -106,6 +128,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestão de Espaços
     Route::middleware(['permission:secao.gestao-espacos'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::get('chamados', [InstitucionalChamadoController::class, 'index'])
+            ->name('chamados.index');
+        Route::get('espacos/qrcodes', [InstitucionalQrCodeController::class, 'adesivos'])
+            ->name('espacos.qrcodes');
+        Route::get('espacos/{espaco}/qrcode', [InstitucionalQrCodeController::class, 'espaco'])
+            ->name('espacos.qrcode');
         Route::patch('espacos/{espaco}/alterar-gestores', [InstitucionalEspacoController::class, 'alterarGestores'])
             ->name('espacos.alterarGestores');
         Route::resource('espacos', InstitucionalEspacoController::class);

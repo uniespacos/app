@@ -23,6 +23,10 @@ export const PERMISSION_LABELS: Record<string, string> = {
     'reservas.deletar': 'Deletar reserva',
     'reservas.avaliar': 'Avaliar reserva (aprovar/recusar)',
 
+    // Chamados
+    'chamados.listar': 'Listar chamados',
+    'chamados.triar': 'Triar chamado (alterar situação)',
+
     // Roles
     'roles.listar': 'Listar roles',
     'roles.visualizar': 'Visualizar role',
@@ -70,6 +74,7 @@ export const PERMISSION_LABELS: Record<string, string> = {
     'secao.dashboard-institucional': 'Acessar dashboard institucional',
     'secao.dashboard-gestor': 'Acessar dashboard de gestor',
     'secao.gestao-reservas': 'Acessar gestão de reservas',
+    'secao.gestao-chamados': 'Acessar fila de chamados',
     'secao.gestao-espacos': 'Acessar gestão de espaços',
     'secao.gestao-usuarios': 'Acessar gestão de usuários',
     'secao.gestao-instituicoes': 'Acessar gestão de instituições',
