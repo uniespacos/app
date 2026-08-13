@@ -42,7 +42,11 @@
       "tbl-espaco-user",
       "tbl-users",
       "tbl-setors",
-      "tbl-permission-types"
+      "tbl-permissions",
+      "tbl-roles",
+      "tbl-model-has-permissions",
+      "tbl-model-has-roles",
+      "tbl-role-has-permissions"
     ],
     "relationshipIds": [
       "rel-01",
@@ -57,9 +61,14 @@
       "rel-10",
       "rel-11",
       "rel-12",
-      "rel-13",
       "rel-14",
-      "rel-15"
+      "rel-15",
+      "rel-spatie-01",
+      "rel-spatie-02",
+      "rel-spatie-03",
+      "rel-spatie-04",
+      "rel-spatie-05",
+      "rel-spatie-06"
     ],
     "indexIds": [],
     "memoIds": []
@@ -401,7 +410,6 @@
           "tbl-users-password",
           "tbl-users-telefone",
           "tbl-users-profile_pic",
-          "tbl-users-permission_type_id",
           "tbl-users-setor_id",
           "tbl-users-remember_token",
           "tbl-users-created_at",
@@ -415,7 +423,6 @@
           "tbl-users-password",
           "tbl-users-telefone",
           "tbl-users-profile_pic",
-          "tbl-users-permission_type_id",
           "tbl-users-setor_id",
           "tbl-users-remember_token",
           "tbl-users-created_at",
@@ -467,33 +474,149 @@
           "createAt": 1775343489062
         }
       },
-      "tbl-permission-types": {
-        "id": "tbl-permission-types",
-        "name": "permission_types",
+      "tbl-permissions": {
+        "id": "tbl-permissions",
+        "name": "permissions",
         "comment": "",
         "columnIds": [
-          "tbl-permission-types-id",
-          "tbl-permission-types-nome",
-          "tbl-permission-types-created_at",
-          "tbl-permission-types-updated_at"
+          "tbl-permissions-id",
+          "tbl-permissions-name",
+          "tbl-permissions-guard_name",
+          "tbl-permissions-created_at",
+          "tbl-permissions-updated_at"
         ],
         "seqColumnIds": [
-          "tbl-permission-types-id",
-          "tbl-permission-types-nome",
-          "tbl-permission-types-created_at",
-          "tbl-permission-types-updated_at"
+          "tbl-permissions-id",
+          "tbl-permissions-name",
+          "tbl-permissions-guard_name",
+          "tbl-permissions-created_at",
+          "tbl-permissions-updated_at"
         ],
         "ui": {
-          "x": 954.714,
-          "y": 1506.5446,
+          "x": 200,
+          "y": 1500,
           "zIndex": 1,
-          "widthName": 93,
+          "widthName": 99,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1775343582259,
-          "createAt": 1775343489062
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles": {
+        "id": "tbl-roles",
+        "name": "roles",
+        "comment": "",
+        "columnIds": [
+          "tbl-roles-id",
+          "tbl-roles-name",
+          "tbl-roles-guard_name",
+          "tbl-roles-is_system",
+          "tbl-roles-description",
+          "tbl-roles-created_at",
+          "tbl-roles-updated_at"
+        ],
+        "seqColumnIds": [
+          "tbl-roles-id",
+          "tbl-roles-name",
+          "tbl-roles-guard_name",
+          "tbl-roles-is_system",
+          "tbl-roles-description",
+          "tbl-roles-created_at",
+          "tbl-roles-updated_at"
+        ],
+        "ui": {
+          "x": 200,
+          "y": 1900,
+          "zIndex": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-permissions": {
+        "id": "tbl-model-has-permissions",
+        "name": "model_has_permissions",
+        "comment": "",
+        "columnIds": [
+          "tbl-model-has-permissions-permission_id",
+          "tbl-model-has-permissions-model_type",
+          "tbl-model-has-permissions-model_id"
+        ],
+        "seqColumnIds": [
+          "tbl-model-has-permissions-permission_id",
+          "tbl-model-has-permissions-model_type",
+          "tbl-model-has-permissions-model_id"
+        ],
+        "ui": {
+          "x": 700,
+          "y": 1500,
+          "zIndex": 1,
+          "widthName": 189,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-roles": {
+        "id": "tbl-model-has-roles",
+        "name": "model_has_roles",
+        "comment": "",
+        "columnIds": [
+          "tbl-model-has-roles-role_id",
+          "tbl-model-has-roles-model_type",
+          "tbl-model-has-roles-model_id"
+        ],
+        "seqColumnIds": [
+          "tbl-model-has-roles-role_id",
+          "tbl-model-has-roles-model_type",
+          "tbl-model-has-roles-model_id"
+        ],
+        "ui": {
+          "x": 700,
+          "y": 1900,
+          "zIndex": 1,
+          "widthName": 135,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-role-has-permissions": {
+        "id": "tbl-role-has-permissions",
+        "name": "role_has_permissions",
+        "comment": "",
+        "columnIds": [
+          "tbl-role-has-permissions-permission_id",
+          "tbl-role-has-permissions-role_id"
+        ],
+        "seqColumnIds": [
+          "tbl-role-has-permissions-permission_id",
+          "tbl-role-has-permissions-role_id"
+        ],
+        "ui": {
+          "x": 1200,
+          "y": 1700,
+          "zIndex": 1,
+          "widthName": 180,
+          "widthComment": 60,
+          "color": ""
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       }
     },
@@ -1978,26 +2101,6 @@
           "createAt": 1775343489063
         }
       },
-      "tbl-users-permission_type_id": {
-        "id": "tbl-users-permission_type_id",
-        "tableId": "tbl-users",
-        "name": "permission_type_id",
-        "comment": "",
-        "dataType": "INTEGER",
-        "default": "",
-        "options": 8,
-        "ui": {
-          "keys": 2,
-          "widthName": 103,
-          "widthComment": 60,
-          "widthDataType": 60,
-          "widthDefault": 60
-        },
-        "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
-        }
-      },
       "tbl-users-setor_id": {
         "id": "tbl-users-setor_id",
         "tableId": "tbl-users",
@@ -2198,84 +2301,404 @@
           "createAt": 1775343489063
         }
       },
-      "tbl-permission-types-id": {
-        "id": "tbl-permission-types-id",
-        "tableId": "tbl-permission-types",
+      "tbl-permissions-id": {
+        "id": "tbl-permissions-id",
+        "tableId": "tbl-permissions",
         "name": "id",
         "comment": "",
-        "dataType": "INTEGER",
+        "dataType": "BIGINT",
         "default": "",
         "options": 11,
         "ui": {
-          "keys": 0,
+          "keys": 1,
           "widthName": 60,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       },
-      "tbl-permission-types-nome": {
-        "id": "tbl-permission-types-nome",
-        "tableId": "tbl-permission-types",
-        "name": "nome",
+      "tbl-permissions-name": {
+        "id": "tbl-permissions-name",
+        "tableId": "tbl-permissions",
+        "name": "name",
         "comment": "",
-        "dataType": "VARCHAR",
+        "dataType": "VARCHAR(125)",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
           "widthName": 60,
           "widthComment": 60,
-          "widthDataType": 60,
+          "widthDataType": 96,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       },
-      "tbl-permission-types-created_at": {
-        "id": "tbl-permission-types-created_at",
-        "tableId": "tbl-permission-types",
+      "tbl-permissions-guard_name": {
+        "id": "tbl-permissions-guard_name",
+        "tableId": "tbl-permissions",
+        "name": "guard_name",
+        "comment": "",
+        "dataType": "VARCHAR(125)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 96,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-permissions-created_at": {
+        "id": "tbl-permissions-created_at",
+        "tableId": "tbl-permissions",
         "name": "created_at",
         "comment": "",
         "dataType": "TIMESTAMP",
         "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 72,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-permissions-updated_at": {
+        "id": "tbl-permissions-updated_at",
+        "tableId": "tbl-permissions",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 72,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-id": {
+        "id": "tbl-roles-id",
+        "tableId": "tbl-roles",
+        "name": "id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 1,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-name": {
+        "id": "tbl-roles-name",
+        "tableId": "tbl-roles",
+        "name": "name",
+        "comment": "",
+        "dataType": "VARCHAR(125)",
+        "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
           "widthName": 60,
           "widthComment": 60,
-          "widthDataType": 65,
+          "widthDataType": 96,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       },
-      "tbl-permission-types-updated_at": {
-        "id": "tbl-permission-types-updated_at",
-        "tableId": "tbl-permission-types",
-        "name": "updated_at",
+      "tbl-roles-guard_name": {
+        "id": "tbl-roles-guard_name",
+        "tableId": "tbl-roles",
+        "name": "guard_name",
         "comment": "",
-        "dataType": "TIMESTAMP",
+        "dataType": "VARCHAR(125)",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 62,
+          "widthName": 80,
           "widthComment": 60,
-          "widthDataType": 65,
+          "widthDataType": 96,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-is_system": {
+        "id": "tbl-roles-is_system",
+        "tableId": "tbl-roles",
+        "name": "is_system",
+        "comment": "",
+        "dataType": "BOOLEAN",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 72,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-description": {
+        "id": "tbl-roles-description",
+        "tableId": "tbl-roles",
+        "name": "description",
+        "comment": "",
+        "dataType": "VARCHAR(500)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 88,
+          "widthComment": 60,
+          "widthDataType": 96,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-created_at": {
+        "id": "tbl-roles-created_at",
+        "tableId": "tbl-roles",
+        "name": "created_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 72,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-roles-updated_at": {
+        "id": "tbl-roles-updated_at",
+        "tableId": "tbl-roles",
+        "name": "updated_at",
+        "comment": "",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 72,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-permissions-permission_id": {
+        "id": "tbl-model-has-permissions-permission_id",
+        "tableId": "tbl-model-has-permissions",
+        "name": "permission_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 3,
+          "widthName": 104,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-permissions-model_type": {
+        "id": "tbl-model-has-permissions-model_type",
+        "tableId": "tbl-model-has-permissions",
+        "name": "model_type",
+        "comment": "",
+        "dataType": "VARCHAR(255)",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 1,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 96,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-permissions-model_id": {
+        "id": "tbl-model-has-permissions-model_id",
+        "tableId": "tbl-model-has-permissions",
+        "name": "model_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 1,
+          "widthName": 64,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-roles-role_id": {
+        "id": "tbl-model-has-roles-role_id",
+        "tableId": "tbl-model-has-roles",
+        "name": "role_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 3,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-roles-model_type": {
+        "id": "tbl-model-has-roles-model_type",
+        "tableId": "tbl-model-has-roles",
+        "name": "model_type",
+        "comment": "",
+        "dataType": "VARCHAR(255)",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 1,
+          "widthName": 80,
+          "widthComment": 60,
+          "widthDataType": 96,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-model-has-roles-model_id": {
+        "id": "tbl-model-has-roles-model_id",
+        "tableId": "tbl-model-has-roles",
+        "name": "model_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 1,
+          "widthName": 64,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-role-has-permissions-permission_id": {
+        "id": "tbl-role-has-permissions-permission_id",
+        "tableId": "tbl-role-has-permissions",
+        "name": "permission_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 3,
+          "widthName": 104,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "tbl-role-has-permissions-role_id": {
+        "id": "tbl-role-has-permissions-role_id",
+        "tableId": "tbl-role-has-permissions",
+        "name": "role_id",
+        "comment": "",
+        "dataType": "BIGINT",
+        "default": "",
+        "options": 11,
+        "ui": {
+          "keys": 3,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       }
     },
@@ -2616,34 +3039,6 @@
           "createAt": 1775343489063
         }
       },
-      "rel-13": {
-        "id": "rel-13",
-        "identification": false,
-        "relationshipType": 4,
-        "startRelationshipType": 2,
-        "start": {
-          "tableId": "tbl-permission-types",
-          "columnIds": [
-            "tbl-permission-types-id"
-          ],
-          "x": 1326.714,
-          "y": 1582.5446,
-          "direction": 2
-        },
-        "end": {
-          "tableId": "tbl-users",
-          "columnIds": [
-            "tbl-users-permission_type_id"
-          ],
-          "x": 1867.0429,
-          "y": 1224.5982,
-          "direction": 1
-        },
-        "meta": {
-          "updateAt": 1775343489063,
-          "createAt": 1775343489063
-        }
-      },
       "rel-14": {
         "id": "rel-14",
         "identification": false,
@@ -2698,6 +3093,174 @@
         "meta": {
           "updateAt": 1775343489063,
           "createAt": 1775343489063
+        }
+      },
+      "rel-spatie-01": {
+        "id": "rel-spatie-01",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-permissions",
+          "columnIds": [
+            "tbl-permissions-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-model-has-permissions",
+          "columnIds": [
+            "tbl-model-has-permissions-permission_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "rel-spatie-02": {
+        "id": "rel-spatie-02",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-model-has-permissions",
+          "columnIds": [
+            "tbl-model-has-permissions-model_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "rel-spatie-03": {
+        "id": "rel-spatie-03",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-roles",
+          "columnIds": [
+            "tbl-roles-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-model-has-roles",
+          "columnIds": [
+            "tbl-model-has-roles-role_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "rel-spatie-04": {
+        "id": "rel-spatie-04",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-users",
+          "columnIds": [
+            "tbl-users-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-model-has-roles",
+          "columnIds": [
+            "tbl-model-has-roles-model_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "rel-spatie-05": {
+        "id": "rel-spatie-05",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-permissions",
+          "columnIds": [
+            "tbl-permissions-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-role-has-permissions",
+          "columnIds": [
+            "tbl-role-has-permissions-permission_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
+        }
+      },
+      "rel-spatie-06": {
+        "id": "rel-spatie-06",
+        "identification": false,
+        "relationshipType": 4,
+        "startRelationshipType": 2,
+        "start": {
+          "tableId": "tbl-roles",
+          "columnIds": [
+            "tbl-roles-id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 2
+        },
+        "end": {
+          "tableId": "tbl-role-has-permissions",
+          "columnIds": [
+            "tbl-role-has-permissions-role_id"
+          ],
+          "x": 0,
+          "y": 0,
+          "direction": 1
+        },
+        "meta": {
+          "updateAt": 1777677574005,
+          "createAt": 1777677574005
         }
       }
     },
