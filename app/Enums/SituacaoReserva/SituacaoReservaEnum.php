@@ -11,4 +11,28 @@ enum SituacaoReservaEnum: string
     case PARCIALMENTE_DEFERIDA = 'parcialmente_deferida';
     case DEFERIDA = 'deferida';
     case INATIVA = 'inativa';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::EM_ANALISE => 'Em Análise',
+            self::INDEFERIDA => 'Indeferida',
+            self::PARCIALMENTE_DEFERIDA => 'Parcialmente Deferida',
+            self::DEFERIDA => 'Deferida',
+            self::INATIVA => 'Inativa',
+        };
+    }
+
+    /**
+     * Converte um valor cru do banco no rotulo legivel, sem quebrar
+     * caso apareca uma situacao desconhecida.
+     */
+    public static function labelDe(?string $valor): string
+    {
+        if ($valor === null) {
+            return '—';
+        }
+
+        return self::tryFrom($valor)?->label() ?? $valor;
+    }
 }

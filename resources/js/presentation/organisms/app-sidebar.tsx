@@ -2,7 +2,7 @@ import { NavMain } from '@/presentation/molecules/nav-main';
 import { NavUser } from '@/presentation/molecules/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
-import { hasPermission } from '@/lib/auth';
+import { hasPermission, hasRole } from '@/lib/auth';
 import AppLogo from '@/presentation/atoms/app-logo';
 import type { User } from '@/types';
 import {
@@ -14,10 +14,11 @@ import {
     PERMISSION_SECAO_GESTAO_MODULOS,
     PERMISSION_SECAO_GESTAO_SETORES,
     PERMISSION_SECAO_GESTAO_ROLES,
+    PERMISSION_SECAO_RELATORIOS,
 } from '@/constants/permissions';
 
 /* Ícones ---------------------------------------------------------------- */
-import { BookOpen, Briefcase, Building, Calendar, Eye, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
 
 /* ------------- Tipo local de item de menu (não exportado) ------------- */
 import type { LucideIcon } from 'lucide-react';
@@ -51,6 +52,7 @@ export function AppSidebar() {
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_UNIDADES)     ? [{ title: 'Gerenciar Unidades',       href: '/institucional/unidades',     icon: MapPin     }] : []),
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_MODULOS)      ? [{ title: 'Gerenciar Modulos',        href: '/institucional/modulos',      icon: Grid3X3    }] : []),
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_SETORES)      ? [{ title: 'Gerenciar Setores',        href: '/institucional/setors',       icon: Briefcase  }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_RELATORIOS)          ? [{ title: 'Relatórios',               href: hasRole(user, 'institucional') ? '/institucional/relatorios' : '/gestor/relatorios', icon: FileBarChart2 }] : []),
           ]
         : [];
 

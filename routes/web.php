@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\EspacoController;
+use App\Http\Controllers\Gestor\GestorRelatorioController;
 use App\Http\Controllers\Gestor\GestorReservaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Institucional\InstitucionalEspacoController;
 use App\Http\Controllers\Institucional\InstitucionalInstituicaoController;
 use App\Http\Controllers\Institucional\InstitucionalModuloController;
 use App\Http\Controllers\Institucional\InstitucionalPermissionController;
+use App\Http\Controllers\Institucional\InstitucionalRelatorioController;
 use App\Http\Controllers\Institucional\InstitucionalRoleController;
 use App\Http\Controllers\Institucional\InstitucionalSetorController;
 use App\Http\Controllers\Institucional\InstitucionalUnidadeController;
@@ -111,6 +113,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('roles', InstitucionalRoleController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::put('roles/{role}/permissions', [InstitucionalRoleController::class, 'syncPermissions'])->name('roles.syncpermissions');
         Route::get('permissions', [InstitucionalPermissionController::class, 'index'])->name('permissions.index');
+    });
+
+    // Gestão de Relatórios
+    Route::middleware(['permission:secao.relatorios'])->prefix('gestor')->name('gestor.')->group(function () {
+        Route::get('relatorios', [GestorRelatorioController::class, 'index'])->name('relatorios.index');
+        Route::post('relatorios/gerar', [GestorRelatorioController::class, 'gerar'])->name('relatorios.gerar');
+        Route::post('relatorios/dados', [GestorRelatorioController::class, 'dados'])->name('relatorios.dados');
+    });
+
+    Route::middleware(['permission:secao.relatorios'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::get('relatorios', [InstitucionalRelatorioController::class, 'index'])->name('relatorios.index');
+        Route::post('relatorios/gerar', [InstitucionalRelatorioController::class, 'gerar'])->name('relatorios.gerar');
+        Route::post('relatorios/dados', [InstitucionalRelatorioController::class, 'dados'])->name('relatorios.dados');
     });
 });
 

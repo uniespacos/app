@@ -20,6 +20,7 @@ return new class extends Migration
         'secao.gestao-modulos',
         'secao.gestao-setores',
         'secao.gestao-roles',
+        'secao.relatorios',
     ];
 
     public function up(): void
@@ -38,6 +39,7 @@ return new class extends Migration
         $gestor->givePermissionTo([
             'secao.dashboard-gestor',
             'secao.gestao-reservas',
+            'secao.relatorios',
         ]);
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -51,7 +53,7 @@ return new class extends Migration
         $gestor = Role::findByName('gestor', 'web');
 
         $institucional->revokePermissionTo(self::SECTION_PERMISSIONS);
-        $gestor->revokePermissionTo(['secao.dashboard-gestor', 'secao.gestao-reservas']);
+        $gestor->revokePermissionTo(['secao.dashboard-gestor', 'secao.gestao-reservas', 'secao.relatorios']);
 
         Permission::whereIn('name', self::SECTION_PERMISSIONS)->delete();
 

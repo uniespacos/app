@@ -40,6 +40,10 @@ class RoleSeeder extends Seeder
             'reservas.avaliar',
             'secao.dashboard-gestor',
             'secao.gestao-reservas',
+            'relatorios.reservas-periodo',
+            'relatorios.ocupacao-espacos',
+            'relatorios.inventario-espacos',
+            'secao.relatorios',
         ]);
     }
 }

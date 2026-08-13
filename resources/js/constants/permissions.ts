@@ -70,6 +70,12 @@ export const PERMISSION_ANDARES_ATUALIZAR = 'andares.atualizar';
 // Sistema
 export const PERMISSION_SISTEMA_TELESCOPE = 'sistema.telescope';
 
+// Relatórios
+export const PERMISSION_RELATORIOS_RESERVAS_PERIODO = 'relatorios.reservas-periodo';
+export const PERMISSION_RELATORIOS_OCUPACAO_ESPACOS = 'relatorios.ocupacao-espacos';
+export const PERMISSION_RELATORIOS_INVENTARIO_ESPACOS = 'relatorios.inventario-espacos';
+export const PERMISSION_RELATORIOS_INDICADORES_CONSOLIDADOS = 'relatorios.indicadores-consolidados';
+
 // Seções
 export const PERMISSION_SECAO_DASHBOARD_INSTITUCIONAL = 'secao.dashboard-institucional';
 export const PERMISSION_SECAO_DASHBOARD_GESTOR = 'secao.dashboard-gestor';
@@ -81,3 +87,4 @@ export const PERMISSION_SECAO_GESTAO_UNIDADES = 'secao.gestao-unidades';
 export const PERMISSION_SECAO_GESTAO_MODULOS = 'secao.gestao-modulos';
 export const PERMISSION_SECAO_GESTAO_SETORES = 'secao.gestao-setores';
 export const PERMISSION_SECAO_GESTAO_ROLES = 'secao.gestao-roles';
+export const PERMISSION_SECAO_RELATORIOS = 'secao.relatorios';

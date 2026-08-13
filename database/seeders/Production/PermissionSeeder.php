@@ -68,6 +68,11 @@ class PermissionSeeder extends Seeder
         'andares.atualizar',
         // Sistema
         'sistema.telescope',
+        // Relatórios
+        'relatorios.reservas-periodo',
+        'relatorios.ocupacao-espacos',
+        'relatorios.inventario-espacos',
+        'relatorios.indicadores-consolidados',
         // Seções (UI access control)
         'secao.dashboard-institucional',
         'secao.dashboard-gestor',
@@ -79,6 +84,7 @@ class PermissionSeeder extends Seeder
         'secao.gestao-modulos',
         'secao.gestao-setores',
         'secao.gestao-roles',
+        'secao.relatorios',
     ];
 
     public function run(): void
