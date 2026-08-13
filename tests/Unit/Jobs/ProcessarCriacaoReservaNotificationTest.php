@@ -53,7 +53,8 @@ class ProcessarCriacaoReservaNotificationTest extends TestCase
         ];
 
         $job = new ProcessarCriacaoReserva($dadosRequisicao, $applicantUser);
-        $job->handle();
+        // Via container, como o worker faz: o handle() recebe o ExpansaoHorariosService.
+        app()->call([$job, 'handle']);
 
         Notification::assertSentTo($managerUser, NewReservationNotification::class);
         Notification::assertSentTo($applicantUser, ReservationCreatedNotification::class);

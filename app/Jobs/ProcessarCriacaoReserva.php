@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationFailedNotification;
+use App\Services\ExpansaoHorariosService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -48,8 +49,11 @@ class ProcessarCriacaoReserva implements ShouldQueue
     /**
      * Execute the job — creates the Reserva, generates all recurring Horario records,
      * notifies managers, and dispatches conflict validation.
+     *
+     * O servico e injetado aqui, e nao no construtor: o job e serializado para a
+     * fila e so as propriedades do construtor viajam junto.
      */
-    public function handle(): void
+    public function handle(ExpansaoHorariosService $expansao): void
     {
         Log::info('ProcessarCriacaoReserva started', [
             'solicitante_id' => $this->solicitante->id,
@@ -57,7 +61,16 @@ class ProcessarCriacaoReserva implements ShouldQueue
         ]);
 
         try {
-            $reserva = DB::transaction(function () {
+            $horariosData = $this->dadosRequisicao['horarios_solicitados'];
+
+            // Uma query para todas as agendas e seus gestores, em vez de um
+            // findOrFail por slot dentro do loop.
+            $agendasMap = Agenda::with('user')
+                ->whereIn('id', collect($horariosData)->pluck('agenda_id')->unique()->filter()->all())
+                ->get()
+                ->keyBy('id');
+
+            [$reserva, $gestoresUnicos] = DB::transaction(function () use ($expansao, $agendasMap, $horariosData) {
                 $reserva = Reserva::create([
                     'titulo' => $this->dadosRequisicao['titulo'],
                     'descricao' => $this->dadosRequisicao['descricao'] ?? '',
@@ -68,49 +81,39 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     'situacao' => 'em_analise',
                 ]);
 
-                $horariosData = $this->dadosRequisicao['horarios_solicitados'];
-                $gestores = [];
-                $dataFinalReserva = Carbon::parse($reserva->data_final);
+                [$linhas, $agendasUsadas] = $expansao->montar(
+                    $horariosData,
+                    $agendasMap,
+                    (string) $reserva->recorrencia,
+                    Carbon::parse($reserva->data_final),
+                    (int) $reserva->id,
+                    fn (Agenda $agenda) => $agenda->user && $agenda->user->id === $this->solicitante->id
+                        ? 'deferida'
+                        : 'em_analise',
+                );
 
-                foreach ($horariosData as $horarioInfo) {
-                    $gestor = Agenda::findOrFail($horarioInfo['agenda_id'])->user;
-                    $gestores[] = $gestor;
-                    $dataIteracao = Carbon::parse($horarioInfo['data']);
-
-                    while ($dataIteracao->lte($dataFinalReserva)) {
-                        Horario::create([
-                            'data' => $dataIteracao->toDateString(),
-                            'horario_inicio' => $horarioInfo['horario_inicio'],
-                            'horario_fim' => $horarioInfo['horario_fim'],
-                            'agenda_id' => $horarioInfo['agenda_id'],
-                            'reserva_id' => $reserva->id,
-                            'situacao' => $gestor->id === $this->solicitante->id ? 'deferida' : 'em_analise',
-                        ]);
-                        $dataIteracao->addWeek();
-                    }
+                if ($linhas !== []) {
+                    Horario::insert($linhas);
                 }
 
-                $gestoresUnicos = collect($gestores)->unique('id');
+                // Agenda sem gestor atribuido nao entra na conta — antes disso
+                // o acesso direto a `$gestor->id` estourava nesse caso.
+                $gestoresUnicos = $agendasUsadas->map(fn (Agenda $a) => $a->user)->filter()->unique('id')->values();
+
                 if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
                     $reserva->update(['situacao' => 'deferida']);
-                } elseif (collect($gestores)->contains(fn ($g) => $g->id === $this->solicitante->id)) {
+                } elseif ($gestoresUnicos->contains(fn ($g) => $g->id === $this->solicitante->id)) {
                     $reserva->update(['situacao' => 'parcialmente_deferida']);
                 }
 
                 Log::info('Reservation created', [
                     'reserva_id' => $reserva->id,
                     'situacao' => $reserva->situacao,
-                    'horarios_count' => $reserva->horarios()->count(),
+                    'horarios_count' => count($linhas),
                 ]);
 
-                return $reserva;
+                return [$reserva, $gestoresUnicos];
             });
-
-            $horariosData = $this->dadosRequisicao['horarios_solicitados'];
-            $gestoresUnicos = collect($horariosData)
-                ->map(fn ($h) => Agenda::find($h['agenda_id'])?->user)
-                ->filter()
-                ->unique('id');
 
             foreach ($gestoresUnicos as $gestor) {
                 if ($gestor->id !== $this->solicitante->id) {
