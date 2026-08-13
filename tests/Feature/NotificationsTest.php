@@ -70,8 +70,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma nova solicitação de reserva foi criada:', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
-        $this->assertStringContainsString($this->reserva->user->name, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
+        $this->assertStringContainsString(e($this->reserva->user->name), $mailData);
         $this->assertStringContainsString(route('gestor.reservas.show', $this->reserva->id), $mailData);
 
         // Test Broadcast
@@ -94,12 +94,12 @@ class NotificationsTest extends TestCase
         $mailData = (string) $mailMessage->render();
 
         $this->assertStringContainsString('foi avaliada.', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
         $this->assertStringContainsString('Deferida', $mailData);
         $this->assertStringContainsString('Solicitante:', $mailData);
-        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString(e($this->user->name), $mailData);
         $this->assertStringContainsString('Avaliador:', $mailData);
-        $this->assertStringContainsString($this->manager->name, $mailData);
+        $this->assertStringContainsString(e($this->manager->name), $mailData);
         $this->assertStringContainsString(route('reservas.show', $this->reserva->id), $mailData);
 
         // Test Broadcast
@@ -121,8 +121,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('criada com sucesso e está aguardando avaliação.', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
-        $this->assertStringContainsString($this->reserva->user->name, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
+        $this->assertStringContainsString(e($this->reserva->user->name), $mailData);
         $this->assertStringContainsString(route('reservas.show', $this->reserva->id), $mailData);
 
         // Test Broadcast
@@ -144,8 +144,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
-        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
+        $this->assertStringContainsString(e($this->user->name), $mailData);
         $this->assertStringContainsString(route('reservas.index'), $mailData);
 
         // Test Broadcast
@@ -167,8 +167,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Uma reserva foi cancelada pelo solicitante:', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
-        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
+        $this->assertStringContainsString(e($this->user->name), $mailData);
         $this->assertStringContainsString(route('gestor.reservas.index'), $mailData);
 
         // Test Broadcast
@@ -190,7 +190,7 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizada com sucesso.', $mailData);
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
         $this->assertStringContainsString(route('reservas.show', $this->reserva->id), $mailData);
 
         // Test Broadcast
@@ -212,8 +212,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('Houve um erro ao processar sua solicitação', $mailData); // uses reservation_failed view
-        $this->assertStringContainsString($this->reserva->titulo, $mailData);
-        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString(e($this->reserva->titulo), $mailData);
+        $this->assertStringContainsString(e($this->user->name), $mailData);
         $this->assertStringContainsString(route('reservas.edit', $this->reserva->id), $mailData);
 
         // Test Broadcast
@@ -299,8 +299,8 @@ class NotificationsTest extends TestCase
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('foi atualizado em nosso sistema.', $mailData);
-        $this->assertStringContainsString($this->setor->nome, $mailData);
-        $this->assertStringContainsString($this->user->name, $mailData);
+        $this->assertStringContainsString(e($this->setor->nome), $mailData);
+        $this->assertStringContainsString(e($this->user->name), $mailData);
         $this->assertStringContainsString(route('institucional.setors.show', $this->setor->id), $mailData);
 
         // Test Broadcast
