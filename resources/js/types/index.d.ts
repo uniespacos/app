@@ -96,6 +96,11 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    /**
+     * Subitens do menu. Quando presente com mais de um item, o item vira um
+     * grupo recolhivel; com um unico item, e achatado no menu principal.
+     */
+    items?: NavItem[];
 }
 
 /**

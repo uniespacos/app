@@ -7,6 +7,7 @@ import AppLogo from '@/presentation/atoms/app-logo';
 import type { User } from '@/types';
 import {
     PERMISSION_SECAO_GESTAO_RESERVAS,
+    PERMISSION_SECAO_GESTAO_CHAMADOS,
     PERMISSION_SECAO_GESTAO_ESPACOS,
     PERMISSION_SECAO_GESTAO_USUARIOS,
     PERMISSION_SECAO_GESTAO_INSTITUICOES,
@@ -18,7 +19,7 @@ import {
 } from '@/constants/permissions';
 
 /* Ícones ---------------------------------------------------------------- */
-import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, TriangleAlert, Users, Wrench } from 'lucide-react';
 
 /* ------------- Tipo local de item de menu (não exportado) ------------- */
 import type { LucideIcon } from 'lucide-react';
@@ -27,6 +28,7 @@ type MenuItem = {
     title: string;
     href: string;
     icon: LucideIcon;
+    items?: MenuItem[];
 };
 
 /* ----------------- Itens de navegação (agrupados) ---------------------- */
@@ -42,9 +44,19 @@ export function AppSidebar() {
     const { props } = usePage<{ auth: { user: User } }>();
     const user = props.auth.user;
 
+    /* Chamados forma um grupo unico na sidebar. O gestor so alcanca a propria
+       fila, e nesse caso o NavMain acha o submenu de um item so. */
+    const chamadosItems: MenuItem[] = user
+        ? [
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_CHAMADOS)     ? [{ title: 'Fila de Chamados',         href: '/gestor/chamados',            icon: Wrench        }] : []),
+              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Espaços sem Responsável',  href: '/institucional/chamados',     icon: TriangleAlert }] : []),
+          ]
+        : [];
+
     const extraItems: MenuItem[] = user
         ? [
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_RESERVAS)     ? [{ title: 'Gerir Reservas',          href: '/gestor/reservas',            icon: Eye        }] : []),
+              ...(chamadosItems.length > 0                                  ? [{ title: 'Chamados',                href: chamadosItems[0].href,         icon: Wrench, items: chamadosItems }] : []),
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Gerir Espaços',            href: '/institucional/espacos',      icon: Building   }] : []),
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_USUARIOS)     ? [{ title: 'Gerenciar Usuários',       href: '/institucional/usuarios',     icon: Users      }] : []),
               ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ROLES)        ? [{ title: 'Gerenciar Papéis',         href: '/institucional/roles',        icon: ShieldCheck}] : []),
