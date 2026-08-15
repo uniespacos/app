@@ -2,8 +2,6 @@ name: CI/CD - Staging
 
 on:
   push:
-    branches:
-      - develop
     tags:
       - "v*-*"
   workflow_dispatch:
