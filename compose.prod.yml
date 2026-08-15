@@ -1,7 +1,7 @@
 services:
     web:
         container_name: web-production
-        image: ghcr.io/${GHCR_REPO_WEB:-uniespacos/app/web}:${IMAGE_TAG:-latest}
+        image: ghcr.io/${GHCR_REPO_WEB:-uniespacos/uniespacos/web}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         env_file:
             - .env
@@ -22,7 +22,7 @@ services:
             - app
     app:
         container_name: app-production
-        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/uniespacos/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         volumes:
             - uniespacos-storage-production:/var/www/storage
@@ -35,7 +35,7 @@ services:
                 condition: service_healthy
     queue-worker:
         container_name: queue-worker-production
-        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/uniespacos/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         command: php artisan queue:work --verbose --tries=3 --timeout=90
         volumes:
@@ -49,7 +49,7 @@ services:
             - app
     reverb:
         container_name: reverb-production
-        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/app/app}:${IMAGE_TAG:-latest}
+        image: ghcr.io/${GHCR_REPO_APP:-uniespacos/uniespacos/app}:${IMAGE_TAG:-latest}
         restart: unless-stopped
         command: php artisan reverb:start --host=0.0.0.0 --port=9000
         env_file:
