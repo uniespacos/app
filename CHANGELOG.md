@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.6](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.5...v1.3.0-rc.6) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** use cloudflared-recognized env vars for Access service token auth ([c4288b9](https://github.com/uniespacos/uniespacos/commit/c4288b90cc4a354cd641a073ed1abaeeb52202bf))
+* **ci:** use cloudflared-recognized env vars for Access service token auth ([7c20b8e](https://github.com/uniespacos/uniespacos/commit/7c20b8ea9bd23c5ec17129f30f5c1a3e2ea5720b))
+
 ## [1.3.0-rc.5](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.4...v1.3.0-rc.5) (2026-08-15)
 
 
