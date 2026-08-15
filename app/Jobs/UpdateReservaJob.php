@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Models\Agenda;
+use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
 use App\Notifications\ReservationUpdatedNotification;
 use App\Notifications\ReservationUpdateFailedNotification;
+use App\Services\ExpansaoHorariosService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -33,8 +36,11 @@ class UpdateReservaJob implements ShouldQueue
 
     /**
      * Execute the job — updates the reservation and regenerates horarios for the given scope.
+     *
+     * O servico e injetado aqui, e nao no construtor: o job e serializado para a
+     * fila e so as propriedades do construtor viajam junto.
      */
-    public function handle(): void
+    public function handle(ExpansaoHorariosService $expansao): void
     {
         Log::info('UpdateReservaJob started', [
             'reserva_id' => $this->reserva->id,
@@ -43,7 +49,7 @@ class UpdateReservaJob implements ShouldQueue
         ]);
 
         try {
-            DB::transaction(function () {
+            DB::transaction(function () use ($expansao) {
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
                     'descricao' => $this->validatedData['descricao'] ?? '',
@@ -76,22 +82,52 @@ class UpdateReservaJob implements ShouldQueue
                         $this->reserva->horarios()->create($novoHorario);
                     }
                 } else {
+                    $agendasMap = Agenda::with('user')
+                        ->whereIn('id', $horariosSolicitados->pluck('agenda_id')->unique()->filter()->all())
+                        ->get()
+                        ->keyBy('id');
+
+                    // O escopo `recurring` regrava tudo. Sem guardar o que ja foi
+                    // avaliado, a edicao apagaria situacao, justificativa e
+                    // avaliador — e quem tem `reservas.atualizar` chega aqui mesmo
+                    // com a reserva parcialmente avaliada, sem passar pelo
+                    // bloqueio da ReservaPolicy.
+                    $avaliacoes = $this->reserva->horarios()
+                        ->whereIn('situacao', ['deferida', 'indeferida'])
+                        ->get()
+                        ->keyBy(fn ($h) => $this->chaveHorario($h->agenda_id, $h->data, $h->horario_inicio));
+
                     $this->reserva->horarios()->delete();
 
-                    foreach ($horariosSolicitados as $horarioInfo) {
-                        $dataIteracao = Carbon::parse($horarioInfo['data']);
-                        $dataFinalReserva = Carbon::parse($this->reserva->data_final);
+                    [$linhas] = $expansao->montar(
+                        $horariosSolicitados->all(),
+                        $agendasMap,
+                        (string) $this->reserva->recorrencia,
+                        Carbon::parse($this->reserva->data_final),
+                        (int) $this->reserva->id,
+                        // Mesma regra da criacao: se o dono da reserva administra
+                        // a agenda, o horario ja nasce deferido. Vale o dono, e
+                        // nao quem edita — senao um gestor editando a reserva de
+                        // outra pessoa a deferiria sem querer.
+                        fn (Agenda $agenda) => $agenda->user_id === $this->reserva->user_id
+                            ? 'deferida'
+                            : 'em_analise',
+                    );
 
-                        while ($dataIteracao->lte($dataFinalReserva)) {
-                            $this->reserva->horarios()->create([
-                                'data' => $dataIteracao->toDateString(),
-                                'horario_inicio' => $horarioInfo['horario_inicio'],
-                                'horario_fim' => $horarioInfo['horario_fim'],
-                                'agenda_id' => $horarioInfo['agenda_id'],
-                                'situacao' => 'em_analise',
-                            ]);
-                            $dataIteracao->addWeek();
+                    foreach ($linhas as $indice => $linha) {
+                        $anterior = $avaliacoes->get(
+                            $this->chaveHorario($linha['agenda_id'], $linha['data'], $linha['horario_inicio'])
+                        );
+
+                        if ($anterior !== null) {
+                            $linhas[$indice]['situacao'] = $anterior->situacao;
+                            $linhas[$indice]['justificativa'] = $anterior->justificativa;
+                            $linhas[$indice]['user_id'] = $anterior->user_id;
                         }
+                    }
+
+                    if ($linhas !== []) {
+                        Horario::insert($linhas);
                     }
                 }
             });
@@ -118,6 +154,16 @@ class UpdateReservaJob implements ShouldQueue
             ]);
             $this->fail($e);
         }
+    }
+
+    /**
+     * Identidade de um horario para casar o que foi regravado com o que ja
+     * estava avaliado. `data` vem como string do banco e como string do
+     * expansor, mas passa por Carbon para nao depender desse formato.
+     */
+    private function chaveHorario(int $agendaId, mixed $data, string $horarioInicio): string
+    {
+        return implode('-', [$agendaId, Carbon::parse($data)->toDateString(), $horarioInicio]);
     }
 
     /**
