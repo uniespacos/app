@@ -172,8 +172,8 @@ jobs:
     environment:
       name: production
     env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
+      TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
+      TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

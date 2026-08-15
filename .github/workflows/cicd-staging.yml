@@ -173,8 +173,8 @@ jobs:
     environment:
       name: staging
     env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
+      TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
+      TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
