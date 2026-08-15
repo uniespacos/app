@@ -206,16 +206,18 @@ jobs:
           scp ./compose.prod.yml ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/compose.prod.yml
           scp ./docker/production/scripts/deploy.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/deploy.staging.sh
           scp ./docker/production/scripts/rollback.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/rollback.staging.sh
+          scp ./docker/production/scripts/provision-staging.sh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }}:${STAGING_PATH}/provision-staging.sh
 
           ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
             mkdir -p ${STAGING_PATH}/docker/production/caddy
             cat > ${STAGING_PATH}/docker/production/caddy/Caddyfile
-          " < ./docker/production/caddy/Caddyfile
+          " < ./docker/production/caddy/Caddyfile.staging
 
           ssh ${{ secrets.SSH_USER_STAGING }}@${{ secrets.SSH_HOST_STAGING }} "
             set -e
             cd ${STAGING_PATH}
-            chmod +x deploy.staging.sh rollback.staging.sh
+            chmod +x deploy.staging.sh rollback.staging.sh provision-staging.sh
+            ./provision-staging.sh ${STAGING_PATH}
             echo '${{ secrets.PAT_STAGING }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
             set -a
             source .env
