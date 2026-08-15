@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.9](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.8...v1.3.0-rc.9) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** publish staging web port to match Cloudflare Tunnel target ([4431289](https://github.com/uniespacos/uniespacos/commit/443128983e1da43c0ab772952948d3cb879d5156))
+* **docker:** publish staging web port to match Cloudflare Tunnel target ([b7219c6](https://github.com/uniespacos/uniespacos/commit/b7219c64fa9f4872cbd66110d027ed57bd2e42b3))
+
 ## [1.3.0-rc.8](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.7...v1.3.0-rc.8) (2026-08-15)
 
 
