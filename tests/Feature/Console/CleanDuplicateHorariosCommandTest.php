@@ -10,11 +10,12 @@ use App\Models\Reserva;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\PermiteHorariosDuplicados;
 use Tests\TestCase;
 
 class CleanDuplicateHorariosCommandTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, PermiteHorariosDuplicados;
 
     private Reserva $reserva;
 
@@ -23,6 +24,10 @@ class CleanDuplicateHorariosCommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // O comando existe para remover duplicatas, entao o teste precisa
+        // conseguir cria-las.
+        $this->permitirHorariosDuplicados();
 
         $this->agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
         $this->reserva = Reserva::factory()->create([
