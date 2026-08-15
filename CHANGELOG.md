@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.4](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.3...v1.3.0-rc.4) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** skip TelescopeServiceProvider when telescope package is absent ([accf075](https://github.com/uniespacos/uniespacos/commit/accf075c5bf5a1de2a03bfa8a45f17c878536aa4))
+* **ci:** skip TelescopeServiceProvider when telescope package is absent ([af903ab](https://github.com/uniespacos/uniespacos/commit/af903ab00d29ac45e5f1a03d5cc5e0bcc2eba109))
+
 ## [1.3.0-rc.3](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.2...v1.3.0-rc.3) (2026-08-15)
 
 
