@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.2](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2026-08-15)
+
+
+### Bug Fixes
+
+* expansao dupla recorrencia ([13c42f3](https://github.com/uniespacos/uniespacos/commit/13c42f31c145e828e0a911abb214f45dfdbb3804))
+
 ## [1.3.0-rc.1](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc...v1.3.0-rc.1) (2026-08-15)
 
 
