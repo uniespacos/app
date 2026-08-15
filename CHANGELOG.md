@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.7](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.6...v1.3.0-rc.7) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** correct default GHCR image path in compose.prod.yml ([ff32751](https://github.com/uniespacos/uniespacos/commit/ff32751b4b4e069293548fa9433292b6703f1bec))
+* **docker:** correct default GHCR image path in compose.prod.yml ([7bef57d](https://github.com/uniespacos/uniespacos/commit/7bef57d51d14577a6966eb13cc6562ea8a005b7c))
+
 ## [1.3.0-rc.6](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.5...v1.3.0-rc.6) (2026-08-15)
 
 
