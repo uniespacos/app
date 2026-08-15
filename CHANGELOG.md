@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.5](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.4...v1.3.0-rc.5) (2026-08-15)
+
+
+### Bug Fixes
+
+* **style:** use imported Telescope provider class per Pint fully_qualified_strict_types ([c1a298c](https://github.com/uniespacos/uniespacos/commit/c1a298c13cbb4014e1be930a97fb158a20c9226c))
+* **style:** use imported Telescope provider class per Pint fully_qualified_strict_types ([ece021e](https://github.com/uniespacos/uniespacos/commit/ece021e440fc87090076b2d3efa74dc9884695e7))
+
 ## [1.3.0-rc.4](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.3...v1.3.0-rc.4) (2026-08-15)
 
 
