@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.8](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.7...v1.3.0-rc.8) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** give staging its own cert-free Caddy config ([3e8b169](https://github.com/uniespacos/uniespacos/commit/3e8b169648893190c3ee9641a336713796dd97a7))
+* **docker:** give staging its own cert-free Caddy config ([8369e63](https://github.com/uniespacos/uniespacos/commit/8369e634c7c69719d0b90bb8f65cf18923d907c7))
+
 ## [1.3.0-rc.7](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.6...v1.3.0-rc.7) (2026-08-15)
 
 
