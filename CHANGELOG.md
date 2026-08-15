@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.3](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.2...v1.3.0-rc.3) (2026-08-15)
+
+
+### Features
+
+* **reservas:** forbid duplicated horarios at the database level ([aed5d72](https://github.com/uniespacos/uniespacos/commit/aed5d72617d8062260f4e64d52c118366cdd288c))
+
 ## [1.3.0-rc.2](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2026-08-15)
 
 
