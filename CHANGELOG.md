@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.1](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc...v1.3.0-rc.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** trigger staging pipeline only on staging tags ([cbc4e0c](https://github.com/uniespacos/uniespacos/commit/cbc4e0c8086c8480d1bfd23a8c001e06008fb4a8))
+
 ## [1.3.0-rc](https://github.com/uniespacos/uniespacos/compare/v1.2.3...v1.3.0-rc) (2026-08-15)
 
 
