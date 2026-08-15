@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { IFormHandler } from '../application/ports/form-handler.interface';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic constraint must accept payload types without an index signature
 export function useAgnosticForm<T extends Record<string, any>>(initialValues?: T): IFormHandler<T> {
     const form = useForm(initialValues as unknown as Record<string, string>);
 

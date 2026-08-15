@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic constraint must accept payload types without an index signature
 export interface IFormHandler<T extends Record<string, any>> {
     data: T;
     setData: {
