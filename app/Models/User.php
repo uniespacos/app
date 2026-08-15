@@ -23,7 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, MustVerifyEmailTrait, Notifiable, HasRoles;
+    use HasFactory, HasRoles, MustVerifyEmailTrait, Notifiable;
 
     /**
      * @var list<string>

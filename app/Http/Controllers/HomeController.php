@@ -25,8 +25,8 @@ class HomeController extends Controller
 
         $view = match (true) {
             $user->hasPermissionTo('secao.dashboard-institucional') => 'Dashboard/DashboardInstitucionalPage',
-            $user->hasPermissionTo('secao.dashboard-gestor')        => 'Dashboard/DashboardGestorPage',
-            default                                                  => 'Dashboard/DashboardUsuarioPage',
+            $user->hasPermissionTo('secao.dashboard-gestor') => 'Dashboard/DashboardGestorPage',
+            default => 'Dashboard/DashboardUsuarioPage',
         };
 
         return Inertia::render($view, $data);
