@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.10](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.9...v1.3.0-rc.10) (2026-08-16)
+
+
+### Bug Fixes
+
+* **container:** bind all repository interfaces in AppServiceProvider ([042096a](https://github.com/uniespacos/uniespacos/commit/042096a9c1dab32d8a892a3733dbfa51b8df017c))
+* **container:** bind all repository interfaces in AppServiceProvider ([cb88e04](https://github.com/uniespacos/uniespacos/commit/cb88e04fadfcb351f2f5d858ee754d4040a963ab))
+
 ## [1.3.0-rc.9](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.8...v1.3.0-rc.9) (2026-08-15)
 
 
