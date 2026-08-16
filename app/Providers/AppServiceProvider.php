@@ -16,10 +16,30 @@ use App\Policies\ReservaPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SetorPolicy;
 use App\Policies\UnidadePolicy;
+use App\Repositories\AgendaRepositoryEloquent;
+use App\Repositories\AgendaRepositoryInterface;
+use App\Repositories\AndarRepositoryEloquent;
+use App\Repositories\AndarRepositoryInterface;
+use App\Repositories\EspacoRepositoryEloquent;
+use App\Repositories\EspacoRepositoryInterface;
+use App\Repositories\HorarioRepositoryEloquent;
+use App\Repositories\HorarioRepositoryInterface;
+use App\Repositories\InstituicaoRepositoryEloquent;
+use App\Repositories\InstituicaoRepositoryInterface;
+use App\Repositories\ModuloRepositoryEloquent;
+use App\Repositories\ModuloRepositoryInterface;
 use App\Repositories\PermissionRepositoryEloquent;
 use App\Repositories\PermissionRepositoryInterface;
+use App\Repositories\ReservaRepositoryEloquent;
+use App\Repositories\ReservaRepositoryInterface;
 use App\Repositories\RoleRepositoryEloquent;
 use App\Repositories\RoleRepositoryInterface;
+use App\Repositories\SetorRepositoryEloquent;
+use App\Repositories\SetorRepositoryInterface;
+use App\Repositories\UnidadeRepositoryEloquent;
+use App\Repositories\UnidadeRepositoryInterface;
+use App\Repositories\UserRepositoryEloquent;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +56,16 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(RoleRepositoryInterface::class, RoleRepositoryEloquent::class);
         $this->app->bind(PermissionRepositoryInterface::class, PermissionRepositoryEloquent::class);
+        $this->app->bind(AgendaRepositoryInterface::class, AgendaRepositoryEloquent::class);
+        $this->app->bind(AndarRepositoryInterface::class, AndarRepositoryEloquent::class);
+        $this->app->bind(EspacoRepositoryInterface::class, EspacoRepositoryEloquent::class);
+        $this->app->bind(HorarioRepositoryInterface::class, HorarioRepositoryEloquent::class);
+        $this->app->bind(InstituicaoRepositoryInterface::class, InstituicaoRepositoryEloquent::class);
+        $this->app->bind(ModuloRepositoryInterface::class, ModuloRepositoryEloquent::class);
+        $this->app->bind(ReservaRepositoryInterface::class, ReservaRepositoryEloquent::class);
+        $this->app->bind(SetorRepositoryInterface::class, SetorRepositoryEloquent::class);
+        $this->app->bind(UnidadeRepositoryInterface::class, UnidadeRepositoryEloquent::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepositoryEloquent::class);
 
         if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
