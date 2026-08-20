@@ -111,25 +111,31 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     /**
      * Returns a Reserva with horarios filtered to the gestor's agendas and the given week
      *
+     * Issue #119: o whereHas escopa a própria Reserva às agendas do gestor. Sem
+     * ele, filtrar apenas o relacionamento devolvia titulo/descricao/user de
+     * reservas fora do escopo de gestão. Mesmo critério de getPaginatedForGestor.
+     *
      * @param  array<int>  $agendaIds
      */
     public function findForGestorModal(int $reservaId, array $agendaIds, string $weekStart, string $weekEnd): ?Reserva
     {
-        return $this->reserva->with([
-            'user',
-            'horarios' => function ($query) use ($agendaIds, $weekStart, $weekEnd) {
-                $query->whereIn('agenda_id', $agendaIds)
-                    ->whereBetween('data', [$weekStart, $weekEnd])
-                    ->orderBy('data')->orderBy('horario_inicio')
-                    ->with([
-                        'agenda' => function ($q) {
-                            $q->select('id', 'espaco_id', 'turno', 'user_id')
-                                ->with('espaco.andar.modulo');
-                        },
-                        'avaliador',
-                    ]);
-            },
-        ])->find($reservaId);
+        return $this->reserva
+            ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendaIds))
+            ->with([
+                'user',
+                'horarios' => function ($query) use ($agendaIds, $weekStart, $weekEnd) {
+                    $query->whereIn('agenda_id', $agendaIds)
+                        ->whereBetween('data', [$weekStart, $weekEnd])
+                        ->orderBy('data')->orderBy('horario_inicio')
+                        ->with([
+                            'agenda' => function ($q) {
+                                $q->select('id', 'espaco_id', 'turno', 'user_id')
+                                    ->with('espaco.andar.modulo');
+                            },
+                            'avaliador',
+                        ]);
+                },
+            ])->find($reservaId);
     }
 
     /**

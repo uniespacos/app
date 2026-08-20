@@ -60,7 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rotas para Usuário Gestor
     // ---------------------------
     Route::middleware(['permission:secao.gestao-reservas'])->prefix('gestor')->name('gestor.')->group(function () {
-        Route::resource('reservas', GestorReservaController::class);
+        // GestorReservaController implementa apenas estes três métodos; sem o
+        // only(), as rotas create/store/edit/destroy eram registradas apontando
+        // para métodos inexistentes e retornavam 500 em vez de 404.
+        Route::resource('reservas', GestorReservaController::class)->only(['index', 'show', 'update']);
     });
 
     // ---------------------------

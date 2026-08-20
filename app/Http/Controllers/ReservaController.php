@@ -67,6 +67,8 @@ class ReservaController extends Controller
      */
     public function show(Reserva $reserva): RedirectResponse
     {
+        $this->authorize('view', $reserva);
+
         return redirect()->route('reservas.index', ['reserva' => $reserva->id]);
     }
 
@@ -75,6 +77,8 @@ class ReservaController extends Controller
      */
     public function edit(Request $request, Reserva $reserva): Response
     {
+        $this->authorize('update', $reserva);
+
         $data = $this->service->getEditData($reserva, $request->input('semana', ''));
 
         return Inertia::render('Espacos/VisualizarEspacoPage', $data);
