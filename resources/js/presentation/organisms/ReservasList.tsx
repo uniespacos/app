@@ -10,6 +10,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
+import { LocalReserva } from '@/presentation/molecules/LocalReserva';
 import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
 import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
@@ -116,9 +117,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                 </TableCell>
 
                                 <TableCell className="hidden md:table-cell">
-                                    <div>
-                                        <p>{reserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}</p>
-                                    </div>
+                                    <LocalReserva espaco={reserva.horarios[0]?.agenda?.espaco} />
                                 </TableCell>
 
                                 <TableCell className="hidden lg:table-cell">
