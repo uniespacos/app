@@ -69,7 +69,14 @@ class ReservaController extends Controller
     {
         $this->authorize('view', $reserva);
 
-        return redirect()->route('reservas.index', ['reserva' => $reserva->id]);
+        // Issue #222: as notificações apontam para esta rota e a URL fica gravada
+        // na tabela notifications, então propagar a semana aqui conserta também
+        // os links já enviados. Sem isto, index cai no default 'today' e o modal
+        // abre numa semana sem horários.
+        return redirect()->route('reservas.index', [
+            'reserva' => $reserva->id,
+            'semana' => $this->service->resolveDataAncora($reserva),
+        ]);
     }
 
     /**

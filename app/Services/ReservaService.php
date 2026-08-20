@@ -75,16 +75,30 @@ class ReservaService
     }
 
     /**
+     * Reference date used to open a reservation on the calendar: its first
+     * chronological slot, falling back to data_inicial only when it has none.
+     *
+     * Issue #222. Do not simplify this to data_inicial alone: editing a single
+     * occurrence rewrites data_inicial with the smallest slot of the edited week
+     * (use-agenda-selection-usecase.ts:78-79 feeding UpdateReservaJob.php:56), so
+     * it can drift ahead of the reservation's real first slot and send the
+     * calendar back to a week with nothing in it.
+     */
+    public function resolveDataAncora(Reserva $reserva): string
+    {
+        $firstSlot = $reserva->horarios()->orderBy('data', 'asc')->first();
+
+        return Carbon::parse($firstSlot ? $firstSlot->data : $reserva->data_inicial)->format('Y-m-d');
+    }
+
+    /**
      * Returns all data needed to render the reservation edit page (espaco schedule + reservation).
      *
      * @return array<string, mixed>
      */
     public function getEditData(Reserva $reserva, string $weekRef): array
     {
-        $firstSlot = $reserva->horarios()->orderBy('data', 'asc')->first();
-        $defaultDate = $firstSlot ? $firstSlot->data : $reserva->data_inicial;
-
-        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $defaultDate);
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $this->resolveDataAncora($reserva));
 
         $reserva->load([
             'user',
@@ -205,7 +219,7 @@ class ReservaService
      */
     public function getForGestorReview(Reserva $reserva, User $gestor, string $weekRef): array
     {
-        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $reserva->data_inicial);
+        [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef ?: $this->resolveDataAncora($reserva));
         $agendaIds = $gestor->agendas()->pluck('id')->all();
 
         $conflitosMap = $this->conflictService->findConflictsFor($reserva->id);
