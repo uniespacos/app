@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.13](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.12...v1.3.0-rc.13) (2026-08-20)
+
+
+### Bug Fixes
+
+* corrigindo ordem de gestores turno ([#258](https://github.com/uniespacos/uniespacos/issues/258)) ([4374bcd](https://github.com/uniespacos/uniespacos/commit/4374bcdafb88fd4802d83dc53d09cd3df8a1b2d7))
+
 ## [1.3.0-rc.12](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.11...v1.3.0-rc.12) (2026-08-20)
 
 
