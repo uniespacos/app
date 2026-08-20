@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Models\Andar;
 use App\Models\Modulo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Andar>
+ * @extends Factory<Andar>
  */
 class AndarFactory extends Factory
 {

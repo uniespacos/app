@@ -1,269 +1,247 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Models\Agenda;
-use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
-use App\Notifications\NewReservationNotification;
-use App\Notifications\ReservationCreatedNotification;
-use App\Notifications\ReservationFailedNotification;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
+/**
+ * Cobre a geracao de horarios na criacao de reserva.
+ *
+ * A versao anterior deste arquivo usava a anotacao `@test` sem prefixo `test_`,
+ * que o PHPUnit 12 nao reconhece mais: os quatro testes nunca executaram
+ * ("No tests found in class"). Alem disso, mockavam `Horario::create` e
+ * `Agenda::findOrFail`, ou seja, assertavam o mecanismo da implementacao bugada
+ * em vez da regra de negocio — nenhum deles pegaria a duplicacao.
+ */
 class ProcessarCriacaoReservaTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @group jobs
-     */
-    public function it_creates_reservation_and_sends_notifications(): void
+    use DatabaseTransactions;
+
+    protected function setUp(): void
     {
-        // Mocking dependencies and data
-        Bus::fake(); // Fake the Bus to prevent actual job dispatching
-        Notification::fake(); // Fake notifications to assert they are sent
-        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) {
-            return $callback();
-        });
+        parent::setUp();
 
-        // Mocking models and their creation
-        $user = User::factory()->create(['id' => 11]); // The applicant
-        $manager = User::factory()->create(['id' => 9]); // A manager
-
-        $agenda = Agenda::factory()->create(['id' => 1, 'user_id' => $manager->id]);
-        $horarioData = [
-            [
-                'agenda_id' => $agenda->id,
-                'horario_inicio' => '07:30:00',
-                'horario_fim' => '08:20:00',
-                'data' => '2026-02-26',
-            ],
-        ];
-
-        // Mocking the request data
-        $dadosRequisicao = [
-            'titulo' => 'Test Reservation',
-            'descricao' => 'A test reservation.',
-            'data_inicial' => '2026-02-26T03:00:00.000Z',
-            'data_final' => '2026-02-26T03:00:00.000Z', // Single day for simplicity
-            'recorrencia' => 'unica',
-            'horarios' => $horarioData,
-            'horarios_solicitados' => $horarioData, // Ensure this is present as per job logic
-        ];
-
-        // Mocking model creations within the job
-        $mockReserva = new Reserva([
-            'id' => 18,
-            'titulo' => $dadosRequisicao['titulo'],
-            'descricao' => $dadosRequisicao['descricao'],
-            'data_inicial' => $dadosRequisicao['data_inicial'],
-            'data_final' => $dadosRequisicao['data_final'],
-            'recorrencia' => $dadosRequisicao['recorrencia'],
-            'user_id' => $user->id,
-            'situacao' => 'em_analise',
-        ]);
-        $mockReserva->forceFill(['created_at' => now(), 'updated_at' => now()]);
-
-        Reserva::shouldReceive('create')->once()->andReturn($mockReserva);
-        Horario::shouldReceive('create')->once();
-        Agenda::shouldReceive('findOrFail')->once()->andReturn($agenda);
-        $manager->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof NewReservationNotification && $notification->reserva->id === $mockReserva->id;
-        });
-        $user->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof ReservationCreatedNotification && $notification->reserva->id === $mockReserva->id;
-        });
-
-        // Instantiate and run the job
-        $job = new ProcessarCriacaoReserva($dadosRequisicao, $user);
-        $job->handle();
-
-        // Assertions
-        // Check if the correct notifications were sent
-        Notification::assertSentTo($manager, NewReservationNotification::class);
-        Notification::assertSentTo($user, ReservationCreatedNotification::class);
-
-        // Assert that ValidateReservationConflictsJob was dispatched
-        Bus::assertDispatched(function ($job) use ($mockReserva) {
-            return $job instanceof \App\Jobs\ValidateReservationConflictsJob && $job->reserva->id === $mockReserva->id;
-        });
-    }
-
-    /**
-     * @test
-     *
-     * @group jobs
-     */
-    public function it_fails_and_notifies_user_on_exception(): void
-    {
-        // Mocking dependencies
-        Notification::fake();
-        DB::shouldReceive('transaction')->once()->andThrow(new \Exception('Database error'));
-
-        $user = User::factory()->create(['id' => 11]);
-        $dadosRequisicao = [
-            'titulo' => 'Test Reservation Fail',
-            'descricao' => 'A test reservation fail.',
-            'data_inicial' => '2026-02-26T03:00:00.000Z',
-            'data_final' => '2026-02-26T03:00:00.000Z',
-            'recorrencia' => 'unica',
-            'horarios' => [],
-            'horarios_solicitados' => [],
-        ];
-
-        // Instantiate and run the job
-        $job = new ProcessarCriacaoReserva($dadosRequisicao, $user);
-
-        // Expecting the job to be marked as failed
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Database error');
-        $job->handle();
-
-        // Assert that ReservationFailedNotification was sent
-        Notification::assertSentTo($user, ReservationFailedNotification::class, function ($notification) use ($dadosRequisicao) {
-            return $notification->titulo === $dadosRequisicao['titulo'];
-        });
-    }
-
-    /**
-     * @test
-     *
-     * @group jobs
-     */
-    public function it_handles_single_manager_and_deferida_status(): void
-    {
-        // Mocking dependencies and data
         Bus::fake();
         Notification::fake();
-        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) {
-            return $callback();
-        });
-
-        $user = User::factory()->create(['id' => 11]); // Applicant is also the sole manager
-        $agenda = Agenda::factory()->create(['id' => 1, 'user_id' => $user->id]);
-        $horarioData = [['agenda_id' => $agenda->id, 'horario_inicio' => '07:30:00', 'horario_fim' => '08:20:00', 'data' => '2026-02-26']];
-
-        $dadosRequisicao = [
-            'titulo' => 'Single Manager Test',
-            'descricao' => '',
-            'data_inicial' => '2026-02-26T03:00:00.000Z',
-            'data_final' => '2026-02-26T03:00:00.000Z',
-            'recorrencia' => 'unica',
-            'horarios' => $horarioData,
-            'horarios_solicitados' => $horarioData,
-        ];
-
-        $mockReserva = new Reserva([
-            'id' => 19,
-            'titulo' => $dadosRequisicao['titulo'],
-            'descricao' => $dadosRequisicao['descricao'],
-            'data_inicial' => $dadosRequisicao['data_inicial'],
-            'data_final' => $dadosRequisicao['data_final'],
-            'recorrencia' => $dadosRequisicao['recorrencia'],
-            'user_id' => $user->id,
-            'situacao' => 'em_analise', // Should be updated to 'deferida'
-        ]);
-        $mockReserva->forceFill(['created_at' => now(), 'updated_at' => now()]);
-
-        Reserva::shouldReceive('create')->once()->andReturn($mockReserva);
-        Horario::shouldReceive('create')->once();
-        Agenda::shouldReceive('findOrFail')->once()->andReturn($agenda);
-
-        // Expecting reserva to be updated to 'deferida'
-        $mockReserva->shouldReceive('update')->once()->with(['situacao' => 'deferida']);
-
-        // No NewReservationNotification should be sent to the applicant themselves
-        $user->shouldNotReceive('notify')->with(NewReservationNotification::class);
-        $user->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof ReservationCreatedNotification && $notification->reserva->id === $mockReserva->id;
-        });
-
-        $job = new ProcessarCriacaoReserva($dadosRequisicao, $user);
-        $job->handle();
-
-        Notification::assertSentTo($user, ReservationCreatedNotification::class);
-        Bus::assertDispatched(fn ($job) => $job instanceof \App\Jobs\ValidateReservationConflictsJob);
     }
 
     /**
-     * @test
-     *
-     * @group jobs
+     * @param  array<int, array<string, mixed>>  $slots
+     * @return array<string, mixed>
      */
-    public function it_handles_multiple_managers_and_partial_status(): void
+    private function dados(array $slots, string $recorrencia, string $dataInicial, string $dataFinal, string $titulo = 'Reserva de teste'): array
     {
-        // Mocking dependencies and data
-        Bus::fake();
-        Notification::fake();
-        DB::shouldReceive('transaction')->andReturnUsing(function ($callback) {
-            return $callback();
-        });
-
-        $user = User::factory()->create(['id' => 11]); // Applicant
-        $manager1 = User::factory()->create(['id' => 9]); // Manager 1
-        $manager2 = User::factory()->create(['id' => 10]); // Manager 2
-
-        $agenda1 = Agenda::factory()->create(['id' => 1, 'user_id' => $manager1->id]);
-        $agenda2 = Agenda::factory()->create(['id' => 2, 'user_id' => $manager2->id]);
-
-        $horarioData = [
-            ['agenda_id' => $agenda1->id, 'horario_inicio' => '07:30:00', 'horario_fim' => '08:20:00', 'data' => '2026-02-26'],
-            ['agenda_id' => $agenda2->id, 'horario_inicio' => '07:30:00', 'horario_fim' => '08:20:00', 'data' => '2026-02-26'],
+        return [
+            'titulo' => $titulo,
+            'descricao' => 'Descricao de teste',
+            'data_inicial' => $dataInicial,
+            'data_final' => $dataFinal,
+            'recorrencia' => $recorrencia,
+            'horarios_solicitados' => $slots,
         ];
+    }
 
-        $dadosRequisicao = [
-            'titulo' => 'Partial Status Test',
-            'descricao' => '',
-            'data_inicial' => '2026-02-26T03:00:00.000Z',
-            'data_final' => '2026-02-26T03:00:00.000Z',
-            'recorrencia' => 'unica',
-            'horarios' => $horarioData,
-            'horarios_solicitados' => $horarioData,
+    /**
+     * @return array<string, mixed>
+     */
+    private function slot(int $agendaId, string $data, string $inicio = '08:00:00', string $fim = '10:00:00'): array
+    {
+        return [
+            'data' => $data,
+            'horario_inicio' => $inicio,
+            'horario_fim' => $fim,
+            'agenda_id' => $agendaId,
         ];
+    }
 
-        $mockReserva = new Reserva([
-            'id' => 20,
-            'titulo' => $dadosRequisicao['titulo'],
-            'descricao' => $dadosRequisicao['descricao'],
-            'data_inicial' => $dadosRequisicao['data_inicial'],
-            'data_final' => $dadosRequisicao['data_final'],
-            'recorrencia' => $dadosRequisicao['recorrencia'],
-            'user_id' => $user->id,
-            'situacao' => 'em_analise', // Should be updated to 'parcialmente_deferida'
-        ]);
-        $mockReserva->forceFill(['created_at' => now(), 'updated_at' => now()]);
+    /**
+     * `app()->call()` resolve o ExpansaoHorariosService injetado no handle(),
+     * exatamente como o worker faria.
+     *
+     * @param  array<string, mixed>  $dados
+     */
+    private function executar(array $dados, User $solicitante): Reserva
+    {
+        $job = new ProcessarCriacaoReserva($dados, $solicitante);
+        app()->call([$job, 'handle']);
 
-        Reserva::shouldReceive('create')->once()->andReturn($mockReserva);
-        Horario::shouldReceive('create')->twice();
-        Agenda::shouldReceive('findOrFail')->twice()->andReturn($agenda1, $agenda2);
+        return Reserva::where('titulo', $dados['titulo'])->firstOrFail();
+    }
 
-        // Expecting reserva to be updated to 'parcialmente_deferida'
-        $mockReserva->shouldReceive('update')->once()->with(['situacao' => 'parcialmente_deferida']);
+    public function test_recorrencia_periodica_nao_multiplica_horarios_por_semana(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
 
-        // Expecting notifications to managers
-        $manager1->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof NewReservationNotification && $notification->reserva->id === $mockReserva->id;
+        // O frontend manda uma entrada por semana ja selecionada. A versao
+        // antiga expandia cada uma ate o fim: 4 + 3 + 2 + 1 = 10 registros.
+        $dados = $this->dados([
+            $this->slot($agenda->id, '2026-09-01'),
+            $this->slot($agenda->id, '2026-09-08'),
+            $this->slot($agenda->id, '2026-09-15'),
+            $this->slot($agenda->id, '2026-09-22'),
+        ], '1mes', '2026-09-01', '2026-09-28');
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertCount(4, $reserva->horarios);
+        $this->assertSame(
+            ['2026-09-01', '2026-09-08', '2026-09-15', '2026-09-22'],
+            $reserva->horarios->pluck('data')->sort()->values()->all()
+        );
+    }
+
+    public function test_recorrencia_unica_grava_apenas_as_datas_avulsas_enviadas(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        // Tres slots na semana 1 e dois na semana 3, pulando a semana 2.
+        $dados = $this->dados([
+            $this->slot($agenda->id, '2026-09-01'),
+            $this->slot($agenda->id, '2026-09-02', '14:00:00', '16:00:00'),
+            $this->slot($agenda->id, '2026-09-03', '10:00:00', '12:00:00'),
+            $this->slot($agenda->id, '2026-09-17'),
+            $this->slot($agenda->id, '2026-09-18', '14:00:00', '16:00:00'),
+        ], 'unica', '2026-09-01', '2026-09-18');
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertCount(5, $reserva->horarios);
+        $this->assertSame(
+            ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-17', '2026-09-18'],
+            $reserva->horarios->pluck('data')->sort()->values()->all()
+        );
+    }
+
+    public function test_cada_padrao_ancora_na_propria_data_selecionada(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        // Quarta 02/09 e segunda 14/09: `data_inicial` e 02/09, entao ancorar a
+        // reserva inteira nela faria a segunda comecar em 07/09.
+        $dados = $this->dados([
+            $this->slot($agenda->id, '2026-09-02'),
+            $this->slot($agenda->id, '2026-09-14'),
+        ], '1mes', '2026-09-02', '2026-09-28');
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $datas = $reserva->horarios->pluck('data')->sort()->values()->all();
+
+        $this->assertNotContains('2026-09-07', $datas);
+        $this->assertSame(
+            ['2026-09-02', '2026-09-09', '2026-09-14', '2026-09-16', '2026-09-21', '2026-09-23', '2026-09-28'],
+            $datas
+        );
+    }
+
+    public function test_horarios_vao_para_o_banco_num_unico_insert(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $dados = $this->dados(
+            [$this->slot($agenda->id, '2026-09-01')],
+            'personalizado',
+            '2026-09-01',
+            '2026-12-31' // ~18 semanas
+        );
+
+        $inserts = 0;
+        DB::listen(function ($query) use (&$inserts) {
+            if (str_contains(strtolower($query->sql), 'insert into "horarios"')) {
+                $inserts++;
+            }
         });
-        $manager2->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof NewReservationNotification && $notification->reserva->id === $mockReserva->id;
-        });
-        // Applicant should not be notified of NewReservationNotification
-        $user->shouldNotReceive('notify')->with(NewReservationNotification::class);
-        $user->shouldReceive('notify')->once()->withArgs(function ($notification) use ($mockReserva) {
-            return $notification instanceof ReservationCreatedNotification && $notification->reserva->id === $mockReserva->id;
-        });
 
-        $job = new ProcessarCriacaoReserva($dadosRequisicao, $user);
-        $job->handle();
+        $reserva = $this->executar($dados, $solicitante);
 
-        Notification::assertSentTo($manager1, NewReservationNotification::class);
-        Notification::assertSentTo($manager2, NewReservationNotification::class);
-        Notification::assertSentTo($user, ReservationCreatedNotification::class);
-        Bus::assertDispatched(fn ($job) => $job instanceof \App\Jobs\ValidateReservationConflictsJob);
+        $this->assertSame(1, $inserts, 'Os horarios devem ir num unico INSERT em lote.');
+        $this->assertCount(18, $reserva->horarios);
+    }
+
+    public function test_payload_com_slot_repetido_nao_duplica_nem_falha(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $dados = $this->dados([
+            $this->slot($agenda->id, '2026-09-01'),
+            $this->slot($agenda->id, '2026-09-01'),
+        ], 'unica', '2026-09-01', '2026-09-01');
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertCount(1, $reserva->horarios);
+    }
+
+    public function test_reserva_do_proprio_gestor_ja_nasce_deferida(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $solicitante->id]);
+
+        $dados = $this->dados(
+            [$this->slot($agenda->id, '2026-09-01')],
+            'unica',
+            '2026-09-01',
+            '2026-09-01'
+        );
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertSame('deferida', $reserva->situacao);
+        $this->assertSame('deferida', $reserva->horarios->first()->situacao);
+    }
+
+    public function test_reserva_com_agenda_de_terceiro_fica_parcialmente_deferida(): void
+    {
+        $solicitante = User::factory()->create();
+        $outroGestor = User::factory()->create();
+
+        $agendaPropria = Agenda::factory()->create(['user_id' => $solicitante->id]);
+        $agendaDeTerceiro = Agenda::factory()->create(['user_id' => $outroGestor->id]);
+
+        $dados = $this->dados([
+            $this->slot($agendaPropria->id, '2026-09-01'),
+            $this->slot($agendaDeTerceiro->id, '2026-09-01', '14:00:00', '16:00:00'),
+        ], 'unica', '2026-09-01', '2026-09-01');
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertSame('parcialmente_deferida', $reserva->situacao);
+        $this->assertSame(
+            ['deferida', 'em_analise'],
+            $reserva->horarios->sortBy('horario_inicio')->pluck('situacao')->values()->all()
+        );
+    }
+
+    public function test_agenda_sem_gestor_nao_quebra_a_criacao(): void
+    {
+        $solicitante = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => null]);
+
+        $dados = $this->dados(
+            [$this->slot($agenda->id, '2026-09-01')],
+            'unica',
+            '2026-09-01',
+            '2026-09-01'
+        );
+
+        $reserva = $this->executar($dados, $solicitante);
+
+        $this->assertCount(1, $reserva->horarios);
+        $this->assertSame('em_analise', $reserva->situacao);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
@@ -44,7 +46,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => fn () => $request->user() ? $request->user()->load('setor') : null,
+                'user' => fn () => $request->user() ? $this->formatAuthUser($request->user()) : null,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
@@ -61,5 +63,17 @@ class HandleInertiaRequests extends Middleware
                 ? $request->user()->notifications()->limit(15)->get()
                 : [],
         ];
+    }
+
+    private function formatAuthUser($user): array
+    {
+        $user->load(['setor', 'unreadNotifications']);
+
+        return array_merge($user->toArray(), [
+            'unread_notifications_count' => $user->unreadNotifications->count(),
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+        ]);
     }
 }

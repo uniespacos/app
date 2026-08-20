@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Fortify;
 
 use App\Models\User;
@@ -36,14 +38,17 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'telefone' => $input['phone'],
             'setor_id' => $input['setor_id'],
             'profile_pic' => 'aushaushuahsas', // TODO: Impl avatars system
-            'permission_type_id' => 3, // TODO: Impl permissions system
             'password' => Hash::make($input['password']),
         ]);
+
+        $user->assignRole('comum');
+
+        return $user;
     }
 }

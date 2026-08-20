@@ -44,7 +44,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
     libicu-dev \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
+    gd \
     pdo_mysql \
     pdo_pgsql \
     pgsql \
@@ -84,6 +90,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libicu-dev \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libwebp-dev \
     libfcgi-bin \
     procps \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

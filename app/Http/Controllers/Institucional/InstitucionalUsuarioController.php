@@ -1,213 +1,110 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
-use App\Models\Agenda;
-use App\Models\Instituicao;
-use App\Models\PermissionType;
-use App\Models\Setor;
+use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdatePermissionsRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Importar o modelo User para buscar o usuário
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Inertia\Inertia; // Importar Rule para validações
+use App\Services\UserService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class InstitucionalUsuarioController extends Controller
 {
+    use AuthorizesRequests;
+
+    public function __construct(
+        protected UserService $service,
+    ) {}
+
     /**
-     * Display a listing of the resource.
+     * Display the users listing with permission types, institutions, and sectors.
      */
-    public function index()
+    public function index(): Response
     {
-        $user = Auth::user();
-        $instituicao_id = $user->setor->unidade->instituicao_id;
-        $users = User::whereHas('setor.unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with([
-            'setor.unidade.instituicao',
-            'agendas.espaco.andar.modulo.unidade.instituicao',
-        ])->get();
+        $this->authorize('viewAny', User::class);
 
-        $permissionTypes = PermissionType::all()->map(function ($type) {
-            return [
-                'id' => $type->id,
-                'nome' => $type->nome,
-                'label' => $type->nome,
-            ];
-        });
+        $data = $this->service->getIndexData(Auth::user());
 
-        return Inertia::render('Administrativo/Usuarios/Usuarios', [
-            'users' => $users,
-            'permissionTypes' => $permissionTypes,
-            'instituicoes' => Instituicao::with([
-                'unidades.modulos.andars.espacos.agendas',
-            ])->get(),
-            'setores' => Setor::with([
-                'unidade.instituicao',
-                'users.agendas.espaco.andar.modulo.unidade.instituicao',
-            ])->get(),
-
-        ]);
+        return Inertia::render('Administrativo/Usuarios/Usuarios', $data);
     }
 
-    public function updatePermissions(Request $request, User $user)
+    /**
+     * Store a newly created user in storage.
+     */
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'permission_type_id' => ['required', 'exists:permission_types,id'],
-            'agendas' => ['array'], // Permite que agendas seja um array vazio ou com IDs
-        ]);
-        $userId = $user->id;
-        $agendaIds = $validated['agendas'] ?? []; // Pega os IDs das agendas ou um array vazio se não houver
+        $this->authorize('create', User::class);
+
+        User::create($request->validated());
+
+        return redirect()->route('institucional.usuarios.index')
+            ->with('success', 'Usuário criado com sucesso.');
+    }
+
+    /**
+     * Update the specified user in storage.
+     */
+    public function update(UpdateUserRequest $request, User $usuario): RedirectResponse
+    {
+        $this->authorize('update', $usuario);
+
+        $usuario->update($request->validated());
+
+        return redirect()->route('institucional.usuarios.index')
+            ->with('success', 'Usuário atualizado com sucesso.');
+    }
+
+    /**
+     * Update the permission type and agenda assignments for the given user.
+     */
+    public function updatePermissions(UpdatePermissionsRequest $request, User $user): RedirectResponse
+    {
+        $this->authorize('updatePermissions', $user);
+
         try {
-            DB::transaction(function () use ($validated, $user, $userId, $agendaIds) {
-                // Atualiza a permissão do usuário
-                $user->permission_type_id = $validated['permission_type_id'];
-                $user->save();
+            $this->service->updatePermissions($user, $request->validated());
 
-                if ($validated['permission_type_id'] == 1 || $validated['permission_type_id'] == 3) {
-                    // Se a permissão for de administrador, limpa as agendas associadas
-                    Agenda::where('user_id', $userId)
-                        ->update(['user_id' => null]);
-                } else {
-                    Agenda::where('user_id', $userId)
-                        ->whereNotIn('id', $agendaIds)
-                        ->update(['user_id' => null]);
+            return redirect()->route('institucional.usuarios.index')
+                ->with('success', 'Permissões atualizadas com sucesso.');
+        } catch (\Exception $e) {
+            Log::error("Erro ao atualizar permissões do usuário {$user->id}: ".$e->getMessage());
 
-                    // 2. Associa as novas (ou existentes) agendas a este usuário
-                    // Pega agendas da nova lista e define o user_id para o ID deste usuário
-                    Agenda::whereIn('id', $agendaIds)
-                        ->update(['user_id' => $userId]);
-                }
-            });
-            DB::commit();
-
-            return redirect()->route('institucional.usuarios.index')->with('success', 'Permissões atualizadas com sucesso.');
-        } catch (\Throwable $th) {
-            DB::rollBack();
-
-            // Captura qualquer erro e retorna uma resposta de erro
-            return redirect()->route('institucional.usuarios.index')->with('error', 'Erro ao atualizar permissões: '.$th->getMessage());
+            return redirect()->route('institucional.usuarios.index')
+                ->with('error', 'Erro ao atualizar permissões: '.$e->getMessage());
         }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Delete the specified user from storage after password confirmation.
      */
-    public function create()
+    public function destroy(ConfirmPasswordRequest $request, User $usuario): RedirectResponse
     {
-        // Renderiza o componente UserController para criação de um novo usuário
-        // Você pode passar listas de roles e statuses disponíveis
-        $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
-        $statuses = ['active', 'inactive', 'suspended']; // Exemplo de status
+        $this->authorize('delete', $usuario);
 
-        return Inertia::render('Editar/UserController', [
-            'roles' => $roles,
-            'statuses' => $statuses,
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role' => ['required', 'string', Rule::in(['admin', 'gestor', 'user'])],
-            'status' => ['required', 'string', Rule::in(['active', 'inactive', 'suspended'])],
-            // 'password' => ['required', 'string', 'min:8', 'confirmed'], // Adicionar senha para criação
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'status' => $request->status,
-            // 'password' => bcrypt($request->password), // Criptografar a senha
-        ]);
-
-        return redirect()->route('institucional.usuarios.index')->with('success', 'Usuário criado com sucesso.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        // Geralmente, a tela de "show" exibe os detalhes de um usuário.
-        // Você pode renderizar um componente React para isso, ou usar os dados diretamente.
-        $user = User::findOrFail($id);
-
-        return Inertia::render('Editar/UserDetail', [
-            'user' => $user,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $user = User::findOrFail($id);
-        $roles = ['admin', 'gestor', 'user']; // Exemplo de funções
-        $statuses = ['active', 'inactive', 'suspended']; // Exemplo de status
-
-        // Renderiza o componente UserController passando o usuário a ser editado
-        return Inertia::render('Editar/UserController', [
-            'user' => $user,
-            'roles' => $roles,
-            'statuses' => $statuses,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $user = User::findOrFail($id);
-
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', 'string', Rule::in(['admin', 'gestor', 'user'])],
-            'status' => ['required', 'string', Rule::in(['active', 'inactive', 'suspended'])],
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'status' => $request->status,
-        ]);
-
-        return redirect()->route('institucional.usuarios.index')->with('success', 'Usuário atualizado com sucesso.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request, string $id)
-    {
-        $request->validate([
-            'password' => 'required',
-        ]);
-
-        $user = Auth::user(); // Obtém o usuário logado
-
-        // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
-        try {
-            $user = User::findOrFail($id);
-            $user->delete();
 
-            return redirect()->route('institucional.usuarios.index')->with('success', 'Usuário excluído com sucesso.');
-        } catch (\Throwable $th) {
-            return redirect()->route('institucional.usuarios.index')->with('error', 'Erro ao Usuário excluir.');
+        try {
+            $this->service->delete($usuario);
+
+            return redirect()->route('institucional.usuarios.index')
+                ->with('success', 'Usuário excluído com sucesso.');
+        } catch (\Exception $e) {
+            Log::error("Erro ao excluir usuário {$usuario->id}: ".$e->getMessage());
+
+            return redirect()->route('institucional.usuarios.index')
+                ->with('error', 'Erro ao excluir usuário.');
         }
     }
 }

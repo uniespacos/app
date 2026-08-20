@@ -1,5 +1,5 @@
-import { CadastrarModuloForm } from '@/pages/Administrativo/Modulos/CadastrarModulo';
-import { AndarFormData } from '@/pages/Administrativo/Modulos/fragments/AndarFormCard';
+import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
+import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import { Modulo } from '@/types';
 import { criarTerreoInicial, nivelParaNome, nomeParaNivel } from './AndarHelpers';
 
@@ -12,6 +12,7 @@ export function transformModuloToFormData(modulo: Modulo): CadastrarModuloForm {
     if (modulo.andars && modulo.andars.length > 0) {
         andares = modulo.andars.map((andar) => ({
             id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+            nome: andar.nome,
             nivel: nomeParaNivel(andar.nome),
             tipo_acesso: Array.isArray(andar.tipo_acesso) ? andar.tipo_acesso : [],
         }));

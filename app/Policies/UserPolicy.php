@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\User;
@@ -12,7 +14,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return in_array($user->permission_type_id, [1, 2]);
+        return $user->hasPermissionTo('usuarios.listar');
     }
 
     /**
@@ -23,7 +25,7 @@ class UserPolicy
     public function view(User $user, User $model): bool
     {
         return $user->id === $model->id
-            || in_array($user->permission_type_id, [1, 2]);
+            || $user->hasPermissionTo('usuarios.visualizar');
     }
 
     /**
@@ -32,18 +34,25 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('usuarios.criar');
     }
 
     /**
      *  Atualizar usuários
      * - O próprio usuário pode atualizar o seu perfil
-     * - Institucional (1), Gestor (2) e Comum (3) podem atualizar qualquer usuário
      */
     public function update(User $user, User $model): bool
     {
         return $user->id === $model->id
-            || in_array($user->permission_type_id, [1, 2, 3]);
+            || $user->hasPermissionTo('usuarios.atualizar');
+    }
+
+    /**
+     *  Atualizar permissões de outro usuário
+     */
+    public function updatePermissions(User $user, User $model): bool
+    {
+        return $user->hasPermissionTo('usuarios.gerenciar-permissoes');
     }
 
     /**
@@ -52,7 +61,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('usuarios.deletar');
     }
 
     /**
@@ -61,7 +70,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('usuarios.deletar');
     }
 
     /**
@@ -70,7 +79,7 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('usuarios.deletar');
     }
 
     /**
@@ -78,7 +87,7 @@ class UserPolicy
      */
     public function isComum(User $user): bool
     {
-        return $user->permission_type_id === 3;
+        return ! $user->hasAnyPermission(['secao.gestao-reservas', 'secao.dashboard-institucional']);
     }
 
     /**
@@ -86,7 +95,7 @@ class UserPolicy
      */
     public function isGestor(User $user): bool
     {
-        return $user->permission_type_id === 2;
+        return $user->hasPermissionTo('secao.gestao-reservas');
     }
 
     /**
@@ -94,6 +103,6 @@ class UserPolicy
      */
     public function isInstitucional(User $user): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('secao.dashboard-institucional');
     }
 }

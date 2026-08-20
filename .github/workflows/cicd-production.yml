@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+      - "!v*-*"
 
 permissions:
   contents: read
@@ -52,11 +53,12 @@ jobs:
         run: UID=${{ env.UID }} GID=${{ env.GID }} docker compose -f compose.test.yml up -d
       - name: Setup Environment
         run: |
+          docker compose -f compose.test.yml exec -T postgres psql -U uniespacos -d uniespacos -c "CREATE DATABASE uniespacos_test;"
           docker compose -f compose.test.yml exec -T workspace /bin/bash -c "
             cp .env.testing .env
             composer install --no-interaction --no-progress --prefer-dist
             php artisan key:generate
-            php artisan migrate --seed --force
+            DB_DATABASE=uniespacos_test php artisan migrate --seed --force
           "
       - name: Run Tests
         env:
@@ -170,8 +172,8 @@ jobs:
     environment:
       name: production
     env:
-      CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
-      CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
+      TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID_PRODUCTION }}
+      TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET_PRODUCTION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

@@ -1,203 +1,129 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ConfirmPasswordRequest;
 use App\Http\Requests\StoreModuloRequest;
 use App\Http\Requests\UpdateModuloRequest;
 use App\Models\Modulo;
-use App\Models\Unidade;
-use Illuminate\Http\Request;
+use App\Services\ModuloService;
+use App\Services\UnidadeService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class InstitucionalModuloController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $user = Auth::user();
-        $instituicao_id = $user->setor->unidade->instituicao_id;
+    use AuthorizesRequests;
 
-        $modulos = Modulo::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao_id))->with(['andars', 'unidade.instituicao'])->latest()->paginate(10);
+    public function __construct(
+        protected ModuloService $service,
+        protected UnidadeService $unidadeService,
+    ) {}
+
+    /**
+     * Display a paginated listing of modules scoped to the authenticated user's institution.
+     */
+    public function index(): Response
+    {
+        $this->authorize('viewAny', Modulo::class);
+
+        $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
 
         return Inertia::render('Administrativo/Modulos/Modulos', [
-            'modulos' => $modulos,
+            'modulos' => $this->service->paginate($instituicaoId, 10),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new module.
      */
-    public function create()
+    public function create(): Response
     {
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
-        $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
 
         return Inertia::render('Administrativo/Modulos/CadastrarModulo', [
             'instituicao' => $instituicao,
-            'unidades' => $unidades,
+            'unidades' => $this->unidadeService->getAllByInstituicao($instituicao->id),
         ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created module along with its floors in storage.
      */
-    public function store(StoreModuloRequest $request)
+    public function store(StoreModuloRequest $request): RedirectResponse
     {
-        $request->validated(); // Valida os dados usando a Form Request
+        $this->authorize('create', Modulo::class);
+
         try {
-            DB::beginTransaction();
+            $this->service->store($request->validated());
 
-            // Criar o módulo
-            $modulo = Modulo::create([
-                'nome' => $request->validated('nome'),
-                'unidade_id' => $request->validated('unidade_id'),
-            ]);
-
-            // Criar os andares
-            foreach ($request->validated('andares') as $andarData) {
-                $modulo->andars()->create([
-                    'nome' => $andarData['nome'],
-                    'tipo_acesso' => $andarData['tipo_acesso'],
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()
-                ->route('institucional.modulos.index')
+            return redirect()->route('institucional.modulos.index')
                 ->with('success', 'Módulo cadastrado com sucesso!');
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->with(['error' => 'Erro ao cadastrar módulo: '.$e->getMessage()])->withInput();
+            return back()->with(['error' => 'Erro ao cadastrar módulo: '.$e->getMessage()])->withInput();
         }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified module.
      */
-    public function edit(Modulo $modulo) // Corrigido o nome do parâmetro para $instituico
+    public function edit(Modulo $modulo): Response
     {
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao;
-        $unidades = Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao'])->get();
-        $modulo->load(['andars', 'unidade.instituicao']); // Carrega a unidade e a instituição associada ao módulo
+
+        $modulo->load(['andars', 'unidade.instituicao']);
 
         return Inertia::render('Administrativo/Modulos/EditarModulo', [
             'instituicao' => $instituicao,
-            'unidades' => $unidades,
+            'unidades' => $this->unidadeService->getAllByInstituicao($instituicao->id),
             'modulo' => $modulo,
         ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified module and synchronize its floors in storage.
      */
-    public function update(UpdateModuloRequest $request, Modulo $modulo)
+    public function update(UpdateModuloRequest $request, Modulo $modulo): RedirectResponse
     {
-        $dadosValidados = $request->validated();
+        $this->authorize('update', $modulo);
+
         try {
-            DB::beginTransaction();
+            $this->service->update($modulo, $request->validated());
 
-            // Atualizar dados básicos do módulo
-            $modulo->update([
-                'nome' => $dadosValidados['nome'],
-                'unidade_id' => $dadosValidados['unidade_id'],
-            ]);
-
-            // Pega os nomes dos andares que vieram da request.
-            // Usar uma Collection do Laravel facilita a manipulação.
-            $nomesDosAndaresRequest = collect($dadosValidados['andares'])->pluck('nome');
-
-            $andaresAtuais = $modulo->andars;
-            $andaresParaRemover = $andaresAtuais->whereNotIn('nome', $nomesDosAndaresRequest);
-
-            foreach ($andaresParaRemover as $andar) {
-                // **IMPORTANTE: Verificação de segurança!**
-                // Não permite remover um andar se ele já tiver espaços vinculados.
-                // Isso previne a perda de dados que era o problema original.
-                if ($andar->espacos()->exists()) {
-                    // Lança uma exceção que será capturada pelo bloco catch.
-                    throw new \Exception(
-                        "Não é possível remover o andar '{$andar->nome}' pois ele já possui espaços cadastrados."
-                    );
-                }
-                // Se não tiver espaços, pode deletar com segurança.
-                $andar->delete();
-            }
-            // **ETAPA DE ATUALIZAÇÃO E CRIAÇÃO**
-            // Itera sobre os andares enviados no formulário.
-            foreach ($dadosValidados['andares'] as $andarData) {
-                // Usa o método updateOrCreate para sincronizar.
-                // 1º argumento: As condições para encontrar o registro (chave única).
-                // 2º argumento: Os valores para atualizar (se encontrar) ou criar (se não encontrar).
-                $modulo->andars()->updateOrCreate(
-                    [
-                        'nome' => $andarData['nome'], // Procura por um andar com este nome...
-                    ],
-                    [
-                        // ...e atualiza/cria com estes dados.
-                        'tipo_acesso' => $andarData['tipo_acesso'],
-                    ]
-                );
-            }
-
-            DB::commit();
-
-            return redirect()
-                ->route('institucional.modulos.index')
+            return redirect()->route('institucional.modulos.index')
                 ->with('success', 'Módulo atualizado com sucesso!');
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->with(['error' => 'Erro ao atualizar módulo: '.$e->getMessage()])
-                ->withInput();
+            return back()->with(['error' => 'Erro ao atualizar módulo: '.$e->getMessage()])->withInput();
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified module and its floors from storage.
+     * Requires password confirmation from the authenticated user.
      */
-    public function destroy(Request $request, Modulo $modulo)
+    public function destroy(ConfirmPasswordRequest $request, Modulo $modulo): RedirectResponse
     {
-        $request->validate([
-            'password' => 'required',
-        ]);
+        $this->authorize('delete', $modulo);
 
-        $user = Auth::user(); // Obtém o usuário logado
-
-        // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
+
         try {
-            DB::beginTransaction();
+            $this->service->delete($modulo);
 
-            // Remover andares primeiro (devido à foreign key)
-            $modulo->andars()->delete();
-
-            // Remover o módulo
-            $modulo->delete();
-
-            DB::commit();
-
-            return redirect()
-                ->route('institucional.modulos.index')
+            return redirect()->route('institucional.modulos.index')
                 ->with('success', 'Módulo removido com sucesso!');
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->withErrors(['error' => 'Erro ao remover módulo: '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Erro ao remover módulo: '.$e->getMessage()]);
         }
     }
 }

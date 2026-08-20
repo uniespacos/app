@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
@@ -8,9 +10,11 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\CustomLoginResponse;
 use App\Http\Responses\CustomVerifyEmailResponse;
+use App\Models\Instituicao;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -47,13 +51,13 @@ class FortifyServiceProvider extends ServiceProvider
         // Tell Fortify to render Inertia views for standard authentication pages
         Fortify::loginView(function () {
             return Inertia::render('auth/login', [ // Updated to lowercase based on convention
-                'canResetPassword' => \Illuminate\Support\Facades\Route::has('password.request'),
+                'canResetPassword' => Route::has('password.request'),
                 'status' => session('status'),
             ]);
         });
 
         Fortify::registerView(function () {
-            $instituicaos = \App\Models\Instituicao::with(['setors.unidade'])->get();
+            $instituicaos = Instituicao::with(['setors.unidade'])->get();
 
             return Inertia::render('auth/register', [
                 'instituicaos' => $instituicaos,

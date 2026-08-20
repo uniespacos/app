@@ -1,5 +1,131 @@
 # Changelog
 
+## [1.3.0-rc.10](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.9...v1.3.0-rc.10) (2026-08-16)
+
+
+### Bug Fixes
+
+* **container:** bind all repository interfaces in AppServiceProvider ([042096a](https://github.com/uniespacos/uniespacos/commit/042096a9c1dab32d8a892a3733dbfa51b8df017c))
+* **container:** bind all repository interfaces in AppServiceProvider ([cb88e04](https://github.com/uniespacos/uniespacos/commit/cb88e04fadfcb351f2f5d858ee754d4040a963ab))
+
+## [1.3.0-rc.9](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.8...v1.3.0-rc.9) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** publish staging web port to match Cloudflare Tunnel target ([4431289](https://github.com/uniespacos/uniespacos/commit/443128983e1da43c0ab772952948d3cb879d5156))
+* **docker:** publish staging web port to match Cloudflare Tunnel target ([b7219c6](https://github.com/uniespacos/uniespacos/commit/b7219c64fa9f4872cbd66110d027ed57bd2e42b3))
+
+## [1.3.0-rc.8](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.7...v1.3.0-rc.8) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** give staging its own cert-free Caddy config ([3e8b169](https://github.com/uniespacos/uniespacos/commit/3e8b169648893190c3ee9641a336713796dd97a7))
+* **docker:** give staging its own cert-free Caddy config ([8369e63](https://github.com/uniespacos/uniespacos/commit/8369e634c7c69719d0b90bb8f65cf18923d907c7))
+
+## [1.3.0-rc.7](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.6...v1.3.0-rc.7) (2026-08-15)
+
+
+### Bug Fixes
+
+* **docker:** correct default GHCR image path in compose.prod.yml ([ff32751](https://github.com/uniespacos/uniespacos/commit/ff32751b4b4e069293548fa9433292b6703f1bec))
+* **docker:** correct default GHCR image path in compose.prod.yml ([7bef57d](https://github.com/uniespacos/uniespacos/commit/7bef57d51d14577a6966eb13cc6562ea8a005b7c))
+
+## [1.3.0-rc.6](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.5...v1.3.0-rc.6) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** use cloudflared-recognized env vars for Access service token auth ([c4288b9](https://github.com/uniespacos/uniespacos/commit/c4288b90cc4a354cd641a073ed1abaeeb52202bf))
+* **ci:** use cloudflared-recognized env vars for Access service token auth ([7c20b8e](https://github.com/uniespacos/uniespacos/commit/7c20b8ea9bd23c5ec17129f30f5c1a3e2ea5720b))
+
+## [1.3.0-rc.5](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.4...v1.3.0-rc.5) (2026-08-15)
+
+
+### Bug Fixes
+
+* **style:** use imported Telescope provider class per Pint fully_qualified_strict_types ([c1a298c](https://github.com/uniespacos/uniespacos/commit/c1a298c13cbb4014e1be930a97fb158a20c9226c))
+* **style:** use imported Telescope provider class per Pint fully_qualified_strict_types ([ece021e](https://github.com/uniespacos/uniespacos/commit/ece021e440fc87090076b2d3efa74dc9884695e7))
+
+## [1.3.0-rc.4](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.3...v1.3.0-rc.4) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** skip TelescopeServiceProvider when telescope package is absent ([accf075](https://github.com/uniespacos/uniespacos/commit/accf075c5bf5a1de2a03bfa8a45f17c878536aa4))
+* **ci:** skip TelescopeServiceProvider when telescope package is absent ([af903ab](https://github.com/uniespacos/uniespacos/commit/af903ab00d29ac45e5f1a03d5cc5e0bcc2eba109))
+
+## [1.3.0-rc.3](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.2...v1.3.0-rc.3) (2026-08-15)
+
+
+### Features
+
+* **reservas:** forbid duplicated horarios at the database level ([aed5d72](https://github.com/uniespacos/uniespacos/commit/aed5d72617d8062260f4e64d52c118366cdd288c))
+
+## [1.3.0-rc.2](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2026-08-15)
+
+
+### Bug Fixes
+
+* expansao dupla recorrencia ([13c42f3](https://github.com/uniespacos/uniespacos/commit/13c42f31c145e828e0a911abb214f45dfdbb3804))
+
+## [1.3.0-rc.1](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc...v1.3.0-rc.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* **ci:** trigger staging pipeline only on staging tags ([cbc4e0c](https://github.com/uniespacos/uniespacos/commit/cbc4e0c8086c8480d1bfd23a8c001e06008fb4a8))
+
+## [1.3.0-rc](https://github.com/uniespacos/uniespacos/compare/v1.2.3...v1.3.0-rc) (2026-08-15)
+
+
+### Features
+
+* add multi-stage production Dockerfile for PHP-FPM with frontend asset build ([63e0d31](https://github.com/uniespacos/uniespacos/commit/63e0d31c4e0dc67c0dbf5ef67f8b79975b0239e6))
+* **auth:** add Role model with is_system deletion guard ([d9a03ee](https://github.com/uniespacos/uniespacos/commit/d9a03ee0fd984ff4cdbdf4cfe8f93a416320e9e4))
+* **db:** add migrations for spatie permissions and migrate users ([1da06d3](https://github.com/uniespacos/uniespacos/commit/1da06d345c604e35743e129e8b9c56fef50a963f))
+* **frontend:** centralize permission constants and consume roles via Inertia ([0c1dfda](https://github.com/uniespacos/uniespacos/commit/0c1dfdaa57d34114b32bca3abd6d28eb40e71203))
+* general reports ([8d02e3b](https://github.com/uniespacos/uniespacos/commit/8d02e3b4eb427710cd558ca3ca258015cff3b4c6))
+* **permissions:** add reports permissions to catalog ([7501d82](https://github.com/uniespacos/uniespacos/commit/7501d82383bfab1b327f5728a95218be2b2a1c88))
+* **permissions:** expand catalog with roles management permissions ([de5c4cd](https://github.com/uniespacos/uniespacos/commit/de5c4cd4c22642b789f777cee8f963770d850d8a))
+* **refactor:** Phase 1 - Domain Removal & Presentation Setup ([8d48f8e](https://github.com/uniespacos/uniespacos/commit/8d48f8e49d2e7f1e25f5fe8b2676788ac968226f))
+* **refactor:** Phase 1 - Foundation & Shared Abstractions ([132665e](https://github.com/uniespacos/uniespacos/commit/132665e303a982a81abe7f9b4d43d792434834fc))
+* **refactor:** Phase 2 - Atomic UI Migration & Component Re-mapping ([a783a47](https://github.com/uniespacos/uniespacos/commit/a783a473aae75040238990b7a7c6cea84407ac0f))
+* **refactor:** Phase 2 - Pilot Feature Reservas (Minhas Reservas) ([b5f46b3](https://github.com/uniespacos/uniespacos/commit/b5f46b3d1caba72a3fa8f4a2de35e25f1b4b7f95))
+* **refactor:** Phase 3 - Reservas Gestor & Evaluation Screens ([97b290a](https://github.com/uniespacos/uniespacos/commit/97b290a0cd8d482156592ebbbe2ade4f462f242a))
+* **refactor:** Phase 4 - Espacos & Favoritos Features ([4106135](https://github.com/uniespacos/uniespacos/commit/4106135f09f9d04efbf54d4fa0c42ecc20ce2b41))
+* **refactor:** Phase 5 - Administrativo & Settings Refactoring ([5b25b05](https://github.com/uniespacos/uniespacos/commit/5b25b05077c29cf9e31a175b53913aa4d825c1b8))
+* **refactor:** Phase 6 - Backend REST API Transition & Swap ([8bd4d93](https://github.com/uniespacos/uniespacos/commit/8bd4d932a0eced27e2017acca0fa9d801b9be401))
+* **relatorios:** add dashboard UI with charts and usable filters ([8d79c72](https://github.com/uniespacos/uniespacos/commit/8d79c722d2f1e368bf539af98cc1c12b247d9e8d))
+* **relatorios:** add general reports module ([b566b19](https://github.com/uniespacos/uniespacos/commit/b566b1995bf59487003b17c9bc860d9ef8245ca6))
+* **relatorios:** serve report data for on-screen exploration ([cdf70f6](https://github.com/uniespacos/uniespacos/commit/cdf70f62edb19a9dac3c57cfd1975e836168abfd))
+* **roles-ui:** add roles management page and direct permissions tab ([439f4ee](https://github.com/uniespacos/uniespacos/commit/439f4ee87462c365dbcce8db92e6c2f9a0219d47))
+* **roles:** add backend layers for granular role and permission CRUD ([14a412d](https://github.com/uniespacos/uniespacos/commit/14a412da0e41762f59a16a6014bd7137d75b5856))
+
+
+### Bug Fixes
+
+* **ci:** create and migrate the dedicated test database ([cd4a467](https://github.com/uniespacos/uniespacos/commit/cd4a467ea40f8222ffa4d63f866e84eebad002ab))
+* **ci:** use prerelease versioning strategy for staging releases ([70224b7](https://github.com/uniespacos/uniespacos/commit/70224b76ff8a1c68b56aa839946b0d761675da46))
+* **relatorios:** base occupancy rate on distinct slots ([4a11285](https://github.com/uniespacos/uniespacos/commit/4a11285803b88c2e4e58bd21174218c93648983b))
+* **tests:** run the suite against a dedicated database ([f9a86d0](https://github.com/uniespacos/uniespacos/commit/f9a86d014013e482d4dd299f30a241cc875db081))
+* **vite:** point page entrypoint to presentation/pages ([5c0cfe6](https://github.com/uniespacos/uniespacos/commit/5c0cfe66da6b9fb3724c59bc78ada8e157cce5de))
+
+
+### Miscellaneous Chores
+
+* atualizar pacotes existentes e incluir layers, telescope, pint e larastan ao ambiente de desenvolvimento ([95b9c7f](https://github.com/uniespacos/uniespacos/commit/95b9c7f2514b3ef3bb35b26b88e239c070b7dbc8))
+* **deps:** add recharts for the reports dashboard ([d1cd1c9](https://github.com/uniespacos/uniespacos/commit/d1cd1c944eb3d2b6332218edf983a937139469b3))
+* **deps:** install spatie/laravel-permission v6 ([75f9bb4](https://github.com/uniespacos/uniespacos/commit/75f9bb4b55fd553b017c12f3a992a8e494bec8b9))
+* **docker:** enable gd extension in dev php images ([0d56d4e](https://github.com/uniespacos/uniespacos/commit/0d56d4eb31c056fc8ea2d5398f37f76e77732d60))
+* fix pint issues ([44531a9](https://github.com/uniespacos/uniespacos/commit/44531a9b5cce22cd0a0d0dada68a3f5ad29a1fb6))
+* ignore local tooling artifacts ([ecad18a](https://github.com/uniespacos/uniespacos/commit/ecad18a3b4b5fe6b521c807cf65f2bc6eb200d4a))
+* **refactor:** update implementation plan with TS resolution and phases ([8d808bc](https://github.com/uniespacos/uniespacos/commit/8d808bc0d992264461e067ae5916ec466044edc0))
+* removendo actions gemini-cli ([d1f1d67](https://github.com/uniespacos/uniespacos/commit/d1f1d67ea64eabaeab12e04d9f027b02fbe725f7))
+* **seeders:** seed named test users for institucional, gestor, comum ([dda397a](https://github.com/uniespacos/uniespacos/commit/dda397a6ce454ae8ff285dd85cc237099ddd1cda))
+* update dependencies ([63b880e](https://github.com/uniespacos/uniespacos/commit/63b880e51ce421f082eee2c1b38ca9e50f9a6eaa))
+
 ## [1.2.3](https://github.com/uniespacos/app/compare/v1.2.2...v1.2.3) (2026-03-09)
 
 

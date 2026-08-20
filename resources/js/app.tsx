@@ -8,7 +8,7 @@ import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'UniEspaços';
 
-window.Pusher = Pusher; // Certifique-se de que o Pusher está disponível globalmente
+window.Pusher = Pusher as unknown as typeof window.Pusher; // Certifique-se de que o Pusher está disponível globalmente
 
 // Configure Echo using Vite environment variables directly from .env.dev
 window.Echo = new Echo({
@@ -25,7 +25,7 @@ window.Echo = new Echo({
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) => resolvePageComponent(`./presentation/pages/${name}.tsx`, import.meta.glob('./presentation/pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
 

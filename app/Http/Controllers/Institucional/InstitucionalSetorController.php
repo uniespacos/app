@@ -1,133 +1,123 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ConfirmPasswordRequest;
 use App\Http\Requests\StoreSetorRequest;
 use App\Http\Requests\UpdateSetorRequest;
 use App\Models\Setor;
-use App\Models\Unidade;
-use App\Models\User;
-use App\Notifications\SectorUpdatedNotification;
-use Illuminate\Http\Request;
+use App\Services\SetorService;
+use App\Services\UnidadeService;
+use App\Services\UserService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class InstitucionalSetorController extends Controller
 {
+    use AuthorizesRequests;
+
+    public function __construct(
+        protected SetorService $service,
+        protected UnidadeService $unidadeService,
+        protected UserService $userService,
+    ) {}
+
     /**
-     * Display a listing of the resource.
+     * Display a listing of sectors with related institution, units and users.
      */
-    public function index()
+    public function index(): Response
     {
+        $this->authorize('viewAny', Setor::class);
+
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao->load(['unidades']);
+        $instituicaoId = $instituicao->id;
 
         return Inertia::render('Administrativo/Setores/Setores', [
             'instituicao' => $instituicao,
-            'unidades' => Unidade::whereInstituicaoId($instituicao->id)->with(['instituicao', 'setors'])->get(), // Carrega unidades com instituições e setores
-            'setores' => Setor::whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicao->id))->with(['unidade.instituicao'])->get(),
-            'usuarios' => User::with(['setor'])->get(), // Carrega setores com unidade e instituição
+            'unidades' => $this->unidadeService->getAllByInstituicao($instituicaoId)->load(['setors']),
+            'setores' => $this->service->getAllByInstituicao($instituicaoId),
+            'usuarios' => $this->userService->getAllByInstituicao($instituicaoId),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Redirect to the sector panel — sectors are managed inline, not via a separate create page.
      */
-    public function create()
+    public function create(): RedirectResponse
     {
-        return redirect()
-            ->route('institucional.setors.index')
-            ->with('error', 'A criação de setores é a partir do painel administrativo de setores.'); // Redireciona para a lista de setores com mensagem de erro
+        return redirect()->route('institucional.setors.index')
+            ->with('error', 'A criação de setores é a partir do painel administrativo de setores.');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created sector in storage.
      */
-    public function store(StoreSetorRequest $request)
+    public function store(StoreSetorRequest $request): RedirectResponse
     {
-        $request->validated(); // Valida os dados usando a Form Request
-        try {
-            Setor::create([
-                'nome' => $request->validated('nome'),
-                'sigla' => $request->validated('sigla'),
-                'unidade_id' => $request->validated('unidade_id'),
-            ]);
+        $this->authorize('create', Setor::class);
 
-            return redirect()
-                ->route('institucional.setors.index')
+        try {
+            $this->service->store($request->validated());
+
+            return redirect()->route('institucional.setors.index')
                 ->with('success', 'Setor cadastrado com sucesso!');
         } catch (\Exception $e) {
-            return back()
-                ->with(['error' => 'Erro ao cadastrar setor: '.$e->getMessage()])->withInput();
+            return back()->with(['error' => 'Erro ao cadastrar setor: '.$e->getMessage()])->withInput();
         }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Redirect to the sector panel — sectors are edited inline.
      */
-    public function edit(Setor $setor) // Corrigido o nome do parâmetro para $instituico
+    public function edit(Setor $setor): RedirectResponse
     {
-        return redirect()
-            ->route('institucional.setors.index')
-            ->with('error', 'A edição de setores é a partir do painel administrativo de setores.'); // Redireciona para a lista de setores com mensagem de erro
+        return redirect()->route('institucional.setors.index')
+            ->with('error', 'A edição de setores é a partir do painel administrativo de setores.');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified sector in storage and notify its users.
      */
-    public function update(UpdateSetorRequest $request, Setor $setor)
+    public function update(UpdateSetorRequest $request, Setor $setor): RedirectResponse
     {
-        $request->validated(); // Valida os dados usando a Form Request
-        try {
-            $setor->update([
-                'nome' => $request->validated('nome'),
-                'sigla' => $request->validated('sigla'),
-                'unidade_id' => $request->validated('unidade_id'),
-            ]);
-            $setor->load(['users']);
-            // Notifica os usuários do setor sobre a atualização
-            foreach ($setor->users as $user) {
-                $user->notify(new SectorUpdatedNotification(
-                    $setor,
-                    $user
-                ));
-            }
+        $this->authorize('update', $setor);
 
-            return redirect()
-                ->route('institucional.setors.index')
+        try {
+            $this->service->update($setor, $request->validated());
+
+            return redirect()->route('institucional.setors.index')
                 ->with('success', 'Setor atualizado com sucesso!');
         } catch (\Exception $e) {
-            return back()
-                ->with(['error' => 'Erro ao atualizar setor: '.$e->getMessage()])->withInput();
+            return back()->with(['error' => 'Erro ao atualizar setor: '.$e->getMessage()])->withInput();
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified sector from storage.
+     * Requires password confirmation from the authenticated user.
      */
-    public function destroy(Request $request, Setor $setor)
+    public function destroy(ConfirmPasswordRequest $request, Setor $setor): RedirectResponse
     {
-        $request->validate([
-            'password' => 'required',
-        ]);
+        $this->authorize('delete', $setor);
 
-        $user = Auth::user(); // Obtém o usuário logado
-
-        // 2. Verificar se o usuário existe e se a senha fornecida corresponde à senha do usuário
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $request->passwordMatches()) {
             return back()->with('error', 'A senha fornecida está incorreta.');
         }
-        try {
-            $setor->delete();
 
-            return redirect()
-                ->route('institucional.setors.index')
+        try {
+            $this->service->delete($setor);
+
+            return redirect()->route('institucional.setors.index')
                 ->with('success', 'Setor removido com sucesso!');
         } catch (\Exception $e) {
-            return back()
-                ->withErrors(['error' => 'Erro ao remover setor: '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Erro ao remover setor: '.$e->getMessage()]);
         }
     }
 }

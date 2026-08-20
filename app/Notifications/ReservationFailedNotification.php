@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\User;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class ReservationFailedNotification extends BaseNotification
 {
@@ -21,10 +24,17 @@ class ReservationFailedNotification extends BaseNotification
         $this->user = $user;
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new \Illuminate\Notifications\Messages\MailMessage)
+        return (new MailMessage)
             ->subject('Falha na sua solicitação de reserva: '.$this->reservationTitle)
-            ->view('emails.reservations.reservation_failed', ['reservationTitle' => $this->reservationTitle, 'user' => $this->user, 'url' => $this->url]);
+            ->view('emails.reservations.reservation_failed', [
+                'reservationTitle' => $this->reservationTitle,
+                'user' => $this->user,
+                'url' => $this->url,
+            ]);
     }
 }

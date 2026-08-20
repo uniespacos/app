@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Espaco;
@@ -12,7 +14,7 @@ class EspacoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('espacos.listar');
     }
 
     /**
@@ -20,7 +22,7 @@ class EspacoPolicy
      */
     public function view(User $user, Espaco $espaco): bool
     {
-        return false;
+        return $user->hasPermissionTo('espacos.visualizar');
     }
 
     /**
@@ -28,7 +30,7 @@ class EspacoPolicy
      */
     public function create(User $user): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('espacos.criar');
     }
 
     /**
@@ -36,7 +38,15 @@ class EspacoPolicy
      */
     public function update(User $user, Espaco $espaco): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('espacos.atualizar');
+    }
+
+    /**
+     * Determine whether the user can update the shift managers of the model.
+     */
+    public function updateGestores(User $user, Espaco $espaco): bool
+    {
+        return $user->hasPermissionTo('espacos.alterar-gestores');
     }
 
     /**
@@ -44,7 +54,7 @@ class EspacoPolicy
      */
     public function delete(User $user, Espaco $espaco): bool
     {
-        return $user->permission_type_id === 1;
+        return $user->hasPermissionTo('espacos.deletar');
     }
 
     /**

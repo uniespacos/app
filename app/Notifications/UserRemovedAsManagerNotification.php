@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\User;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class UserRemovedAsManagerNotification extends BaseNotification
 {
@@ -15,28 +18,30 @@ class UserRemovedAsManagerNotification extends BaseNotification
     public function __construct(User $user, ?string $espacoNome = null, ?string $turno = null)
     {
         $message = 'Você foi removido como gestor de agenda.';
-        $url = route('espacos.index');
 
         if ($espacoNome && $turno) {
             $message = 'Você foi removido como gestor do espaço: '.$espacoNome.' Turno: '.$turno.'.';
-            $url = route('espacos.index'); // Or a more specific page if available
         }
 
-        parent::__construct(
-            'Gestão de Espaços',
-            $message,
-            $url
-        );
+        parent::__construct('Gestão de Espaços', $message, route('espacos.index'));
 
         $this->user = $user;
         $this->espacoNome = $espacoNome;
         $this->turno = $turno;
     }
 
-    public function toMail(object $notifiable): \Illuminate\Notifications\Messages\MailMessage
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new \Illuminate\Notifications\Messages\MailMessage)
+        return (new MailMessage)
             ->subject('Você foi removido como gestor de agenda.')
-            ->view('emails.users.user_removed_as_manager', ['user' => $this->user, 'espacoNome' => $this->espacoNome, 'turno' => $this->turno, 'url' => $this->url]);
+            ->view('emails.users.user_removed_as_manager', [
+                'user' => $this->user,
+                'espacoNome' => $this->espacoNome,
+                'turno' => $this->turno,
+                'url' => $this->url,
+            ]);
     }
 }

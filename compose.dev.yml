@@ -1,25 +1,18 @@
 services:
   web:
-    container_name: web
     image: caddy:latest
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
-      - "443:443/udp"
     volumes:
-      - ./docker/development/caddy/conf/Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/development/caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./:/var/www
       - caddy_data:/data
       - caddy_config:/config
-    networks:
-      - internal
     depends_on:
-      app:
-        condition: service_started
-
+      - app
   app:
-    container_name: app
     build:
       context: .
       dockerfile: ./docker/development/php-fpm/Dockerfile
@@ -33,21 +26,13 @@ services:
         XDEBUG_LOG: ${XDEBUG_LOG:-/dev/stdout}
         XDEBUG_LOG_LEVEL: ${XDEBUG_LOG_LEVEL:-0}
     env_file:
-      - ./.env.dev
+      - .env
     volumes:
       - ./:/var/www
-    networks:
-      - internal
-    healthcheck:
-      test: [ "CMD-SHELL", "/usr/local/bin/php-fpm-healthcheck" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
     depends_on:
       postgres:
         condition: service_healthy
   queue-worker:
-    container_name: queue-worker-development
     build:
       context: .
       dockerfile: ./docker/development/php-fpm/Dockerfile
@@ -56,15 +41,12 @@ services:
     volumes:
       - ./:/var/www/
     env_file:
-      - ./.env.dev
-    networks:
-      - internal
+      - .env
     depends_on:
       reverb:
         condition: service_started
 
   workspace:
-    container_name: workspace
     build:
       context: .
       dockerfile: ./docker/development/workspace/Dockerfile
@@ -83,16 +65,9 @@ services:
     stdin_open: true
     volumes:
       - ./:/var/www
-    networks:
-      - internal
     env_file:
-      - ./.env.dev
-    depends_on:
-      app:
-        condition: service_started
-
+      - .env
   reverb:
-    container_name: reverb
     build:
       context: .
       dockerfile: ./docker/development/php-fpm/Dockerfile
@@ -103,25 +78,18 @@ services:
       - ./:/var/www
     entrypoint: [ "sh", "-c", "php artisan reverb:start --host=0.0.0.0 --port=9000 --hostname='reverb' --debug" ]
     env_file:
-      - ./.env.dev
-    networks:
-      - internal
+      - .env
     depends_on:
       app:
         condition: service_started
-
   postgres:
     image: postgres:16
-    container_name: postgres
     environment:
-      - PGPASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres-data-development:/var/lib/postgresql/data
-    networks:
-      - internal
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}" ]
       interval: 10s
@@ -131,15 +99,12 @@ services:
     image: adminer:5
     restart: always
     ports:
-      - "9080:8080"
-    networks:
-      - internal
+      - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
   mailpit:
     image: axllent/mailpit
-    container_name: mailpit
     restart: unless-stopped
     volumes:
       - ./docker/development/mailpit/data:/data
@@ -147,14 +112,7 @@ services:
       - 8025:8025
       - 1025:1025
     environment:
-      MP_MAX_MESSAGES: 5000
       MP_DATABASE: /data/mailpit.db
-    networks:
-      - internal
-
-networks:
-  internal:
-
 
 volumes:
   postgres-data-development:

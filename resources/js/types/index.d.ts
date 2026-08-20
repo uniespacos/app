@@ -14,6 +14,11 @@ export interface SharedData {
     ziggy: Config & { location: string };
     flash: FlashMessages;
     sidebarOpen: boolean;
+    name?: string;
+    quote?: {
+        message: string;
+        author: string;
+    } | null;
     [key: string]: unknown;
 }
 
@@ -34,11 +39,41 @@ export interface User {
     email_verified_at: string | null;
     telefone: string;
     profile_pic?: string;
-    permission_type_id: number;
+    roles: string[]; // Array de nomes de roles (ex: ['institucional', 'gestor'])
+    permissions: string[]; // Array de nomes de permissões (todas: herdadas via role + diretas)
+    direct_permissions?: string[]; // Apenas permissões atribuídas diretamente ao usuário (model_has_permissions)
     setor_id: number | null;
     setor?: Setor; // Opcional, carregar com with('setor')
     agendas?: Agenda[]; // Relação aninhada, array de agendas
     unread_notifications: []; // Adicionado no AppServiceProvider
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Modelo de Role (Papel/Função).
+ */
+export interface Role {
+    id: number;
+    name: string;
+    description: string | null;
+    is_system: boolean;
+    guard_name: string;
+    permissions?: string[]; // Array de nomes de permissões
+    users_count?: number; // Contagem de usuários com esta role
+    permissions_count?: number; // Contagem de permissões
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Modelo de Permission (Permissão).
+ */
+export interface Permission {
+    id: number;
+    name: string;
+    group: string; // Grupo derivado do prefixo (ex: 'usuarios', 'espacos')
+    guard_name: string;
     created_at: string;
     updated_at: string;
 }
@@ -211,6 +246,7 @@ export interface Reserva {
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
     can_update?: boolean; // Permissão de edição dinâmica
+    validation_status?: 'processing' | 'pending' | 'completed' | string; // Validação de conflitos em segundo plano
 }
 
 // =============================================================================
@@ -325,12 +361,6 @@ export type AgendaDiasSemanaType = {
 };
 
 export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>;
-export interface PermissionType {
-    id: number;
-    name: 'institucional' | 'gestor' | 'comum';
-    label: string;
-}
-
 export interface SelectedAgenda {
     agenda: Agenda;
     espaco: Espaco;
@@ -354,4 +384,55 @@ interface ReservaAvaliadaNotificationPayload {
     status_avaliacao: string;
     mensagem: string;
     url: string;
+}
+
+export type TipoRelatorio =
+    | 'reservas_periodo'
+    | 'ocupacao_espacos'
+    | 'inventario_espacos'
+    | 'indicadores_consolidados';
+
+export type FormatoRelatorio = 'pdf' | 'csv' | 'xlsx';
+
+export interface FiltrosRelatorio {
+    data_inicio?: string;
+    data_fim?: string;
+    situacoes?: SituacaoReserva[];
+    turnos?: Array<'manha' | 'tarde' | 'noite'>;
+    unidade_id?: number;
+    modulo_id?: number;
+    andar_id?: number;
+    espaco_id?: number;
+    setor_id?: number;
+}
+
+export interface TipoRelatorioOption {
+    value: TipoRelatorio;
+    label: string;
+}
+
+export interface OpcoesInventario {
+    unidades: Array<{ id: number; nome: string }>;
+    modulos: Array<{ id: number; nome: string; unidade_id: number }>;
+    andares: Array<{ id: number; nome: string; modulo_id: number }>;
+    espacos: Array<{ id: number; nome: string; andar_id: number }>;
+}
+
+export interface ColunaRelatorio {
+    chave: string;
+    rotulo: string;
+    tipo: string;
+    largura: number;
+}
+
+export interface DadosRelatorio {
+    tipo: TipoRelatorio;
+    titulo: string;
+    subtitulo: string;
+    colunas: ColunaRelatorio[];
+    linhas: Record<string, unknown>[];
+    sumario: Record<string, unknown>;
+    filtrosAplicados: Record<string, unknown>;
+    geradoPor: string;
+    geradoEm: string;
 }

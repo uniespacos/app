@@ -1,6 +1,16 @@
 <?php
 
-return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-];
+declare(strict_types=1);
+
+use App\Providers\AppServiceProvider;
+use App\Providers\FortifyServiceProvider;
+use App\Providers\RelatorioServiceProvider;
+use App\Providers\TelescopeServiceProvider;
+use Laravel\Telescope\TelescopeApplicationServiceProvider;
+
+return array_values(array_filter([
+    AppServiceProvider::class,
+    FortifyServiceProvider::class,
+    RelatorioServiceProvider::class,
+    class_exists(TelescopeApplicationServiceProvider::class) ? TelescopeServiceProvider::class : null,
+]));

@@ -1,17 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
+use App\Models\Instituicao;
+use App\Models\Modulo;
 use App\Models\Reserva;
+use App\Models\Role;
+use App\Models\Setor;
+use App\Models\Unidade;
+use App\Policies\InstituicaoPolicy;
+use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
-use Illuminate\Support\Facades\Auth;
+use App\Policies\RolePolicy;
+use App\Policies\SetorPolicy;
+use App\Policies\UnidadePolicy;
+use App\Repositories\AgendaRepositoryEloquent;
+use App\Repositories\AgendaRepositoryInterface;
+use App\Repositories\AndarRepositoryEloquent;
+use App\Repositories\AndarRepositoryInterface;
+use App\Repositories\EspacoRepositoryEloquent;
+use App\Repositories\EspacoRepositoryInterface;
+use App\Repositories\HorarioRepositoryEloquent;
+use App\Repositories\HorarioRepositoryInterface;
+use App\Repositories\InstituicaoRepositoryEloquent;
+use App\Repositories\InstituicaoRepositoryInterface;
+use App\Repositories\ModuloRepositoryEloquent;
+use App\Repositories\ModuloRepositoryInterface;
+use App\Repositories\PermissionRepositoryEloquent;
+use App\Repositories\PermissionRepositoryInterface;
+use App\Repositories\ReservaRepositoryEloquent;
+use App\Repositories\ReservaRepositoryInterface;
+use App\Repositories\RoleRepositoryEloquent;
+use App\Repositories\RoleRepositoryInterface;
+use App\Repositories\SetorRepositoryEloquent;
+use App\Repositories\SetorRepositoryInterface;
+use App\Repositories\UnidadeRepositoryEloquent;
+use App\Repositories\UnidadeRepositoryInterface;
+use App\Repositories\UserRepositoryEloquent;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +54,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepositoryEloquent::class);
+        $this->app->bind(PermissionRepositoryInterface::class, PermissionRepositoryEloquent::class);
+        $this->app->bind(AgendaRepositoryInterface::class, AgendaRepositoryEloquent::class);
+        $this->app->bind(AndarRepositoryInterface::class, AndarRepositoryEloquent::class);
+        $this->app->bind(EspacoRepositoryInterface::class, EspacoRepositoryEloquent::class);
+        $this->app->bind(HorarioRepositoryInterface::class, HorarioRepositoryEloquent::class);
+        $this->app->bind(InstituicaoRepositoryInterface::class, InstituicaoRepositoryEloquent::class);
+        $this->app->bind(ModuloRepositoryInterface::class, ModuloRepositoryEloquent::class);
+        $this->app->bind(ReservaRepositoryInterface::class, ReservaRepositoryEloquent::class);
+        $this->app->bind(SetorRepositoryInterface::class, SetorRepositoryEloquent::class);
+        $this->app->bind(UnidadeRepositoryInterface::class, UnidadeRepositoryEloquent::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepositoryEloquent::class);
+
+        if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
@@ -29,46 +79,33 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Reserva::class, ReservaPolicy::class);
+        Gate::policy(Instituicao::class, InstituicaoPolicy::class);
+        Gate::policy(Unidade::class, UnidadePolicy::class);
+        Gate::policy(Modulo::class, ModuloPolicy::class);
+        Gate::policy(Setor::class, SetorPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
 
-        DB::listen(function ($query) {
-            Log::info(
-                $query->sql, // A consulta SQL executada
-                $query->bindings, // Os valores que são ligados aos placeholders (?)
-                $query->time // O tempo de execução da consulta
-            );
-        });
-        Inertia::share([
-            'auth.user' => function () {
-                $user = Auth::user();
-                if ($user) {
-                    return array_merge($user->toArray(), [
-                        'unread_notifications_count' => $user->unreadNotifications->count(),
-                        // Você pode adicionar mais dados do usuário aqui se precisar
-                    ]);
-                }
+        if ($this->app->environment('development')) {
+            DB::listen(fn ($query) => Log::info($query->sql, $query->bindings));
+        }
 
-                return null;
-            },
-        ]);
         if ($this->app->environment('testing')) {
             Vite::macro('shouldBeIgnored', fn () => true);
         }
 
-        // Environment variable validation
         $this->validateEnvVariables();
     }
 
     /**
-     * Validate essential environment variables.
+     * Validate essential environment variables on boot.
+     * Skipped during CLI commands that do not require a full environment.
      */
     protected function validateEnvVariables(): void
     {
-        // Skip validation during CLI commands that don't need the full environment
-        // (like package:discover, config:clear, etc.)
         if ($this->app->runningInConsole()) {
             return;
         }
@@ -101,6 +138,7 @@ class AppServiceProvider extends ServiceProvider
         ];
 
         foreach ($requiredEnvVariables as $variable) {
+            /** @phpstan-ignore larastan.noEnvCallsOutsideOfConfig */
             if (! env($variable)) {
                 throw new \Exception("Missing required environment variable: {$variable}");
             }

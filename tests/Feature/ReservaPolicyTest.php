@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Agenda;
@@ -118,8 +120,7 @@ class ReservaPolicyTest extends TestCase
 
     public function test_gestor_cannot_edit_details_of_own_reservation_if_partially_evaluated()
     {
-        // Arrange: User is a Gestor (permission_type_id = 2 usually, but here we just need them to own the agenda)
-        // Actually, Rule 2 checked if user owns the agenda.
+        // Arrange: User with gestor role owns the agenda
         $gestor = User::factory()->create();
         $agenda = Agenda::factory()->create(['user_id' => $gestor->id]); // Gestor owns agenda
 
