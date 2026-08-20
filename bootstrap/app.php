@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Exceptions\ErrorEnvelope;
+use App\Exceptions\ExceptionContext;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
@@ -42,23 +44,26 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Issue #119 / #112: sem isto, um abort(403) numa visita Inertia devolve
-        // HTML que o cliente não sabe renderizar, e o usuário vê o modal de erro
-        // cru do Inertia com a página de exceção do Symfony dentro.
-        //
-        // Os ambientes local e testing ficam de fora de propósito: em local
-        // preserva a página de debug do Laravel; em testing mantém o 403 puro,
-        // para que assertForbidden() não dependa do bundle do React.
+        // Issue #112: contexto anexado a toda exceção logada, para não repetir
+        // user_id/rota em cada chamada de Log.
+        $exceptions->context(fn () => ExceptionContext::build());
+
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
-            if (app()->environment(['local', 'testing'])) {
-                return $response;
+            // Issue #112: o envelope vale em todos os ambientes — é contrato de
+            // resposta, não recurso de depuração. Requisições Inertia não caem
+            // aqui: elas enviam Accept: text/html, então expectsJson() é false.
+            if ($request->expectsJson()) {
+                return ErrorEnvelope::apply($response);
             }
 
-            // Endpoints JSON (notificações, relatórios) devem continuar
-            // respondendo JSON. Requisições Inertia não caem aqui: elas enviam
-            // Accept: text/html, então expectsJson() é false — e o page load
-            // direto (o vetor real do IDOR) também recebe a página estilizada.
-            if ($request->expectsJson()) {
+            // Issue #119: sem o que vem abaixo, um abort(403) numa visita Inertia
+            // devolve HTML que o cliente não sabe renderizar, e o usuário vê o
+            // modal de erro cru do Inertia com a página do Symfony dentro.
+            //
+            // Local e testing ficam de fora de propósito: em local preserva a
+            // página de debug do Laravel; em testing mantém o 403 puro, para que
+            // assertForbidden() não dependa do bundle do React.
+            if (app()->environment(['local', 'testing'])) {
                 return $response;
             }
 

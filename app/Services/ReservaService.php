@@ -175,7 +175,11 @@ class ReservaService
             try {
                 $gestor->notify(new ReservationCanceledNotification($reserva, $user));
             } catch (\Exception $e) {
-                Log::warning("Falha ao notificar gestor {$gestor->id} sobre cancelamento da reserva {$reserva->id}: ".$e->getMessage());
+                Log::warning('Falha ao notificar gestor sobre cancelamento de reserva', [
+                    'gestor_id' => $gestor->id,
+                    'reserva_id' => $reserva->id,
+                    'exception' => $e,
+                ]);
             }
         }
     }

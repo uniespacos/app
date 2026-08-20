@@ -142,7 +142,7 @@ class UpdateReservaJob implements ShouldQueue
             } catch (Exception $e) {
                 Log::warning('Failed to send reservation update notification', [
                     'reserva_id' => $this->reserva->id,
-                    'error' => $e->getMessage(),
+                    'exception' => $e,
                 ]);
             }
 
@@ -150,7 +150,7 @@ class UpdateReservaJob implements ShouldQueue
             Log::error('UpdateReservaJob failed', [
                 'reserva_id' => $this->reserva->id,
                 'user_id' => $this->user->id,
-                'error' => $e->getMessage(),
+                'exception' => $e,
             ]);
             $this->fail($e);
         }
@@ -174,7 +174,7 @@ class UpdateReservaJob implements ShouldQueue
         Log::error('UpdateReservaJob exhausted all retries', [
             'reserva_id' => $this->reserva->id,
             'user_id' => $this->user->id,
-            'error' => $exception->getMessage(),
+            'exception' => $exception,
         ]);
 
         try {
@@ -182,7 +182,7 @@ class UpdateReservaJob implements ShouldQueue
         } catch (Exception $e) {
             Log::error('Failed to send reservation update failure notification', [
                 'reserva_id' => $this->reserva->id,
-                'error' => $e->getMessage(),
+                'exception' => $e,
             ]);
         }
     }
