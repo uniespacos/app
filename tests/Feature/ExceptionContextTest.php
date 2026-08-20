@@ -85,22 +85,31 @@ class ExceptionContextTest extends TestCase
     /**
      * Guarda de segurança: nenhum campo sensível pode entrar no contexto, e o
      * corpo da requisição não é incluído de forma alguma.
+     *
+     * Os valores são canários gerados em runtime, e não literais. Dois motivos:
+     * um valor único por execução não pode passar por acidente (um literal fixo
+     * poderia coincidir com algo já presente no contexto), e não deixa no
+     * arquivo uma string com formato de credencial — que os scanners de segredo
+     * reportam como vazamento, ainda que seja fixture.
      */
     public function test_context_never_carries_request_payload_or_secrets(): void
     {
         $user = User::factory()->create();
 
+        $canarioSenha = 'canario-senha-'.bin2hex(random_bytes(8));
+        $canarioToken = 'canario-token-'.bin2hex(random_bytes(8));
+
         $this->actingAs($user)->post(route('reservas.destroy', 1), [
-            'password' => 'senha-super-secreta',
-            '_token' => 'token-secreto',
+            'password' => $canarioSenha,
+            '_token' => $canarioToken,
         ]);
 
         $contexto = ExceptionContext::build();
 
         $serializado = json_encode($contexto, JSON_THROW_ON_ERROR);
 
-        $this->assertStringNotContainsString('senha-super-secreta', $serializado);
-        $this->assertStringNotContainsString('token-secreto', $serializado);
+        $this->assertStringNotContainsString($canarioSenha, $serializado);
+        $this->assertStringNotContainsString($canarioToken, $serializado);
 
         foreach (['password', 'password_confirmation', 'current_password', '_token', 'token'] as $campo) {
             $this->assertArrayNotHasKey($campo, $contexto);
