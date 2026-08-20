@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { TURNO_LABEL, TURNOS_ORDENADOS } from '@/constants/turnos';
 import type { Espaco, User } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { UserSearchCombobox } from '@/presentation/molecules/UserSearchComboBox';
@@ -20,11 +21,6 @@ export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: G
         noite: null,
     });
 
-    const turnos = {
-        manha: 'Manhã',
-        tarde: 'Tarde',
-        noite: 'Noite',
-    };
     useEffect(() => {
         if (espaco?.agendas) {
             setGestores({
@@ -83,14 +79,14 @@ export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: G
                 </div>
 
                 <div className="space-y-4">
-                    {Object.entries(turnos).map(([turno, label]) => (
+                    {TURNOS_ORDENADOS.map((turno) => (
                         <div key={turno} className="space-y-2">
-                            <Label className="block">{label}</Label>
+                            <Label className="block">{TURNO_LABEL[turno]}</Label>
                             <UserSearchCombobox
                                 usuarios={usuarios}
                                 value={gestores[turno]}
                                 onValueChange={(value) => handleGestorChange(turno, value)}
-                                placeholder={`Buscar gestor para o turno da ${label.toLowerCase()}...`}
+                                placeholder={`Buscar gestor para o turno da ${TURNO_LABEL[turno].toLowerCase()}...`}
                             />
                         </div>
                     ))}
