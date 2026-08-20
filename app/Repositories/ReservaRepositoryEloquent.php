@@ -55,7 +55,8 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                 'horarios' => function ($query) use ($weekStart, $weekEnd) {
                     $query->whereBetween('data', [$weekStart, $weekEnd])
                         ->orderBy('data')->orderBy('horario_inicio')
-                        ->with(['agenda.espaco']);
+                        // Issue #105: a listagem exibe espaço + módulo na coluna "Local".
+                        ->with(['agenda.espaco.andar.modulo']);
                 },
                 'user:id,name',
             ])
@@ -100,7 +101,12 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                 'horarios' => function ($query) use ($agendaIds) {
                     $query->whereIn('agenda_id', $agendaIds)->limit(1)->with([
                         'agenda:id,espaco_id,turno',
-                        'agenda.espaco:id,nome',
+                        // Issue #105: os selects são enxutos de propósito, mas cada
+                        // relação aninhada precisa da própria chave estrangeira —
+                        // sem andar_id/modulo_id a cadeia volta null silenciosamente.
+                        'agenda.espaco:id,nome,andar_id',
+                        'agenda.espaco.andar:id,nome,modulo_id',
+                        'agenda.espaco.andar.modulo:id,nome',
                     ]);
                 },
             ])
