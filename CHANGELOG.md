@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.11](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.10...v1.3.0-rc.11) (2026-08-20)
+
+
+### Bug Fixes
+
+* solving idor reserva authorization ([#253](https://github.com/uniespacos/uniespacos/issues/253)) ([4a59670](https://github.com/uniespacos/uniespacos/commit/4a59670a21d2b847f6ebce9d0d15586b08d8b676))
+
 ## [1.3.0-rc.10](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.9...v1.3.0-rc.10) (2026-08-16)
 
 
