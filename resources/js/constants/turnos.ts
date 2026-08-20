@@ -5,3 +5,19 @@ export const HORARIOS_PADRAO = {
 } as const;
 
 export type Turno = keyof typeof HORARIOS_PADRAO;
+
+/**
+ * Ordem canônica de exibição dos turnos (issue #101).
+ *
+ * Nem `Espaco::agendas()` nem `EspacoRepositoryEloquent::getAllByInstituicao`
+ * aplicam ORDER BY, então a ordem em que as agendas chegam do backend é a que o
+ * banco resolver dar. Qualquer lista de turnos na UI precisa impor esta ordem —
+ * e a partir daqui, de um único lugar.
+ */
+export const TURNOS_ORDENADOS: readonly Turno[] = ['manha', 'tarde', 'noite'];
+
+export const TURNO_LABEL: Record<Turno, string> = {
+    manha: 'Manhã',
+    tarde: 'Tarde',
+    noite: 'Noite',
+};
