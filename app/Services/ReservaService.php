@@ -16,6 +16,7 @@ use App\Repositories\ReservaRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class ReservaService
@@ -48,10 +49,19 @@ class ReservaService
         });
 
         $reservaToShow = null;
-        if ($filters['reserva'] ?? null) {
-            $reservaToShow = $this->repoReserva->findWithWeekSlots((int) $filters['reserva'], $weekStart, $weekEnd);
+        $reservaIdFiltro = $filters['reserva'] ?? null;
+
+        // Valida o formato antes de tocar o banco: sem isso, ?reserva=abc vira
+        // (int) 0 e dispara um find(0) desnecessário.
+        if (! empty($reservaIdFiltro) && filter_var($reservaIdFiltro, FILTER_VALIDATE_INT) !== false) {
+            $reservaToShow = $this->repoReserva->findWithWeekSlots((int) $reservaIdFiltro, $weekStart, $weekEnd);
 
             if ($reservaToShow) {
+                // Issue #119: a reserva vem da query string, não de route-model
+                // binding, então a autorização precisa acontecer aqui — onde o
+                // objeto é resolvido — e não na borda HTTP.
+                Gate::forUser($user)->authorize('view', $reservaToShow);
+
                 $reservaToShow->can_update = $user->can('update', $reservaToShow);
             }
         }

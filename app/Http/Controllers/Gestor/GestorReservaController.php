@@ -59,6 +59,8 @@ class GestorReservaController extends Controller
      */
     public function update(AvaliarReservaRequest $request, Reserva $reserva): RedirectResponse
     {
+        $this->authorize('viewForGestor', $reserva);
+
         try {
             $this->service->evaluate($reserva, $request->validated(), Auth::user());
 
