@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.15](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.14...v1.3.0-rc.15) (2026-08-20)
+
+
+### Bug Fixes
+
+* padronizar envelope de erro JSON e logging da aplicacao ([#263](https://github.com/uniespacos/uniespacos/issues/263)) ([a504887](https://github.com/uniespacos/uniespacos/commit/a504887ac0c60fa6aaffbe31a6aaba1eee49fba0))
+
 ## [1.3.0-rc.14](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.13...v1.3.0-rc.14) (2026-08-20)
 
 
