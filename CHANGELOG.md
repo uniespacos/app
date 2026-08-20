@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.12](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.11...v1.3.0-rc.12) (2026-08-20)
+
+
+### Bug Fixes
+
+* issue semana reserva notificacao ([#256](https://github.com/uniespacos/uniespacos/issues/256)) ([3b62a3e](https://github.com/uniespacos/uniespacos/commit/3b62a3e54de4bca11623dc54b0cd0c5db1b9adab))
+
 ## [1.3.0-rc.11](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.10...v1.3.0-rc.11) (2026-08-20)
 
 
