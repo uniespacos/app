@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.14](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.13...v1.3.0-rc.14) (2026-08-20)
+
+
+### Bug Fixes
+
+* exibir modulo e andar na listagem de reservas ([#261](https://github.com/uniespacos/uniespacos/issues/261)) ([4cd67ea](https://github.com/uniespacos/uniespacos/commit/4cd67ea613dc4f11053dad8d85f62c78bfff4c7b)), closes [#105](https://github.com/uniespacos/uniespacos/issues/105)
+
 ## [1.3.0-rc.13](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.12...v1.3.0-rc.13) (2026-08-20)
 
 
