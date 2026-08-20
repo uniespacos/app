@@ -160,14 +160,17 @@ class AvaliarReservaJob implements ShouldQueue
                     $this->gestor
                 ));
             } catch (Exception $e) {
-                Log::warning("Falha ao enviar notificação de avaliação para a reserva {$this->reserva->id}: ".$e->getMessage());
+                Log::warning('Falha ao enviar notificação de avaliação da reserva', [
+                    'reserva_id' => $this->reserva->id,
+                    'exception' => $e,
+                ]);
             }
 
         } catch (Exception $e) {
             Log::error('AvaliarReservaJob failed', [
                 'reserva_id' => $this->reserva->id,
                 'gestor_id' => $this->gestor->id,
-                'error' => $e->getMessage(),
+                'exception' => $e,
             ]);
             $this->fail($e);
         }
@@ -181,7 +184,7 @@ class AvaliarReservaJob implements ShouldQueue
         Log::error('AvaliarReservaJob exhausted all retries', [
             'reserva_id' => $this->reserva->id,
             'gestor_id' => $this->gestor->id,
-            'error' => $exception->getMessage(),
+            'exception' => $exception,
         ]);
     }
 
@@ -218,7 +221,10 @@ class AvaliarReservaJob implements ShouldQueue
             ->get();
 
         foreach ($reservasParaRevalidar as $reserva) {
-            Log::info("Disparando revalidação de conflito para Reserva ID {$reserva->id} devido à aprovação da Reserva ID {$this->reserva->id}");
+            Log::info('Disparando revalidação de conflito por aprovação de reserva', [
+                'reserva_id' => $reserva->id,
+                'reserva_aprovada_id' => $this->reserva->id,
+            ]);
             ValidateReservationConflictsJob::dispatch($reserva);
         }
     }

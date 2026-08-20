@@ -55,7 +55,10 @@ class ReservaController extends Controller
             return redirect()->route('espacos.index')
                 ->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
         } catch (\Exception $error) {
-            Log::error('Erro ao despachar o job de criação de reserva: '.$error->getMessage());
+            Log::error('Erro ao despachar o job de criação de reserva', [
+                'user_id' => Auth::id(),
+                'exception' => $error,
+            ]);
 
             return redirect()->route('espacos.index')
                 ->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
@@ -104,7 +107,11 @@ class ReservaController extends Controller
             return redirect()->route('reservas.index')
                 ->with('success', 'Sua reserva foi enviada para atualização. O processo será concluído em segundo plano.');
         } catch (\Exception $e) {
-            Log::error("Erro ao despachar UpdateReservaJob para reserva {$reserva->id}: ".$e->getMessage());
+            Log::error('Erro ao despachar UpdateReservaJob', [
+                'reserva_id' => $reserva->id,
+                'user_id' => Auth::id(),
+                'exception' => $e,
+            ]);
 
             return back()->with('error', 'Ocorreu um erro ao enviar a atualização para processamento.');
         }
@@ -127,9 +134,10 @@ class ReservaController extends Controller
 
             return back()->with('success', 'Reserva cancelada com sucesso!');
         } catch (\Exception $error) {
-            Log::error('Erro ao cancelar (inativar) reserva: '.$error->getMessage(), [
+            Log::error('Erro ao cancelar (inativar) reserva', [
                 'reserva_id' => $reserva->id,
                 'user_id' => Auth::id(),
+                'exception' => $error,
             ]);
 
             return back()->with('error', 'Erro ao cancelar a reserva. Por favor, tente novamente.');

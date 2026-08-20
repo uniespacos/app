@@ -120,7 +120,11 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     try {
                         $gestor->notify(new NewReservationNotification($reserva));
                     } catch (Exception $e) {
-                        Log::warning("Falha ao notificar gestor {$gestor->id}: ".$e->getMessage());
+                        Log::warning('Falha ao notificar gestor sobre nova reserva', [
+                            'gestor_id' => $gestor->id,
+                            'reserva_id' => $reserva->id,
+                            'exception' => $e,
+                        ]);
                     }
                 }
             }
@@ -132,14 +136,18 @@ class ProcessarCriacaoReserva implements ShouldQueue
             try {
                 $this->solicitante->notify(new ReservationCreatedNotification($reserva));
             } catch (Exception $e) {
-                Log::warning('Falha ao enviar notificação de sucesso: '.$e->getMessage());
+                Log::warning('Falha ao enviar notificação de reserva criada', [
+                    'reserva_id' => $reserva->id,
+                    'solicitante_id' => $this->solicitante->id,
+                    'exception' => $e,
+                ]);
             }
 
         } catch (Exception $e) {
             Log::error('ProcessarCriacaoReserva failed', [
                 'solicitante_id' => $this->solicitante->id,
                 'titulo' => $this->dadosRequisicao['titulo'],
-                'error' => $e->getMessage(),
+                'exception' => $e,
             ]);
             $this->fail($e);
         }
@@ -157,7 +165,10 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 $this->solicitante
             ));
         } catch (Exception $e) {
-            Log::error('Falha fatal ao enviar notificação de erro: '.$e->getMessage());
+            Log::error('Falha fatal ao enviar notificação de erro de criação de reserva', [
+                'solicitante_id' => $this->solicitante->id,
+                'exception' => $e,
+            ]);
         }
     }
 }

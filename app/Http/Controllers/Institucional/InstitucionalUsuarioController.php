@@ -77,7 +77,10 @@ class InstitucionalUsuarioController extends Controller
             return redirect()->route('institucional.usuarios.index')
                 ->with('success', 'Permissões atualizadas com sucesso.');
         } catch (\Exception $e) {
-            Log::error("Erro ao atualizar permissões do usuário {$user->id}: ".$e->getMessage());
+            Log::error('Erro ao atualizar permissões do usuário', [
+                'usuario_alvo_id' => $user->id,
+                'exception' => $e,
+            ]);
 
             return redirect()->route('institucional.usuarios.index')
                 ->with('error', 'Erro ao atualizar permissões: '.$e->getMessage());
@@ -101,7 +104,10 @@ class InstitucionalUsuarioController extends Controller
             return redirect()->route('institucional.usuarios.index')
                 ->with('success', 'Usuário excluído com sucesso.');
         } catch (\Exception $e) {
-            Log::error("Erro ao excluir usuário {$usuario->id}: ".$e->getMessage());
+            Log::error('Erro ao excluir usuário', [
+                'usuario_alvo_id' => $usuario->id,
+                'exception' => $e,
+            ]);
 
             return redirect()->route('institucional.usuarios.index')
                 ->with('error', 'Erro ao excluir usuário.');

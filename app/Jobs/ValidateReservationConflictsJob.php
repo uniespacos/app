@@ -47,7 +47,7 @@ class ValidateReservationConflictsJob implements ShouldQueue
         } catch (Throwable $e) {
             Log::error('ValidateReservationConflictsJob failed', [
                 'reserva_id' => $this->reserva->id,
-                'error' => $e->getMessage(),
+                'exception' => $e,
             ]);
             $this->reserva->update(['validation_status' => 'failed']);
             $this->fail($e);
@@ -61,7 +61,7 @@ class ValidateReservationConflictsJob implements ShouldQueue
     {
         Log::error('ValidateReservationConflictsJob exhausted all retries', [
             'reserva_id' => $this->reserva->id,
-            'error' => $exception->getMessage(),
+            'exception' => $exception,
         ]);
         $this->reserva->update(['validation_status' => 'failed']);
     }

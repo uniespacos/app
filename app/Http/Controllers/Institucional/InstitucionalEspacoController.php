@@ -73,7 +73,7 @@ class InstitucionalEspacoController extends Controller
             return redirect()->route('institucional.espacos.index')
                 ->with('success', 'Espaço cadastrado com sucesso!');
         } catch (\Exception $e) {
-            Log::error('Erro ao criar espaço: '.$e->getMessage());
+            Log::error('Erro ao criar espaço', ['exception' => $e]);
 
             return redirect()->back()
                 ->with('error', 'Ocorreu um erro inesperado ao criar o espaço.')
@@ -129,7 +129,10 @@ class InstitucionalEspacoController extends Controller
             return redirect()->route('institucional.espacos.index')
                 ->with('success', 'Espaço atualizado com sucesso!');
         } catch (\Exception $e) {
-            Log::error('Erro ao atualizar espaço: '.$e->getMessage());
+            Log::error('Erro ao atualizar espaço', [
+                'espaco_id' => $espaco->id,
+                'exception' => $e,
+            ]);
 
             return redirect()->back()
                 ->with('error', 'Ocorreu um erro inesperado ao atualizar o espaço.')
@@ -172,7 +175,10 @@ class InstitucionalEspacoController extends Controller
             return redirect()->route('institucional.espacos.index')
                 ->with('success', 'Gestores atualizados com sucesso!');
         } catch (\Exception $e) {
-            Log::error('Erro ao atualizar gestores do espaço: '.$e->getMessage());
+            Log::error('Erro ao atualizar gestores do espaço', [
+                'espaco_id' => $espaco->id,
+                'exception' => $e,
+            ]);
 
             return redirect()->back()
                 ->with('error', 'Ocorreu um erro ao atualizar os gestores do espaço.');

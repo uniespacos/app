@@ -98,7 +98,10 @@ class UserService
                 try {
                     $user->notify(new UserAssignedAsManagerNotification($user));
                 } catch (\Exception $e) {
-                    Log::warning("Failed to notify user {$user->id} of manager assignment: ".$e->getMessage());
+                    Log::warning('Falha ao notificar usuário sobre atribuição como gestor', [
+                        'user_id' => $user->id,
+                        'exception' => $e,
+                    ]);
                 }
             } else {
                 Agenda::where('user_id', $user->id)->update(['user_id' => null]);
@@ -106,7 +109,10 @@ class UserService
                 try {
                     $user->notify(new UserRemovedAsManagerNotification($user));
                 } catch (\Exception $e) {
-                    Log::warning("Failed to notify user {$user->id} of manager removal: ".$e->getMessage());
+                    Log::warning('Falha ao notificar usuário sobre remoção como gestor', [
+                        'user_id' => $user->id,
+                        'exception' => $e,
+                    ]);
                 }
             }
 
