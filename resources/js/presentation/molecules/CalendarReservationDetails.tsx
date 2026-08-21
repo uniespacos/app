@@ -32,6 +32,7 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                     isSlotSelecionado={SEM_SELECAO}
                     alternarSelecaoSlot={alternarSelecaoSlotFn}
                     slotsDaReserva={slotsSolicitados}
+                    exigirGestor={false}
                 />
             </Card>
         );

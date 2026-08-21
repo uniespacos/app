@@ -11,6 +11,13 @@ type CalendarDiaMobileProps = {
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     slotsDaReserva?: SlotCalendario[];
+    /**
+     * Na tela de agendar, turno sem gestor não pode ser reservado — faz
+     * sentido esconder. No modal de detalhes de uma reserva já feita, a
+     * agenda pode não trazer o gestor carregado, e o turno precisa aparecer
+     * do mesmo jeito: é a própria reserva, não uma oferta de horário livre.
+     */
+    exigirGestor?: boolean;
 };
 
 /**
@@ -28,7 +35,14 @@ type CalendarDiaMobileProps = {
  * desktop. Isso é deliberado: derivação duplicada faria as visões divergirem, e
  * um slot livre no celular que está reservado no desktop vira reserva sobreposta.
  */
-export default function CalendarDiaMobile({ diasSemana, agendas, isSlotSelecionado, alternarSelecaoSlot, slotsDaReserva }: CalendarDiaMobileProps) {
+export default function CalendarDiaMobile({
+    diasSemana,
+    agendas,
+    isSlotSelecionado,
+    alternarSelecaoSlot,
+    slotsDaReserva,
+    exigirGestor = true,
+}: CalendarDiaMobileProps) {
     const indiceInicial = Math.max(
         diasSemana.findIndex((dia) => dia.ehHoje),
         0,
@@ -38,8 +52,11 @@ export default function CalendarDiaMobile({ diasSemana, agendas, isSlotSeleciona
     const diaVisivel = diasSemana[indiceDia];
 
     const agendasOrdenadas = useMemo(
-        () => [...agendas].filter((a) => a.user).sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
-        [agendas],
+        () =>
+            [...agendas]
+                .filter((a) => !exigirGestor || a.user)
+                .sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
+        [agendas, exigirGestor],
     );
 
     const slotsPorTurno = useMemo(() => {
