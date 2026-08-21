@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.16](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.15...v1.3.0-rc.16) (2026-08-21)
+
+
+### Bug Fixes
+
+* separar arquivamento da situacao no filtro de reservas ([#266](https://github.com/uniespacos/uniespacos/issues/266)) ([8f180f0](https://github.com/uniespacos/uniespacos/commit/8f180f07237ada5910bede80a60dbe5497c3300f)), closes [#108](https://github.com/uniespacos/uniespacos/issues/108)
+
 ## [1.3.0-rc.15](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.14...v1.3.0-rc.15) (2026-08-20)
 
 
