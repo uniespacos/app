@@ -48,7 +48,9 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     {
         return $this->reserva->newQuery()
             ->where('user_id', $userId)
-            ->where('situacao', '!=', 'inativa')
+            // Issue #108: era `->where('situacao', '!=', 'inativa')` fixo aqui,
+            // o que anulava qualquer filtro por arquivadas logo abaixo.
+            ->arquivo($filters['arquivo'] ?? null)
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where('titulo', 'like', '%'.$s.'%'))
             ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s))
             ->with([
@@ -91,11 +93,10 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             ->select(['id', 'titulo', 'descricao', 'situacao', 'user_id', 'data_inicial', 'data_final'])
             ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendaIds))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('titulo', 'like', "%{$s}%")->orWhere('descricao', 'like', "%{$s}%")))
-            ->when(
-                $filters['situacao'] ?? null,
-                fn ($q, $s) => $q->where('situacao', $s),
-                fn ($q) => $q->where('situacao', '!=', 'inativa')
-            )
+            // Issue #108: os dois eixos ficam independentes, entao "Todas as
+            // situacoes" deixa de significar "todas menos as arquivadas".
+            ->arquivo($filters['arquivo'] ?? null)
+            ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s))
             ->with([
                 'user:id,name',
                 'horarios' => function ($query) use ($agendaIds) {

@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 interface UseReservasGestorUseCaseProps {
     repository: IReservasRepository;
-    initialFilters: { search?: string; situacao?: string };
+    initialFilters: { search?: string; situacao?: string; arquivo?: string };
     initialSemana: { referencia: string };
 }
 
@@ -16,6 +16,7 @@ export function useReservasGestorUseCase({
 }: UseReservasGestorUseCaseProps) {
     const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
     const [selectedSituacao, setSelectedSituacao] = useState(initialFilters.situacao || '');
+    const [selectedArquivo, setSelectedArquivo] = useState(initialFilters.arquivo || 'ativas');
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(
         new Date(initialSemana.referencia + 'T12:00:00')
     );
@@ -31,17 +32,21 @@ export function useReservasGestorUseCase({
         const params: Record<string, unknown> = {
             search: debouncedSearch || undefined,
             situacao: selectedSituacao || undefined,
+            // 'ativas' é o padrão do backend; omitir mantém a URL limpa.
+            arquivo: selectedArquivo && selectedArquivo !== 'ativas' ? selectedArquivo : undefined,
             semana: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined,
         };
 
         repository.getReservasGestor(params);
-    }, [debouncedSearch, selectedSituacao, selectedDate, repository]);
+    }, [debouncedSearch, selectedSituacao, selectedArquivo, selectedDate, repository]);
 
     return {
         searchTerm,
         setSearchTerm,
         selectedSituacao,
         setSelectedSituacao,
+        selectedArquivo,
+        setSelectedArquivo,
         selectedDate,
         setSelectedDate,
     };

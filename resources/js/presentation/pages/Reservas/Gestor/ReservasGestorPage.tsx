@@ -31,7 +31,7 @@ export default function MinhasReservas({
 }: {
     user: User;
     reservas: Paginator<Reserva>;
-    filters: { search?: string; situacao?: string };
+    filters: { search?: string; situacao?: string; arquivo?: string };
     reservaToShow?: Reserva;
     semana: { referencia: string };
 }) {
@@ -40,6 +40,8 @@ export default function MinhasReservas({
         setSearchTerm,
         selectedSituacao,
         setSelectedSituacao,
+        selectedArquivo,
+        setSelectedArquivo,
         selectedDate,
         setSelectedDate,
     } = useReservasGestorUseCase({
@@ -60,9 +62,10 @@ export default function MinhasReservas({
                             onSearchTermChange={setSearchTerm}
                             selectedSituacao={selectedSituacao}
                             onSituacaoChange={setSelectedSituacao}
+                            selectedArquivo={selectedArquivo}
+                            onArquivoChange={setSelectedArquivo}
                             selectedDate={selectedDate}
                             onDateChange={setSelectedDate}
-                            isGestor={true}
                         />
                         <Suspense fallback={<ReservasLoading />}>
                             <ReservasList

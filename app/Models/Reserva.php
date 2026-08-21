@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\SituacaoReserva\ModoArquivoEnum;
 use Carbon\Carbon;
 use Database\Factories\ReservaFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +43,28 @@ class Reserva extends Model
         'conflict_cache' => 'array',
         'cache_validated_at' => 'datetime',
     ];
+
+    /**
+     * Aplica o eixo de arquivamento a uma listagem (issue #108).
+     *
+     * Fica no model, e nao em cada repositorio, porque a regra estava escrita
+     * de duas formas divergentes: getPaginatedForGestor tinha o default certo,
+     * e getPaginatedForUser aplicava `!= 'inativa'` incondicionalmente — o que
+     * transformava um filtro por arquivadas na contradicao
+     * `situacao != 'inativa' AND situacao = 'inativa'`. Uma definicao so
+     * elimina a chance de as duas divergirem de novo.
+     *
+     * @param  Builder<Reserva>  $query
+     * @return Builder<Reserva>
+     */
+    public function scopeArquivo(Builder $query, mixed $modo): Builder
+    {
+        return match (ModoArquivoEnum::fromFiltro($modo)) {
+            ModoArquivoEnum::ARQUIVADAS => $query->where('situacao', 'inativa'),
+            ModoArquivoEnum::TODAS => $query,
+            ModoArquivoEnum::ATIVAS => $query->where('situacao', '!=', 'inativa'),
+        };
+    }
 
     /**
      * Returns a human-readable label for the current situacao value.
