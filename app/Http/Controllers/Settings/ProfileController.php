@@ -12,6 +12,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,6 +47,22 @@ class ProfileController extends Controller
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
+        }
+
+        $currentPhotoPath = $user->getRawOriginal('profile_pic');
+
+        if ($request->hasFile('photo')) {
+            if ($currentPhotoPath) {
+                Storage::disk('public')->delete($currentPhotoPath);
+            }
+
+            $user->profile_pic = $request->file('photo')->store('avatars', 'public');
+        } elseif ($request->boolean('remove_photo')) {
+            if ($currentPhotoPath) {
+                Storage::disk('public')->delete($currentPhotoPath);
+            }
+
+            $user->profile_pic = '';
         }
 
         $user->save();
