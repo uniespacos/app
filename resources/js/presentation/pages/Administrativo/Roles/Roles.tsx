@@ -166,7 +166,7 @@ export default function RolesPage() {
                                                     {!role.is_system && (
                                                         <DropdownMenuItem
                                                             onClick={() => handleDelete(role)}
-                                                            className="text-red-600"
+                                                            className="text-destructive"
                                                         >
                                                             <Trash2 className="mr-2 h-4 w-4" />
                                                             Deletar

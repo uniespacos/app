@@ -32,7 +32,7 @@ class GestorReservaController extends Controller
         $data = $this->service->getGestorListing(
             Auth::user(),
             $request->input('semana', 'today'),
-            $request->only(['search', 'situacao', 'arquivo', 'reserva'])
+            $request->only(['search', 'situacao', 'arquivo', 'ordenar', 'reserva'])
         );
 
         return Inertia::render('Reservas/Gestor/ReservasGestorPage', $data);

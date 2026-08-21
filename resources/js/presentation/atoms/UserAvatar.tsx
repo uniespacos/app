@@ -15,7 +15,7 @@ export function UserAvatar({ user, className = "h-8 w-8", fallbackClassName }: U
     return (
         <Avatar className={`overflow-hidden rounded-full ${className}`}>
             <AvatarImage src={profilePic || '/placeholder.svg'} alt={user.name} />
-            <AvatarFallback className={`rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white ${fallbackClassName}`}>
+            <AvatarFallback className={`rounded-lg bg-muted text-foreground ${fallbackClassName}`}>
                 {getInitials(user.name)}
             </AvatarFallback>
         </Avatar>

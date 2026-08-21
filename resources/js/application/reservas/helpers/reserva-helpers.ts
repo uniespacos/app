@@ -19,23 +19,16 @@ export function calculateGestorStatus(reserva: Reserva): SituacaoReserva {
     return reserva.situacao;
 }
 
-export function sortReservasForGestor(reservas: Reserva[]): Reserva[] {
-    const list = reservas.map((reserva) => ({
+/**
+ * Recalcula a situação exibida ao gestor a partir dos horários da própria
+ * reserva (parcial/em_analise por turno), sem reordenar a lista — a ordem já
+ * vem do backend, de acordo com o critério de ordenação escolhido
+ * (data de solicitação ou situação). Reordenar aqui de novo contradiria a
+ * escolha do usuário.
+ */
+export function comSituacaoEfetivaDoGestor(reservas: Reserva[]): Reserva[] {
+    return reservas.map((reserva) => ({
         ...reserva,
         situacao: calculateGestorStatus(reserva),
     }));
-    
-    return [...list].sort((a, b) => {
-        if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-        if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;
-        return 0;
-    });
-}
-
-export function sortReservasForUser(reservas: Reserva[]): Reserva[] {
-    return [...reservas].sort((a, b) => {
-        if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
-        if (b.situacao === 'em_analise' && a.situacao !== 'parcialmente_deferida') return 1;
-        return 0;
-    });
 }

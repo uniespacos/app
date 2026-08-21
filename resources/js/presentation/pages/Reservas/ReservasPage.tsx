@@ -33,7 +33,7 @@ export default function MinhasReservas({
 }: {
     user: User;
     reservas: Paginator<Reserva>;
-    filters: { search?: string; situacao?: string; arquivo?: string };
+    filters: { search?: string; situacao?: string; arquivo?: string; ordenar?: string };
     reservaToShow?: Reserva;
     semana: { referencia: string };
 }) {
@@ -44,6 +44,8 @@ export default function MinhasReservas({
         setSelectedSituacao,
         selectedArquivo,
         setSelectedArquivo,
+        selectedOrdenar,
+        setSelectedOrdenar,
         selectedDate,
         setSelectedDate,
     } = useReservasListUseCase({
@@ -55,38 +57,36 @@ export default function MinhasReservas({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Minhas Reservas" />
-            <div className="flex">
-                <div className="container mx-auto w-[100vh] flex-1 space-y-6 py-6">
-                    <div className="space-y-6 p-6">
-                        <GenericHeader
-                            titulo="Minhas Reservas"
-                            descricao="Gerencie suas solicitações de reservas de espaços acadêmicos"
-                            canSeeButton={true}
-                            buttonText="Nova Reserva"
-                            buttonLink={route('espacos.index')}
-                            ButtonIcon={PlusCircle}
-                        />
-                        <ReservasFilters
-                            searchTerm={searchTerm}
-                            onSearchTermChange={setSearchTerm}
-                            selectedSituacao={selectedSituacao}
-                            onSituacaoChange={setSelectedSituacao}
-                            selectedArquivo={selectedArquivo}
-                            onArquivoChange={setSelectedArquivo}
-                            selectedDate={selectedDate}
-                            onDateChange={setSelectedDate}
-                        />
-                        <Suspense fallback={<ReservasLoading />}>
-                            <ReservasList
-                                fallback={<ReservasEmpty />}
-                                paginator={paginator}
-                                isGestor={false}
-                                reservaToShow={reservaToShow}
-                                routeName={'reservas.index'}
-                            />
-                        </Suspense>
-                    </div>
-                </div>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo="Minhas Reservas"
+                    descricao="Gerencie suas solicitações de reservas de espaços acadêmicos"
+                    canSeeButton={true}
+                    buttonText="Nova Reserva"
+                    buttonLink={route('espacos.index')}
+                    ButtonIcon={PlusCircle}
+                />
+                <ReservasFilters
+                    searchTerm={searchTerm}
+                    onSearchTermChange={setSearchTerm}
+                    selectedSituacao={selectedSituacao}
+                    onSituacaoChange={setSelectedSituacao}
+                    selectedArquivo={selectedArquivo}
+                    onArquivoChange={setSelectedArquivo}
+                    selectedOrdenar={selectedOrdenar}
+                    onOrdenarChange={setSelectedOrdenar}
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                />
+                <Suspense fallback={<ReservasLoading />}>
+                    <ReservasList
+                        fallback={<ReservasEmpty />}
+                        paginator={paginator}
+                        isGestor={false}
+                        reservaToShow={reservaToShow}
+                        routeName={'reservas.index'}
+                    />
+                </Suspense>
             </div>
         </AppLayout>
     );

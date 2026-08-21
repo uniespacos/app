@@ -29,7 +29,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     onChange={(e) => setData((prevData: FormCadastroValues) => ({ ...prevData, nome: e.target.value }))}
                     disabled={processing}
                 />
-                {errors.nome && <p className="mt-1 text-sm text-red-500">{errors.nome}</p>}
+                {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
             </div>
 
             <div className="space-y-2">
@@ -42,7 +42,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     onChange={(e) => setData((prevData: FormCadastroValues) => ({ ...prevData, capacidade_pessoas: e.target.valueAsNumber }))}
                     disabled={processing}
                 />
-                {errors.capacidade_pessoas && <p className="mt-1 text-sm text-red-500">{errors.capacidade_pessoas}</p>}
+                {errors.capacidade_pessoas && <p className="mt-1 text-sm text-destructive">{errors.capacidade_pessoas}</p>}
             </div>
 
             <div className="space-y-2">
@@ -55,7 +55,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     onChange={(e) => setData((prevData: FormCadastroValues) => ({ ...prevData, descricao: e.target.value }))}
                     disabled={processing}
                 />
-                {errors.descricao && <p className="mt-1 text-sm text-red-500">{errors.descricao}</p>}
+                {errors.descricao && <p className="mt-1 text-sm text-destructive">{errors.descricao}</p>}
             </div>
         </>
     );

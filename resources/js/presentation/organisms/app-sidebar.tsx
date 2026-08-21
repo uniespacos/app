@@ -59,7 +59,10 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             {/* Cabeçalho ------------------------------------------------------- */}
-            <SidebarHeader>
+            {/* border-b separa a marca do restante do menu — sem ela o Sheet
+                mobile ficava com a logo flutuando solta no topo de uma lista
+                de itens, sem nenhuma divisão visual entre as duas áreas. */}
+            <SidebarHeader className="border-sidebar-border/50 border-b">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -81,7 +84,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             {/* Rodapé ---------------------------------------------------------- */}
-            <SidebarFooter>
+            <SidebarFooter className="border-sidebar-border/50 border-t">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

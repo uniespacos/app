@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from '@/components/ui/badge';
+import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
+import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
 import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
-import AppLayout from '@/presentation/templates/app-layout';
+import { Badge } from '@/components/ui/badge';
+import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
+import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
+import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
+import EvaluationForm from '@/presentation/organisms/EvaluationForm';
+import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
+import AppLayout from '@/presentation/templates/app-layout';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Head } from '@inertiajs/react';
+import { format, parse, parseISO } from 'date-fns';
 import { Clock, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
-import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
-import EvaluationForm from '@/presentation/organisms/EvaluationForm';
-import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
-import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
-import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
-import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
-import { parseISO, format, parse } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
@@ -55,14 +56,7 @@ export default function AvaliarReserva({
     const dataInicialReserva = useMemo(() => new Date(reserva.data_inicial), [reserva.data_inicial]);
     const dataFinalReserva = useMemo(() => new Date(reserva.data_final), [reserva.data_final]);
 
-    const {
-        semanaVisivel,
-        isLoading,
-        podeVoltar,
-        podeAvancar,
-        irParaSemanaAnterior,
-        irParaProximaSemana,
-    } = useAgendaNavigation({
+    const { semanaVisivel, isLoading, podeVoltar, podeAvancar, irParaSemanaAnterior, irParaProximaSemana } = useAgendaNavigation({
         semanaInicial,
         routeName: 'gestor.reservas.show',
         routeParams: useMemo(() => ({ reserva: reserva.id }), [reserva.id]),
@@ -155,14 +149,17 @@ export default function AvaliarReserva({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Avaliar reserva" />
-            <div className="min-h-screen bg-gray-50 p-6">
+            <div className="bg-muted/50 min-h-screen p-6">
                 <div className="mx-auto max-w-4xl space-y-6">
                     <div className="container mx-auto space-y-6 p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">Avaliar Reserva</h1>
-                                <p className="mt-1 text-gray-600">
-                                    Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} / {reserva.horarios[0]?.agenda?.espaco?.andar?.nome}
+                                <h1 className="text-foreground text-3xl font-bold">Avaliar Reserva</h1>
+                                <p className="text-muted-foreground mt-1">
+                                    Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} /{' '}
+                                    {reserva.horarios[0]?.agenda?.espaco?.andar?.nome
+                                        ? getAndarLabelByValue(reserva.horarios[0].agenda.espaco.andar.nome)
+                                        : null}
                                 </p>
                             </div>
                             <Badge className={`${getStatusReservaColor(situacaoHeader)} flex items-center gap-1`}>
@@ -173,7 +170,7 @@ export default function AvaliarReserva({
 
                         <ReservaInfoCard reserva={reserva}>
                             <div>
-                                <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
+                                <h4 className="text-foreground mb-3 flex items-center gap-2 font-medium">
                                     <Clock className="h-4 w-4" />
                                     Horários Solicitados
                                 </h4>

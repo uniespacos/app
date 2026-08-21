@@ -1,3 +1,4 @@
+import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
 import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
@@ -68,37 +69,11 @@ export const formatDateTime = (dateString: string | Date) => {
 
 export const diasSemanaParser = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
-export const getStatusReservaColor = (situacao: SituacaoReserva) => {
-    switch (situacao) {
-        case 'em_analise':
-            return 'bg-yellow-500';
-        case 'deferida':
-            return 'bg-green-500';
-        case 'indeferida':
-            return 'bg-red-500';
-        case 'parcialmente_deferida':
-            return 'bg-blue-500';
-        case 'inativa':
-            return 'bg-gray-300';
-        default:
-            return 'bg-gray-500';
-    }
-};
+/** Tom sólido da situação. A definição vive em ESTILO_SITUACAO. */
+export const getStatusReservaColor = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao]?.solido ?? 'bg-muted-foreground';
 
-export const getStatusReservaText = (situacao: SituacaoReserva) => {
-    switch (situacao) {
-        case 'em_analise':
-            return 'Em Analise';
-        case 'deferida':
-            return 'Deferida';
-        case 'parcialmente_deferida':
-            return 'Parcialmente Deferida';
-        case 'indeferida':
-            return 'Indeferida';
-        default:
-            return 'Desconhecido';
-    }
-};
+/** Rótulo da situação. Idem — inclusive os acentos, que aqui faltavam. */
+export const getStatusReservaText = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao]?.label ?? 'Desconhecido';
 
 export const getTurnoText = (turno: 'manha' | 'tarde' | 'noite' | undefined) => {
     switch (turno) {
@@ -147,7 +122,11 @@ export function diasDaSemana(dataReferencia: Date, hoje: Date) {
         return {
             data: dia,
             nome: format(dia, 'EEEE', { locale: ptBR }),
-            abreviado: format(dia, 'EEE', { locale: ptBR }),
+            // 'EEE' no locale pt-BR devolve o nome por extenso ("segunda"), não
+            // a forma curta — os três consumidores faziam `.replace('.', '')`
+            // esperando "seg.", o que nunca casava. 'EEEEEE' é a forma curta de
+            // verdade ("seg"), que é o que cabe num seletor de 7 colunas.
+            abreviado: format(dia, 'EEEEEE', { locale: ptBR }),
             diaMes: format(dia, 'dd/MM'),
             valor: format(dia, 'yyyy-MM-dd'),
             ehHoje: isSameDay(dia, hoje),

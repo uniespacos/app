@@ -16,6 +16,8 @@ describe('ReservasFilters', () => {
         onSituacaoChange: jest.fn(),
         selectedArquivo: 'ativas',
         onArquivoChange: jest.fn(),
+        selectedOrdenar: 'data_solicitacao',
+        onOrdenarChange: jest.fn(),
     };
 
     beforeEach(() => {
@@ -61,7 +63,19 @@ describe('ReservasFilters', () => {
 
         fireEvent.click(screen.getByLabelText('Situação'));
 
-        expect(screen.getByText('Todas as situações')).toBeInTheDocument();
+        expect(screen.getAllByText('Todas as situações').length).toBeGreaterThan(0);
+    });
+
+    /**
+     * Sem o valor padrão mapeado para um item real, o trigger caía no
+     * placeholder cinza-claro — parecendo "nada selecionado" ao lado do select
+     * "Exibir", que sempre mostra um valor concreto ("Ativas"). Os dois devem
+     * ter o mesmo peso visual no estado padrão.
+     */
+    it('mostra Todas as situacoes no trigger quando nao ha filtro', () => {
+        render(<ReservasFilters {...props} />);
+
+        expect(screen.getByLabelText('Situação')).toHaveTextContent('Todas as situações');
     });
 
     it('notifica o pai ao escolher Arquivadas', () => {
@@ -71,5 +85,20 @@ describe('ReservasFilters', () => {
         fireEvent.click(screen.getByText('Arquivadas'));
 
         expect(props.onArquivoChange).toHaveBeenCalledWith('arquivadas');
+    });
+
+    it('oferece o seletor de ordenacao com Data de solicitacao como padrao', () => {
+        render(<ReservasFilters {...props} />);
+
+        expect(screen.getByLabelText('Ordenar por')).toHaveTextContent('Data de solicitação');
+    });
+
+    it('notifica o pai ao escolher ordenar por Situacao', () => {
+        render(<ReservasFilters {...props} />);
+
+        fireEvent.click(screen.getByLabelText('Ordenar por'));
+        fireEvent.click(screen.getByRole('option', { name: 'Situação' }));
+
+        expect(props.onOrdenarChange).toHaveBeenCalledWith('situacao');
     });
 });

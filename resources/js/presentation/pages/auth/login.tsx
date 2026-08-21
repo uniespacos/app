@@ -31,7 +31,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4 py-12 sm:px-6 lg:px-8">
             <Head title="Entrar" />
             <div className="w-full max-w-md">
                 <Card className="w-full">
@@ -57,10 +57,10 @@ export default function Login() {
                                     placeholder="seu@email.com"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                    className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     disabled={processing}
                                 />
-                                {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+                                {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                             </div>
 
                             <div className="space-y-2">
@@ -81,7 +81,7 @@ export default function Login() {
                                         placeholder="********"
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
-                                        className={errors.password ? 'border-red-500 pr-10 focus-visible:ring-red-500' : 'pr-10'}
+                                        className={errors.password ? 'border-destructive pr-10 focus-visible:ring-destructive' : 'pr-10'}
                                         disabled={processing}
                                     />
                                     <button
@@ -89,10 +89,10 @@ export default function Login() {
                                         className="absolute inset-y-0 right-0 flex items-center pr-3"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
-                                        {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                                     </button>
                                 </div>
-                                {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
+                                {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password}</p>}
                             </div>
 
                             <div className="flex items-center space-x-2 py-4">

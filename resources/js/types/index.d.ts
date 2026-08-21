@@ -218,6 +218,7 @@ export interface Horario {
     situacao: 'em_analise' | 'indeferida' | 'deferida' | 'inativa';
     justificativa?: string | null; // Justificativa opcional para indeferimento
     user?: User;
+    avaliador?: User; // Gestor que avaliou este horário (null enquanto em_analise)
     is_conflicted?: boolean;
     conflict_details?: string;
 

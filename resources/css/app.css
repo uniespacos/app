@@ -38,10 +38,44 @@
 
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
+    --color-destructive-subtle: var(--destructive-subtle);
+    --color-destructive-accent: var(--destructive-accent);
+
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-success-subtle: var(--success-subtle);
+    --color-success-accent: var(--success-accent);
+
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-warning-subtle: var(--warning-subtle);
+    --color-warning-accent: var(--warning-accent);
+
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
+    --color-info-subtle: var(--info-subtle);
+    --color-info-accent: var(--info-accent);
+
+    --color-neutral-subtle: var(--neutral-subtle);
+    --color-neutral-accent: var(--neutral-accent);
 
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+
+    /*
+      Expostos como utilitários (bg-brand-blue, text-brand-green-strong, ...)
+      para os casos em que a cor é decisão de marca e não papel semântico —
+      ilustrações, gráficos, destaques institucionais. Para botões, links e
+      estados, continue usando `primary`/`ring`, que já apontam para cá.
+    */
+    --color-brand-blue: var(--brand-blue);
+    --color-brand-blue-deep: var(--brand-blue-deep);
+    --color-brand-blue-darkest: var(--brand-blue-darkest);
+    --color-brand-blue-light: var(--brand-blue-light);
+    --color-brand-green: var(--brand-green);
+    --color-brand-green-strong: var(--brand-green-strong);
+    --color-brand-yellow: var(--brand-yellow);
 
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
@@ -77,75 +111,213 @@
     }
 }
 
+/*
+  ── Paleta da marca ────────────────────────────────────────────────────────
+  Extraída de public/_img/uniespacos_logo.png. O tema anterior tinha
+  `--primary: oklch(0.205 0 0)` — croma zero, ou seja, cinza puro: a aplicação
+  não carregava cor de marca nenhuma.
+
+  Os valores abaixo são as cores da logo convertidas para oklch, com o
+  contraste medido contra o texto que vai por cima. O que ditou os papéis:
+
+    #0071bc  azul do wordmark   5.14:1 com branco  → serve de primary
+    #47ae6a  verde das páginas  2.79:1 com branco  → NÃO serve para botão;
+                                                     fica como preenchimento
+                                                     com texto escuro
+    #1e7b3c  verde do slogan    5.31:1 com branco  → é o verde utilizável
+                                                     quando o texto é branco
+    #3084b5  azul do capelo                        → apoio / gráficos
+    #45b0e5  azul claro do capelo                  → primary no modo escuro
+                                                     (6.27:1 sobre o fundo)
+    #eed04d  amarelo                               → só gráficos e avisos
+
+  Regra prática: o verde claro da logo é bonito e é o que aparece nas páginas
+  do livro, mas reprova em texto branco. Usar `--brand-green-strong` sempre que
+  houver texto por cima.
+*/
 :root {
+    --brand-blue: oklch(0.536 0.144 248);
+    --brand-blue-deep: oklch(0.585 0.109 238.5);
+    --brand-blue-light: oklch(0.718 0.123 233.9);
+    /* Fundo institucional escuro (painel de login). Sempre escuro nos dois
+       temas — é superfície de marca, não superfície de conteúdo —, então leva
+       texto branco fixo por cima: 16:1. */
+    --brand-blue-darkest: oklch(0.25 0.06 248);
+    --brand-green: oklch(0.673 0.139 151.9);
+    --brand-green-strong: oklch(0.515 0.129 149.6);
+    --brand-yellow: oklch(0.86 0.149 96.1);
+
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
+    --primary: var(--brand-blue);
+    --primary-foreground: oklch(1 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
+    /*
+      Estados semânticos das reservas. Antes existiam quatro definições
+      divergentes do que é "deferida" — SituacaoBadge usava green-50/200/700,
+      getStatusReservaColor usava green-500, calendar-slot-cell usava
+      green-100/300 e CalendarDiaMobile green-500. Nenhuma delas reagia ao modo
+      escuro. Aqui há uma definição por significado.
+
+      `-subtle` é o preenchimento pálido dos badges e `-accent` o texto/borda
+      que vai por cima dele; todos os pares foram medidos e passam AA
+      (5.9 a 6.7:1). Onde há texto branco sobre o tom sólido, também passa.
+
+      success e info apontam para os verdes e azuis da logo, então o estado da
+      reserva fala a língua da marca em vez de cores avulsas do Tailwind.
+    */
+    --success: var(--brand-green-strong);
+    --success-foreground: oklch(1 0 0);
+    --success-subtle: oklch(0.965 0.025 150);
+    --success-accent: oklch(0.45 0.12 150);
+
+    --warning: oklch(0.75 0.15 85);
+    --warning-foreground: oklch(0.145 0 0);
+    --warning-subtle: oklch(0.975 0.04 90);
+    --warning-accent: oklch(0.47 0.1 75);
+
+    --info: var(--brand-blue);
+    --info-foreground: oklch(1 0 0);
+    --info-subtle: oklch(0.965 0.025 248);
+    --info-accent: oklch(0.45 0.13 248);
+
     --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
+    /*
+      Era idêntico a --destructive: vermelho sobre vermelho, contraste 1:1.
+      UserSearchComboBox usava `hover:bg-destructive hover:text-destructive-foreground`
+      e o botão sumia ao passar o mouse.
+    */
+    --destructive-foreground: oklch(1 0 0);
+    --destructive-subtle: oklch(0.965 0.025 27);
+    --destructive-accent: oklch(0.5 0.19 27);
+
+    --neutral-subtle: oklch(0.97 0 0);
+    --neutral-accent: oklch(0.45 0 0);
+
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
+    /* O anel de foco herda a marca: é o retorno visual mais frequente do app. */
+    --ring: var(--brand-blue);
+
+    /* Gráficos percorrem a paleta da logo em vez das cores padrão do shadcn. */
+    --chart-1: var(--brand-blue);
+    --chart-2: var(--brand-green);
+    --chart-3: var(--brand-blue-light);
+    --chart-4: var(--brand-yellow);
+    --chart-5: var(--brand-blue-deep);
+
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-primary: var(--brand-blue);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    /*
+      Cinza neutro quase invisível (L 0.97, sem matiz) antes — hover e item
+      ativo do menu mal se distinguiam do fundo. Tingido com o matiz do
+      brand-blue (248) só que bem claro e dessaturado, para ficar sutil sem
+      virar um bloco azul chapado; o texto/ícone por cima vai na cor da marca
+      (~7:1 de contraste), não mais cinza genérico.
+    */
+    --sidebar-accent: oklch(0.94 0.02 248);
+    --sidebar-accent-foreground: var(--brand-blue);
     --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    --sidebar-ring: var(--brand-blue);
 }
 
 .dark {
+    /*
+      O azul da marca (L 0.536) é escuro demais para o fundo escuro — daria
+      cerca de 2:1 e sumiria. O modo escuro usa o azul claro do capelo, que
+      rende 6.27:1 sobre o fundo, e leva texto PRETO por cima (8.59:1), não
+      branco.
+
+      O verde claro também sobe de posto aqui: sobre fundo escuro ele finalmente
+      tem contraste, então é ele que fica em `--brand-green-strong`.
+    */
+    --brand-blue: oklch(0.718 0.123 233.9);
+    --brand-blue-deep: oklch(0.585 0.109 238.5);
+    --brand-blue-light: oklch(0.8 0.1 230);
+    --brand-green: oklch(0.673 0.139 151.9);
+    --brand-green-strong: oklch(0.673 0.139 151.9);
+    --brand-yellow: oklch(0.86 0.149 96.1);
+
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.145 0 0);
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.145 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
+    --primary: var(--brand-blue);
+    --primary-foreground: oklch(0.145 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
+    /*
+      No escuro os papéis se invertem: o tom `-subtle` deixa de ser um pastel
+      claro e vira uma versão dessaturada e escura da cor, com o `-accent`
+      claro por cima. Manter os pastéis do modo claro aqui produziria blocos
+      brilhantes no meio da interface escura.
+    */
+    --success: oklch(0.673 0.139 151.9);
+    --success-foreground: oklch(0.145 0 0);
+    --success-subtle: oklch(0.28 0.05 150);
+    --success-accent: oklch(0.8 0.12 150);
+
+    --warning: oklch(0.8 0.14 88);
+    --warning-foreground: oklch(0.145 0 0);
+    --warning-subtle: oklch(0.3 0.05 88);
+    --warning-accent: oklch(0.85 0.12 90);
+
+    --info: oklch(0.718 0.123 233.9);
+    --info-foreground: oklch(0.145 0 0);
+    --info-subtle: oklch(0.29 0.05 240);
+    --info-accent: oklch(0.82 0.1 235);
+
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(1 0 0);
+    --destructive-subtle: oklch(0.29 0.08 27);
+    --destructive-accent: oklch(0.8 0.13 27);
+
+    --neutral-subtle: oklch(0.269 0 0);
+    --neutral-accent: oklch(0.78 0 0);
+
     --border: oklch(0.269 0 0);
     --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
+    --ring: var(--brand-blue);
+
+    --chart-1: var(--brand-blue);
+    --chart-2: var(--brand-green);
+    --chart-3: var(--brand-blue-light);
+    --chart-4: var(--brand-yellow);
+    --chart-5: var(--brand-blue-deep);
+
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
+    /*
+      Era `oklch(0.985 0 0)` em cima de `--sidebar-primary-foreground` idêntico:
+      branco sobre branco, contraste 1:1 — o item ativo da sidebar ficava
+      invisível no modo escuro.
+    */
+    --sidebar-primary: var(--brand-blue);
+    --sidebar-primary-foreground: oklch(0.145 0 0);
+    /* Mesmo tingimento do claro, invertido: fundo escuro com leve matiz azul,
+       texto no azul claro do modo escuro (--brand-blue já resolvido acima). */
+    --sidebar-accent: oklch(0.3 0.03 248);
+    --sidebar-accent-foreground: var(--brand-blue);
     --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar-ring: var(--brand-blue);
 }
 
 @layer base {

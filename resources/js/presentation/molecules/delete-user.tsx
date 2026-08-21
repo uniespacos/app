@@ -1,16 +1,18 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
+import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import HeadingSmall from '@/presentation/atoms/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Modal } from '@/presentation/molecules/Modal';
 
 export default function DeleteUser() {
+    const [open, setOpen] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
 
@@ -26,6 +28,7 @@ export default function DeleteUser() {
     };
 
     const closeModal = () => {
+        setOpen(false);
         clearErrors();
         reset();
     };
@@ -34,59 +37,53 @@ export default function DeleteUser() {
         <div className="space-y-6">
             <HeadingSmall title="Excluir conta" description="Exclua sua conta e todos os seus recursos" />
 
-            <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
-                <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
+            <div className="space-y-4 rounded-lg border border-destructive/25 bg-destructive-subtle p-4">
+                <div className="relative space-y-0.5 text-destructive-accent">
                     <p className="font-medium">Aviso</p>
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Excluir conta</Button>
-                    </DialogTrigger>
+                <Button variant="destructive" onClick={() => setOpen(true)}>
+                    Excluir conta
+                </Button>
 
-                    <DialogContent>
-                        <DialogTitle>Tem certeza que deseja excluir sua conta?</DialogTitle>
+                <Modal
+                    open={open}
+                    onOpenChange={setOpen}
+                    title="Tem certeza que deseja excluir sua conta?"
+                    description="Uma vez que sua conta for excluída, todos os seus recursos e dados serão permanentemente removidos. Por favor, digite sua senha para confirmar que deseja excluir permanentemente sua conta."
+                >
+                    <form className="space-y-6" onSubmit={deleteUser}>
+                        <div className="grid gap-2">
+                            <Label htmlFor="password" className="sr-only">
+                                Senha
+                            </Label>
 
-                        <DialogDescription>
-                            Uma vez que sua conta for excluída, todos os seus recursos e dados serão permanentemente removidos. Por favor, digite sua
-                            senha para confirmar que deseja excluir permanentemente sua conta.
-                        </DialogDescription>
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Senha"
+                                autoComplete="current-password"
+                            />
 
-                        <form className="space-y-6" onSubmit={deleteUser}>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="sr-only">
-                                    Senha
-                                </Label>
+                            <InputError message={errors.password} />
+                        </div>
 
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Senha"
-                                    autoComplete="current-password"
-                                />
+                        <DialogFooter className="gap-2">
+                            <Button type="button" variant="outline" onClick={closeModal}>
+                                Cancelar
+                            </Button>
 
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancelar
-                                    </Button>
-                                </DialogClose>
-
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Excluir conta</button>
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                            <Button variant="destructive" disabled={processing} asChild>
+                                <button type="submit">Excluir conta</button>
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Modal>
             </div>
         </div>
     );

@@ -1,17 +1,20 @@
 import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { Camera, Trash2 } from 'lucide-react';
+import { FormEventHandler, useRef, useState } from 'react';
 
-import DeleteUser from '@/presentation/molecules/delete-user';
-import HeadingSmall from '@/presentation/atoms/heading-small';
-import InputError from '@/presentation/atoms/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import HeadingSmall from '@/presentation/atoms/heading-small';
+import InputError from '@/presentation/atoms/input-error';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
+import DeleteUser from '@/presentation/molecules/delete-user';
+import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import AppLayout from '@/presentation/templates/app-layout';
 import SettingsLayout from '@/presentation/templates/settings/layout';
-import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,12 +23,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const ROLE_LABEL: Record<string, string> = {
+    institucional: 'Institucional',
+    gestor: 'Gestor',
+    comum: 'Usuário',
+};
+
 type ProfileForm = {
     name: string;
     email: string;
     phone: string;
     instituicao_id: string;
     setor_id: string;
+    photo: File | null;
+    remove_photo: boolean;
+    _method: 'patch';
 };
 
 export default function Profile({
@@ -36,16 +48,43 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
     instituicaos: Instituicao[];
-    }) {
+}) {
     const { auth } = usePage<SharedData>().props;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
         phone: auth.user.telefone || '',
         instituicao_id: '',
         setor_id: auth.user.setor_id?.toString() || '',
+        photo: null,
+        remove_photo: false,
+        _method: 'patch',
     });
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        setData((prevData) => ({ ...prevData, photo: file, remove_photo: false }));
+        setPhotoPreview(URL.createObjectURL(file));
+    };
+
+    const handleRemovePhoto = () => {
+        setData((prevData) => ({ ...prevData, photo: null, remove_photo: true }));
+        setPhotoPreview(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const previewUser = photoPreview
+        ? { ...auth.user, profile_pic: photoPreview }
+        : { ...auth.user, profile_pic: data.remove_photo ? undefined : auth.user.profile_pic };
 
     const formatPhoneNumber = (value: string) => {
         const cleaned = value.replace(/\D/g, '');
@@ -76,8 +115,16 @@ export default function Profile({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('settings.profile.update'), {
+        // POST com _method=patch (não PATCH puro): o PHP só popula $_POST/$_FILES em
+        // corpos multipart/form-data quando o verbo HTTP é POST. Um PATCH puro com o
+        // arquivo da foto chega ao Laravel como se todos os campos estivessem vazios.
+        post(route('settings.profile.update'), {
+            forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => {
+                setPhotoPreview(null);
+                setData((prevData) => ({ ...prevData, photo: null, remove_photo: false }));
+            },
         });
     };
 
@@ -86,6 +133,40 @@ export default function Profile({
             <Head title="Configurações de perfil" />
 
             <SettingsLayout>
+                <div className="flex items-center gap-4 border-b pb-6">
+                    <div className="relative">
+                        <UserAvatar user={previewUser} className="h-16 w-16 text-lg" />
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="bg-primary text-primary-foreground border-background absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2"
+                            aria-label="Alterar foto de perfil"
+                        >
+                            <Camera className="h-3 w-3" />
+                        </button>
+                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{auth.user.name}</p>
+                        <p className="text-muted-foreground truncate text-sm">{auth.user.email}</p>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                            {auth.user.roles.map((role) => (
+                                <Badge key={role} variant="secondary">
+                                    {ROLE_LABEL[role] ?? role}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+
+                    {(previewUser.profile_pic || auth.user.profile_pic) && !data.remove_photo && (
+                        <Button type="button" variant="ghost" size="sm" onClick={handleRemovePhoto}>
+                            <Trash2 className="mr-1.5 h-4 w-4" />
+                            Remover foto
+                        </Button>
+                    )}
+                </div>
+
                 <div className="space-y-6">
                     <HeadingSmall title="Informações do perfil" description="Atualize seu nome, endereço de e-mail, telefone e setor" />
 
@@ -140,7 +221,7 @@ export default function Profile({
                         </div>
 
                         <div className="border-t pt-6">
-                            <h3 className="mb-4 text-lg font-medium text-gray-900">Informações Institucionais</h3>
+                            <h3 className="text-foreground mb-4 text-lg font-medium">Informações Institucionais</h3>
                             <SeletorInstituicao
                                 instituicaos={instituicaos}
                                 processing={processing}
@@ -159,14 +240,14 @@ export default function Profile({
                                         href={route('verification.send')}
                                         method="post"
                                         as="button"
-                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                        className="text-foreground decoration-border underline underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                                     >
                                         Clique aqui para reenviar o e-mail de verificação.
                                     </Link>
                                 </p>
 
                                 {status === 'verification-link-sent' && (
-                                    <div className="mt-2 text-sm font-medium text-green-600">
+                                    <div className="text-success-accent mt-2 text-sm font-medium">
                                         Um novo link de verificação foi enviado para seu e-mail.
                                     </div>
                                 )}
@@ -183,7 +264,7 @@ export default function Profile({
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Salvo</p>
+                                <p className="text-muted-foreground text-sm">Salvo</p>
                             </Transition>
                         </div>
                     </form>

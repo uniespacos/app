@@ -1,7 +1,6 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Dialog } from '@/components/ui/dialog';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -113,7 +112,7 @@ export default function CadastroEspacoPage() {
                 <div className="container mx-auto space-y-6 py-6">
                     <div className="container mx-auto space-y-6 p-6">
                         <GenericHeader titulo={pageTitulo} descricao={pageDescricao} />
-                        <Dialog open={isAddAndarDialogOpen} onOpenChange={setIsAddAndarDialogOpen}>
+                        <>
                             <Card className="mb-6">
                                 <CardContent className="pt-6">
                                     <form onSubmit={onSubmit} className="space-y-6">
@@ -156,8 +155,10 @@ export default function CadastroEspacoPage() {
                                     </form>
                                 </CardContent>
                             </Card>
-                            {data.modulo_id && <AddAndarDialog moduloSelecionado={data.modulo_id} setIsDialogOpen={setIsAddAndarDialogOpen} />}
-                        </Dialog>
+                            {data.modulo_id && (
+                                <AddAndarDialog open={isAddAndarDialogOpen} moduloSelecionado={data.modulo_id} setIsDialogOpen={setIsAddAndarDialogOpen} />
+                            )}
+                        </>
                     </div>
                 </div>
             </div>

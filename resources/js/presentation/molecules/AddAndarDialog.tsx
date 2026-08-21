@@ -1,9 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormField } from '@/presentation/molecules/FormField';
+import { Modal } from '@/presentation/molecules/Modal';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -75,11 +76,12 @@ function MultiSelect({ value, onValueChange, processing }: { value: string[]; on
 }
 
 interface AddAndarDialogProps {
+    open: boolean;
     moduloSelecionado: number;
     setIsDialogOpen: (isOpen: boolean) => void;
 }
 
-export function AddAndarDialog({ moduloSelecionado, setIsDialogOpen }: AddAndarDialogProps) {
+export function AddAndarDialog({ open, moduloSelecionado, setIsDialogOpen }: AddAndarDialogProps) {
     const andaresPredefinidos = ['Térreo', ...Array.from({ length: 10 }, (_, i) => `${i + 1}º Andar`)];
     const [nomeNovoAndar, setNomeNovoAndar] = useState('');
     const [tipoAcessoNovoAndar, setTipoAcessoNovoAndar] = useState<string[]>([]);
@@ -108,13 +110,23 @@ export function AddAndarDialog({ moduloSelecionado, setIsDialogOpen }: AddAndarD
     };
 
     return (
-        <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle>Adicionar Novo Andar</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                    <Label htmlFor="novo-andar-nome">Nome do Andar</Label>
+        <Modal
+            open={open}
+            onOpenChange={setIsDialogOpen}
+            title="Adicionar Novo Andar"
+            footer={
+                <>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleAddNovoAndar} disabled={isSubmitting || !nomeNovoAndar || tipoAcessoNovoAndar.length === 0}>
+                        {isSubmitting ? 'Adicionando...' : 'Adicionar'}
+                    </Button>
+                </>
+            }
+        >
+            <div className="grid gap-4">
+                <FormField label="Nome do Andar" htmlFor="novo-andar-nome">
                     <Select value={nomeNovoAndar} onValueChange={setNomeNovoAndar}>
                         <SelectTrigger id="novo-andar-nome">
                             <SelectValue placeholder="Selecione um andar" />
@@ -127,20 +139,12 @@ export function AddAndarDialog({ moduloSelecionado, setIsDialogOpen }: AddAndarD
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
+                </FormField>
                 <div className="space-y-2">
                     <Label>Tipos de Acesso</Label>
                     <MultiSelect processing={isSubmitting} value={tipoAcessoNovoAndar} onValueChange={setTipoAcessoNovoAndar} />
                 </div>
             </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
-                    Cancelar
-                </Button>
-                <Button onClick={handleAddNovoAndar} disabled={isSubmitting || !nomeNovoAndar || tipoAcessoNovoAndar.length === 0}>
-                    {isSubmitting ? 'Adicionando...' : 'Adicionar'}
-                </Button>
-            </DialogFooter>
-        </DialogContent>
+        </Modal>
     );
 }

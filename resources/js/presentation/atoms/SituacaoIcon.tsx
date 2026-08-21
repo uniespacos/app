@@ -9,10 +9,10 @@ interface SituacaoIconProps {
 export function SituacaoIcon({ situacao, className = 'h-4 w-4' }: SituacaoIconProps) {
     switch (situacao) {
         case 'deferida':
-            return <CheckCircle className={`${className} text-green-600`} />;
+            return <CheckCircle className={`${className} text-success-accent`} />;
         case 'indeferida':
-            return <XCircle className={`${className} text-red-600`} />;
+            return <XCircle className={`${className} text-destructive`} />;
         default:
-            return <AlertCircle className={`${className} text-yellow-600`} />;
+            return <AlertCircle className={`${className} text-warning-accent`} />;
     }
 }

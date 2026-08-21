@@ -71,15 +71,15 @@ export default function Register() {
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-center">
                                 <img src="/_img/uniespacos_logo.png" alt="Logo UniEspaços" className="h-100 w-auto" />
-                                <p className="text-lg text-gray-600">Crie sua conta para começar a usar nossa plataforma</p>
+                                <p className="text-lg text-muted-foreground">Crie sua conta para começar a usar nossa plataforma</p>
                             </div>
                         </div>
 
                         {/* Form Section */}
-                        <div className="rounded-2xl bg-white p-8 shadow-xl">
+                        <div className="rounded-2xl bg-card p-8 shadow-xl">
                             <div className="mb-8">
-                                <h2 className="mb-2 text-2xl font-semibold text-gray-900">Criar conta</h2>
-                                <p className="text-gray-600">Preencha os dados abaixo para se cadastrar</p>
+                                <h2 className="mb-2 text-2xl font-semibold text-foreground">Criar conta</h2>
+                                <p className="text-muted-foreground">Preencha os dados abaixo para se cadastrar</p>
                             </div>
 
                             <FormRegistroUsuario
@@ -91,7 +91,7 @@ export default function Register() {
                                 onSubmit={handleSubmit}
                             />
 
-                            <div className="mt-6 border-t border-gray-200 pt-6">
+                            <div className="mt-6 border-t border-border pt-6">
                                 <Button variant="outline" className="w-full bg-transparent" onClick={handleBackToLogin}>
                                     <ArrowLeft className="mr-2 h-4 w-4" />
                                     Voltar para o login

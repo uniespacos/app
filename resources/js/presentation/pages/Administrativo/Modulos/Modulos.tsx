@@ -21,11 +21,17 @@ const breadcrumbs = [
     },
 ];
 
+/*
+ * Distinção categórica, não semântica: "térreo" não é sucesso nem "escada" é
+ * informação. A atribuição é arbitrária — como já era com purple/orange —, mas
+ * agora usa os tokens do tema, então funciona no modo escuro e fica dentro da
+ * paleta da marca.
+ */
 const tiposAcessoColors: Record<string, string> = {
-    terreo: 'bg-green-100 text-green-800 border-green-200',
-    escada: 'bg-blue-100 text-blue-800 border-blue-200',
-    elevador: 'bg-purple-100 text-purple-800 border-purple-200',
-    rampa: 'bg-orange-100 text-orange-800 border-orange-200',
+    terreo: 'bg-success-subtle text-success-accent border-success/25',
+    escada: 'bg-info-subtle text-info-accent border-info/25',
+    elevador: 'bg-warning-subtle text-warning-accent border-warning/25',
+    rampa: 'bg-neutral-subtle text-neutral-accent border-neutral-accent/25',
 };
 
 export default function ModulosPage() {
@@ -88,7 +94,7 @@ export default function ModulosPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Buscar</Label>
+                                        <Label className="text-sm font-medium">Unidade</Label>
                                         <Select value={filtroUnidade} onValueChange={setFiltroUnidade}>
                                             <SelectTrigger className="w-full sm:w-[200px]">
                                                 <SelectValue placeholder="Filtrar por unidade" />
@@ -153,7 +159,7 @@ export default function ModulosPage() {
                                                                         e.stopPropagation();
                                                                         router.get(route('institucional.modulos.edit', { modulo: modulo.id }));
                                                                     }}
-                                                                    className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                                                    className="text-info-accent hover:bg-info-subtle hover:text-info-accent"
                                                                 >
                                                                     <Edit className="h-4 w-4" />
                                                                 </Button>
@@ -164,7 +170,7 @@ export default function ModulosPage() {
                                                                         e.stopPropagation();
                                                                         setRemoverModulo(modulo);
                                                                     }}
-                                                                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                                                    className="text-destructive hover:bg-destructive-subtle hover:text-destructive"
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </Button>
@@ -227,7 +233,7 @@ export default function ModulosPage() {
                                                                                                         variant="outline"
                                                                                                         className={
                                                                                                             tiposAcessoColors[tipo] ||
-                                                                                                            'bg-gray-100 text-gray-800'
+                                                                                                            'bg-muted text-foreground'
                                                                                                         }
                                                                                                     >
                                                                                                         {tipo}

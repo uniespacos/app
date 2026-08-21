@@ -12,7 +12,9 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -29,11 +31,15 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Display the users listing with permission types, institutions, and sectors.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', User::class);
 
-        $data = $this->service->getIndexData(Auth::user());
+        $data = $this->service->getIndexData(
+            Auth::user(),
+            $request->string('search')->trim()->value() ?: null,
+            $request->integer('setor_id') ?: null,
+        );
 
         return Inertia::render('Administrativo/Usuarios/Usuarios', $data);
     }
@@ -58,10 +64,56 @@ class InstitucionalUsuarioController extends Controller
     {
         $this->authorize('update', $usuario);
 
-        $usuario->update($request->validated());
+        $validated = $request->validated();
+        $validated['telefone'] = $validated['phone'] ?? $usuario->telefone;
+        unset($validated['phone']);
 
-        return redirect()->route('institucional.usuarios.index')
-            ->with('success', 'Usuário atualizado com sucesso.');
+        $usuario->update($validated);
+
+        // back() em vez de route(index): preserva a busca/página em que o
+        // admin estava, que o redirect fixo descartava.
+        return back()->with('success', 'Usuário atualizado com sucesso.');
+    }
+
+    /**
+     * Resend the email verification notification to the given user.
+     */
+    public function resendVerification(User $usuario): RedirectResponse
+    {
+        $this->authorize('update', $usuario);
+
+        try {
+            $this->service->resendVerificationEmail($usuario);
+
+            return back()->with('success', 'E-mail de verificação reenviado.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Send a password reset link to the given user.
+     */
+    public function sendPasswordReset(User $usuario): RedirectResponse
+    {
+        $this->authorize('update', $usuario);
+
+        $sent = $this->service->sendPasswordResetLink($usuario);
+
+        return back()->with(
+            $sent ? 'success' : 'error',
+            $sent ? 'Link de redefinição de senha enviado.' : 'Não foi possível enviar o link de redefinição.',
+        );
+    }
+
+    /**
+     * Return the data the permission modal needs for a single user, on demand.
+     */
+    public function permissionContext(User $usuario): JsonResponse
+    {
+        $this->authorize('updatePermissions', $usuario);
+
+        return response()->json($this->service->getPermissionContext($usuario));
     }
 
     /**
@@ -74,8 +126,7 @@ class InstitucionalUsuarioController extends Controller
         try {
             $this->service->updatePermissions($user, $request->validated());
 
-            return redirect()->route('institucional.usuarios.index')
-                ->with('success', 'Permissões atualizadas com sucesso.');
+            return back()->with('success', 'Permissões atualizadas com sucesso.');
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar permissões do usuário', [
                 'usuario_alvo_id' => $user->id,
@@ -101,8 +152,7 @@ class InstitucionalUsuarioController extends Controller
         try {
             $this->service->delete($usuario);
 
-            return redirect()->route('institucional.usuarios.index')
-                ->with('success', 'Usuário excluído com sucesso.');
+            return back()->with('success', 'Usuário excluído com sucesso.');
         } catch (\Exception $e) {
             Log::error('Erro ao excluir usuário', [
                 'usuario_alvo_id' => $usuario->id,

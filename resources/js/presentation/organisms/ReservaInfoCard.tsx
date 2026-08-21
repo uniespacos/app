@@ -25,14 +25,14 @@ export function ReservaInfoCard({ reserva, children }: ReservaInfoCardProps) {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div>
-                    <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
-                    <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{reserva.descricao}</p>
+                    <h4 className="mb-2 font-medium text-foreground">Descrição</h4>
+                    <p className="rounded-lg bg-muted/50 p-3 text-foreground">{reserva.descricao}</p>
                 </div>
                 <Separator />
                 <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-gray-500" />
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-sm text-gray-500">Período</p>
+                        <p className="text-sm text-muted-foreground">Período</p>
                         <p className="font-medium">
                             {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
                         </p>

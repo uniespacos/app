@@ -154,7 +154,7 @@ export default function ModuloForm({
                                     ))}
                                 </SelectContent>
                             </SelectUI>
-                            {errors.unidade_id && <p className="mt-1 text-sm text-red-500">{errors.unidade_id}</p>}
+                            {errors.unidade_id && <p className="mt-1 text-sm text-destructive">{errors.unidade_id}</p>}
                         </div>
 
                         {/* Input Nome do Módulo */}
@@ -166,7 +166,7 @@ export default function ModuloForm({
                                 onChange={(e) => setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value }))}
                                 placeholder="Ex: Bloco Administrativo"
                             />
-                            {errors.nome && <p className="mt-1 text-sm text-red-500">{errors.nome}</p>}
+                            {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
                         </div>
                     </CardContent>
                 </Card>

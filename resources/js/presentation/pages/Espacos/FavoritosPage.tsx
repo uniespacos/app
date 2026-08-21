@@ -54,9 +54,9 @@ export default function FavoritosPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-10 text-center text-gray-500">
+                            <div className="py-10 text-center text-muted-foreground">
                                 <p>Você ainda não favoritou nenhum espaço. Explore e adicione seus favoritos!</p>
-                                <Link href={route('espacos.index')} className="mt-4 block text-blue-500 hover:underline">
+                                <Link href={route('espacos.index')} className="mt-4 block text-info-accent hover:underline">
                                     Ver todos os espaços
                                 </Link>
                             </div>

@@ -1,19 +1,21 @@
 import DeleteItem from '@/presentation/molecules/delete-item';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { formatDate } from '@/lib/utils';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Edit, FileText, XCircle } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
+import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
 import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
-import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
+import { comSituacaoEfetivaDoGestor } from '@/application/reservas/helpers/reserva-helpers';
 
 interface ReservasListProps {
     reservaToShow?: Reserva | undefined;
@@ -24,12 +26,17 @@ interface ReservasListProps {
     routeName: string;
 }
 // Componente principal da lista de reservas
-export function ReservasList({ paginator, fallback, isGestor, user, reservaToShow, routeName }: ReservasListProps) {
+export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName }: ReservasListProps) {
     const { data: reservas, links } = paginator;
+    const isMobile = useIsMobile();
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
-    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
-        isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
+    // A ordem já vem certa do backend (filtro "ordenar", issue de critério de
+    // ordenação) — aqui só recalcula a situação efetiva exibida ao gestor
+    // (parcial/em_analise por horário), sem reordenar a página no cliente.
+    const reservasFiltradas = useMemo(
+        () => (isGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas),
+        [isGestor, reservas],
     );
 
     useEffect(() => {
@@ -39,12 +46,6 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
             setSelectedReserva(undefined);
         }
     }, [reservaToShow]);
-
-    useEffect(() => {
-        setReservasFiltradas(
-            isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
-        );
-    }, [isGestor, reservas, user?.id]);
 
     if (reservas.length === 0) {
         return fallback;
@@ -89,6 +90,52 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
         );
     };
 
+    if (isMobile) {
+        return (
+            <div className="space-y-4">
+                <div className="space-y-3">
+                    {reservasFiltradas.map((reserva) => (
+                        <ReservaCardMobile
+                            key={reserva.id}
+                            reserva={reserva}
+                            isGestor={isGestor}
+                            onDetalhes={handleAbrirDetalhes}
+                            onAvaliar={handleAvaliarButton}
+                            onEditar={(id) => router.get(`reservas/${id}/edit`)}
+                            onCancelar={setRemoverReserva}
+                        />
+                    ))}
+                </div>
+                {selectedReserva && (
+                    <ReservaDetalhes
+                        isOpen={!!selectedReserva}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                handleFecharDetalhes();
+                            }
+                        }}
+                        isGestor={isGestor}
+                        selectedReserva={selectedReserva}
+                        setRemoverReserva={setRemoverReserva}
+                        routeName={routeName}
+                    />
+                )}
+                {removerReserva && (
+                    <DeleteItem
+                        isOpen={(open) => {
+                            if (!open) {
+                                setRemoverReserva(null);
+                            }
+                        }}
+                        itemName={removerReserva.titulo}
+                        route={route('reservas.destroy', { reserva: removerReserva.id })}
+                    />
+                )}
+                <PaginacaoListas links={links} />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-4">
             <div className="overflow-hidden rounded-md border">
@@ -97,7 +144,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                         <TableRow>
                             <TableHead>Título</TableHead>
                             <TableHead className="hidden md:table-cell">Local</TableHead>
-                            <TableHead className="hidden lg:table-cell">Periodo</TableHead>
+                            <TableHead className="hidden lg:table-cell">Período</TableHead>
                             <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
@@ -129,34 +176,34 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
-                                        {/* ALTERADO: O botão agora chama a função handleAbrirDetalhes */}
-                                        <Button variant="outline" onClick={() => handleAbrirDetalhes(reserva)}>
-                                            <FileText className="mr-2 h-4 w-4" />
+                                    <div className="flex flex-wrap justify-end gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => handleAbrirDetalhes(reserva)}>
+                                            <FileText className="mr-1.5 h-4 w-4" />
                                             Detalhes
                                         </Button>
 
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
-                                                <Button onClick={() => handleAvaliarButton(reserva.id)} variant="outline">
-                                                    <Edit className="h-4 w-4" />
+                                                <Button variant="outline" size="sm" onClick={() => handleAvaliarButton(reserva.id)}>
+                                                    <Edit className="mr-1.5 h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
                                             ) : (
                                                 <>
                                                     {reserva.can_update && (
                                                         <Button
+                                                            variant="outline"
+                                                            size="sm"
                                                             onClick={() => {
                                                                 router.get(`reservas/${reserva.id}/edit`);
                                                             }}
-                                                            variant="outline"
                                                         >
-                                                            <Edit />
+                                                            <Edit className="mr-1.5 h-4 w-4" />
                                                             Editar
                                                         </Button>
                                                     )}
-                                                    <Button onClick={() => setRemoverReserva(reserva)} variant="destructive">
-                                                        <XCircle className="text-white" />
+                                                    <Button variant="destructive" size="sm" onClick={() => setRemoverReserva(reserva)}>
+                                                        <XCircle className="mr-1.5 h-4 w-4" />
                                                         Cancelar
                                                     </Button>
                                                 </>

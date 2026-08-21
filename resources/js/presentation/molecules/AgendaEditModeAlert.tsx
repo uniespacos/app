@@ -6,10 +6,10 @@ type AgendaEditModeAlertProps = { reserva: Reserva };
 
 export default function AgendaEditModeAlert({ reserva }: AgendaEditModeAlertProps) {
     return (
-        <Alert variant="default" className="border-yellow-400 bg-yellow-50 text-yellow-800">
-            <Pencil className="h-4 w-4 !text-yellow-600" />
-            <AlertTitle className="font-semibold !text-yellow-900">Modo de Edição</AlertTitle>
-            <AlertDescription className="!text-yellow-700">
+        <Alert variant="default" className="border-warning/25 bg-warning-subtle text-warning-accent">
+            <Pencil className="h-4 w-4 !text-warning-accent" />
+            <AlertTitle className="font-semibold !text-warning-accent">Modo de Edição</AlertTitle>
+            <AlertDescription className="!text-warning-accent">
                 Você está editando a reserva: <strong>Titulo: {reserva.titulo} </strong> As alterações nos horários e detalhes serão salvas nesta
                 reserva.
             </AlertDescription>

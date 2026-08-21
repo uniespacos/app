@@ -82,6 +82,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('usuarios', InstitucionalUsuarioController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::put('usuarios/{user}/edit-permissions', [InstitucionalUsuarioController::class, 'updatePermissions'])
             ->name('usuarios.updatepermissions');
+        Route::get('usuarios/{usuario}/contexto-permissoes', [InstitucionalUsuarioController::class, 'permissionContext'])
+            ->name('usuarios.permission-context');
+        Route::post('usuarios/{usuario}/resend-verification', [InstitucionalUsuarioController::class, 'resendVerification'])
+            ->name('usuarios.resend-verification');
+        Route::post('usuarios/{usuario}/reset-password', [InstitucionalUsuarioController::class, 'sendPasswordReset'])
+            ->name('usuarios.reset-password');
     });
 
     // Gestão de Instituições

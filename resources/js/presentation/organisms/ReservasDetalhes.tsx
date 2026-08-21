@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { diasDaSemana, formatDate } from '@/lib/utils';
+import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
+import AvaliacaoGestoresResumo from '@/presentation/molecules/AvaliacaoGestoresResumo';
+import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
+import { Modal } from '@/presentation/molecules/Modal';
 import { Agenda, Horario, Reserva, SlotCalendario } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { DialogProps } from '@radix-ui/react-dialog';
 import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, subDays } from 'date-fns';
-import { CalendarDays, Clock, Edit, FileText, Home, Loader2, User, XCircle } from 'lucide-react'; // Adicionado Loader2
+import { CalendarDays, Clock, Edit, ExternalLink, FileText, Home, Loader2, User, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
-import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
-import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
+
 type ReservaDetalhesProps = {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -19,17 +20,9 @@ type ReservaDetalhesProps = {
     isGestor?: boolean;
     setRemoverReserva: (selectedReserva: Reserva) => void;
     routeName: string; // NOVO: Adicione esta prop
-} & DialogProps;
+};
 
-export default function ReservaDetalhes({
-    isOpen,
-    onOpenChange,
-    selectedReserva,
-    isGestor,
-    setRemoverReserva,
-    routeName,
-    ...props
-}: ReservaDetalhesProps) {
+export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, routeName }: ReservaDetalhesProps) {
     const { semana } = usePage().props as any;
 
     // NOVO: Estado para controlar o carregamento dos dados da semana
@@ -76,6 +69,7 @@ export default function ReservaDetalhes({
     );
 
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
+    const espaco = selectedReserva.horarios[0]?.agenda?.espaco;
 
     // ALTERADO: A função de navegação agora controla o estado de loading
     const navegarParaSemana = (novaData: Date) => {
@@ -106,105 +100,122 @@ export default function ReservaDetalhes({
     const podeAvancar = useMemo(() => isBefore(endOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataFinalReserva), [dataFinalReserva, semanaVisivel]);
 
     return (
-        <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] min-w-[80vw] overflow-y-auto">
-                {/* ... DialogHeader, Descrição, etc. ... */}
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5" />
-                        {selectedReserva.titulo}
-                    </DialogTitle>
-                    <DialogDescription className="flex-col justify-between">
-                        <span className="flex items-center gap-2 p-1">
-                            <User className="h-4 w-4" />
-                            Solicitado por: {selectedReserva.user?.name}
-                        </span>
-                        <span className="flex items-center gap-2 p-1">
-                            <Home className="h-4 w-4" />
-                            Espaço: {selectedReserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
-                        </span>
-                        <span className="flex items-center gap-2 p-1">
-                            <SituacaoIndicator situacao={selectedReserva.situacao} />
-                        </span>
-                    </DialogDescription>
-                </DialogHeader>
-                <span>
-                    <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
-                    <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{selectedReserva.descricao}</p>
+        <Modal
+            open={isOpen}
+            onOpenChange={onOpenChange}
+            size="xl"
+            className="max-h-[90vh] overflow-y-auto sm:max-w-[80vw]"
+            title={
+                <span className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    {selectedReserva.titulo}
                 </span>
-                <Separator />
-                <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-gray-500" />
-                    <div>
-                        <p className="text-sm text-gray-500">Período Total da Reserva</p>
-                        <p className="font-medium">
-                            {formatDate(selectedReserva.data_inicial)} até {formatDate(selectedReserva.data_final)}
-                        </p>
-                    </div>
-                </div>
-                <Separator />
-                <div className="mb-4 space-y-4">
-                    <h4 className="flex items-center gap-2 font-medium text-gray-900">
-                        <Clock className="h-4 w-4" />
-                        Horários Solicitados
-                    </h4>
-
-                    {/* NOVO: Wrapper para o indicador de loading sobre o calendário */}
-                    <div className="relative mb-4 space-y-4">
-                        <AgendaNavegacao
-                            semanaAtual={semanaVisivel}
-                            onAnterior={handleSemanaAnterior}
-                            onProxima={handleProximaSemana}
-                            desabilitarAnterior={!podeVoltar}
-                            desabilitarProxima={!podeAvancar}
-                        />
-                        <CalendarReservationDetails
-                            agendas={agendas}
-                            diasSemana={diasDaSemana(semanaVisivel, new Date())}
-                            slotsSolicitados={slotsSelecao}
-                        />
-                        {isLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
-                                <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                            </div>
-                        )}
-                    </div>
-                </div>
-                {/* ... Restante do Dialog (Justificativa, Footer, etc.) ... */}
-                <Separator />
-                {justificativaReserva && (
-                    <div>
-                        <h4 className="mb-2 font-medium text-red-900">Justificativa do indeferimento</h4>
-                        <p className="rounded-lg bg-red-50 p-3 text-red-700">{justificativaReserva}</p>
-                        <Separator className="mt-10" />
-                    </div>
-                )}
-                {selectedReserva.observacao && (
-                    <div>
-                        <h4 className="mb-2 font-medium text-blue-900">Observação</h4>
-                        <p className="rounded-lg bg-blue-50 p-3 text-blue-700">{selectedReserva.observacao}</p>
-                        <Separator className="mt-5" />
-                    </div>
-                )}
-                <DialogFooter>
-                    {isGestor ? (
-                        <Button variant="outline" onClick={() => router.get(`/gestor/reservas/${selectedReserva.id}`)}>
-                            <Edit className="mr-1 h-4 w-4" /> Avaliar
-                        </Button>
-                    ) : (
-                        <div className="flex gap-2">
-                            {selectedReserva.can_update && (
-                                <Button variant="outline" onClick={() => router.get(route('reservas.edit', selectedReserva.id))}>
-                                    <Edit className="mr-1 h-4 w-4" /> Editar
-                                </Button>
-                            )}
-                            <Button variant="destructive" onClick={() => setRemoverReserva(selectedReserva)}>
-                                <XCircle className="mr-1 h-4 w-4" /> Cancelar
+            }
+            description={
+                <span className="flex flex-col justify-between">
+                    <span className="flex items-center gap-2 p-1">
+                        <User className="h-4 w-4" />
+                        Solicitado por: {selectedReserva.user?.name}
+                    </span>
+                    <span className="flex items-center gap-2 p-1">
+                        <Home className="h-4 w-4" />
+                        Espaço: {espaco?.nome ?? ' '}
+                        {espaco && (
+                            <Button
+                                variant="link"
+                                size="sm"
+                                className="h-auto p-0 text-xs"
+                                onClick={() => router.get(route('espacos.show', espaco.id))}
+                            >
+                                Ver agenda do espaço <ExternalLink className="ml-1 h-3 w-3" />
                             </Button>
+                        )}
+                    </span>
+                    <span className="flex items-center gap-2 p-1">
+                        <SituacaoIndicator situacao={selectedReserva.situacao} />
+                    </span>
+                </span>
+            }
+            footer={
+                isGestor ? (
+                    <Button variant="outline" onClick={() => router.get(`/gestor/reservas/${selectedReserva.id}`)}>
+                        <Edit className="mr-1 h-4 w-4" /> Avaliar
+                    </Button>
+                ) : (
+                    <div className="flex gap-2">
+                        {selectedReserva.can_update && (
+                            <Button variant="outline" onClick={() => router.get(route('reservas.edit', selectedReserva.id))}>
+                                <Edit className="mr-1 h-4 w-4" /> Editar
+                            </Button>
+                        )}
+                        <Button variant="destructive" onClick={() => setRemoverReserva(selectedReserva)}>
+                            <XCircle className="mr-1 h-4 w-4" /> Cancelar
+                        </Button>
+                    </div>
+                )
+            }
+        >
+            <span>
+                <h4 className="text-foreground mb-2 font-medium">Descrição</h4>
+                <p className="bg-muted/50 text-foreground rounded-lg p-3">{selectedReserva.descricao}</p>
+            </span>
+            <Separator />
+            <div className="flex items-center gap-2">
+                <CalendarDays className="text-muted-foreground h-4 w-4" />
+                <div>
+                    <p className="text-muted-foreground text-sm">Período Total da Reserva</p>
+                    <p className="font-medium">
+                        {formatDate(selectedReserva.data_inicial)} até {formatDate(selectedReserva.data_final)}
+                    </p>
+                </div>
+            </div>
+            <Separator />
+            <div className="mb-4 space-y-4">
+                <h4 className="text-foreground flex items-center gap-2 font-medium">
+                    <Clock className="h-4 w-4" />
+                    Horários Solicitados
+                </h4>
+
+                {/* NOVO: Wrapper para o indicador de loading sobre o calendário */}
+                <div className="relative mb-4 space-y-4">
+                    <AgendaNavegacao
+                        semanaAtual={semanaVisivel}
+                        onAnterior={handleSemanaAnterior}
+                        onProxima={handleProximaSemana}
+                        desabilitarAnterior={!podeVoltar}
+                        desabilitarProxima={!podeAvancar}
+                    />
+                    <CalendarReservationDetails
+                        agendas={agendas}
+                        diasSemana={diasDaSemana(semanaVisivel, new Date())}
+                        slotsSolicitados={slotsSelecao}
+                    />
+                    {isLoading && (
+                        <div className="bg-background/70 absolute inset-0 flex items-center justify-center rounded-md backdrop-blur-sm">
+                            <Loader2 className="text-primary h-8 w-8 animate-spin" />
                         </div>
                     )}
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                </div>
+            </div>
+
+            <Separator />
+            <AvaliacaoGestoresResumo horarios={selectedReserva.horarios} />
+
+            <Separator />
+            {justificativaReserva && (
+                <div>
+                    <h4 className="text-destructive mb-2 font-medium">Justificativa do indeferimento</h4>
+                    <p className="bg-destructive-subtle text-destructive rounded-lg p-3">{justificativaReserva}</p>
+                    <Separator className="mt-10" />
+                </div>
+            )}
+            {selectedReserva.observacao && (
+                <div>
+                    <h4 className="text-info-accent mb-2 font-medium">Observação</h4>
+                    <p className="bg-info-subtle text-info-accent rounded-lg p-3">{selectedReserva.observacao}</p>
+                    <Separator className="mt-5" />
+                </div>
+            )}
+        </Modal>
     );
 }

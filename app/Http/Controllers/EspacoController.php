@@ -61,6 +61,7 @@ class EspacoController extends Controller
     public function favoritar(Espaco $espaco): RedirectResponse
     {
         $this->service->addFavorite(Auth::user(), $espaco);
+        Espaco::forgetFavoritosCache(Auth::id());
 
         return redirect()->back()->with('success', 'Espaço adicionado aos favoritos!');
     }
@@ -71,6 +72,7 @@ class EspacoController extends Controller
     public function desfavoritar(Espaco $espaco): RedirectResponse
     {
         $this->service->removeFavorite(Auth::user(), $espaco);
+        Espaco::forgetFavoritosCache(Auth::id());
 
         return redirect()->back()->with('success', 'Espaço removido dos favoritos!');
     }

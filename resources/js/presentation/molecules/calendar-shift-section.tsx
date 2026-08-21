@@ -1,8 +1,7 @@
-import { Agenda, AgendaDiasSemanaType, Horario, SlotCalendario } from '@/types';
-import { format } from 'date-fns';
-import { useMemo } from 'react';
-import { HORARIOS_PADRAO } from '@/constants/turnos';
+import { derivarSlotsDoTurno } from '@/application/espacos/helpers/derivar-slots-do-turno';
 import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
+import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
+import { useMemo } from 'react';
 
 type CalendarShiftSectionProps = {
     titulo: string;
@@ -27,39 +26,28 @@ export default function CalendarShiftSection({
     const isSlotSelecionadoFn = isSlotSelecionado || (() => false);
     const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
 
-    // Otimização: Cria um mapa dos horários já reservados por OUTRAS pessoas para busca rápida
-    const horariosReservadosMap = useMemo(() => {
-        const map = new Map<string, { horario: Horario; autor: string; reserva_titulo: string }>();
-        agenda.horarios?.forEach((horario) => {
-            // Um horário é "reservado" se estiver deferido e não pertencer à reserva que estamos editando/visualizando
-            const reservaDaProp = slotsSolicitados?.[0]?.dadosReserva?.horarioDB?.reserva?.id;
-            if (horario.situacao === 'deferida' && horario.reserva && horario.reserva.id !== reservaDaProp) {
-                const chave = `${horario.data}|${horario.horario_inicio}`;
-                map.set(chave, {
-                    horario: horario,
-                    autor: horario.reserva.user?.name ?? 'Indefinido',
-                    reserva_titulo: horario.reserva.titulo,
-                });
-            }
-        });
-        return map;
-    }, [agenda.horarios, slotsSolicitados]);
+    // A derivação dos slots vive em derivar-slots-do-turno para que a visão
+    // mobile use exatamente os mesmos slots — ver o comentário de lá.
+    const derivados = useMemo(
+        () => derivarSlotsDoTurno(agenda, diasSemana, slotsSolicitados),
+        [agenda, diasSemana, slotsSolicitados],
+    );
 
-    // Otimização: Cria um mapa dos horários que pertencem à reserva atual (seja no modo de edição ou visualização)
-    const slotsSolicitadosMap = useMemo(() => {
-        const map = new Map<string, SlotCalendario>();
-        slotsSolicitados?.forEach((slot) => {
-            map.set(slot.id, slot);
+    // Reagrupa por linha de horário, que é como a grade é desenhada.
+    const linhasPorHorario = useMemo(() => {
+        const linhas = new Map<string, SlotCalendario[]>();
+        derivados.forEach(({ horaLabel, slot }) => {
+            const linha = linhas.get(horaLabel) ?? [];
+            linha.push(slot);
+            linhas.set(horaLabel, linha);
         });
-        return map;
-    }, [slotsSolicitados]);
-
-    const horariosDoTurno = HORARIOS_PADRAO[agenda.turno as keyof typeof HORARIOS_PADRAO];
+        return linhas;
+    }, [derivados]);
 
     return (
         <div key={agenda.id}>
             {/* Cabeçalho do Turno */}
-            <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b bg-gray-50">
+            <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b bg-muted/50">
                 <div className="p-2 text-center text-xs font-semibold">{titulo.charAt(0).toUpperCase() + titulo.slice(1)}</div>
                 {diasSemana.map((dia) => (
                     <div key={`${titulo}-${dia.valor}`} className="p-2 text-center text-xs font-medium"></div>
@@ -67,66 +55,21 @@ export default function CalendarShiftSection({
             </div>
 
             {/* Renderiza cada LINHA de horário (ex: 07:30 - 08:20) */}
-            {horariosDoTurno.map((horaString) => {
-                return (
-                    <div key={horaString} className="grid grid-cols-[80px_repeat(7,1fr)] border-b">
-                        <div className="text-muted-foreground border-r p-2 pr-3 text-right text-xs">{horaString}</div>
+            {[...linhasPorHorario.entries()].map(([horaLabel, slots]) => (
+                <div key={horaLabel} className="grid grid-cols-[80px_repeat(7,1fr)] border-b">
+                    <div className="text-muted-foreground border-r p-2 pr-3 text-right text-xs">{horaLabel}</div>
 
-                        {/* Para cada linha, renderiza as 7 COLUNAS (Seg a Dom) */}
-                        {diasSemana.map((dia) => {
-                            const [horario_inicio_str, horario_fim_str] = horaString.split(' - ').map((s) => s.trim() + ':00');
-                            const diaFormatado = format(dia.data, 'yyyy-MM-dd');
-                            const chave = `${diaFormatado}|${horario_inicio_str}`;
-
-                            // Verifica se o slot está no passado (data e hora)
-                            const slotDateTime = new Date(`${diaFormatado}T${horario_inicio_str}`);
-                            const isPast = slotDateTime < new Date();
-
-                            // Lógica para decidir o que renderizar na célula
-                            let slot: SlotCalendario;
-                            const horarioSolicitado = slotsSolicitadosMap.get(chave);
-                            const horarioReservado = horariosReservadosMap.get(chave);
-
-                            if (horarioSolicitado) {
-                                slot = { ...horarioSolicitado, isPast };
-                            } else if (horarioReservado) {
-                                slot = {
-                                    id: chave,
-                                    status: 'reservado',
-                                    data: dia.data,
-                                    horario_inicio: horario_inicio_str,
-                                    horario_fim: horario_fim_str,
-                                    isPast,
-                                    dadosReserva: {
-                                        horarioDB: horarioReservado.horario,
-                                        autor: horarioReservado.autor,
-                                        reserva_titulo: horarioReservado.reserva_titulo,
-                                    },
-                                };
-                            } else {
-                                slot = {
-                                    id: chave,
-                                    status: 'livre',
-                                    data: dia.data,
-                                    horario_inicio: horario_inicio_str,
-                                    horario_fim: horario_fim_str,
-                                    agenda_id: agenda.id,
-                                    isPast,
-                                };
-                            }
-
-                            return (
-                                <CalendarSlotCell
-                                    key={slot.id}
-                                    slot={slot}
-                                    isSelecionado={isSlotSelecionadoFn(slot)}
-                                    onSelect={() => alternarSelecaoSlotFn(slot)}
-                                />
-                            );
-                        })}
-                    </div>
-                );
-            })}
+                    {/* Para cada linha, renderiza as 7 COLUNAS (Seg a Dom) */}
+                    {slots.map((slot) => (
+                        <CalendarSlotCell
+                            key={slot.id}
+                            slot={slot}
+                            isSelecionado={isSlotSelecionadoFn(slot)}
+                            onSelect={() => alternarSelecaoSlotFn(slot)}
+                        />
+                    ))}
+                </div>
+            ))}
         </div>
     );
 }

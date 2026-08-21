@@ -120,7 +120,7 @@ export default function Password() {
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Salvo</p>
+                                <p className="text-muted-foreground text-sm">Salvo</p>
                             </Transition>
                         </div>
                     </form>
