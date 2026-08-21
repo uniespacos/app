@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
@@ -20,15 +20,29 @@ interface ModalProps {
     size?: ModalSize;
     showCloseButton?: boolean;
     className?: string;
+    /** Elemento que abre o modal ao ser clicado, para modais autocontidos que não dependem de estado externo para abrir (o fechamento continua via onOpenChange). */
+    trigger?: ReactNode;
     children?: ReactNode;
 }
 
 // Modal padrão da aplicação: toda tela que precisar de um modal customizado
 // deve montar seu organismo por cima deste componente em vez de reimplementar
 // Dialog/DialogContent diretamente.
-export function Modal({ open, onOpenChange, title, description, footer, size = 'md', showCloseButton = true, className, children }: ModalProps) {
+export function Modal({
+    open,
+    onOpenChange,
+    title,
+    description,
+    footer,
+    size = 'md',
+    showCloseButton = true,
+    className,
+    trigger,
+    children,
+}: ModalProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
+            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent className={cn(MODAL_SIZE_CLASSES[size], className)} showCloseButton={showCloseButton}>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>

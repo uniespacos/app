@@ -1,35 +1,27 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Badge } from '@/components/ui/badge';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { router } from '@inertiajs/react';
-import type { Role, Permission } from '@/types';
-import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { getGroupLabel, getPermissionLabel } from '@/constants/permission-labels';
+import { FormField } from '@/presentation/molecules/FormField';
+import { Modal } from '@/presentation/molecules/Modal';
+import type { Permission, Role } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const roleFormSchema = z.object({
     name: z
         .string()
         .min(1, 'Nome é obrigatório')
         .max(50, 'Nome deve ter no máximo 50 caracteres')
-        .regex(
-            /^[a-z][a-z0-9-]*$/,
-            'Use apenas letras minúsculas, números e hífens (ex: secretaria-academica). Deve começar com letra.',
-        ),
+        .regex(/^[a-z][a-z0-9-]*$/, 'Use apenas letras minúsculas, números e hífens (ex: secretaria-academica). Deve começar com letra.'),
     description: z.string().max(500, 'Descrição deve ter no máximo 500 caracteres').optional(),
     permissions: z.array(z.string()).optional(),
 });
@@ -92,9 +84,7 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
 
     const handleTogglePermission = (permissionName: string) => {
         const current = selectedPermissions || [];
-        const updated = current.includes(permissionName)
-            ? current.filter((p) => p !== permissionName)
-            : [...current, permissionName];
+        const updated = current.includes(permissionName) ? current.filter((p) => p !== permissionName) : [...current, permissionName];
         setValue('permissions', updated, { shouldValidate: true });
     };
 
@@ -133,136 +123,114 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
     const slugSuggestion = nameValue && !/^[a-z][a-z0-9-]*$/.test(nameValue) ? slugify(nameValue) : null;
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>{role ? 'Editar Papel' : 'Criar Novo Papel'}</DialogTitle>
-                    <DialogDescription>
-                        {role ? 'Atualize os detalhes do papel' : 'Crie um novo papel customizado'}
-                    </DialogDescription>
-                </DialogHeader>
+        <Modal
+            open={isOpen}
+            onOpenChange={onClose}
+            size="xl"
+            className="max-h-[90vh] max-w-5xl overflow-y-auto"
+            title={role ? 'Editar Papel' : 'Criar Novo Papel'}
+            description={role ? 'Atualize os detalhes do papel' : 'Crie um novo papel customizado'}
+        >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-5">
+                    <FormField label="Nome (identificador técnico)" htmlFor="name" error={errors.name?.message}>
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field }) => <Input id="name" {...field} placeholder="ex: secretaria-academica" disabled={role?.is_system} />}
+                        />
+                        {slugSuggestion && !errors.name?.message?.includes('obrigatório') && (
+                            <button
+                                type="button"
+                                onClick={() => setValue('name', slugSuggestion, { shouldValidate: true })}
+                                className="text-info-accent mt-1 text-sm hover:underline"
+                            >
+                                Usar sugestão: <strong>{slugSuggestion}</strong>
+                            </button>
+                        )}
+                    </FormField>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="space-y-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nome (identificador técnico)</Label>
-                            <Controller
-                                name="name"
-                                control={control}
-                                render={({ field }) => (
-                                    <Input
-                                        id="name"
-                                        {...field}
-                                        placeholder="ex: secretaria-academica"
-                                        disabled={role?.is_system}
-                                    />
-                                )}
-                            />
-                            {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>}
-                            {slugSuggestion && !errors.name?.message?.includes('obrigatório') && (
-                                <button
-                                    type="button"
-                                    onClick={() => setValue('name', slugSuggestion, { shouldValidate: true })}
-                                    className="mt-1 text-sm text-info-accent hover:underline"
+                    <FormField label="Descrição (opcional)" htmlFor="description" error={errors.description?.message}>
+                        <Controller
+                            name="description"
+                            control={control}
+                            render={({ field }) => <Textarea id="description" {...field} placeholder="Para que serve esse papel..." rows={3} />}
+                        />
+                    </FormField>
+                </div>
+
+                <div>
+                    <div className="mb-3 flex items-center justify-between">
+                        <Label className="text-base">Permissões</Label>
+                        <Badge variant="secondary">{selectedPermissions.length} selecionadas</Badge>
+                    </div>
+
+                    <div className="space-y-2">
+                        {Object.entries(permissions).map(([group, perms]) => {
+                            const stats = groupStats[group];
+                            const allSelected = stats.selected === stats.total;
+                            const someSelected = stats.selected > 0 && !allSelected;
+                            const isOpen = openGroups[group] ?? false;
+
+                            return (
+                                <Collapsible
+                                    key={group}
+                                    open={isOpen}
+                                    onOpenChange={(o) => setOpenGroups((prev) => ({ ...prev, [group]: o }))}
+                                    className="rounded-md border"
                                 >
-                                    Usar sugestão: <strong>{slugSuggestion}</strong>
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Descrição (opcional)</Label>
-                            <Controller
-                                name="description"
-                                control={control}
-                                render={({ field }) => (
-                                    <Textarea
-                                        id="description"
-                                        {...field}
-                                        placeholder="Para que serve esse papel..."
-                                        rows={3}
-                                    />
-                                )}
-                            />
-                            {errors.description && <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <Label className="text-base">Permissões</Label>
-                            <Badge variant="secondary">{selectedPermissions.length} selecionadas</Badge>
-                        </div>
-
-                        <div className="space-y-2">
-                            {Object.entries(permissions).map(([group, perms]) => {
-                                const stats = groupStats[group];
-                                const allSelected = stats.selected === stats.total;
-                                const someSelected = stats.selected > 0 && !allSelected;
-                                const isOpen = openGroups[group] ?? false;
-
-                                return (
-                                    <Collapsible
-                                        key={group}
-                                        open={isOpen}
-                                        onOpenChange={(o) => setOpenGroups((prev) => ({ ...prev, [group]: o }))}
-                                        className="rounded-md border"
-                                    >
-                                        <div className="flex items-center justify-between p-3 hover:bg-muted/50">
-                                            <div className="flex items-center gap-3 flex-1">
-                                                <Checkbox
-                                                    checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                                                    onCheckedChange={() => handleToggleGroup(group, perms)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                                <CollapsibleTrigger className="flex items-center gap-2 flex-1 text-left">
-                                                    <span className="font-medium">{getGroupLabel(group)}</span>
-                                                    <Badge variant={allSelected ? 'default' : 'outline'} className="text-xs">
-                                                        {stats.selected}/{stats.total}
-                                                    </Badge>
-                                                    <ChevronDown
-                                                        className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                                                    />
-                                                </CollapsibleTrigger>
-                                            </div>
+                                    <div className="hover:bg-muted/50 flex items-center justify-between p-3">
+                                        <div className="flex flex-1 items-center gap-3">
+                                            <Checkbox
+                                                checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                                                onCheckedChange={() => handleToggleGroup(group, perms)}
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                            <CollapsibleTrigger className="flex flex-1 items-center gap-2 text-left">
+                                                <span className="font-medium">{getGroupLabel(group)}</span>
+                                                <Badge variant={allSelected ? 'default' : 'outline'} className="text-xs">
+                                                    {stats.selected}/{stats.total}
+                                                </Badge>
+                                                <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                            </CollapsibleTrigger>
                                         </div>
+                                    </div>
 
-                                        <CollapsibleContent>
-                                            <div className="border-t bg-muted/20 p-3 space-y-2">
-                                                {perms.map((perm) => (
-                                                    <Label
-                                                        key={perm.name}
-                                                        className="flex items-start gap-3 p-2 rounded hover:bg-background cursor-pointer text-foreground font-normal leading-normal select-none"
-                                                    >
-                                                        <Checkbox
-                                                            checked={selectedPermissions.includes(perm.name)}
-                                                            onCheckedChange={() => handleTogglePermission(perm.name)}
-                                                            className="mt-0.5"
-                                                        />
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="text-sm">{getPermissionLabel(perm.name)}</div>
-                                                            <div className="text-xs text-muted-foreground font-mono">{perm.name}</div>
-                                                        </div>
-                                                    </Label>
-                                                ))}
-                                            </div>
-                                        </CollapsibleContent>
-                                    </Collapsible>
-                                );
-                            })}
-                        </div>
+                                    <CollapsibleContent>
+                                        <div className="bg-muted/20 space-y-2 border-t p-3">
+                                            {perms.map((perm) => (
+                                                <Label
+                                                    key={perm.name}
+                                                    className="hover:bg-background text-foreground flex cursor-pointer items-start gap-3 rounded p-2 leading-normal font-normal select-none"
+                                                >
+                                                    <Checkbox
+                                                        checked={selectedPermissions.includes(perm.name)}
+                                                        onCheckedChange={() => handleTogglePermission(perm.name)}
+                                                        className="mt-0.5"
+                                                    />
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="text-sm">{getPermissionLabel(perm.name)}</div>
+                                                        <div className="text-muted-foreground font-mono text-xs">{perm.name}</div>
+                                                    </div>
+                                                </Label>
+                                            ))}
+                                        </div>
+                                    </CollapsibleContent>
+                                </Collapsible>
+                            );
+                        })}
                     </div>
+                </div>
 
-                    <div className="flex gap-2 justify-end pt-4 border-t">
-                        <Button type="button" variant="outline" onClick={onClose}>
-                            Cancelar
-                        </Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {role ? 'Atualizar' : 'Criar'} Papel
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
+                <div className="flex justify-end gap-2 border-t pt-4">
+                    <Button type="button" variant="outline" onClick={onClose}>
+                        Cancelar
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {role ? 'Atualizar' : 'Criar'} Papel
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 }
