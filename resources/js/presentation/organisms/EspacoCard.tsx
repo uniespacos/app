@@ -55,9 +55,11 @@ export default function EspacoCard({
                     <CarouselContent>
                         {imageSources.map((src, index) => (
                             <CarouselItem key={index}>
-                                <div className="aspect-video">
-                                    {' '}
-                                    {/* Proporção 16:9 para consistência */}
+                                {/* bg-muted por trás: sem isso, uma imagem quebrada ou
+                                    ainda carregando deixava o card com um retângulo
+                                    preto sólido — chamativo ao lado dos outros cards
+                                    com o placeholder visível. */}
+                                <div className="bg-muted aspect-video">
                                     <img
                                         src={src}
                                         alt={`Imagem ${index + 1} de ${espaco.nome}`}
