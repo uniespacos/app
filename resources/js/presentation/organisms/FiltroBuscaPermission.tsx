@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getTurnoText } from '@/lib/utils';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { Andar, Espaco, Instituicao, Modulo, SelectedAgenda, Unidade } from '@/types';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -199,7 +200,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                                 <SelectContent>
                                     {andares.map((andar) => (
                                         <SelectItem key={andar.id} value={andar.id.toString()}>
-                                            {andar.nome}
+                                            {getAndarLabelByValue(andar.nome)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -275,7 +276,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                                         </div>
                                         <div className="text-muted-foreground text-sm">
                                             {selectedAgenda.instituicao.nome} → {selectedAgenda.unidade.nome} → {selectedAgenda.modulo.nome} →{' '}
-                                            {selectedAgenda.andar.nome}
+                                            {getAndarLabelByValue(selectedAgenda.andar.nome)}
                                         </div>
                                         <Badge variant="outline">Capacidade: {selectedAgenda.espaco.capacidade_pessoas} pessoas</Badge>
                                     </div>

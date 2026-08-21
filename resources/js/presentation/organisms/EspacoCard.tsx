@@ -3,14 +3,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { hasPermission } from '@/lib/auth';
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
+import { hasPermission } from '@/lib/auth';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import type { Espaco, User } from '@/types';
 import { Building2, Calendar, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
 
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
-import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
 import { useFavoritarEspacoUseCase } from '@/application/espacos/use-cases/use-favoritar-espaco-usecase';
+import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 
 const httpGateway = new InertiaHttpGateway();
 const espacosRepository = new InertiaEspacosRepository(httpGateway);
@@ -91,7 +92,7 @@ export default function EspacoCard({
                     <button
                         onClick={handleFavoritarEspaco}
                         disabled={processing}
-                        className={`absolute top-2 right-2 rounded-full p-2.5 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive text-white hover:bg-destructive' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
+                        className={`absolute top-2 right-2 rounded-full p-2.5 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive hover:bg-destructive text-white' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
                         title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
                     >
                         <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
@@ -114,7 +115,7 @@ export default function EspacoCard({
                     </Badge>
                     <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
                         <Layers className="h-4 w-4 flex-shrink-0" />
-                        <span className="min-w-0 truncate">{espaco.andar?.nome ?? 'N/A'}</span>
+                        <span className="min-w-0 truncate">{espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : 'N/A'}</span>
                     </Badge>
                     <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />

@@ -1,9 +1,10 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { router } from '@inertiajs/react';
 import { FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
     return (
@@ -24,7 +25,8 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                 <div className="min-w-0 space-y-1">
                                     <h4 className="truncate font-medium">{reserva.titulo}</h4>
                                     <p className="text-muted-foreground truncate text-sm">
-                                        {espaco?.nome} - {espaco?.andar?.nome}, {espaco?.andar?.modulo?.nome}
+                                        {espaco?.nome} - {espaco?.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null},{' '}
+                                        {espaco?.andar?.modulo?.nome}
                                     </p>
                                     <p className="text-muted-foreground text-xs">{new Date(reserva.data_inicial).toLocaleDateString('pt-BR')}</p>
                                 </div>

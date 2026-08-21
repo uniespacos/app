@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TURNOS_ORDENADOS, TURNO_LABEL } from '@/constants/turnos';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { AgendaGestoresPorTurnoType, Espaco } from '@/types';
 import { Building2, Home, MapPin, User, Users } from 'lucide-react';
 
@@ -26,7 +27,7 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {espaco.andar?.nome}
+                        {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null}
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                         <Users className="h-3 w-3" />

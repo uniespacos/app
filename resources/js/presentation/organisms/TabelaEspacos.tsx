@@ -1,15 +1,16 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
 
 interface TabelaEspacosProps {
     espacos: Espaco[]; // Agora recebe os espaços já filtrados e paginados
@@ -24,7 +25,7 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
         return (
             <Card>
                 <CardContent>
-                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-12 text-center">
+                    <div className="border-border flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center">
                         <h2 className="text-xl font-semibold">Nenhum espaço encontrado</h2>
                         <p className="text-muted-foreground mt-2">Tente ajustar os filtros ou cadastre um novo espaço para que ele apareça aqui.</p>
                         <Button onClick={() => router.get(route('institucional.espacos.create'))} className="mt-4">
@@ -69,7 +70,8 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
                                                 <div className="font-medium">{espaco.andar?.modulo?.unidade?.instituicao?.sigla}</div>
                                                 <div>{espaco.andar?.modulo?.unidade?.nome}</div>
                                                 <div className="text-muted-foreground">
-                                                    {espaco.andar?.modulo?.nome} - {espaco.andar?.nome}
+                                                    {espaco.andar?.modulo?.nome} -{' '}
+                                                    {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null}
                                                 </div>
                                             </div>
                                         </TableCell>

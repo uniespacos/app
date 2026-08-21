@@ -1,3 +1,4 @@
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import type { Espaco } from '@/types';
 
 interface LocalReservaProps {
@@ -17,7 +18,7 @@ export function LocalReserva({ espaco }: LocalReservaProps) {
     }
 
     const modulo = espaco.andar?.modulo?.nome;
-    const andar = espaco.andar?.nome;
+    const andar = espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : undefined;
     // Mesma ordem usada na tabela administrativa de espaços (TabelaEspacos).
     const detalhe = [modulo, andar].filter(Boolean).join(' - ');
 

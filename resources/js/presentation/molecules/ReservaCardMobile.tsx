@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
 import { formatDate } from '@/lib/utils';
+import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { Calendar, Edit, FileText, MapPin, XCircle } from 'lucide-react';
@@ -28,7 +29,8 @@ type ReservaCardMobileProps = {
 export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;
-    const local = [espaco?.nome, espaco?.andar?.modulo?.nome, espaco?.andar?.nome].filter(Boolean).join(' - ');
+    const andar = espaco?.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : undefined;
+    const local = [espaco?.nome, espaco?.andar?.modulo?.nome, andar].filter(Boolean).join(' - ');
 
     return (
         <div className="bg-card overflow-hidden rounded-lg border">
