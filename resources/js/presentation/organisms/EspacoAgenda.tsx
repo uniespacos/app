@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { diasDaSemana } from '@/lib/utils';
+import { cn, diasDaSemana } from '@/lib/utils';
 import { Espaco, Reserva } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -76,7 +76,16 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     }, [agendas]);
 
     return (
-        <div className="container mx-auto max-w-7xl space-y-4 py-4">
+        /*
+            O painel de ação é `fixed`, e a lista de horários do mobile não tem
+            scroll próprio — é a página inteira que rola. Sem espaço reservado
+            no fim, o último horário ficava fisicamente atrás do painel fixo:
+            visível, mas o clique caía no painel, não no slot. `pb-40` no
+            mobile abre espaço suficiente para rolar o último item para cima do
+            painel (dois botões empilhados + padding do card); `sm:pb-24` cobre
+            o layout em linha do desktop, mais raso.
+        */
+        <div className={cn('container mx-auto max-w-7xl space-y-4 py-4', slotsSelecao.length > 0 && 'pb-40 sm:pb-24')}>
             {isEditMode && reserva && <AgendaEditModeAlert reserva={reserva} />}
             <AgendaHeader espaco={espaco} gestoresPorTurno={gestoresPorTurno} />
             <AgendaNavegacao
