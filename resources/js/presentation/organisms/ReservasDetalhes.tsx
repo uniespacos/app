@@ -7,9 +7,10 @@ import { Agenda, Horario, Reserva, SlotCalendario } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, subDays } from 'date-fns';
-import { CalendarDays, Clock, Edit, FileText, Home, Loader2, User, XCircle } from 'lucide-react'; // Adicionado Loader2
+import { CalendarDays, Clock, Edit, ExternalLink, FileText, Home, Loader2, User, XCircle } from 'lucide-react'; // Adicionado Loader2
 import { useMemo, useState } from 'react';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
+import AvaliacaoGestoresResumo from '@/presentation/molecules/AvaliacaoGestoresResumo';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 type ReservaDetalhesProps = {
@@ -76,6 +77,7 @@ export default function ReservaDetalhes({
     );
 
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
+    const espaco = selectedReserva.horarios[0]?.agenda?.espaco;
 
     // ALTERADO: A função de navegação agora controla o estado de loading
     const navegarParaSemana = (novaData: Date) => {
@@ -124,7 +126,17 @@ export default function ReservaDetalhes({
                         </span>
                         <span className="flex items-center gap-2 p-1">
                             <Home className="h-4 w-4" />
-                            Espaço: {selectedReserva.horarios[0]?.agenda?.espaco?.nome ?? ' '}
+                            Espaço: {espaco?.nome ?? ' '}
+                            {espaco && (
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="h-auto p-0 text-xs"
+                                    onClick={() => router.get(route('espacos.show', espaco.id))}
+                                >
+                                    Ver agenda do espaço <ExternalLink className="ml-1 h-3 w-3" />
+                                </Button>
+                            )}
                         </span>
                         <span className="flex items-center gap-2 p-1">
                             <SituacaoIndicator situacao={selectedReserva.situacao} />
@@ -173,6 +185,10 @@ export default function ReservaDetalhes({
                         )}
                     </div>
                 </div>
+
+                <Separator />
+                <AvaliacaoGestoresResumo horarios={selectedReserva.horarios} />
+
                 {/* ... Restante do Dialog (Justificativa, Footer, etc.) ... */}
                 <Separator />
                 {justificativaReserva && (

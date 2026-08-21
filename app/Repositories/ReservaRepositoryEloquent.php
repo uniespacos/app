@@ -76,7 +76,9 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             'horarios' => function ($query) use ($weekStart, $weekEnd) {
                 $query->whereBetween('data', [$weekStart, $weekEnd])
                     ->orderBy('data')->orderBy('horario_inicio')
-                    ->with(['agenda.espaco.andar.modulo.unidade', 'avaliador']);
+                    // agenda.user: gestor do turno, exibido no modal de detalhes
+                    // com quem avaliou/falta avaliar cada horario.
+                    ->with(['agenda.espaco.andar.modulo.unidade', 'agenda.user', 'avaliador']);
             },
         ])->find($reservaId);
     }
