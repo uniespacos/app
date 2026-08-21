@@ -144,7 +144,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                         <TableRow>
                             <TableHead>Título</TableHead>
                             <TableHead className="hidden md:table-cell">Local</TableHead>
-                            <TableHead className="hidden lg:table-cell">Periodo</TableHead>
+                            <TableHead className="hidden lg:table-cell">Período</TableHead>
                             <TableHead className="hidden md:table-cell">Situação</TableHead>
                             <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
@@ -176,34 +176,34 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2 pt-2" key={reserva.id}>
-                                        {/* ALTERADO: O botão agora chama a função handleAbrirDetalhes */}
-                                        <Button variant="outline" onClick={() => handleAbrirDetalhes(reserva)}>
-                                            <FileText className="mr-2 h-4 w-4" />
+                                    <div className="flex flex-wrap justify-end gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => handleAbrirDetalhes(reserva)}>
+                                            <FileText className="mr-1.5 h-4 w-4" />
                                             Detalhes
                                         </Button>
 
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
-                                                <Button onClick={() => handleAvaliarButton(reserva.id)} variant="outline">
-                                                    <Edit className="h-4 w-4" />
+                                                <Button variant="outline" size="sm" onClick={() => handleAvaliarButton(reserva.id)}>
+                                                    <Edit className="mr-1.5 h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
                                             ) : (
                                                 <>
                                                     {reserva.can_update && (
                                                         <Button
+                                                            variant="outline"
+                                                            size="sm"
                                                             onClick={() => {
                                                                 router.get(`reservas/${reserva.id}/edit`);
                                                             }}
-                                                            variant="outline"
                                                         >
-                                                            <Edit />
+                                                            <Edit className="mr-1.5 h-4 w-4" />
                                                             Editar
                                                         </Button>
                                                     )}
-                                                    <Button onClick={() => setRemoverReserva(reserva)} variant="destructive">
-                                                        <XCircle className="text-white" />
+                                                    <Button variant="destructive" size="sm" onClick={() => setRemoverReserva(reserva)}>
+                                                        <XCircle className="mr-1.5 h-4 w-4" />
                                                         Cancelar
                                                     </Button>
                                                 </>
