@@ -167,7 +167,7 @@ export default function ReservaDetalhes({
                             slotsSolicitados={slotsSelecao}
                         />
                         {isLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
+                            <div className="bg-background/70 absolute inset-0 flex items-center justify-center rounded-md backdrop-blur-sm">
                                 <Loader2 className="text-primary h-8 w-8 animate-spin" />
                             </div>
                         )}

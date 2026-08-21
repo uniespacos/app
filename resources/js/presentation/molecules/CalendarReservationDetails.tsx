@@ -1,6 +1,8 @@
 import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import { Card } from '@/components/ui/card';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
 type CalendarReservationDetailsProps = {
@@ -10,8 +12,31 @@ type CalendarReservationDetailsProps = {
     alternarSelecaoSlot?: (slot: SlotCalendario) => void;
 };
 
+const SEM_SELECAO = () => false;
+
 export default function CalendarReservationDetails({ diasSemana, agendas, slotsSolicitados, alternarSelecaoSlot }: CalendarReservationDetailsProps) {
     const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
+    const isMobile = useIsMobile();
+
+    // Mesma visão de dia-a-dia da agenda de reserva: a grade de 800px nunca
+    // coube no celular, e aqui ela ficava dentro de um modal ainda mais
+    // apertado — era rolagem lateral dentro de rolagem vertical dentro de
+    // dialog. `isSlotSelecionado` sempre falso porque este uso é read-only
+    // (não há seleção de horário no modal de detalhes).
+    if (isMobile) {
+        return (
+            <Card className="p-0">
+                <CalendarDiaMobile
+                    diasSemana={diasSemana}
+                    agendas={agendas}
+                    isSlotSelecionado={SEM_SELECAO}
+                    alternarSelecaoSlot={alternarSelecaoSlotFn}
+                    slotsDaReserva={slotsSolicitados}
+                />
+            </Card>
+        );
+    }
+
     return (
         <Card className="p-0">
             {/* O scroll precisa ficar no PAI: antes, `overflow-auto` estava no
