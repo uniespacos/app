@@ -220,8 +220,15 @@
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: var(--brand-blue);
     --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
+    /*
+      Cinza neutro quase invisível (L 0.97, sem matiz) antes — hover e item
+      ativo do menu mal se distinguiam do fundo. Tingido com o matiz do
+      brand-blue (248) só que bem claro e dessaturado, para ficar sutil sem
+      virar um bloco azul chapado; o texto/ícone por cima vai na cor da marca
+      (~7:1 de contraste), não mais cinza genérico.
+    */
+    --sidebar-accent: oklch(0.94 0.02 248);
+    --sidebar-accent-foreground: var(--brand-blue);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: var(--brand-blue);
 }
@@ -305,8 +312,10 @@
     */
     --sidebar-primary: var(--brand-blue);
     --sidebar-primary-foreground: oklch(0.145 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
+    /* Mesmo tingimento do claro, invertido: fundo escuro com leve matiz azul,
+       texto no azul claro do modo escuro (--brand-blue já resolvido acima). */
+    --sidebar-accent: oklch(0.3 0.03 248);
+    --sidebar-accent-foreground: var(--brand-blue);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: var(--brand-blue);
 }
