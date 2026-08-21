@@ -61,7 +61,19 @@ describe('ReservasFilters', () => {
 
         fireEvent.click(screen.getByLabelText('Situação'));
 
-        expect(screen.getByText('Todas as situações')).toBeInTheDocument();
+        expect(screen.getAllByText('Todas as situações').length).toBeGreaterThan(0);
+    });
+
+    /**
+     * Sem o valor padrão mapeado para um item real, o trigger caía no
+     * placeholder cinza-claro — parecendo "nada selecionado" ao lado do select
+     * "Exibir", que sempre mostra um valor concreto ("Ativas"). Os dois devem
+     * ter o mesmo peso visual no estado padrão.
+     */
+    it('mostra Todas as situacoes no trigger quando nao ha filtro', () => {
+        render(<ReservasFilters {...props} />);
+
+        expect(screen.getByLabelText('Situação')).toHaveTextContent('Todas as situações');
     });
 
     it('notifica o pai ao escolher Arquivadas', () => {

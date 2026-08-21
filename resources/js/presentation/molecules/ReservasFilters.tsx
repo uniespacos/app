@@ -49,7 +49,13 @@ export function ReservasFilters({
                     entrava em contradição com o padrão do backend.
                 */}
                 <Select
-                    value={selectedSituacao} // 5. O valor vem das props
+                    // Sem o `|| 'todas'`, o valor vazio de "todas as situações"
+                    // não batia com nenhum SelectItem e o Select caía no
+                    // placeholder — cinza-claro, como se nada tivesse sido
+                    // escolhido. Ao lado, o select "Exibir" mostra "Ativas" em
+                    // texto normal no mesmo tipo de estado padrão. Mesmo padrão
+                    // aqui: valor padrão mapeado para um item real.
+                    value={selectedSituacao || 'todas'}
                     onValueChange={(value) => onSituacaoChange(value === 'todas' ? '' : value)} // 6. A mudança notifica o pai
                 >
                     <SelectTrigger className="w-full sm:w-[180px]" aria-label="Situação">
