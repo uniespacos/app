@@ -29,7 +29,10 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         unidade: filters.unidade || 'all',
         modulo: filters.modulo || 'all',
         andar: filters.andar || 'all',
-        capacidade: filters.capacidade || '',
+        // '' não batia com nenhum SelectItem (o padrão é 'qualquer'), então o
+        // trigger caía no placeholder cinza — parecia "nada selecionado" ao
+        // lado dos outros três selects, que sempre mostram um valor concreto.
+        capacidade: filters.capacidade || 'qualquer',
     });
     const isInitialMount = useRef(true);
 
