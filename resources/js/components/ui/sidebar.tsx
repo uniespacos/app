@@ -349,11 +349,14 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      // `sticky bottom-0` + fundo sólido garante que o perfil/logout continue
-      // alcançáveis mesmo se a lista de navegação crescer além da altura da
-      // tela no Sheet mobile — sem isso, o rodapé só ficava visível se todo
-      // o conteúdo acima coubesse exatamente na viewport.
-      className={cn("bg-sidebar sticky bottom-0 z-10 flex shrink-0 flex-col gap-2 p-2", className)}
+      // O rodapé já fica fora da área que rola (SidebarContent tem
+      // overflow-auto próprio) e é `shrink-0`, então ele naturalmente
+      // permanece visível no fim da coluna sem precisar de position:sticky.
+      // `sticky` aqui era redundante e, dentro do Sheet mobile (fixed +
+      // portal do Radix), o Safari no iOS tem bug conhecido de sticky
+      // desaparecer nesse tipo de aninhamento — foi isso que fazia o rodapé
+      // sumir por completo no gestor (menu mais longo) em iPhone.
+      className={cn("bg-sidebar flex shrink-0 flex-col gap-2 p-2", className)}
       {...props}
     />
   )

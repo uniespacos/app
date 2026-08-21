@@ -6,7 +6,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { hasPermission } from '@/lib/auth';
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
 import type { Espaco, User } from '@/types';
-import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
+import { Building2, Calendar, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
 
 import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
@@ -48,7 +48,11 @@ export default function EspacoCard({
             : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
 
     return (
-        <Card className="flex flex-col overflow-hidden">
+        // Card sem o py-6/gap-6 padrão do shadcn: aquele padding é o que deixava
+        // uma tarja da cor do card acima e abaixo da imagem (ela nunca alcançava
+        // as bordas arredondadas). Com py-0 a imagem é o primeiro filho colado no
+        // topo, e o overflow-hidden faz o efeito de máscara nos cantos do Card.
+        <Card className="flex flex-col gap-0 overflow-hidden py-0">
             {/* --- Seção da Imagem/Carrossel --- */}
             <div className="relative">
                 <Carousel className="w-full">
@@ -81,12 +85,13 @@ export default function EspacoCard({
                     )}
                 </Carousel>
 
-                {/* Botão de Favoritar posicionado sobre a imagem */}
+                {/* Botão de Favoritar posicionado sobre a imagem. Padding um pouco
+                    maior que o alvo de toque mínimo (44px) para não ficar apertado no mobile. */}
                 {showFavoritar && (
                     <button
                         onClick={handleFavoritarEspaco}
                         disabled={processing}
-                        className={`absolute top-2 right-2 rounded-full p-2 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive text-white hover:bg-destructive' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
+                        className={`absolute top-2 right-2 rounded-full p-2.5 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive text-white hover:bg-destructive' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
                         title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
                     >
                         <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
@@ -94,29 +99,28 @@ export default function EspacoCard({
                 )}
             </div>
 
-            {/* O CardHeader agora contém apenas o título, como é o padrão */}
-            <CardHeader>
+            <CardHeader className="pt-4">
                 <CardTitle className="truncate text-xl" title={espaco.nome}>
                     {espaco.nome}
                 </CardTitle>
             </CardHeader>
 
-            {/* Adicionado 'flex-grow' para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
-            <CardContent className="flex-grow">
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
-                    <Badge variant="outline" className="flex h-auto items-start gap-1.5">
+            {/* flex-grow para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
+            <CardContent className="flex-grow pt-4">
+                <div className="grid grid-cols-2 gap-2">
+                    <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
                         <Building2 className="h-4 w-4 flex-shrink-0" />
-                        <span className="break-words whitespace-normal">{modulo ?? 'N/A'}</span>
+                        <span className="min-w-0 truncate">{modulo ?? 'N/A'}</span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
+                        <Layers className="h-4 w-4 flex-shrink-0" />
                         <span className="min-w-0 truncate">{espaco.andar?.nome ?? 'N/A'}</span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
+                    <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
                         <MapPin className="h-4 w-4 flex-shrink-0" />
                         <span className="min-w-0 truncate">{espaco.andar?.modulo?.unidade?.sigla ?? 'N/A'}</span>
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1.5 overflow-hidden">
+                    <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
                         <Users className="h-4 w-4 flex-shrink-0" />
                         <span className="min-w-0 truncate">{espaco.capacidade_pessoas} pessoas</span>
                     </Badge>
@@ -124,7 +128,7 @@ export default function EspacoCard({
             </CardContent>
 
             {/* O rodapé se alinha na parte inferior do card */}
-            <CardFooter className="flex flex-wrap gap-2 pt-4">
+            <CardFooter className="flex flex-wrap gap-2 py-4">
                 {isGerenciarEspacos && hasPermission(user, PERMISSION_ESPACOS_ATUALIZAR) ? (
                     <>
                         <Button
@@ -137,11 +141,11 @@ export default function EspacoCard({
                             Ver Detalhes
                         </Button>
                         <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
-                            <Edit className="mr-2 h-4 w-4" />
+                            <Edit className="mr-1.5 h-4 w-4" />
                             Editar
                         </Button>
                         <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash2 className="mr-1.5 h-4 w-4" />
                             Excluir
                         </Button>
                     </>
