@@ -58,22 +58,22 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
 
     // Determinar cor do botão
     const getCorBotao = () => {
-        if (podeRemover) return 'text-red-600 hover:text-red-700';
-        if (isTerreo) return 'text-blue-400 cursor-not-allowed border-blue-200';
-        return 'text-amber-500 cursor-not-allowed border-amber-200';
+        if (podeRemover) return 'text-destructive hover:text-destructive';
+        if (isTerreo) return 'text-info-accent cursor-not-allowed border-info/25';
+        return 'text-warning-accent cursor-not-allowed border-warning/25';
     };
 
     return (
         <TooltipProvider>
-            <Card className={`relative ${hasErrors ? 'border-red-200' : ''} ${isTerreo ? 'border-blue-200 bg-blue-50/50' : ''}`}>
+            <Card className={`relative ${hasErrors ? 'border-destructive/25' : ''} ${isTerreo ? 'border-info/25 bg-info-subtle' : ''}`}>
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             {nivelParaLabel(andar.nivel)}
                             {isTerreo && (
                                 <div className="flex items-center gap-1">
-                                    <Lock className="h-3 w-3 text-blue-600" />
-                                    <span className="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">Obrigatório</span>
+                                    <Lock className="h-3 w-3 text-info-accent" />
+                                    <span className="rounded bg-info-subtle px-2 py-1 text-xs font-medium text-info-accent">Obrigatório</span>
                                 </div>
                             )}
                         </CardTitle>
@@ -120,7 +120,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                 <CardContent className="space-y-3">
                     {/* Aviso para térreo */}
                     {isTerreo && (
-                        <div className="rounded border border-blue-200 bg-blue-100 p-2 text-xs text-blue-700">
+                        <div className="rounded border border-info/25 bg-info-subtle p-2 text-xs text-info-accent">
                             <p className="font-medium">ℹ️ Andar obrigatório</p>
                             <p>Todo módulo deve ter térreo. Configure os tipos de acesso necessários.</p>
                         </div>
@@ -128,7 +128,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
 
                     {/* Aviso para andares bloqueados */}
                     {!podeRemover && !isTerreo && (
-                        <div className="rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-700">
+                        <div className="rounded border border-warning/25 bg-warning-subtle p-2 text-xs text-warning-accent">
                             <p className="flex items-center gap-1 font-medium">
                                 <AlertTriangle className="h-3 w-3" />
                                 Remoção bloqueada
@@ -154,7 +154,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                 </div>
                             ))}
                         </div>
-                        {hasErrors && <p className="text-xs text-red-500">{errors[`andares.${index}.tipo_acesso`]}</p>}
+                        {hasErrors && <p className="text-xs text-destructive">{errors[`andares.${index}.tipo_acesso`]}</p>}
                     </div>
                 </CardContent>
             </Card>

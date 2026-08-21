@@ -1,4 +1,5 @@
 import { derivarSlotsDoTurno, type SlotDerivado } from '@/application/espacos/helpers/derivar-slots-do-turno';
+import { ESTILO_SLOT } from '@/constants/situacao-reserva';
 import { TURNOS_ORDENADOS, TURNO_LABEL, type Turno } from '@/constants/turnos';
 import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
@@ -10,29 +11,6 @@ type CalendarDiaMobileProps = {
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     slotsDaReserva?: SlotCalendario[];
-};
-
-const ROTULO_STATUS: Record<SlotCalendario['status'], string> = {
-    livre: 'Livre',
-    reservado: 'Reservado',
-    selecionado: 'Selecionado',
-    solicitado: 'Em análise',
-    deferida: 'Deferida',
-    indeferida: 'Indeferida',
-};
-
-/**
- * Mesma semântica de cor da célula do desktop (calendar-slot-cell), aplicada
- * numa faixa lateral em vez do fundo da linha inteira: em tela estreita o fundo
- * colorido competia com o texto e derrubava o contraste.
- */
-const COR_STATUS: Record<SlotCalendario['status'], string> = {
-    livre: 'bg-muted-foreground/25',
-    reservado: 'bg-blue-400',
-    selecionado: 'bg-primary',
-    solicitado: 'bg-yellow-400',
-    deferida: 'bg-green-500',
-    indeferida: 'bg-red-400',
 };
 
 /**
@@ -148,14 +126,14 @@ export default function CalendarDiaMobile({ diasSemana, agendas, isSlotSeleciona
                                 {/* Faixa de cor à esquerda: o status fica legível sem
                                     depender de tingir a linha inteira, que empastelava
                                     o texto. */}
-                                <span className={cn('h-8 w-1 shrink-0 rounded-full', COR_STATUS[status])} aria-hidden />
+                                <span className={cn('h-8 w-1 shrink-0 rounded-full', ESTILO_SLOT[status].solido)} aria-hidden />
 
                                 <span className="text-sm font-medium tabular-nums">{horaLabel}</span>
 
                                 {/* Ao contrário da célula da grade, aqui há largura
                                     para o título inteiro da reserva. */}
                                 <span className="text-muted-foreground ml-auto truncate text-right text-xs">
-                                    {slot.status === 'reservado' && !selecionado ? slot.dadosReserva?.reserva_titulo : ROTULO_STATUS[status]}
+                                    {slot.status === 'reservado' && !selecionado ? slot.dadosReserva?.reserva_titulo : ESTILO_SLOT[status].label}
                                 </span>
                             </button>
                         );

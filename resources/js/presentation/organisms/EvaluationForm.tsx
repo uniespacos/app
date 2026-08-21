@@ -87,17 +87,17 @@ export default function EvaluationForm({
                     <div className="space-y-2">
                         <Label className="font-medium">Decisão Global</Label>
                         <RadioGroup value={decisao} onValueChange={onDecisaoChange} disabled={isRadioGroupDisabled}>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-green-300 has-[:checked]:bg-green-50">
+                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-success/25 has-[:checked]:bg-success-subtle">
                                 <RadioGroupItem value="deferida" id="deferida" />
                                 <Label htmlFor="deferida" className="flex w-full cursor-pointer items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                    <CheckCircle className="h-4 w-4 text-success-accent" />
                                     Deferir todos os horários visíveis
                                 </Label>
                             </div>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-destructive/25 has-[:checked]:bg-destructive-subtle">
                                 <RadioGroupItem value="indeferida" id="indeferida" />
                                 <Label htmlFor="indeferida" className="flex w-full cursor-pointer items-center gap-2">
-                                    <XCircle className="h-4 w-4 text-red-600" />
+                                    <XCircle className="h-4 w-4 text-destructive" />
                                     Indeferir todos os horários visíveis
                                 </Label>
                             </div>
@@ -109,7 +109,7 @@ export default function EvaluationForm({
 
                     {showMotivoField && (
                         <div className="space-y-2">
-                            <Label htmlFor="motivo" className="font-medium text-red-700">
+                            <Label htmlFor="motivo" className="font-medium text-destructive">
                                 Motivo do Indeferimento *
                             </Label>
                             <Textarea
@@ -117,14 +117,14 @@ export default function EvaluationForm({
                                 placeholder="Descreva o motivo pelo qual um ou mais horários estão sendo indeferidos..."
                                 value={data.motivo}
                                 onChange={(e) => setData('motivo', e.target.value)}
-                                className="min-h-[100px] border-red-200 focus:border-red-500"
+                                className="min-h-[100px] border-destructive/25 focus:border-destructive"
                             />
-                            <p className="text-sm text-red-600">Este campo é obrigatório se algum horário for indeferido.</p>
+                            <p className="text-sm text-destructive">Este campo é obrigatório se algum horário for indeferido.</p>
                         </div>
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="observacao" className="font-medium text-blue-700">
+                        <Label htmlFor="observacao" className="font-medium text-info-accent">
                             Observação (Opcional)
                         </Label>
                         <Textarea
@@ -132,7 +132,7 @@ export default function EvaluationForm({
                             placeholder="Caso haja uma observação adicional para o solicitante, descreva aqui..."
                             value={data.observacao}
                             onChange={(e) => setData('observacao', e.target.value)}
-                            className="min-h-[100px] border-blue-200 focus:border-blue-500"
+                            className="min-h-[100px] border-info/25 focus:border-info/25"
                         />
                     </div>
 

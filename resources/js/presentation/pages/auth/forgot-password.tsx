@@ -25,7 +25,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <AuthLayout title="Recuperação de senha" description="Digite seu e-mail para receber um link de redefinição de senha">
             <Head title="Recuperação de senha" />
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-success-accent">{status}</div>}
 
             <div className="space-y-6">
                 <form onSubmit={submit}>

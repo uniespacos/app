@@ -116,7 +116,7 @@ export function NotificationDropdown() {
                     <Bell className="h-5 w-5" />
                     {/* Exibe o contador apenas se for maior que zero */}
                     {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                        <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs text-white">
                             {unreadCount}
                         </span>
                     )}
@@ -157,9 +157,9 @@ export function NotificationDropdown() {
                                         <p className="text-sm font-medium">{notification.data.titulo}</p>
                                         <p className="font-regular text-sm">{notification.data.descricao}</p>
 
-                                        <p className="mt-1 text-xs text-gray-500">{formatNotificationTime(notification.created_at)}</p>
+                                        <p className="mt-1 text-xs text-muted-foreground">{formatNotificationTime(notification.created_at)}</p>
                                         {notification.data.url && (
-                                            <a href={notification.data.url} className="mt-1 block text-xs text-blue-500 hover:underline">
+                                            <a href={notification.data.url} className="mt-1 block text-xs text-info-accent hover:underline">
                                                 Ver detalhes
                                             </a>
                                         )}

@@ -158,12 +158,12 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                     />
                                 )}
                             />
-                            {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
+                            {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>}
                             {slugSuggestion && !errors.name?.message?.includes('obrigatório') && (
                                 <button
                                     type="button"
                                     onClick={() => setValue('name', slugSuggestion, { shouldValidate: true })}
-                                    className="mt-1 text-sm text-blue-600 hover:underline"
+                                    className="mt-1 text-sm text-info-accent hover:underline"
                                 >
                                     Usar sugestão: <strong>{slugSuggestion}</strong>
                                 </button>
@@ -184,7 +184,7 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                     />
                                 )}
                             />
-                            {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
+                            {errors.description && <p className="mt-1 text-sm text-destructive">{errors.description.message}</p>}
                         </div>
                     </div>
 

@@ -47,7 +47,7 @@ export default function CalendarShiftSection({
     return (
         <div key={agenda.id}>
             {/* Cabeçalho do Turno */}
-            <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b bg-gray-50">
+            <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b bg-muted/50">
                 <div className="p-2 text-center text-xs font-semibold">{titulo.charAt(0).toUpperCase() + titulo.slice(1)}</div>
                 {diasSemana.map((dia) => (
                     <div key={`${titulo}-${dia.valor}`} className="p-2 text-center text-xs font-medium"></div>

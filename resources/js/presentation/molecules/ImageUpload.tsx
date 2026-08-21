@@ -87,7 +87,7 @@ export function ImageUpload({
             <div className="space-y-2">
                 <Label htmlFor="images">Imagens do Espaço</Label>
                 <Input id="images" type="file" accept="image/*" multiple onChange={handleImagesUpload} disabled={processing} />
-                {errors.imagens && <p className="mt-1 text-sm text-red-500">{errors.imagens}</p>}
+                {errors.imagens && <p className="mt-1 text-sm text-destructive">{errors.imagens}</p>}
             </div>
 
             {imagesWithPreviews.length > 0 ? (
@@ -98,7 +98,7 @@ export function ImageUpload({
                             <div key={index} className="group relative">
                                 <div
                                     className={`aspect-square overflow-hidden rounded-md border ${
-                                        mainImageIndex === index ? 'ring-primary border-primary ring-2' : 'bg-slate-50'
+                                        mainImageIndex === index ? 'ring-primary border-primary ring-2' : 'bg-muted/50'
                                     }`}
                                 >
                                     <img src={img.preview || Image} alt={`Imagem ${index + 1}`} className="h-full w-full object-cover" />
@@ -111,7 +111,7 @@ export function ImageUpload({
                                         type="button"
                                         variant="outline"
                                         size="icon"
-                                        className="h-6 w-6 rounded-full bg-white shadow-md"
+                                        className="h-6 w-6 rounded-full bg-background shadow-md"
                                         onClick={() => setMainImageIndex(index)}
                                         disabled={processing || mainImageIndex === index}
                                         title="Definir como imagem principal"
@@ -126,7 +126,7 @@ export function ImageUpload({
                                             strokeWidth="2"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
-                                            className="h-3 w-3 text-amber-500"
+                                            className="h-3 w-3 text-warning-accent"
                                         >
                                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                         </svg>

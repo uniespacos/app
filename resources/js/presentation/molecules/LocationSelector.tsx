@@ -61,7 +61,7 @@ export function LocationSelector({
                             ))}
                         </SelectContent>
                     </SelectUI>
-                    {errors.unidade_id && <p className="mt-1 text-sm text-red-500">{errors.unidade_id}</p>}
+                    {errors.unidade_id && <p className="mt-1 text-sm text-destructive">{errors.unidade_id}</p>}
                 </div>
 
                 {/* Seleção de Módulo */}
@@ -87,7 +87,7 @@ export function LocationSelector({
                                 ))}
                         </SelectContent>
                     </SelectUI>
-                    {errors.modulo_id && <p className="mt-1 text-sm text-red-500">{errors.modulo_id}</p>}
+                    {errors.modulo_id && <p className="mt-1 text-sm text-destructive">{errors.modulo_id}</p>}
                 </div>
             </div>
 
@@ -113,13 +113,13 @@ export function LocationSelector({
                             </SelectContent>
                         </SelectUI>
                     </div>
-                    {errors.andar_id && <p className="mt-1 text-sm text-red-500">{errors.andar_id}</p>}
+                    {errors.andar_id && <p className="mt-1 text-sm text-destructive">{errors.andar_id}</p>}
                 </div>
 
                 {/* Tipos de Acesso do Andar */}
                 <div className="space-y-2">
                     <Label>Tipos de Acesso do Andar</Label>
-                    <div className="border-input flex min-h-[40px] flex-wrap items-center gap-2 rounded-md border bg-slate-50 px-3 py-2">
+                    <div className="border-input flex min-h-[40px] flex-wrap items-center gap-2 rounded-md border bg-muted/50 px-3 py-2">
                         {tiposDeAcessoDoAndar.length > 0 ? (
                             tiposDeAcessoDoAndar.map((tipo) => (
                                 <Badge key={tipo} variant="secondary">

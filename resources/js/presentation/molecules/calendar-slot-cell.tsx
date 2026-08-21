@@ -1,4 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ESTILO_SLOT } from '@/constants/situacao-reserva';
 import { cn } from '@/lib/utils';
 import { SlotCalendario } from '@/types';
 import { JSX } from 'react';
@@ -7,6 +8,30 @@ type CalendarSlotCellProps = {
     slot: SlotCalendario;
     isSelecionado: boolean;
     onSelect: () => void;
+};
+
+/**
+ * Fundo e texto de cada estado vêm dos tokens semânticos. Antes eram pares
+ * fixos do Tailwind — fundo na escala 100 com texto na escala 900 — que não
+ * reagiam ao modo escuro: o fundo continuava pastel claro no tema escuro, com
+ * texto quase preto por cima, ou o inverso, dependendo da célula.
+ */
+const FUNDO_STATUS: Record<SlotCalendario['status'], string> = {
+    livre: '',
+    reservado: 'border-info-accent/30 bg-info-subtle',
+    selecionado: 'border-primary bg-primary/15',
+    solicitado: 'border-warning-accent/30 bg-warning-subtle',
+    deferida: 'border-success-accent/30 bg-success-subtle',
+    indeferida: 'border-destructive-accent/30 bg-destructive-subtle',
+};
+
+const TEXTO_STATUS: Record<SlotCalendario['status'], string> = {
+    livre: '',
+    reservado: 'text-info-accent',
+    selecionado: 'text-primary',
+    solicitado: 'text-warning-accent',
+    deferida: 'text-success-accent',
+    indeferida: 'text-destructive-accent',
 };
 
 export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: CalendarSlotCellProps) {
@@ -19,7 +44,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
         }
 
         if (isSelecionado) {
-            return <p className="text-xs font-bold text-green-900">Selecionado</p>;
+            return <p className="text-primary text-xs font-bold">{ESTILO_SLOT.selecionado.label}</p>;
         }
 
         if (slot.status === 'reservado') {
@@ -27,7 +52,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <span className="truncate text-xs font-bold text-blue-900">
+                            <span className={cn('truncate text-xs font-bold', TEXTO_STATUS.reservado)}>
                                 {slot.dadosReserva?.reserva_titulo.substring(0, 15)}
                                 {slot.dadosReserva ? (slot.dadosReserva.reserva_titulo.length > 30 ? '...' : '') : null}
                             </span>
@@ -41,17 +66,10 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
             );
         }
 
-        // Adicione aqui outras lógicas de status se necessário (solicitado, deferida, etc.)
-        // Por exemplo:
-        if (slot.status === 'solicitado') {
-            return <p className="text-xs font-bold text-yellow-900">Em análise</p>;
+        if (slot.status === 'solicitado' || slot.status === 'deferida' || slot.status === 'indeferida') {
+            return <p className={cn('text-xs font-bold', TEXTO_STATUS[slot.status])}>{ESTILO_SLOT[slot.status].label}</p>;
         }
-        if (slot.status === 'deferida') {
-            return <p className="text-xs font-bold text-green-900">Deferida</p>;
-        }
-        if (slot.status === 'indeferida') {
-            return <p className="text-xs font-bold text-red-900">Indeferida</p>;
-        }
+
         return null;
     };
 
@@ -62,20 +80,19 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
             className={cn(
                 'relative flex h-12 items-center justify-center border-l p-1 text-center transition-all duration-200',
                 // Estilo para quando está selecionado
-                isSelecionado && 'border-green-500 bg-green-100 shadow-md hover:bg-green-200',
+                isSelecionado && 'border-primary bg-primary/15 shadow-md hover:bg-primary/25',
 
                 // Estilos baseados no status do slot (SÓ APLICAR SE NÃO ESTIVER SELECIONADO)
-                !isSelecionado && {
-                    'cursor-not-allowed border-blue-300 bg-blue-100/70': slot.status === 'reservado',
-                    'border-yellow-300 bg-yellow-100/70': slot.status === 'solicitado',
-                    'border-green-300 bg-green-100/70': slot.status === 'deferida',
-                    'border-red-300 bg-red-100/70': slot.status === 'indeferida',
-                    'cursor-not-allowed': slot.isLocked,
-                    // Hover genérico apenas para slots livres e clicáveis
-                    'cursor-pointer hover:bg-gray-100': slot.status === 'livre' && !slot.isLocked,
-                    'bg-gray-200/50': slot.isPast && slot.status === 'livre',
-                    'opacity-60 grayscale': slot.isPast && slot.status !== 'livre',
-                },
+                !isSelecionado && [
+                    FUNDO_STATUS[slot.status],
+                    {
+                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked,
+                        // Hover genérico apenas para slots livres e clicáveis
+                        'hover:bg-muted cursor-pointer': slot.status === 'livre' && !slot.isLocked,
+                        'bg-muted/60': slot.isPast && slot.status === 'livre',
+                        'opacity-60 grayscale': slot.isPast && slot.status !== 'livre',
+                    },
+                ],
             )}
         >
             {renderSlotContent()}

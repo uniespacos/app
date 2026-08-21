@@ -155,13 +155,13 @@ export default function AvaliarReserva({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Avaliar reserva" />
-            <div className="min-h-screen bg-gray-50 p-6">
+            <div className="min-h-screen bg-muted/50 p-6">
                 <div className="mx-auto max-w-4xl space-y-6">
                     <div className="container mx-auto space-y-6 p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">Avaliar Reserva</h1>
-                                <p className="mt-1 text-gray-600">
+                                <h1 className="text-3xl font-bold text-foreground">Avaliar Reserva</h1>
+                                <p className="mt-1 text-muted-foreground">
                                     Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} / {reserva.horarios[0]?.agenda?.espaco?.andar?.nome}
                                 </p>
                             </div>
@@ -173,7 +173,7 @@ export default function AvaliarReserva({
 
                         <ReservaInfoCard reserva={reserva}>
                             <div>
-                                <h4 className="mb-3 flex items-center gap-2 font-medium text-gray-900">
+                                <h4 className="mb-3 flex items-center gap-2 font-medium text-foreground">
                                     <Clock className="h-4 w-4" />
                                     Horários Solicitados
                                 </h4>

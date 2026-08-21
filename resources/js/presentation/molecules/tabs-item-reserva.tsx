@@ -30,7 +30,7 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                     <Button
                                         size="sm"
                                         onClick={() => router.get(route('reservas.index', { reserva: reserva.id }))}
-                                        className="mt-5 bg-blue-600 hover:bg-blue-700"
+                                        className="mt-5 bg-info hover:bg-info"
                                     >
                                         <CheckCircle className="mr-1 h-4 w-4" />
                                         Ver detalhes

@@ -41,7 +41,7 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                             onChange={(e) => setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value }))}
                             placeholder="Ex: Jequié ou Vitória da Conquista ..."
                         />
-                        {errors.nome && <p className="mt-1 text-sm text-red-500">{errors.nome}</p>}
+                        {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sigla">SIGLA da unidade</Label>
@@ -51,7 +51,7 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                             onChange={(e) => setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value }))}
                             placeholder="Ex: JQ ou VCA ..."
                         />
-                        {errors.sigla && <p className="mt-1 text-sm text-red-500">{errors.sigla}</p>}
+                        {errors.sigla && <p className="mt-1 text-sm text-destructive">{errors.sigla}</p>}
                     </div>
                 </CardContent>
                 <CardFooter>

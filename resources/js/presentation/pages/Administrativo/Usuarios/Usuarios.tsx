@@ -79,11 +79,11 @@ export default function UsuariosPage() {
     const getPermissionColor = (roleName: string): string => {
         switch (roleName) {
             case ROLE_INSTITUCIONAL:
-                return 'bg-red-100 text-red-800';
+                return 'bg-destructive-subtle text-destructive';
             case ROLE_GESTOR:
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-info-subtle text-info-accent';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-muted text-foreground';
         }
     };
 
@@ -186,8 +186,8 @@ export default function UsuariosPage() {
                                                     </Avatar>
                                                     <div className="space-y-1">
                                                         <h3 className="text-lg font-semibold">{user.name}</h3>
-                                                        <p className="text-gray-600">{user.email}</p>
-                                                        <p className="text-sm text-gray-500">{user.telefone}</p>
+                                                        <p className="text-muted-foreground">{user.email}</p>
+                                                        <p className="text-sm text-muted-foreground">{user.telefone}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
@@ -196,9 +196,9 @@ export default function UsuariosPage() {
                                                     </Badge>
                                                     <div className="flex items-center space-x-2">
                                                         <div
-                                                            className={`h-2 w-2 rounded-full ${user.email_verified_at ? 'bg-green-500' : 'bg-red-500'}`}
+                                                            className={`h-2 w-2 rounded-full ${user.email_verified_at ? 'bg-success' : 'bg-destructive'}`}
                                                         />
-                                                        <span className="text-xs text-gray-500">
+                                                        <span className="text-xs text-muted-foreground">
                                                             {user.email_verified_at ? 'Verificado' : 'Não verificado'}
                                                         </span>
                                                     </div>
@@ -218,7 +218,7 @@ export default function UsuariosPage() {
                                                                 <Shield className="mr-2 h-4 w-4" />
                                                                 Permissões
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => setRemoverUsuario(user)} className="text-red-600">
+                                                            <DropdownMenuItem onClick={() => setRemoverUsuario(user)} className="text-destructive">
                                                                 <Trash className="mr-2 h-4 w-4" />
                                                                 Excluir
                                                             </DropdownMenuItem>

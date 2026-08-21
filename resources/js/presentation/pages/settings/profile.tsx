@@ -140,7 +140,7 @@ export default function Profile({
                         </div>
 
                         <div className="border-t pt-6">
-                            <h3 className="mb-4 text-lg font-medium text-gray-900">Informações Institucionais</h3>
+                            <h3 className="mb-4 text-lg font-medium text-foreground">Informações Institucionais</h3>
                             <SeletorInstituicao
                                 instituicaos={instituicaos}
                                 processing={processing}
@@ -159,14 +159,14 @@ export default function Profile({
                                         href={route('verification.send')}
                                         method="post"
                                         as="button"
-                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                        className="text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                                     >
                                         Clique aqui para reenviar o e-mail de verificação.
                                     </Link>
                                 </p>
 
                                 {status === 'verification-link-sent' && (
-                                    <div className="mt-2 text-sm font-medium text-green-600">
+                                    <div className="mt-2 text-sm font-medium text-success-accent">
                                         Um novo link de verificação foi enviado para seu e-mail.
                                     </div>
                                 )}
@@ -183,7 +183,7 @@ export default function Profile({
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Salvo</p>
+                                <p className="text-muted-foreground text-sm">Salvo</p>
                             </Transition>
                         </div>
                     </form>

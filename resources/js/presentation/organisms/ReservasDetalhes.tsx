@@ -132,14 +132,14 @@ export default function ReservaDetalhes({
                     </DialogDescription>
                 </DialogHeader>
                 <span>
-                    <h4 className="mb-2 font-medium text-gray-900">Descrição</h4>
-                    <p className="rounded-lg bg-gray-50 p-3 text-gray-700">{selectedReserva.descricao}</p>
+                    <h4 className="mb-2 font-medium text-foreground">Descrição</h4>
+                    <p className="rounded-lg bg-muted/50 p-3 text-foreground">{selectedReserva.descricao}</p>
                 </span>
                 <Separator />
                 <div className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-gray-500" />
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <div>
-                        <p className="text-sm text-gray-500">Período Total da Reserva</p>
+                        <p className="text-sm text-muted-foreground">Período Total da Reserva</p>
                         <p className="font-medium">
                             {formatDate(selectedReserva.data_inicial)} até {formatDate(selectedReserva.data_final)}
                         </p>
@@ -147,7 +147,7 @@ export default function ReservaDetalhes({
                 </div>
                 <Separator />
                 <div className="mb-4 space-y-4">
-                    <h4 className="flex items-center gap-2 font-medium text-gray-900">
+                    <h4 className="flex items-center gap-2 font-medium text-foreground">
                         <Clock className="h-4 w-4" />
                         Horários Solicitados
                     </h4>
@@ -177,15 +177,15 @@ export default function ReservaDetalhes({
                 <Separator />
                 {justificativaReserva && (
                     <div>
-                        <h4 className="mb-2 font-medium text-red-900">Justificativa do indeferimento</h4>
-                        <p className="rounded-lg bg-red-50 p-3 text-red-700">{justificativaReserva}</p>
+                        <h4 className="mb-2 font-medium text-destructive">Justificativa do indeferimento</h4>
+                        <p className="rounded-lg bg-destructive-subtle p-3 text-destructive">{justificativaReserva}</p>
                         <Separator className="mt-10" />
                     </div>
                 )}
                 {selectedReserva.observacao && (
                     <div>
-                        <h4 className="mb-2 font-medium text-blue-900">Observação</h4>
-                        <p className="rounded-lg bg-blue-50 p-3 text-blue-700">{selectedReserva.observacao}</p>
+                        <h4 className="mb-2 font-medium text-info-accent">Observação</h4>
+                        <p className="rounded-lg bg-info-subtle p-3 text-info-accent">{selectedReserva.observacao}</p>
                         <Separator className="mt-5" />
                     </div>
                 )}

@@ -117,11 +117,11 @@ export default function AndaresManager({ andares, onUpdate, onRemove, onAdd, err
 
             {/* Limitações */}
             <div className="space-y-1 text-center">
-                {!podeAdicionarAcima && <p className="text-xs text-amber-600">⚠️ Máximo de 10 andares superiores atingido</p>}
-                {!podeAdicionarAbaixo && <p className="text-xs text-amber-600">⚠️ Máximo de 2 subsolos atingido</p>}
+                {!podeAdicionarAcima && <p className="text-xs text-warning-accent">⚠️ Máximo de 10 andares superiores atingido</p>}
+                {!podeAdicionarAbaixo && <p className="text-xs text-warning-accent">⚠️ Máximo de 2 subsolos atingido</p>}
             </div>
 
-            {errors?.andares && <p className="text-center text-sm text-red-500">{errors.andares}</p>}
+            {errors?.andares && <p className="text-center text-sm text-destructive">{errors.andares}</p>}
         </div>
     );
 }

@@ -24,7 +24,7 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
         return (
             <Card>
                 <CardContent>
-                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-12 text-center">
                         <h2 className="text-xl font-semibold">Nenhum espaço encontrado</h2>
                         <p className="text-muted-foreground mt-2">Tente ajustar os filtros ou cadastre um novo espaço para que ele apareça aqui.</p>
                         <Button onClick={() => router.get(route('institucional.espacos.create'))} className="mt-4">

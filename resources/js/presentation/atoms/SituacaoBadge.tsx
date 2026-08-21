@@ -1,49 +1,44 @@
 import { Badge } from '@/components/ui/badge';
+import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
+import { cn } from '@/lib/utils';
 import { SituacaoReserva } from '@/types';
 import { CheckCircle, Clock, XSquare } from 'lucide-react';
+import type { ComponentType } from 'react';
 
 interface SituacaoBadgeProps {
     situacao: SituacaoReserva;
 }
 
+const ICONE: Record<SituacaoReserva, ComponentType<{ className?: string }>> = {
+    em_analise: Clock,
+    parcialmente_deferida: CheckCircle,
+    deferida: CheckCircle,
+    indeferida: XSquare,
+    inativa: XSquare,
+};
+
+/**
+ * As cores vêm de ESTILO_SITUACAO, não de classes soltas do Tailwind. Antes
+ * cada situação repetia aqui o próprio trio de border/bg/text, divergindo dos
+ * outros três lugares que também pintam situação.
+ *
+ * O caso `inativa` carregava `border-black-200 text-black-700` — classes que
+ * não existem no Tailwind. Nenhuma cor era aplicada e ninguém percebia, porque
+ * o texto simplesmente herdava a cor do pai.
+ */
 export function SituacaoBadge({ situacao }: SituacaoBadgeProps) {
-    switch (situacao) {
-        case 'em_analise':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-yellow-200 bg-yellow-50 text-yellow-700">
-                    <Clock className="h-3 w-3" />
-                    Em analise
-                </Badge>
-            );
-        case 'parcialmente_deferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-blue-200 bg-blue-50 text-blue-700">
-                    <CheckCircle className="h-3 w-3" />
-                    Parcialmente Deferida
-                </Badge>
-            );
-        case 'deferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-green-200 bg-green-50 text-green-700">
-                    <CheckCircle className="h-3 w-3" />
-                    Deferida
-                </Badge>
-            );
-        case 'indeferida':
-            return (
-                <Badge variant="outline" className="flex items-center gap-1 border-red-200 bg-red-50 text-red-700">
-                    <XSquare className="h-3 w-3" />
-                    Indeferida
-                </Badge>
-            );
-        case 'inativa':
-            return (
-                <Badge variant="outline" className="border-black-200 text-black-700 flex items-center gap-1 bg-gray-50">
-                    <XSquare className="h-3 w-3" />
-                    Inativa / Cancelada
-                </Badge>
-            );
-        default:
-            return null;
+    const estilo = ESTILO_SITUACAO[situacao];
+
+    if (!estilo) {
+        return null;
     }
+
+    const Icone = ICONE[situacao];
+
+    return (
+        <Badge variant="outline" className={cn('flex items-center gap-1', estilo.badge)}>
+            <Icone className="h-3 w-3" />
+            {estilo.label}
+        </Badge>
+    );
 }

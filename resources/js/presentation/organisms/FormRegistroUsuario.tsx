@@ -97,7 +97,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
             <div className="space-y-4">
                 <div className="border-t pt-6">
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-lg font-medium text-gray-900">Informações Institucionais</h3>
+                        <h3 className="text-lg font-medium text-foreground">Informações Institucionais</h3>
                     </div>
                     <SeletorInstituicao
                         instituicaos={instituicaos}
@@ -112,7 +112,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
             {/* Password */}
             <div className="space-y-4">
                 <div className="border-t pt-6">
-                    <h3 className="mb-4 text-lg font-medium text-gray-900">Definir Senha</h3>
+                    <h3 className="mb-4 text-lg font-medium text-foreground">Definir Senha</h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="password">Senha *</Label>

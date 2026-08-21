@@ -290,7 +290,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                                         <div className="font-medium">
                                             {selectedAgenda.espaco.nome} - {getTurnoText(selectedAgenda.agenda.turno)}
                                         </div>
-                                        <div className="text-sm text-gray-600">
+                                        <div className="text-sm text-muted-foreground">
                                             {selectedAgenda.instituicao.nome} → {selectedAgenda.unidade.nome} → {selectedAgenda.modulo.nome} →{' '}
                                             {selectedAgenda.andar.nome}
                                         </div>

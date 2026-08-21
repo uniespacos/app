@@ -194,7 +194,7 @@ export default function AgendaDialogReserva({
                         <div className="space-y-2">
                             <Label htmlFor="titulo" className="flex items-center gap-2 font-medium">
                                 <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva{' '}
-                                <p className="text-sm text-red-500">* Obrigatório</p>
+                                <p className="text-sm text-destructive">* Obrigatório</p>
                             </Label>
                             <Input
                                 id="titulo"
@@ -206,7 +206,7 @@ export default function AgendaDialogReserva({
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="descricao" className="flex items-center gap-2 font-medium">
-                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição <p className="text-sm text-red-500">* Obrigatório</p>
+                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição <p className="text-sm text-destructive">* Obrigatório</p>
                             </Label>
                             <Textarea
                                 id="descricao"
@@ -363,9 +363,9 @@ export default function AgendaDialogReserva({
                     )}
 
                     {showRecurrenceAlert && (
-                        <div className="mt-4 rounded-sm border-l-4 border-amber-500 bg-amber-50 p-4 text-amber-900 shadow-sm" role="alert">
+                        <div className="mt-4 rounded-sm border-l-4 border-warning/25 bg-warning-subtle p-4 text-warning-accent shadow-sm" role="alert">
                             <div className="flex items-center gap-2">
-                                <Repeat className="h-4 w-4 text-amber-600" />
+                                <Repeat className="h-4 w-4 text-warning-accent" />
                                 <p className="text-sm font-semibold">Ajuste de Recorrência</p>
                             </div>
                             <p className="mt-1 text-xs opacity-90">
