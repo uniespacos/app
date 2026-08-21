@@ -1,14 +1,15 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
+import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import HeadingSmall from '@/presentation/atoms/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Modal } from '@/presentation/molecules/Modal';
 
 type DeleteItemProps = {
     itemName: string;
@@ -18,6 +19,7 @@ type DeleteItemProps = {
 };
 
 export default function DeleteItem({ isOpen, route, itemName, showHeading = true }: DeleteItemProps) {
+    const [open, setOpen] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
 
@@ -36,6 +38,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
     };
 
     const closeModal = () => {
+        setOpen(false);
         isOpen?.(false);
         clearErrors();
         reset();
@@ -51,53 +54,47 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Excluir {itemName}</Button>
-                    </DialogTrigger>
+                <Button variant="destructive" onClick={() => setOpen(true)}>
+                    Excluir {itemName}
+                </Button>
 
-                    <DialogContent>
-                        <DialogTitle>{`Tem certeza que deseja excluir o(a) ${itemName}? `}</DialogTitle>
+                <Modal
+                    open={open}
+                    onOpenChange={setOpen}
+                    title={`Tem certeza que deseja excluir o(a) ${itemName}?`}
+                    description={`Uma vez que o(a) ${itemName} for excluído, todos os dados serão permanentemente removidos. Por favor, digite sua senha para confirmar que deseja excluir permanentemente o(a) ${itemName}`}
+                >
+                    <form className="space-y-6" onSubmit={deleteItem}>
+                        <div className="grid gap-2">
+                            <Label htmlFor="password" className="sr-only">
+                                Senha
+                            </Label>
 
-                        <DialogDescription>
-                            {`Uma vez que o(a) ${itemName} for excluído, todos os dados serão permanentemente removidos. Por favor, digite sua senha para
-                            confirmar que deseja excluir permanentemente o(a) ${itemName}`}
-                        </DialogDescription>
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Senha"
+                                autoComplete="current-password"
+                            />
 
-                        <form className="space-y-6" onSubmit={deleteItem}>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="sr-only">
-                                    Senha
-                                </Label>
+                            <InputError message={errors.password} />
+                        </div>
 
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Senha"
-                                    autoComplete="current-password"
-                                />
+                        <DialogFooter className="gap-2">
+                            <Button type="button" variant="outline" onClick={closeModal}>
+                                Cancelar
+                            </Button>
 
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancelar
-                                    </Button>
-                                </DialogClose>
-
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Excluir {itemName}</button>
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                            <Button variant="destructive" disabled={processing} asChild>
+                                <button type="submit">Excluir {itemName}</button>
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Modal>
             </div>
         </div>
     );

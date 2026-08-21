@@ -1,9 +1,9 @@
 'use client';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Instituicao, Setor, Unidade, User } from '@/types';
 import { SetorForm, SetorFormData } from '@/presentation/organisms/SetorForm';
 import { UsuariosSetor } from '@/presentation/organisms/UsuariosSetor';
+import { Modal } from '@/presentation/molecules/Modal';
 
 interface Props {
     // Modal de criação
@@ -47,59 +47,55 @@ export function ModaisSetor({
 
     return (
         <>
-            {/* Modal de Criação */}
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Novo Setor</DialogTitle>
-                        <DialogDescription>Cadastre um novo setor para uma unidade</DialogDescription>
-                    </DialogHeader>
+            <Modal
+                open={isCreateModalOpen}
+                onOpenChange={setIsCreateModalOpen}
+                title="Novo Setor"
+                description="Cadastre um novo setor para uma unidade"
+                size="md"
+            >
+                <SetorForm
+                    instituicao={instituicao}
+                    unidades={unidades}
+                    onSubmit={(data) => {
+                        onCreateSetor(data);
+                        setIsCreateModalOpen(false);
+                    }}
+                    onCancel={() => setIsCreateModalOpen(false)}
+                />
+            </Modal>
+
+            <Modal
+                open={!!editingSetor}
+                onOpenChange={() => setEditingSetor(null)}
+                title="Editar Setor"
+                description="Altere as informações do setor"
+                size="md"
+            >
+                {editingSetor && (
                     <SetorForm
+                        setor={editingSetor}
                         instituicao={instituicao}
                         unidades={unidades}
                         onSubmit={(data) => {
-                            onCreateSetor(data);
-                            setIsCreateModalOpen(false);
+                            onUpdateSetor(editingSetor.id, data);
+                            setEditingSetor(null);
                         }}
-                        onCancel={() => setIsCreateModalOpen(false)}
+                        onCancel={() => setEditingSetor(null)}
                     />
-                </DialogContent>
-            </Dialog>
+                )}
+            </Modal>
 
-            {/* Modal de Edição */}
-            <Dialog open={!!editingSetor} onOpenChange={() => setEditingSetor(null)}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Editar Setor</DialogTitle>
-                        <DialogDescription>Altere as informações do setor</DialogDescription>
-                    </DialogHeader>
-                    {editingSetor && (
-                        <SetorForm
-                            setor={editingSetor}
-                            instituicao={instituicao}
-                            unidades={unidades}
-                            onSubmit={(data) => {
-                                onUpdateSetor(editingSetor.id, data);
-                                setEditingSetor(null);
-                            }}
-                            onCancel={() => setEditingSetor(null)}
-                        />
-                    )}
-                </DialogContent>
-            </Dialog>
-
-            {/* Modal de Usuários do Setor */}
-            <Dialog open={!!viewingUsuarios} onOpenChange={() => setViewingUsuarios(null)}>
-                <DialogContent className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[800px] md:max-w-[900px] lg:max-w-[1000px] xl:max-w-[1200px]">
-                    <DialogHeader>
-                        <DialogTitle>Usuários do Setor</DialogTitle>
-                        <DialogDescription>
-                            {viewingUsuarios?.nome} - {viewingUsuarios?.unidade?.nome}
-                        </DialogDescription>
-                    </DialogHeader>
-                    {viewingUsuarios && <UsuariosSetor setor={viewingUsuarios} usuarios={getUsuariosDoSetor(viewingUsuarios.id)} />}
-                </DialogContent>
-            </Dialog>
+            <Modal
+                open={!!viewingUsuarios}
+                onOpenChange={() => setViewingUsuarios(null)}
+                title="Usuários do Setor"
+                description={`${viewingUsuarios?.nome ?? ''} - ${viewingUsuarios?.unidade?.nome ?? ''}`}
+                size="xl"
+                className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[800px] md:max-w-[900px] lg:max-w-[1000px] xl:max-w-[1200px]"
+            >
+                {viewingUsuarios && <UsuariosSetor setor={viewingUsuarios} usuarios={getUsuariosDoSetor(viewingUsuarios.id)} />}
+            </Modal>
         </>
     );
 }
