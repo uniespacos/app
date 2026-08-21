@@ -44,7 +44,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
         }
 
         if (isSelecionado) {
-            return <p className="text-primary text-xs font-bold">{ESTILO_SLOT.selecionado.label}</p>;
+            return <p className="text-success-accent text-xs font-bold">{ESTILO_SLOT.selecionado.label}</p>;
         }
 
         if (slot.status === 'reservado') {
@@ -79,8 +79,9 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
             onClick={isClickable ? onSelect : undefined}
             className={cn(
                 'relative flex h-12 items-center justify-center border-l p-1 text-center transition-all duration-200',
-                // Estilo para quando está selecionado
-                isSelecionado && 'border-primary bg-primary/15 shadow-md hover:bg-primary/25',
+                // Estilo para quando está selecionado: verde, é o horário que o
+                // usuário está escolhendo para reservar agora — não a cor de marca.
+                isSelecionado && 'border-success-accent bg-success-subtle shadow-md hover:bg-success-subtle/70',
 
                 // Estilos baseados no status do slot (SÓ APLICAR SE NÃO ESTIVER SELECIONADO)
                 !isSelecionado && [

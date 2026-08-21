@@ -176,13 +176,32 @@ export default function AgendaDialogReserva({
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <Button className="shadow-lg">
+                {/*
+                    O Button base tem `whitespace-nowrap` fixo, e este texto é
+                    dinâmico ("Reservar 12 horários em 5 dias") — sem
+                    `whitespace-normal` aqui, ele estoura a largura do container
+                    pai mesmo quando o container tem `max-w`, porque um filho
+                    flex com nowrap não encolhe abaixo do próprio texto. `w-full`
+                    só abaixo de `sm` porque o container fica sem `left`
+                    definido no desktop — lá a largura é calculada pelo próprio
+                    conteúdo, e um `w-full` incondicional criaria um ciclo entre
+                    "largura do botão" e "largura do container".
+                */}
+                <Button className="w-full whitespace-normal shadow-lg sm:w-auto">
                     {isEditMode ? 'Atualizar' : 'Reservar'} {slotsSelecao.length} horário{slotsSelecao.length > 1 ? 's' : ''} em{' '}
                     {Object.keys(slotsAgrupadosPorDia).length} dia
                     {Object.keys(slotsAgrupadosPorDia).length > 1 ? 's' : ''}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[90vh] w-full overflow-y-auto">
+            {/*
+                Era `w-full` sem margem: como o Dialog é `position: fixed`, isso
+                lia 100% do VIEWPORT, não de um container com respiro — o
+                formulário colava nas bordas da tela no celular. `w-[calc(100%-2rem)]`
+                garante 1rem de cada lado; `sm:w-full` volta ao comportamento
+                normal (largura controlada pelo `max-w-lg` padrão do Dialog) a
+                partir do breakpoint onde já há espaço de sobra.
+            */}
+            <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] overflow-y-auto sm:w-full">
                 <form onSubmit={onSubmit}>
                     <DialogHeader>
                         <DialogTitle>{isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}</DialogTitle>
@@ -260,7 +279,12 @@ export default function AgendaDialogReserva({
                             </RadioGroup>
                         </div>
 
-                        <div className="bg-muted/10 grid grid-cols-2 gap-4 rounded-md border p-3">
+                        {/*
+                            grid-cols-2 fixo espremia rótulo + ícone + data
+                            ("dd/MM/yyyy (calculado)") numa coluna de menos de
+                            150px em telas de 360px. Empilha abaixo de sm.
+                        */}
+                        <div className="bg-muted/10 grid grid-cols-1 gap-4 rounded-md border p-3 sm:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="data-inicial" className="text-xs">
                                     Início {formData.recorrencia !== 'personalizado' && '(ajusta recorrência)'}

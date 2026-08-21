@@ -103,7 +103,14 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             </div>
 
             {slotsSelecao.length > 0 && (
-                <div className="fixed right-4 bottom-4 z-20 flex flex-col items-end gap-2">
+                /*
+                    Sem limite de largura, o botão "Reservar N horários em M
+                    dias" — texto dinâmico, `whitespace-nowrap` por padrão —
+                    podia crescer além da tela em 360px com só `right-4`
+                    ancorando um dos lados. `left-4` mais `max-w-[calc(100%-2rem)]`
+                    mantêm o balão sempre dentro da viewport.
+                */
+                <div className="fixed right-4 bottom-4 left-4 z-20 flex flex-col items-end gap-2 sm:left-auto sm:max-w-[calc(100%-2rem)]">
                     <AgendaDialogReserva
                         isOpen={dialogAberto}
                         onOpenChange={setDialogAberto}

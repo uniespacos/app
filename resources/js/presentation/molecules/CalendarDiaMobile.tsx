@@ -119,7 +119,10 @@ export default function CalendarDiaMobile({ diasSemana, agendas, isSlotSeleciona
                                     'flex min-h-[52px] w-full items-center gap-3 border-b px-3 py-2 text-left transition-colors last:border-b-0',
                                     'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
                                     clicavel ? 'hover:bg-muted/50' : 'cursor-not-allowed',
-                                    selecionado && 'bg-primary/10',
+                                    // Verde: é o horário que o usuário está
+                                    // escolhendo para reservar agora, não a cor
+                                    // de marca (que aqui é o seletor de dia acima).
+                                    selecionado && 'bg-success-subtle',
                                     slot.isPast && !selecionado && 'opacity-55',
                                 )}
                             >

@@ -65,7 +65,15 @@ export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
 export const ESTILO_SLOT = {
     livre: { label: 'Livre', solido: 'bg-muted-foreground/25' },
     reservado: { label: 'Reservado', solido: 'bg-info' },
-    selecionado: { label: 'Selecionado', solido: 'bg-primary' },
+    /*
+      `selecionado` é o horário que o usuário está escolhendo para reservar
+      agora — verde, não a cor de marca. Reutiliza o mesmo token de `deferida`
+      de propósito: para quem está montando a reserva, "vou pegar este
+      horário" e "este horário foi aprovado" são a mesma sinalização de
+      positivo, e usar cores diferentes para os dois criaria uma distinção que
+      o usuário não precisa fazer nesse momento.
+    */
+    selecionado: { label: 'Selecionado', solido: 'bg-success' },
     solicitado: { label: 'Em análise', solido: 'bg-warning' },
     deferida: { label: 'Deferida', solido: 'bg-success' },
     indeferida: { label: 'Indeferida', solido: 'bg-destructive' },
