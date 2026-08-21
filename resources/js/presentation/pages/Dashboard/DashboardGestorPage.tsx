@@ -8,9 +8,8 @@ import AppLayout from '@/presentation/templates/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format, subDays } from 'date-fns';
-import { BarChart3, CalendarSearch, CheckCircle, Clock, Eye, Star, Users } from 'lucide-react';
+import { BarChart3, CalendarSearch, Eye, Star } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
-import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 
 const GraficoReservasPeriodo = lazy(() => import('@/presentation/molecules/GraficoReservasPeriodo'));
@@ -24,8 +23,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Dashboard({
     user,
-    reservasPendentes,
-    statusDasReservas,
 }: {
     user: User;
     espacos: Espaco[];
@@ -59,28 +56,6 @@ export default function Dashboard({
         filtrosPeriodo,
     );
 
-    const statCards: Array<{ label: string; valor: number; descricao: string; Icone: typeof Clock; href?: string }> = [
-        {
-            label: 'Pendentes',
-            valor: statusDasReservas.pendentes,
-            descricao: 'Aguardando sua análise',
-            Icone: Clock,
-            href: route('gestor.reservas.index', { situacao: 'em_analise' }),
-        },
-        {
-            label: 'Avaliadas Hoje',
-            valor: statusDasReservas.avaliadas_hoje,
-            descricao: 'Reservas avaliadas hoje',
-            Icone: CheckCircle,
-        },
-        {
-            label: 'Espaços Gerenciados',
-            valor: statusDasReservas.total_espacos,
-            descricao: 'Sob sua responsabilidade',
-            Icone: Users,
-        },
-    ];
-
     const atalhos = [
         { label: 'Gerir Reservas', descricao: 'Avalie as solicitações pendentes', Icone: Eye, href: route('gestor.reservas.index') },
         { label: 'Consultar Espaços', descricao: 'Veja a disponibilidade e reserve', Icone: CalendarSearch, href: route('espacos.index') },
@@ -94,28 +69,6 @@ export default function Dashboard({
                 <div>
                     <h1 className="text-2xl font-bold sm:text-3xl">Painel do Gestor</h1>
                     <p className="text-muted-foreground">Olá, {user.name} - Gerencie as reservas dos seus espaços</p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {statCards.map(({ label, valor, descricao, Icone, href }) => (
-                        <Card
-                            key={label}
-                            role={href ? 'button' : undefined}
-                            tabIndex={href ? 0 : undefined}
-                            onClick={href ? () => router.get(href) : undefined}
-                            onKeyDown={href ? (e) => e.key === 'Enter' && router.get(href) : undefined}
-                            className={href ? 'hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm' : undefined}
-                        >
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">{label}</CardTitle>
-                                <Icone className="text-muted-foreground h-4 w-4" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{valor}</div>
-                                <p className="text-muted-foreground text-xs">{descricao}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -140,55 +93,6 @@ export default function Dashboard({
                         </Card>
                     ))}
                 </div>
-
-                {/* Fila de aprovação: diferente do painel comum, aqui a lista
-                    fica sempre visível — é o motivo do gestor abrir esta tela. */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Reservas Aguardando Análise</CardTitle>
-                        <CardDescription>Avalie as solicitações de reserva dos seus espaços</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {reservasPendentes.length === 0 ? (
-                            <p className="text-muted-foreground py-8 text-center text-sm">Nenhuma reserva pendente no momento.</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {reservasPendentes.slice(0, 5).map((reserva) => (
-                                    <div
-                                        key={reserva.id}
-                                        className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-start sm:justify-between"
-                                    >
-                                        <div className="min-w-0 space-y-1">
-                                            <h4 className="truncate font-medium">{reserva.titulo}</h4>
-                                            <p className="text-muted-foreground truncate text-sm">{reserva.descricao}</p>
-                                            <p className="text-muted-foreground text-xs">
-                                                Solicitante: {reserva.user?.name} ({reserva.user?.setor?.nome})
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start">
-                                            <SituacaoBadge situacao={reserva.situacao} />
-                                            <Button
-                                                size="sm"
-                                                onClick={() => router.get(route('gestor.reservas.show', reserva.id))}
-                                                className="sm:mt-5"
-                                            >
-                                                <CheckCircle className="mr-1 h-4 w-4" />
-                                                Avaliar
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                                {reservasPendentes.length > 5 && (
-                                    <div className="text-center">
-                                        <Button variant="link" size="sm" onClick={() => router.get(route('gestor.reservas.index'))}>
-                                            Ver todas as {reservasPendentes.length} pendentes
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
 
                 {podeVerRelatorios && (
                     <Card>
