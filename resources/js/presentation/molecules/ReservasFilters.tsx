@@ -12,9 +12,11 @@ type ReservasFiltersProps = {
     onSearchTermChange: (value: string) => void;
     selectedSituacao: string;
     onSituacaoChange: (value: string) => void;
+    /** Eixo de arquivamento (issue #108): 'ativas' | 'arquivadas' | 'todas'. */
+    selectedArquivo: string;
+    onArquivoChange: (value: string) => void;
     selectedDate?: Date; // Adicionei para o filtro de data
     onDateChange?: (date: Date | undefined) => void; // Função opcional para lidar com a mudança de data
-    isGestor?: boolean;
 };
 
 export function ReservasFilters({
@@ -22,12 +24,13 @@ export function ReservasFilters({
     onSearchTermChange,
     selectedSituacao,
     onSituacaoChange,
+    selectedArquivo,
+    onArquivoChange,
     selectedDate,
     onDateChange,
-    isGestor = false,
 }: ReservasFiltersProps) {
     return (
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
             <div className="relative flex-1">
                 <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                 <Input
@@ -39,20 +42,36 @@ export function ReservasFilters({
                 />
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
+                {/*
+                    Issue #108: este select cobre apenas o resultado da avaliação.
+                    'inativa' saiu daqui — é estado de arquivamento, e enquanto
+                    dividia este campo com os demais o filtro por arquivadas
+                    entrava em contradição com o padrão do backend.
+                */}
                 <Select
                     value={selectedSituacao} // 5. O valor vem das props
                     onValueChange={(value) => onSituacaoChange(value === 'todas' ? '' : value)} // 6. A mudança notifica o pai
                 >
-                    <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px]" aria-label="Situação">
                         <SelectValue placeholder="Situação" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="todas">Todas</SelectItem>
+                        <SelectItem value="todas">Todas as situações</SelectItem>
                         <SelectItem value="em_analise">Em Análise</SelectItem>
                         <SelectItem value="indeferida">Indeferida</SelectItem>
                         <SelectItem value="parcialmente_deferida">Parcialmente Deferida</SelectItem>
                         <SelectItem value="deferida">Deferida</SelectItem>
-                        {isGestor && <SelectItem value="inativa">Inativa</SelectItem>}
+                    </SelectContent>
+                </Select>
+
+                <Select value={selectedArquivo || 'ativas'} onValueChange={onArquivoChange}>
+                    <SelectTrigger className="w-full sm:w-[180px]" aria-label="Exibir">
+                        <SelectValue placeholder="Exibir" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="ativas">Ativas</SelectItem>
+                        <SelectItem value="arquivadas">Arquivadas</SelectItem>
+                        <SelectItem value="todas">Todas</SelectItem>
                     </SelectContent>
                 </Select>
 

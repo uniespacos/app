@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SituacaoReserva\ModoArquivoEnum;
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Jobs\AvaliarReservaJob;
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Jobs\UpdateReservaJob;
@@ -37,6 +39,8 @@ class ReservaService
     public function getListingForUser(User $user, string $weekRef, array $filters, int $perPage = 10): array
     {
         [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef);
+
+        $filters = $this->normalizarFiltros($filters);
 
         /** @var LengthAwarePaginator<Reserva> $reservas */
         $reservas = $this->repoReserva->getPaginatedForUser($user->id, $weekStart, $weekEnd, $filters, $perPage)
@@ -155,10 +159,56 @@ class ReservaService
     }
 
     /**
+     * Normaliza os filtros de listagem antes de chegarem ao repositorio (issue #108).
+     *
+     * Faz duas coisas:
+     *
+     * 1. Descarta `situacao` que nao seja resultado de avaliacao. Sem isso um
+     *    valor qualquer na query string vira `where('situacao', <lixo>)` e
+     *    devolve lista vazia sem explicar nada a quem esta olhando.
+     *
+     * 2. Traduz o parametro legado. Antes da #108 o unico jeito de ver
+     *    arquivadas era `?situacao=inativa`, oferecido ao gestor no select.
+     *    Depois da mudanca esse valor colidiria com o default de `arquivo` e
+     *    devolveria lista vazia — justamente o bug que a #108 corrige. A
+     *    traducao mantem favoritos, historico e links compartilhados
+     *    funcionando, e so age quando `arquivo` nao veio explicito, para nao
+     *    sobrescrever uma escolha atual do usuario.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    private function normalizarFiltros(array $filters): array
+    {
+        $situacao = $filters['situacao'] ?? null;
+
+        if ($situacao === SituacaoReservaEnum::INATIVA->value && ! isset($filters['arquivo'])) {
+            $filters['arquivo'] = ModoArquivoEnum::ARQUIVADAS->value;
+        }
+
+        $filters['situacao'] = is_string($situacao)
+            && in_array($situacao, SituacaoReservaEnum::valoresDeAvaliacao(), true)
+                ? $situacao
+                : null;
+
+        $filters['arquivo'] = ModoArquivoEnum::fromFiltro($filters['arquivo'] ?? null)->value;
+
+        return $filters;
+    }
+
+    /**
      * Cancels a reservation by marking it and its horarios as inactive and notifying managers.
      */
     public function cancel(Reserva $reserva, User $user): void
     {
+        // Issue #108: cancelar o que ja esta cancelado nao muda estado nenhum,
+        // mas disparava outra rodada de notificacoes para todos os gestores.
+        // Enquanto as arquivadas eram invisiveis na listagem esse caminho era
+        // inalcancavel pela UI; com o filtro novo, deixa de ser.
+        if ($reserva->situacao === SituacaoReservaEnum::INATIVA->value) {
+            return;
+        }
+
         $agendaIds = $reserva->horarios->pluck('agenda_id')->unique()->values()->all();
 
         DB::transaction(function () use ($reserva) {
@@ -194,6 +244,8 @@ class ReservaService
     {
         [$weekStart, $weekEnd, $reference] = $this->resolveWeek($weekRef);
         $agendaIds = $gestor->agendas()->pluck('id')->all();
+
+        $filters = $this->normalizarFiltros($filters);
 
         $reservas = $this->repoReserva->getPaginatedForGestor($agendaIds, $filters, $perPage)
             ->withQueryString();
