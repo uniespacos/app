@@ -76,22 +76,19 @@ export default function Dashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold">Painel Institucional</h1>
-                            <p className="text-muted-foreground">Olá, {user.name} bem vindo ao UniEspaços</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button onClick={() => router.get(route('institucional.espacos.create'))}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Novo Espaço
-                            </Button>
-                        </div>
+                {/* Header */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Painel Institucional</h1>
+                        <p className="text-muted-foreground">Olá, {user.name} - Bem-vindo ao UniEspaços</p>
                     </div>
+                    <Button onClick={() => router.get(route('institucional.espacos.create'))}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Novo Espaço
+                    </Button>
+                </div>
 
-                    {/* Stats Cards */}
+                {/* Stats Cards */}
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -298,8 +295,7 @@ export default function Dashboard({
                                 </CardContent>
                             </Card>
                         </TabsContent>
-                    </Tabs>
-                </div>
+                </Tabs>
             </div>
         </AppLayout>
     );

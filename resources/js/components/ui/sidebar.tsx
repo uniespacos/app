@@ -338,7 +338,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex shrink-0 flex-col gap-2 p-2", className)}
       {...props}
     />
   )
@@ -349,7 +349,11 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      // `sticky bottom-0` + fundo sólido garante que o perfil/logout continue
+      // alcançáveis mesmo se a lista de navegação crescer além da altura da
+      // tela no Sheet mobile — sem isso, o rodapé só ficava visível se todo
+      // o conteúdo acima coubesse exatamente na viewport.
+      className={cn("bg-sidebar sticky bottom-0 z-10 flex shrink-0 flex-col gap-2 p-2", className)}
       {...props}
     />
   )
@@ -489,7 +493,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
+        // h-11 (44px) no mobile é o alvo mínimo de toque recomendado; em
+        // desktop (md:) volta para h-8, mais compacto para uso com mouse.
+        default: "h-11 text-sm md:h-8",
         sm: "h-7 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
       },

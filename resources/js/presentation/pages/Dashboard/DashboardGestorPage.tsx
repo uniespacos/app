@@ -67,7 +67,7 @@ export default function Dashboard({
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
-                    <h1 className="text-2xl font-bold sm:text-3xl">Painel do Gestor</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Painel do Gestor</h1>
                     <p className="text-muted-foreground">Olá, {user.name} - Gerencie as reservas dos seus espaços</p>
                 </div>
 

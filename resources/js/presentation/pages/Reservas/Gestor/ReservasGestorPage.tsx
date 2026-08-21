@@ -7,6 +7,7 @@ import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
 import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
 import { ReservasList } from '@/presentation/organisms/ReservasList';
 import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
+import { ShieldCheck } from 'lucide-react';
 
 import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
@@ -56,33 +57,34 @@ export default function MinhasReservas({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Home" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
-                        <GenericHeader titulo="Gerenciar reservas" descricao="Avalie as solicitações de reserva dos espaços que voce gere" />
-                        <ReservasFilters
-                            searchTerm={searchTerm}
-                            onSearchTermChange={setSearchTerm}
-                            selectedSituacao={selectedSituacao}
-                            onSituacaoChange={setSelectedSituacao}
-                            selectedArquivo={selectedArquivo}
-                            onArquivoChange={setSelectedArquivo}
-                            selectedOrdenar={selectedOrdenar}
-                            onOrdenarChange={setSelectedOrdenar}
-                            selectedDate={selectedDate}
-                            onDateChange={setSelectedDate}
-                        />
-                        <Suspense fallback={<ReservasLoading />}>
-                            <ReservasList
-                                fallback={<ReservasEmpty />}
-                                paginator={paginator}
-                                isGestor={true}
-                                user={user}
-                                reservaToShow={reservaToShow}
-                                routeName="gestor.reservas.index"
-                            />
-                        </Suspense>
-                    </div>
-                </div>
+                <GenericHeader
+                    titulo="Gerenciar reservas"
+                    descricao="Avalie as solicitações de reserva dos espaços que voce gere"
+                    badge="Modo gestor"
+                    BadgeIcon={ShieldCheck}
+                />
+                <ReservasFilters
+                    searchTerm={searchTerm}
+                    onSearchTermChange={setSearchTerm}
+                    selectedSituacao={selectedSituacao}
+                    onSituacaoChange={setSelectedSituacao}
+                    selectedArquivo={selectedArquivo}
+                    onArquivoChange={setSelectedArquivo}
+                    selectedOrdenar={selectedOrdenar}
+                    onOrdenarChange={setSelectedOrdenar}
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                />
+                <Suspense fallback={<ReservasLoading />}>
+                    <ReservasList
+                        fallback={<ReservasEmpty />}
+                        paginator={paginator}
+                        isGestor={true}
+                        user={user}
+                        reservaToShow={reservaToShow}
+                        routeName="gestor.reservas.index"
+                    />
+                </Suspense>
             </div>
         </AppLayout>
     );

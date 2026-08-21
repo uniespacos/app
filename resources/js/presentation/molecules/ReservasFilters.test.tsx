@@ -97,7 +97,7 @@ describe('ReservasFilters', () => {
         render(<ReservasFilters {...props} />);
 
         fireEvent.click(screen.getByLabelText('Ordenar por'));
-        fireEvent.click(screen.getByText('Situação'));
+        fireEvent.click(screen.getByRole('option', { name: 'Situação' }));
 
         expect(props.onOrdenarChange).toHaveBeenCalledWith('situacao');
     });

@@ -64,7 +64,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
-                    <h1 className="text-2xl font-bold sm:text-3xl">Olá, {user.name}!</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Olá, {user.name}!</h1>
                     <p className="text-muted-foreground">
                         {user.setor ? `${user.setor.nome} (${user.setor.sigla})` : 'Bem-vindo ao UniEspaços!'}
                     </p>

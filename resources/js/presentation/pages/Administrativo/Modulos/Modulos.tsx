@@ -94,7 +94,7 @@ export default function ModulosPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Buscar</Label>
+                                        <Label className="text-sm font-medium">Unidade</Label>
                                         <Select value={filtroUnidade} onValueChange={setFiltroUnidade}>
                                             <SelectTrigger className="w-full sm:w-[200px]">
                                                 <SelectValue placeholder="Filtrar por unidade" />
