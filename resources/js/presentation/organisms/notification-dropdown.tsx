@@ -122,44 +122,52 @@ export function NotificationDropdown() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-0" align="end">
-                {/*
-                // TODO: Implementar paginação/infinite scroll se necessário no futuro 
-                <div className="flex items-center justify-between p-4">
-                    <h4 className="text-lg font-semibold">Notificações</h4>
+            {/* w-[calc(100vw-2rem)] evita o popover encostar/vazar nas bordas
+                da tela no celular; sm:w-80 volta ao tamanho fixo no desktop. */}
+            <PopoverContent className="w-[calc(100vw-2rem)] p-0 sm:w-80" align="end">
+                <div className="flex items-center justify-between p-3">
+                    <h4 className="text-sm font-semibold">Notificações{unreadCount > 0 && ` (${unreadCount})`}</h4>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={markAllAsRead}
-                            disabled={isLoading || unreadCount === 0}
-                            className="text-muted-foreground hover:text-primary"
+                            disabled={isLoading}
+                            className="text-muted-foreground hover:text-primary h-auto p-0 text-xs"
                         >
-                            <MailCheck className="mr-1 h-4 w-4" /> Marcar todas como lidas
+                            Marcar todas como lidas
                         </Button>
                     )}
                 </div>
-                */}
                 <Separator />
                 <ScrollArea className="h-[300px]">
-                    <div className="p-4">
+                    <div className="space-y-2 p-3">
                         {isLoading ? (
                             <p className="text-muted-foreground text-center text-sm">Carregando...</p>
                         ) : notifications.length === 0 ? (
-                            <p className="text-muted-foreground text-center text-sm">Nenhuma notificação encontrada.</p>
+                            <div className="text-muted-foreground flex flex-col items-center gap-2 py-8 text-center text-sm">
+                                <Bell className="h-8 w-8 opacity-40" />
+                                Nenhuma notificação por aqui.
+                            </div>
                         ) : (
                             notifications.map((notification) => {
+                                const lida = !!notification.read_at;
                                 return (
                                     <div
                                         key={notification.id}
-                                        className={`mb-3 rounded-md p-2 last:mb-0 ${notification.read_at ? 'bg-muted/50 text-muted-foreground' : 'bg-card'}`}
+                                        // Barra de cor à esquerda marca o não lido, mesmo
+                                        // padrão usado nos slots do calendário mobile — não
+                                        // depende só do tom de fundo, que era sutil demais
+                                        // (bg-card vs bg-muted/50) para notar de relance.
+                                        className={`rounded-md border-l-2 p-2 ${lida ? 'border-transparent' : 'border-primary bg-primary/5'}`}
                                     >
-                                        <p className="text-sm font-medium">{notification.data.titulo}</p>
-                                        <p className="font-regular text-sm">{notification.data.descricao}</p>
-
-                                        <p className="mt-1 text-xs text-muted-foreground">{formatNotificationTime(notification.created_at)}</p>
+                                        <p className={`text-sm ${lida ? 'text-muted-foreground font-normal' : 'font-medium'}`}>
+                                            {notification.data.titulo}
+                                        </p>
+                                        <p className="text-muted-foreground text-sm">{notification.data.descricao}</p>
+                                        <p className="text-muted-foreground mt-1 text-xs">{formatNotificationTime(notification.created_at)}</p>
                                         {notification.data.url && (
-                                            <a href={notification.data.url} className="mt-1 block text-xs text-info-accent hover:underline">
+                                            <a href={notification.data.url} className="text-info-accent mt-1 block text-xs hover:underline">
                                                 Ver detalhes
                                             </a>
                                         )}
@@ -169,18 +177,6 @@ export function NotificationDropdown() {
                         )}
                     </div>
                 </ScrollArea>
-                <Separator />
-                <div className="p-4 text-center">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={markAllAsRead}
-                        disabled={isLoading || unreadCount === 0}
-                        className="text-muted-foreground hover:text-primary"
-                    >
-                        Marcar como lidos todas as notificações
-                    </Button>
-                </div>
             </PopoverContent>
         </Popover>
     );
