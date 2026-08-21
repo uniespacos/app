@@ -1,6 +1,7 @@
 import DeleteItem from '@/presentation/molecules/delete-item';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { formatDate } from '@/lib/utils';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
@@ -11,6 +12,7 @@ import { useEffect, useState } from 'react';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
+import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
 import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
 import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
@@ -26,6 +28,7 @@ interface ReservasListProps {
 // Componente principal da lista de reservas
 export function ReservasList({ paginator, fallback, isGestor, user, reservaToShow, routeName }: ReservasListProps) {
     const { data: reservas, links } = paginator;
+    const isMobile = useIsMobile();
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
     const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
@@ -88,6 +91,52 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
             },
         );
     };
+
+    if (isMobile) {
+        return (
+            <div className="space-y-4">
+                <div className="space-y-3">
+                    {reservasFiltradas.map((reserva) => (
+                        <ReservaCardMobile
+                            key={reserva.id}
+                            reserva={reserva}
+                            isGestor={isGestor}
+                            onDetalhes={handleAbrirDetalhes}
+                            onAvaliar={handleAvaliarButton}
+                            onEditar={(id) => router.get(`reservas/${id}/edit`)}
+                            onCancelar={setRemoverReserva}
+                        />
+                    ))}
+                </div>
+                {selectedReserva && (
+                    <ReservaDetalhes
+                        isOpen={!!selectedReserva}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                handleFecharDetalhes();
+                            }
+                        }}
+                        isGestor={isGestor}
+                        selectedReserva={selectedReserva}
+                        setRemoverReserva={setRemoverReserva}
+                        routeName={routeName}
+                    />
+                )}
+                {removerReserva && (
+                    <DeleteItem
+                        isOpen={(open) => {
+                            if (!open) {
+                                setRemoverReserva(null);
+                            }
+                        }}
+                        itemName={removerReserva.titulo}
+                        route={route('reservas.destroy', { reserva: removerReserva.id })}
+                    />
+                )}
+                <PaginacaoListas links={links} />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">
