@@ -76,6 +76,12 @@ class UserRepositoryEloquent implements UserRepositoryInterface
             ->with([
                 'setor.unidade.instituicao',
                 'agendas.espaco.andar.modulo.unidade.instituicao',
+                // Sem isto, UserService::getIndexData() dispara 3 queries do Spatie
+                // (getRoleNames/getAllPermissions/getDirectPermissions) POR usuário
+                // ao montar a listagem — com a base atual (400+ usuários) isso sozinho
+                // já passava de 20s e estourava o limite de execução do PHP.
+                'roles.permissions',
+                'permissions',
             ])
             ->get();
     }
