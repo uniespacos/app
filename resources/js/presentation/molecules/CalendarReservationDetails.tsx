@@ -1,6 +1,5 @@
 import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
@@ -15,8 +14,12 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
     const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
     return (
         <Card className="p-0">
-            <ScrollArea className="">
-                <div className="min-w-[800px] overflow-auto rounded-xl">
+            {/* O scroll precisa ficar no PAI: antes, `overflow-auto` estava no
+                mesmo elemento que carrega o `min-w-[800px]`, e um elemento não
+                rola a si próprio — a grade vazava para fora do modal no celular.
+                Mesmo padrão de AgendaCalendario. */}
+            <div className="w-full overflow-auto">
+                <div className="min-w-[800px] rounded-xl">
                     <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
                         <div className="text-muted-foreground text-center text-sm font-medium"></div>
                         {diasSemana.map((dia) => (
@@ -45,7 +48,7 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                         );
                     })}
                 </div>
-            </ScrollArea>
+            </div>
         </Card>
     );
 }

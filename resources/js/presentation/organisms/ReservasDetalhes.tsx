@@ -107,7 +107,10 @@ export default function ReservaDetalhes({
 
     return (
         <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] min-w-[80vw] overflow-y-auto">
+            {/* `min-w-[80vw]` brigava com o max-w padrão do DialogContent e
+                empurrava o modal para fora da tela no celular. Com `sm:max-w` o
+                mobile usa a largura natural do componente e só o desktop expande. */}
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[80vw]">
                 {/* ... DialogHeader, Descrição, etc. ... */}
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">

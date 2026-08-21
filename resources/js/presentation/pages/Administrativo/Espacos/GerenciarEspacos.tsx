@@ -98,8 +98,11 @@ export default function GerenciarEspacos() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
             <div className="flex">
-                <div className="container mx-auto w-[100vh] flex-1 space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
+                {/* `w-[100vh]` aqui usava a ALTURA da viewport como largura: num
+                    celular de 390px o container ficava com 844px e a página
+                    inteira rolava lateralmente. */}
+                <div className="container mx-auto w-full flex-1 space-y-6 py-6">
+                    <div className="space-y-6 p-6">
                         {/* Cabeçalho */}
                         <GenericHeader
                             titulo={'Gerenciar Espaços'}
