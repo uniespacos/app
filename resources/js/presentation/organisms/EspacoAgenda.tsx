@@ -96,7 +96,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
                     slotsDaReserva={slotsSelecao}
                 />
                 {isLoading && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
+                    <div className="bg-background/70 absolute inset-0 z-10 flex items-center justify-center rounded-md backdrop-blur-sm">
                         <Loader2 className="text-primary h-8 w-8 animate-spin" />
                     </div>
                 )}
@@ -104,29 +104,36 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
 
             {slotsSelecao.length > 0 && (
                 /*
-                    Sem limite de largura, o botão "Reservar N horários em M
-                    dias" — texto dinâmico, `whitespace-nowrap` por padrão —
-                    podia crescer além da tela em 360px com só `right-4`
-                    ancorando um dos lados. `left-4` mais `max-w-[calc(100%-2rem)]`
-                    mantêm o balão sempre dentro da viewport.
+                    Antes eram dois elementos soltos, cada um com sua própria
+                    largura intrínseca: o botão "Reservar" virava uma faixa azul
+                    cheia (whitespace-normal + w-full) e "Limpar seleção"
+                    boiava, pequeno, à direita — sem nada os ligando visualmente,
+                    e sem contraste contra a lista rolando por trás, então
+                    parecia flutuar sobre o conteúdo em vez de ser uma barra de
+                    ação. Envolvê-los num painel elevado (mesma linguagem visual
+                    dos cards do app: bg-card, border, shadow) resolve as duas
+                    coisas — os dois botões passam a pertencer ao mesmo grupo, e
+                    o painel se separa claramente do que está atrás dele.
                 */
-                <div className="fixed right-4 bottom-4 left-4 z-20 flex flex-col items-end gap-2 sm:left-auto sm:max-w-[calc(100%-2rem)]">
-                    <AgendaDialogReserva
-                        isOpen={dialogAberto}
-                        onOpenChange={setDialogAberto}
-                        onSubmit={handleFormSubmit}
-                        slotsSelecao={slotsSelecao}
-                        hoje={hoje}
-                        isSubmitting={processing}
-                        isEditMode={isEditMode}
-                        espaco={espaco}
-                        formData={formData}
-                        setFormData={setFormData}
-                        setSlotsSelecao={setSlotsSelecao}
-                    />
-                    <Button variant="outline" size="sm" onClick={limparSelecao}>
-                        Limpar seleção
-                    </Button>
+                <div className="fixed right-4 bottom-4 left-4 z-20 sm:left-auto sm:max-w-sm">
+                    <div className="bg-card flex flex-col-reverse gap-2 rounded-xl border p-3 shadow-lg sm:flex-row sm:items-center">
+                        <Button variant="outline" onClick={limparSelecao} className="sm:w-auto">
+                            Limpar seleção
+                        </Button>
+                        <AgendaDialogReserva
+                            isOpen={dialogAberto}
+                            onOpenChange={setDialogAberto}
+                            onSubmit={handleFormSubmit}
+                            slotsSelecao={slotsSelecao}
+                            hoje={hoje}
+                            isSubmitting={processing}
+                            isEditMode={isEditMode}
+                            espaco={espaco}
+                            formData={formData}
+                            setFormData={setFormData}
+                            setSlotsSelecao={setSlotsSelecao}
+                        />
+                    </div>
                 </div>
             )}
         </div>

@@ -31,6 +31,43 @@ type AgendaDialogReservaProps = {
     setSlotsSelecao?: (slots: SlotCalendario[]) => void;
 };
 
+/**
+ * Opção de escopo/recorrência como um card clicável, em vez de um botão de
+ * rádio solto ao lado do texto. O card inteiro é o alvo de clique (via
+ * `<Label>` envolvendo tudo), e o estado selecionado usa os mesmos tokens de
+ * `primary` que o resto do app usa para "isto está ativo" — mesma linguagem
+ * visual do item ativo da sidebar.
+ */
+function OpcaoRadioCard({
+    value,
+    id,
+    titulo,
+    descricao,
+    selecionado,
+}: {
+    value: string;
+    id: string;
+    titulo: string;
+    descricao?: string;
+    selecionado: boolean;
+}) {
+    return (
+        <Label
+            htmlFor={id}
+            className={cn(
+                'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors',
+                selecionado ? 'border-primary bg-primary/5' : 'hover:bg-muted/50 border-border',
+            )}
+        >
+            <RadioGroupItem value={value} id={id} className="mt-0.5" />
+            <div className="grid gap-0.5">
+                <span className="text-sm font-medium">{titulo}</span>
+                {descricao && <span className="text-muted-foreground text-xs">{descricao}</span>}
+            </div>
+        </Label>
+    );
+}
+
 export default function AgendaDialogReserva({
     isEditMode,
     isOpen,
@@ -179,15 +216,11 @@ export default function AgendaDialogReserva({
                 {/*
                     O Button base tem `whitespace-nowrap` fixo, e este texto é
                     dinâmico ("Reservar 12 horários em 5 dias") — sem
-                    `whitespace-normal` aqui, ele estoura a largura do container
-                    pai mesmo quando o container tem `max-w`, porque um filho
-                    flex com nowrap não encolhe abaixo do próprio texto. `w-full`
-                    só abaixo de `sm` porque o container fica sem `left`
-                    definido no desktop — lá a largura é calculada pelo próprio
-                    conteúdo, e um `w-full` incondicional criaria um ciclo entre
-                    "largura do botão" e "largura do container".
+                    `whitespace-normal` aqui, ele estoura a largura do painel que
+                    o envolve. Sem sombra própria: o painel em EspacoAgenda já
+                    carrega o `shadow-lg`, e repeti-la aqui duplicava a borda.
                 */}
-                <Button className="w-full whitespace-normal shadow-lg sm:w-auto">
+                <Button className="w-full whitespace-normal sm:w-auto">
                     {isEditMode ? 'Atualizar' : 'Reservar'} {slotsSelecao.length} horário{slotsSelecao.length > 1 ? 's' : ''} em{' '}
                     {Object.keys(slotsAgrupadosPorDia).length} dia
                     {Object.keys(slotsAgrupadosPorDia).length > 1 ? 's' : ''}
@@ -204,16 +237,29 @@ export default function AgendaDialogReserva({
             <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] overflow-y-auto sm:w-full">
                 <form onSubmit={onSubmit}>
                     <DialogHeader>
-                        <DialogTitle>{isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}</DialogTitle>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Calendar className="h-5 w-5" />
+                            {isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}
+                        </DialogTitle>
                         <DialogDescription>
                             {isEditMode ? 'Ajuste os detalhes e o escopo da sua alteração.' : 'Preencha os detalhes da sua reserva.'}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+                    <div className="space-y-5 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="titulo" className="flex items-center gap-2 font-medium">
-                                <Type className="text-muted-foreground h-4 w-4" /> Título da Reserva{' '}
-                                <p className="text-sm text-destructive">* Obrigatório</p>
+                            <Label htmlFor="titulo" className="flex items-center gap-1.5 font-medium">
+                                <Type className="text-muted-foreground h-4 w-4" />
+                                Título da Reserva
+                                {/*
+                                    Era um <p> (elemento de bloco) dentro de
+                                    <Label>, que renderiza <label> (inline) — HTML
+                                    semanticamente inválido, e era o que empurrava
+                                    "* Obrigatório" para fora de eixo. Um <span>
+                                    com estilo de badge resolve os dois problemas.
+                                */}
+                                <span className="text-destructive-accent bg-destructive-subtle rounded-full px-2 py-0.5 text-xs font-normal">
+                                    Obrigatório
+                                </span>
                             </Label>
                             <Input
                                 id="titulo"
@@ -224,8 +270,12 @@ export default function AgendaDialogReserva({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="descricao" className="flex items-center gap-2 font-medium">
-                                <FileText className="text-muted-foreground h-4 w-4" /> Descrição <p className="text-sm text-destructive">* Obrigatório</p>
+                            <Label htmlFor="descricao" className="flex items-center gap-1.5 font-medium">
+                                <FileText className="text-muted-foreground h-4 w-4" />
+                                Descrição
+                                <span className="text-destructive-accent bg-destructive-subtle rounded-full px-2 py-0.5 text-xs font-normal">
+                                    Obrigatório
+                                </span>
                             </Label>
                             <Textarea
                                 id="descricao"
@@ -238,43 +288,44 @@ export default function AgendaDialogReserva({
 
                         {isEditMode && (
                             <div className="space-y-2 border-t pt-4">
-                                <h3 className="flex items-center gap-2 font-medium">Aplicar Alterações Para:</h3>
+                                <h3 className="text-sm font-medium">Aplicar Alterações Para</h3>
                                 <RadioGroup
                                     value={formData.edit_scope}
                                     onValueChange={(v) => handleSetFormData('edit_scope', v)}
                                     className="space-y-2"
                                 >
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="recurring" id="edit-scope-recurring" />
-                                        <Label htmlFor="edit-scope-recurring" className="cursor-pointer">
-                                            Toda a recorrência (Ex: remover/adicionar esta 3ª feira em todas as semanas)
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="single" id="edit-scope-single" />
-                                        <Label htmlFor="edit-scope-single" className="cursor-pointer">
-                                            Apenas os horários desta semana
-                                        </Label>
-                                    </div>
+                                    <OpcaoRadioCard
+                                        value="recurring"
+                                        id="edit-scope-recurring"
+                                        titulo="Toda a recorrência"
+                                        descricao="Ex: remover/adicionar esta 3ª feira em todas as semanas"
+                                        selecionado={formData.edit_scope === 'recurring'}
+                                    />
+                                    <OpcaoRadioCard
+                                        value="single"
+                                        id="edit-scope-single"
+                                        titulo="Apenas os horários desta semana"
+                                        selecionado={formData.edit_scope === 'single'}
+                                    />
                                 </RadioGroup>
                             </div>
                         )}
 
-                        <div className="space-y-2 border-t pt-2">
-                            <h3 className="flex items-center gap-2 font-medium">
-                                <Repeat className="text-muted-foreground h-4 w-4" /> Período de Recorrência
+                        <div className="space-y-2 border-t pt-4">
+                            <h3 className="flex items-center gap-1.5 text-sm font-medium">
+                                <Repeat className="text-muted-foreground h-4 w-4" />
+                                Período de Recorrência
                             </h3>
                             <RadioGroup value={formData.recorrencia} onValueChange={(v) => handleSetFormData('recorrencia', v)} className="space-y-2">
                                 {opcoesRecorrencia.map((opcao) => (
-                                    <div key={opcao.valor} className="flex items-start space-x-2">
-                                        <RadioGroupItem value={opcao.valor} id={opcao.valor} />
-                                        <div className="grid gap-1">
-                                            <Label htmlFor={opcao.valor} className="font-medium">
-                                                {opcao.label}
-                                            </Label>
-                                            <p className="text-muted-foreground text-xs">{opcao.descricao}</p>
-                                        </div>
-                                    </div>
+                                    <OpcaoRadioCard
+                                        key={opcao.valor}
+                                        value={opcao.valor}
+                                        id={opcao.valor}
+                                        titulo={opcao.label}
+                                        descricao={opcao.descricao}
+                                        selecionado={formData.recorrencia === opcao.valor}
+                                    />
                                 ))}
                             </RadioGroup>
                         </div>
@@ -284,7 +335,7 @@ export default function AgendaDialogReserva({
                             ("dd/MM/yyyy (calculado)") numa coluna de menos de
                             150px em telas de 360px. Empilha abaixo de sm.
                         */}
-                        <div className="bg-muted/10 grid grid-cols-1 gap-4 rounded-md border p-3 sm:grid-cols-2">
+                        <div className="bg-muted/30 grid grid-cols-1 gap-4 rounded-lg border p-3 sm:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="data-inicial" className="text-xs">
                                     Início {formData.recorrencia !== 'personalizado' && '(ajusta recorrência)'}
@@ -344,7 +395,7 @@ export default function AgendaDialogReserva({
                             </div>
                         </div>
 
-                        <div className="bg-muted/30 flex items-start gap-2 rounded-md p-3">
+                        <div className="bg-muted/30 flex items-start gap-2 rounded-lg p-3">
                             <Info className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
                             <div>
                                 <p className="text-sm font-medium">Período da reserva</p>
@@ -353,11 +404,13 @@ export default function AgendaDialogReserva({
                                 </p>
                             </div>
                         </div>
-                        <div className="space-y-2 border-t pt-2">
-                            <h3 className="flex items-center gap-2 font-medium">
-                                <Calendar className="text-muted-foreground h-4 w-4" /> Horários selecionados
+                        <div className="space-y-2 border-t pt-4">
+                            <h3 className="flex items-center gap-1.5 text-sm font-medium">
+                                <Calendar className="text-muted-foreground h-4 w-4" />
+                                Horários selecionados
+                                <span className="text-muted-foreground font-normal">({slotsSelecao.length})</span>
                             </h3>
-                            <ScrollArea className="h-[150px] rounded-md border p-2">
+                            <ScrollArea className="h-[150px] rounded-lg border p-2">
                                 {Object.entries(slotsAgrupadosPorDia).map(([diaKey, { data, slots }]) => (
                                     <div key={diaKey} className="mb-3 last:mb-0">
                                         <div className="mb-1 text-sm font-medium">{format(data, 'EEEE', { locale: ptBR })}</div>
@@ -374,7 +427,7 @@ export default function AgendaDialogReserva({
                         </div>
                     </div>
                     {datasComConflito.length > 0 && (
-                        <div className="bg-destructive/10 border-destructive text-destructive mt-4 rounded-sm border-l-4 p-4 shadow-sm" role="alert">
+                        <div className="bg-destructive-subtle border-destructive text-destructive-accent mt-4 rounded-lg border-l-4 p-4" role="alert">
                             <div className="flex items-center gap-2">
                                 <AlertCircle className="h-4 w-4" />
                                 <p className="text-sm font-semibold">Conflito de Horários Detectado</p>
@@ -387,7 +440,7 @@ export default function AgendaDialogReserva({
                     )}
 
                     {showRecurrenceAlert && (
-                        <div className="mt-4 rounded-sm border-l-4 border-warning/25 bg-warning-subtle p-4 text-warning-accent shadow-sm" role="alert">
+                        <div className="border-warning mt-4 rounded-lg border-l-4 bg-warning-subtle p-4 text-warning-accent" role="alert">
                             <div className="flex items-center gap-2">
                                 <Repeat className="h-4 w-4 text-warning-accent" />
                                 <p className="text-sm font-semibold">Ajuste de Recorrência</p>
