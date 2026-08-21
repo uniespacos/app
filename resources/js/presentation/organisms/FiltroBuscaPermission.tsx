@@ -5,9 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getTurnoText } from '@/lib/utils';
 import { Andar, Espaco, Instituicao, Modulo, SelectedAgenda, Unidade } from '@/types';
-import { router } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 type FiltroBuscaPermissionProps = {
     instituicoes: Instituicao[];
@@ -23,7 +22,6 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
         selectedAndar: '',
         selectedEspaco: '',
     });
-    const isInitialMount = useRef(true);
     const [selectedAgendaId, setSelectedAgendaId] = useState<string>('');
     const [unidades, setUnidades] = useState<Unidade[]>(
         instituicoes.find((i) => i.id.toString() === localFilters.selectedInstituicao)?.unidades || [],
@@ -32,26 +30,11 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
     const [andares, setAndares] = useState<Andar[]>(modulos.find((m) => m.id.toString() === localFilters.selectedModulo)?.andars || []);
     const [espacos, setEspacos] = useState<Espaco[]>(andares.find((a) => a.id.toString() === localFilters.selectedAndar)?.espacos || []);
 
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        const queryParams = Object.fromEntries(
-            Object.entries(localFilters).filter(([key, value]) => {
-                if (value === null || value === '') return false;
-                if (['unidade', 'modulo', 'andar', 'espaco'].includes(key) && value === 'all') return false;
-                return true;
-            }),
-        );
-
-        router.get(route('institucional.usuarios.index'), queryParams, {
-            preserveState: true, // Mantém o estado dos filtros na página
-            preserveScroll: true, // Não rola a página para o topo
-            replace: true,
-        });
-    }, [localFilters]);
+    // Estes filtros são só navegação local na árvore instituição → unidade →
+    // módulo → andar → espaço, que já vem inteira nas props. Antes cada mudança
+    // disparava um router.get em institucional.usuarios.index levando os filtros
+    // na query string — mas o controller nunca leu esses parâmetros, então era
+    // um request de página inteira sem efeito nenhum a cada clique.
 
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
         setLocalFilters((prevFilters) => {
@@ -290,7 +273,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                                         <div className="font-medium">
                                             {selectedAgenda.espaco.nome} - {getTurnoText(selectedAgenda.agenda.turno)}
                                         </div>
-                                        <div className="text-sm text-muted-foreground">
+                                        <div className="text-muted-foreground text-sm">
                                             {selectedAgenda.instituicao.nome} → {selectedAgenda.unidade.nome} → {selectedAgenda.modulo.nome} →{' '}
                                             {selectedAgenda.andar.nome}
                                         </div>

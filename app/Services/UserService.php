@@ -15,6 +15,7 @@ use App\Repositories\UserRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 use Spatie\Permission\PermissionRegistrar;
 
 class UserService
@@ -39,30 +40,82 @@ class UserService
      *
      * @return array<string, mixed>
      */
-    public function getIndexData(User $authUser): array
+    public function getIndexData(User $authUser, ?string $search = null, ?int $setorId = null): array
     {
         $instituicaoId = $authUser->setor->unidade->instituicao_id;
 
-        $users = $this->repoUser->getAllForAdminByInstituicao($instituicaoId)
-            ->map(fn (User $user) => array_merge($user->toArray(), [
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
-            ]));
+        $users = $this->repoUser->getPaginatedForAdminByInstituicao($instituicaoId, $search, $setorId);
+        $users->through(fn (User $user) => array_merge($user->toArray(), [
+            'roles' => $user->getRoleNames(),
+        ]));
+        $users->withQueryString();
 
-        $instituicoes = Instituicao::with(['unidades.modulos.andars.espacos.agendas'])->get();
-
-        $setores = Setor::with([
-            'unidade.instituicao',
-            'users.agendas.espaco.andar.modulo.unidade.instituicao',
-        ])->get();
+        // Só o necessário para o <Select> de setores do filtro. Antes esta query
+        // arrastava todos os usuários de cada setor com a cadeia completa de
+        // agendas/espaços (~495KB de JSON por request) sem que a tela usasse nada
+        // disso além de id e sigla.
+        $setores = Setor::select(['id', 'sigla'])->orderBy('sigla')->get();
 
         return [
             'users' => $users,
-            'instituicoes' => $instituicoes,
             'setores' => $setores,
+            'filters' => ['search' => $search, 'setor_id' => $setorId],
+        ];
+    }
+
+    /**
+     * Returns everything the permission modal needs for a single user.
+     *
+     * Fica fora do index de propósito: a árvore de instituições e as agendas do
+     * usuário só fazem sentido quando o modal de permissões abre, e carregá-las
+     * na listagem custava segundos por request.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPermissionContext(User $user): array
+    {
+        $user = $this->repoUser->getWithPermissionContext($user->id);
+
+        return [
+            'user' => array_merge($user->toArray(), [
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+                'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
+            ]),
+            // Só as colunas que o seletor em cascata desenha. Trazer a linha
+            // inteira de espaco (descricao, imagens, main_image_index) inflava
+            // esta árvore em várias vezes sem que a tela usasse nada disso.
+            'instituicoes' => Instituicao::select(['id', 'nome', 'sigla'])
+                ->with([
+                    'unidades:id,nome,instituicao_id',
+                    'unidades.modulos:id,nome,unidade_id',
+                    'unidades.modulos.andars:id,nome,modulo_id',
+                    'unidades.modulos.andars.espacos:id,nome,capacidade_pessoas,andar_id',
+                    'unidades.modulos.andars.espacos.agendas:id,turno,espaco_id',
+                ])
+                ->get(),
             'permissionCatalog' => $this->repoPermission->getAllGroupedByPrefix(),
         ];
+    }
+
+    /**
+     * Sends the email verification notification to the given user, for an admin to trigger on their behalf.
+     */
+    public function resendVerificationEmail(User $user): void
+    {
+        if ($user->hasVerifiedEmail()) {
+            throw new \RuntimeException('Este e-mail já está verificado.');
+        }
+
+        $user->sendEmailVerificationNotification();
+    }
+
+    /**
+     * Sends a password reset link to the given user's email, for an admin to trigger on their behalf.
+     */
+    public function sendPasswordResetLink(User $user): bool
+    {
+        return Password::sendResetLink(['email' => $user->email]) === Password::RESET_LINK_SENT;
     }
 
     /**

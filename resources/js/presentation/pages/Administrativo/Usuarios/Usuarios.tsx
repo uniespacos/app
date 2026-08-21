@@ -6,20 +6,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { PermissionModal } from '@/presentation/organisms/PermissionModal';
-
-import { Head, router, usePage } from '@inertiajs/react';
-import { Edit, Settings, Shield, Trash } from 'lucide-react';
-import { useEffect, useState } from 'react';
-
-import DeleteItem from '@/presentation/molecules/delete-item';
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AppLayout from '@/presentation/templates/app-layout';
 import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
-import { Instituicao, Permission, Setor, User } from '@/types';
-import { toast } from 'sonner';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import { EditUserModal } from '@/presentation/molecules/EditUserModal';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import { PermissionModal } from '@/presentation/organisms/PermissionModal';
+import AppLayout from '@/presentation/templates/app-layout';
+import { Setor, User } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Edit, Settings, Shield, Trash } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
+type PaginatedUsers = {
+    data: User[];
+    links: { url: string | null; label: string; active: boolean }[];
+};
+
 const breadcrumbs = [
     {
         title: 'Gerenciar Usuarios',
@@ -29,40 +34,38 @@ const breadcrumbs = [
 
 export default function UsuariosPage() {
     const { props } = usePage<{
-        users: User[];
-        instituicoes: Instituicao[];
+        users: PaginatedUsers;
         setores: Setor[];
-        permissionCatalog: Record<string, Permission[]>;
+        filters: { search?: string; setor_id?: number };
     }>();
-    const { users: initialUsers, instituicoes, setores, permissionCatalog } = props;
+    const { users, setores, filters } = props;
 
-    const [users, setUsers] = useState<User[]>(initialUsers);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedSetor, setSelectedSetor] = useState<Setor | undefined>(undefined);
+    const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
+    const [selectedSetorId, setSelectedSetorId] = useState(filters.setor_id?.toString() ?? 'all');
     const [selectedUser, setSelectedUser] = useState<User | undefined>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
+    const [editingUser, setEditingUser] = useState<User | undefined>();
     const [removerUsuario, setRemoverUsuario] = useState<User | undefined>();
-    useEffect(() => {
-        if (!searchTerm) {
-            setFilteredUsers(users);
-            return;
-        }
-        const filtered = users.filter(
-            (user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
-        setFilteredUsers(filtered);
-    }, [searchTerm, users]);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
-        if (!selectedSetor) {
-            setFilteredUsers(users);
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
             return;
         }
-        const filtered = users.filter((user) => user.setor?.id === selectedSetor?.id);
-        setFilteredUsers(filtered);
-    }, [users, selectedSetor]);
+
+        const timeout = setTimeout(() => {
+            router.get(
+                route('institucional.usuarios.index'),
+                { search: searchTerm || undefined, setor_id: selectedSetorId !== 'all' ? selectedSetorId : undefined },
+                { preserveState: true, preserveScroll: true, replace: true },
+            );
+        }, 400);
+
+        return () => clearTimeout(timeout);
+    }, [searchTerm, selectedSetorId]);
+
     const getPermissionLabel = (roleName: string): string => {
         switch (roleName) {
             case ROLE_INSTITUCIONAL:
@@ -93,8 +96,7 @@ export default function UsuariosPage() {
     };
 
     const handleEditUser = (user: User) => {
-        // Implementação futura para edição de usuário
-        toast('Funcionalidade de edição ainda não implementada. ' + user.name);
+        setEditingUser(user);
     };
 
     const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[], directPermissions?: string[]) => {
@@ -108,13 +110,6 @@ export default function UsuariosPage() {
         }
         router.put(route('institucional.usuarios.updatepermissions', { user: userId }), payload, {
             onSuccess: () => {
-                setUsers(
-                    users.map((user) =>
-                        user.id === userId
-                            ? { ...user, roles: [roleName], direct_permissions: directPermissions ?? user.direct_permissions }
-                            : user,
-                    ),
-                );
                 setIsModalOpen(false);
                 setSelectedUser(undefined);
             },
@@ -146,12 +141,7 @@ export default function UsuariosPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Setores</Label>
-                                    <Select
-                                        value={selectedSetor?.id.toString() || 'all'} // 5. O valor vem das props
-                                        onValueChange={(value) => {
-                                            setSelectedSetor(setores.find((s) => s.id.toString() === value));
-                                        }}
-                                    >
+                                    <Select value={selectedSetorId} onValueChange={setSelectedSetorId}>
                                         <SelectTrigger className="w-full sm:w-[180px]">
                                             <SelectValue placeholder="Setores" />
                                         </SelectTrigger>
@@ -169,7 +159,7 @@ export default function UsuariosPage() {
                         </Card>
 
                         <div className="grid gap-4">
-                            {filteredUsers.map((user) => (
+                            {users.data.map((user) => (
                                 <div key={user.id}>
                                     <Card key={user.id} className="cursor-pointer transition-shadow hover:shadow-md">
                                         <CardContent className="p-4">
@@ -187,7 +177,7 @@ export default function UsuariosPage() {
                                                     <div className="space-y-1">
                                                         <h3 className="text-lg font-semibold">{user.name}</h3>
                                                         <p className="text-muted-foreground">{user.email}</p>
-                                                        <p className="text-sm text-muted-foreground">{user.telefone}</p>
+                                                        <p className="text-muted-foreground text-sm">{user.telefone}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
@@ -198,7 +188,7 @@ export default function UsuariosPage() {
                                                         <div
                                                             className={`h-2 w-2 rounded-full ${user.email_verified_at ? 'bg-success' : 'bg-destructive'}`}
                                                         />
-                                                        <span className="text-xs text-muted-foreground">
+                                                        <span className="text-muted-foreground text-xs">
                                                             {user.email_verified_at ? 'Verificado' : 'Não verificado'}
                                                         </span>
                                                     </div>
@@ -246,6 +236,10 @@ export default function UsuariosPage() {
                             ))}
                         </div>
 
+                        <PaginacaoListas links={users.links} />
+
+                        <EditUserModal user={editingUser} isOpen={!!editingUser} onClose={() => setEditingUser(undefined)} />
+
                         {isModalOpen && selectedUser && (
                             <PermissionModal
                                 key={selectedUser.id}
@@ -256,8 +250,6 @@ export default function UsuariosPage() {
                                     setSelectedUser(undefined);
                                 }}
                                 onUpdate={handlePermissionUpdate}
-                                instituicoes={instituicoes}
-                                permissionCatalog={permissionCatalog}
                                 processing={processing}
                             />
                         )}
