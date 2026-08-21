@@ -15,6 +15,9 @@ type ReservasFiltersProps = {
     /** Eixo de arquivamento (issue #108): 'ativas' | 'arquivadas' | 'todas'. */
     selectedArquivo: string;
     onArquivoChange: (value: string) => void;
+    /** Critério de ordenação: 'data_solicitacao' | 'situacao'. */
+    selectedOrdenar: string;
+    onOrdenarChange: (value: string) => void;
     selectedDate?: Date; // Adicionei para o filtro de data
     onDateChange?: (date: Date | undefined) => void; // Função opcional para lidar com a mudança de data
 };
@@ -26,6 +29,8 @@ export function ReservasFilters({
     onSituacaoChange,
     selectedArquivo,
     onArquivoChange,
+    selectedOrdenar,
+    onOrdenarChange,
     selectedDate,
     onDateChange,
 }: ReservasFiltersProps) {
@@ -78,6 +83,16 @@ export function ReservasFilters({
                         <SelectItem value="ativas">Ativas</SelectItem>
                         <SelectItem value="arquivadas">Arquivadas</SelectItem>
                         <SelectItem value="todas">Todas</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={selectedOrdenar || 'data_solicitacao'} onValueChange={onOrdenarChange}>
+                    <SelectTrigger className="w-full sm:w-[200px]" aria-label="Ordenar por">
+                        <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="data_solicitacao">Data de solicitação</SelectItem>
+                        <SelectItem value="situacao">Situação</SelectItem>
                     </SelectContent>
                 </Select>
 

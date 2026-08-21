@@ -62,7 +62,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                 },
                 'user:id,name',
             ])
-            ->latest()
+            ->ordenar($filters['ordenar'] ?? null)
             ->paginate($perPage);
     }
 
@@ -113,7 +113,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                     ]);
                 },
             ])
-            ->latest()
+            ->ordenar($filters['ordenar'] ?? null)
             ->paginate($perPage);
     }
 

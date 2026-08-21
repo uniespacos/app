@@ -33,7 +33,7 @@ class ReservaController extends Controller
         $data = $this->service->getListingForUser(
             Auth::user(),
             $request->input('semana', 'today'),
-            $request->only(['search', 'situacao', 'arquivo', 'reserva'])
+            $request->only(['search', 'situacao', 'arquivo', 'ordenar', 'reserva'])
         );
 
         return Inertia::render('Reservas/ReservasPage', $data);

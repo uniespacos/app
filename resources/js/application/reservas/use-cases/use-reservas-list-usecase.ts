@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 interface UseReservasListUseCaseProps {
     repository: IReservasRepository;
-    initialFilters: { search?: string; situacao?: string; arquivo?: string };
+    initialFilters: { search?: string; situacao?: string; arquivo?: string; ordenar?: string };
     initialSemana: { referencia: string };
 }
 
@@ -17,6 +17,7 @@ export function useReservasListUseCase({
     const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
     const [selectedSituacao, setSelectedSituacao] = useState(initialFilters.situacao || '');
     const [selectedArquivo, setSelectedArquivo] = useState(initialFilters.arquivo || 'ativas');
+    const [selectedOrdenar, setSelectedOrdenar] = useState(initialFilters.ordenar || 'data_solicitacao');
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(
         new Date(initialSemana.referencia + 'T12:00:00')
     );
@@ -32,13 +33,14 @@ export function useReservasListUseCase({
         const params: Record<string, unknown> = {
             search: debouncedSearch || undefined,
             situacao: selectedSituacao || undefined,
-            // 'ativas' é o padrão do backend; omitir mantém a URL limpa.
+            // 'ativas' e 'data_solicitacao' são o padrão do backend; omitir mantém a URL limpa.
             arquivo: selectedArquivo && selectedArquivo !== 'ativas' ? selectedArquivo : undefined,
+            ordenar: selectedOrdenar && selectedOrdenar !== 'data_solicitacao' ? selectedOrdenar : undefined,
             semana: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined,
         };
 
         repository.getReservas(params);
-    }, [debouncedSearch, selectedSituacao, selectedArquivo, selectedDate, repository]);
+    }, [debouncedSearch, selectedSituacao, selectedArquivo, selectedOrdenar, selectedDate, repository]);
 
     return {
         searchTerm,
@@ -47,6 +49,8 @@ export function useReservasListUseCase({
         setSelectedSituacao,
         selectedArquivo,
         setSelectedArquivo,
+        selectedOrdenar,
+        setSelectedOrdenar,
         selectedDate,
         setSelectedDate,
     };

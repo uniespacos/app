@@ -8,14 +8,14 @@ import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Edit, FileText, XCircle } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
 import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
 import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
-import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
+import { comSituacaoEfetivaDoGestor } from '@/application/reservas/helpers/reserva-helpers';
 
 interface ReservasListProps {
     reservaToShow?: Reserva | undefined;
@@ -26,13 +26,17 @@ interface ReservasListProps {
     routeName: string;
 }
 // Componente principal da lista de reservas
-export function ReservasList({ paginator, fallback, isGestor, user, reservaToShow, routeName }: ReservasListProps) {
+export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName }: ReservasListProps) {
     const { data: reservas, links } = paginator;
     const isMobile = useIsMobile();
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
-    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
-        isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
+    // A ordem já vem certa do backend (filtro "ordenar", issue de critério de
+    // ordenação) — aqui só recalcula a situação efetiva exibida ao gestor
+    // (parcial/em_analise por horário), sem reordenar a página no cliente.
+    const reservasFiltradas = useMemo(
+        () => (isGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas),
+        [isGestor, reservas],
     );
 
     useEffect(() => {
@@ -42,12 +46,6 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
             setSelectedReserva(undefined);
         }
     }, [reservaToShow]);
-
-    useEffect(() => {
-        setReservasFiltradas(
-            isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
-        );
-    }, [isGestor, reservas, user?.id]);
 
     if (reservas.length === 0) {
         return fallback;

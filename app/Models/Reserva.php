@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SituacaoReserva\ModoArquivoEnum;
+use App\Enums\SituacaoReserva\OrdenacaoReservaEnum;
 use Carbon\Carbon;
 use Database\Factories\ReservaFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -63,6 +64,35 @@ class Reserva extends Model
             ModoArquivoEnum::ARQUIVADAS => $query->where('situacao', 'inativa'),
             ModoArquivoEnum::TODAS => $query,
             ModoArquivoEnum::ATIVAS => $query->where('situacao', '!=', 'inativa'),
+        };
+    }
+
+    /**
+     * Aplica o criterio de ordenacao escolhido pelo usuario nas listagens
+     * (Minhas Reservas / Gerenciar Reservas).
+     *
+     * Por situacao usa uma prioridade fixa (pendente > parcial > indeferida >
+     * deferida > inativa) em vez da ordem alfabetica das cases do enum, que
+     * nao carrega esse significado. `->latest()` como desempate: dentro do
+     * mesmo grupo de situacao, a mais recente primeiro.
+     *
+     * @param  Builder<Reserva>  $query
+     * @return Builder<Reserva>
+     */
+    public function scopeOrdenar(Builder $query, mixed $criterio): Builder
+    {
+        return match (OrdenacaoReservaEnum::fromFiltro($criterio)) {
+            OrdenacaoReservaEnum::SITUACAO => $query->orderByRaw(
+                "CASE situacao
+                    WHEN 'em_analise' THEN 1
+                    WHEN 'parcialmente_deferida' THEN 2
+                    WHEN 'indeferida' THEN 3
+                    WHEN 'deferida' THEN 4
+                    WHEN 'inativa' THEN 5
+                    ELSE 6
+                END"
+            )->latest(),
+            OrdenacaoReservaEnum::DATA_SOLICITACAO => $query->latest(),
         };
     }
 

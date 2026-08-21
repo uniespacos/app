@@ -1,5 +1,5 @@
 import { Reserva, Horario, SituacaoReserva } from '@/types';
-import { calculateGestorStatus, sortReservasForGestor, sortReservasForUser } from './reserva-helpers';
+import { calculateGestorStatus, comSituacaoEfetivaDoGestor } from './reserva-helpers';
 
 describe('reserva-helpers', () => {
     const mockReserva = (id: number, situacao: SituacaoReserva, horarios: Partial<Horario>[] = []): Reserva => ({
@@ -52,23 +52,16 @@ describe('reserva-helpers', () => {
         });
     });
 
-    describe('sortReservasForGestor', () => {
-        it('should sort em_analise first', () => {
+    describe('comSituacaoEfetivaDoGestor', () => {
+        it('recalcula a situacao de cada reserva sem alterar a ordem da lista', () => {
             const r1 = mockReserva(1, 'deferida', [{ situacao: 'deferida' }]);
-            const r2 = mockReserva(2, 'em_analise', [{ situacao: 'em_analise' }]);
+            const r2 = mockReserva(2, 'parcialmente_deferida', [{ situacao: 'em_analise' }, { situacao: 'deferida' }]);
             const r3 = mockReserva(3, 'indeferida', [{ situacao: 'indeferida' }]);
 
-            const sorted = sortReservasForGestor([r1, r2, r3]);
-            expect(sorted[0].id).toBe(2);
-        });
-    });
+            const resultado = comSituacaoEfetivaDoGestor([r1, r2, r3]);
 
-    describe('sortReservasForUser', () => {
-        it('should sort em_analise first', () => {
-            const r1 = mockReserva(1, 'deferida');
-            const r2 = mockReserva(2, 'em_analise');
-            const sorted = sortReservasForUser([r1, r2]);
-            expect(sorted[0].id).toBe(2);
+            expect(resultado.map((r) => r.id)).toEqual([1, 2, 3]);
+            expect(resultado[1].situacao).toBe('em_analise');
         });
     });
 });

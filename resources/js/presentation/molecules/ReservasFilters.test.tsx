@@ -16,6 +16,8 @@ describe('ReservasFilters', () => {
         onSituacaoChange: jest.fn(),
         selectedArquivo: 'ativas',
         onArquivoChange: jest.fn(),
+        selectedOrdenar: 'data_solicitacao',
+        onOrdenarChange: jest.fn(),
     };
 
     beforeEach(() => {
@@ -83,5 +85,20 @@ describe('ReservasFilters', () => {
         fireEvent.click(screen.getByText('Arquivadas'));
 
         expect(props.onArquivoChange).toHaveBeenCalledWith('arquivadas');
+    });
+
+    it('oferece o seletor de ordenacao com Data de solicitacao como padrao', () => {
+        render(<ReservasFilters {...props} />);
+
+        expect(screen.getByLabelText('Ordenar por')).toHaveTextContent('Data de solicitação');
+    });
+
+    it('notifica o pai ao escolher ordenar por Situacao', () => {
+        render(<ReservasFilters {...props} />);
+
+        fireEvent.click(screen.getByLabelText('Ordenar por'));
+        fireEvent.click(screen.getByText('Situação'));
+
+        expect(props.onOrdenarChange).toHaveBeenCalledWith('situacao');
     });
 });

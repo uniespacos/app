@@ -33,7 +33,7 @@ export default function MinhasReservas({
 }: {
     user: User;
     reservas: Paginator<Reserva>;
-    filters: { search?: string; situacao?: string; arquivo?: string };
+    filters: { search?: string; situacao?: string; arquivo?: string; ordenar?: string };
     reservaToShow?: Reserva;
     semana: { referencia: string };
 }) {
@@ -44,6 +44,8 @@ export default function MinhasReservas({
         setSelectedSituacao,
         selectedArquivo,
         setSelectedArquivo,
+        selectedOrdenar,
+        setSelectedOrdenar,
         selectedDate,
         setSelectedDate,
     } = useReservasListUseCase({
@@ -76,6 +78,8 @@ export default function MinhasReservas({
                             onSituacaoChange={setSelectedSituacao}
                             selectedArquivo={selectedArquivo}
                             onArquivoChange={setSelectedArquivo}
+                            selectedOrdenar={selectedOrdenar}
+                            onOrdenarChange={setSelectedOrdenar}
                             selectedDate={selectedDate}
                             onDateChange={setSelectedDate}
                         />
