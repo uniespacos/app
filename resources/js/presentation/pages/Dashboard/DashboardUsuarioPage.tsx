@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/presentation/templates/app-layout';
 import { DashboardStatusReservasType, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Calendar, CalendarSearch, CheckCircle2, Clock, ListChecks, Plus, Star, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, Plus, XCircle } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -76,12 +76,6 @@ export default function Dashboard() {
         },
     ] as const;
 
-    const atalhos = [
-        { label: 'Consultar Espaços', descricao: 'Veja a disponibilidade e reserve', Icone: CalendarSearch, href: route('espacos.index') },
-        { label: 'Minhas Reservas', descricao: 'Acompanhe todas as suas reservas', Icone: ListChecks, href: route('reservas.index') },
-        { label: 'Espaços Favoritos', descricao: 'Acesso rápido aos que você marcou', Icone: Star, href: route('espacos.favoritos') },
-    ] as const;
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -121,33 +115,11 @@ export default function Dashboard() {
                     ))}
                 </div>
 
-                {/* Atalhos: a página anterior a esta era só leitura — quem
-                    chegava aqui precisava saber que a ação real fica no menu
-                    lateral. Repetir os três caminhos mais usados aqui reduz
-                    esse "e agora?" do primeiro acesso. */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {atalhos.map(({ label, descricao, Icone, href }) => (
-                        <Card
-                            key={label}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => router.get(href)}
-                            onKeyDown={(e) => e.key === 'Enter' && router.get(href)}
-                            className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
-                        >
-                            <CardContent className="flex items-center gap-3 p-4">
-                                <div className="bg-primary/10 text-primary rounded-full p-2">
-                                    <Icone className="h-5 w-5" />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="truncate font-medium">{label}</p>
-                                    <p className="text-muted-foreground truncate text-xs">{descricao}</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-
+                {/* As abas logo abaixo já cobrem "reservas recentes" e
+                    "favoritos" com conteúdo de verdade (lista, busca) — uma
+                    segunda fileira de cards só de navegação para os mesmos
+                    dois destinos, mais "Consultar Espaços" repetindo o botão
+                    "Nova Reserva" acima, era repetição sem ganho. */}
                 <TabsContentDashboard reservas={reservas} espacosFavoritos={espacosFavoritos} user={user} itens={itens} />
             </div>
         </AppLayout>
