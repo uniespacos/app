@@ -1,7 +1,9 @@
 import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
 import { Card } from '@/components/ui/card';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
 type AgendaCalendarioProps = {
@@ -21,10 +23,29 @@ export default function AgendaCalendario({
     alternarSelecaoSlot,
     slotsDaReserva, // Recebe a nova prop
 }: AgendaCalendarioProps) {
+    const isMobile = useIsMobile();
+
     // Ordena as agendas por turno para uma exibição consistente
     const agendasOrdenadas = [...agendas].sort(
         (a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno),
     );
+
+    // Só uma das visões é montada, em vez de renderizar as duas e esconder uma
+    // com CSS: são ~120 células por semana, e construí-las para depois ocultar
+    // desperdiçaria trabalho justamente no aparelho que queremos aliviar.
+    if (isMobile) {
+        return (
+            <Card className="p-0">
+                <CalendarDiaMobile
+                    diasSemana={diasSemana}
+                    agendas={agendas}
+                    isSlotSelecionado={isSlotSelecionado}
+                    alternarSelecaoSlot={alternarSelecaoSlot}
+                    slotsDaReserva={slotsDaReserva}
+                />
+            </Card>
+        );
+    }
 
     return (
         <Card className="p-0">
@@ -38,7 +59,7 @@ export default function AgendaCalendario({
                                 key={dia.valor}
                                 className={cn('border-l bg-gray-50 p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
                             >
-                                <div>{dia.abreviado.replace('.', '')}</div>
+                                <div className="capitalize">{dia.abreviado}</div>
                                 <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
                             </div>
                         ))}

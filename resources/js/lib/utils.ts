@@ -147,7 +147,11 @@ export function diasDaSemana(dataReferencia: Date, hoje: Date) {
         return {
             data: dia,
             nome: format(dia, 'EEEE', { locale: ptBR }),
-            abreviado: format(dia, 'EEE', { locale: ptBR }),
+            // 'EEE' no locale pt-BR devolve o nome por extenso ("segunda"), não
+            // a forma curta — os três consumidores faziam `.replace('.', '')`
+            // esperando "seg.", o que nunca casava. 'EEEEEE' é a forma curta de
+            // verdade ("seg"), que é o que cabe num seletor de 7 colunas.
+            abreviado: format(dia, 'EEEEEE', { locale: ptBR }),
             diaMes: format(dia, 'dd/MM'),
             valor: format(dia, 'yyyy-MM-dd'),
             ehHoje: isSameDay(dia, hoje),

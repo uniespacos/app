@@ -27,7 +27,7 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                                 key={dia.valor}
                                 className={cn('border-l bg-gray-50 p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
                             >
-                                <div>{dia.abreviado.replace('.', '')}</div>
+                                <div className="capitalize">{dia.abreviado}</div>
                                 <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
                             </div>
                         ))}
