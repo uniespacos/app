@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.17](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.16...v1.3.0-rc.17) (2026-08-21)
+
+
+### Bug Fixes
+
+* ajustando identidade visual e correções de performace ([#268](https://github.com/uniespacos/uniespacos/issues/268)) ([1b11e12](https://github.com/uniespacos/uniespacos/commit/1b11e12b89dfac2ff2f2eae635618371fd7b19d3))
+
 ## [1.3.0-rc.16](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.15...v1.3.0-rc.16) (2026-08-21)
 
 
