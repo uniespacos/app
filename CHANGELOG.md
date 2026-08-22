@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.18](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.17...v1.3.0-rc.18) (2026-08-22)
+
+
+### Bug Fixes
+
+* otimizar Gerenciar Usuarios, corrigir N+1 de favoritos e mapear nome do andar ([#270](https://github.com/uniespacos/uniespacos/issues/270)) ([238cf75](https://github.com/uniespacos/uniespacos/commit/238cf75ccdf9741d45e317f4526e0db67e018b0f))
+
 ## [1.3.0-rc.17](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.16...v1.3.0-rc.17) (2026-08-21)
 
 
