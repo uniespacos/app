@@ -49,15 +49,49 @@ Atualizado a cada entrega.
 
 ## 🔨 Em andamento
 
-- [ ] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small` — **próxima, ainda não iniciada**
-  Sem branch aberta ainda. Isolada de propósito: `AvaliarReservaJob::updateReservaOverallStatus` (linha ~255) recalcula `situacao` a partir da contagem de horários e o `match` não trata `inativa` — toda avaliação em uma reserva arquivada a ressuscita para `em_analise`/`deferida`/etc. Caminho de escrita crítico, enquanto a #108 era caminho de leitura. Branch a partir de `develop` (que já tem a #108).
+- [ ] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small`
+  Isolada de propósito: `AvaliarReservaJob::updateReservaOverallStatus` (linha ~255) recalcula `situacao` a partir da contagem de horários e o `match` não trata `inativa` — toda avaliação em uma reserva arquivada a ressuscita para `em_analise`/`deferida`/etc. Branch a partir de `develop` (que já tem a #108).
 
 ---
 
 ## 📋 Fila
 
-- [ ] **#255 — `data_inicial`/`data_final` dessincronizam na edição de ocorrência única** `P2` · `effort: medium`
-  Aberta por mim durante a #222. Bug de integridade: com `edit_scope='single'`, o período é reescrito com os limites da semana editada. Bloqueia navegação para semanas que têm horários. Requer migração de dados.
+**Bugs críticos (do core-workflow-report.md)**
+
+- [ ] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
+  No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Validar por agenda_id.
+
+- [ ] **#255 — `data_inicial`/`data_final` dessincronizam na edição single** `P2` · `effort: medium`
+  Com `edit_scope='single'`, período reescrito com limites da semana. Bloqueia navegação. Requer migração de dados.
+
+**Melhorias de dados (do core-workflow-report.md)**
+
+- [ ] **GAP-02 — UpdateReservaJob não regenera conflitos** `P1` · `effort: medium`
+  Após edição, `conflict_cache` fica obsoleto. Despachar `ValidateReservationConflictsJob` ao final do job.
+
+- [ ] **GAP-06 — ReservaPolicy.update muito restritiva** `P2` · `effort: small`
+  Bloqueia qualquer edição se 1+ horário foi avaliado. Permitir granularmente (só dos não-avaliados).
+
+- [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
+  Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
+
+**UX em tempo real (do core-workflow-report.md)**
+
+- [ ] **GAP-01 — AvaliarReservaPage não auto-reload após ValidateJob terminar** `P0` · `effort: medium`
+  Gestor vê loading indefinidamente. Implementar evento Reverb `ReservationValidatedBroadcast` ao fim do job.
+
+- [ ] **GAP-07 — Falta feedback de progresso para solicitante na criação** `P2` · `effort: medium`
+  Flash genérico "sendo processado". Adicionar dashboard com barra de progresso via Reverb.
+
+**Escalabilidade e UX (do core-workflow-report.md)**
+
+- [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
+  Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
+
+- [ ] **GAP-04 — Notificações de e-mail sem template HTML** `P2` · `effort: small`
+  `BaseNotification.toMail()` usa texto puro. Usar template Blade customizado.
+
+**Outros GitHub issues**
 
 - [ ] **#104 — Templates de horário configuráveis pelo gestor** `P0 de negócio` · `effort: large`
   Nenhuma base no código. Exige migration, revisão da lógica de conflito e do calendário. **Precisa de design antes da execução.**
@@ -65,22 +99,33 @@ Atualizado a cada entrega.
 - [ ] **#102 — Ordenação na "Gerenciar Reservas"** `P3` · `effort: large`
 
 - [ ] **#48 — Filtro/busca no dashboard do gestor** `P3`
-  Parcial: busca existe, mas na aba "Favoritos" e sem debounce. Falta na aba "Espaços que gerencio" e o filtro de pavilhão.
+  Parcial: busca na aba "Favoritos" sem debounce. Falta na aba "Espaços que gerencio" e filtro de pavilhão.
 
 - [ ] **#98 — Versão de build no footer admin via CI/CD** `P3`
 
 - [ ] **#106 — Dia da semana nos grupos de turno** `P4`
-  ⚠️ **Validar antes de investir:** o header sticky já entrega o essencial. Confirmar com o time se ainda faz sentido.
+  ⚠️ **Validar antes de investir:** o header sticky já entrega o essencial.
 
 - [ ] **#107 — Alerta de solicitações pendentes sobrepostas** `P4` · `effort: large`
 
 - [ ] **#46 — Edição administrativa de reserva** `P4`
-  Escopo maior do que aparenta: exige audit log, notificação ao dono e habilitar a permission `reservas.atualizar` em algum role.
+  Escopo maior: exige audit log, notificação ao dono, habilitar permission `reservas.atualizar`.
 
 - [ ] **#49 — Navegação rápida entre salas do pavilhão** `P4`
 
-- [ ] **#260 — Edição administrativa não registra log nem notifica o dono** `P3` · `effort: medium`
-  Aberta por mim ao testar a edição de reservas. A permission `reservas.atualizar` (só `institucional`) faz `ReservaPolicy::update()` retornar `true` para qualquer reserva em qualquer estado — o caminho de edição administrativa da #46 já está **ligado**, mas sem as salvaguardas que ela especifica: não há log de alteração, e `UpdateReservaJob:141` notifica **quem editou**, não o dono da reserva. Corrigir a #46 provavelmente fecha esta; o bug da notificação vale ser corrigido sozinho de todo modo.
+**Futuro (requer design)**
+
+- [ ] **GAP-08 — Dashboard com métricas de ocupação** `P3` · `effort: large`
+  `HomeController`/`HomeService` existem mas não consolidam ocupação. Gráficos e tendências.
+
+- [ ] **GAP-09 — Aprovação parcial granular** `P3` · `effort: medium`
+  Status `parcialmente_deferida` sem caminho claro. Notificar solicitante com opções.
+
+- [ ] **GAP-10 — Histórico e audit trail de avaliações** `P3` · `effort: medium`
+  Falta rastreabilidade além de `user_id` no `Horario`. Tabela de log ou eventos de domínio.
+
+- [ ] **GAP-11 — Reverb completo (auto-reload em ReservasPage, etc.)** `P3` · `effort: large`
+  Eventos só notificam novas notificações. Estruturar canais (ex.: `reservas.{user_id}`) para recarregar dados.
 
 ---
 
@@ -114,13 +159,8 @@ Atualizado a cada entrega.
 |---|---|
 | Concluídas e mergeadas | **6** (#119, #222, #101, #105, #112, #108) |
 | Fechadas no GitHub | **6** (#119, #222, #101, #105, #111, #112) — **#108 falta fechar** |
-| Em andamento | **0** (#265 é a próxima, mas ainda sem branch) |
-| Na fila | **9** |
+| Em andamento | **1** (#265) |
+| Na fila | **23** (9 GitHub issues + 11 GAPs + futuro) |
 | Wontfix | **1** (#41) |
-| Abertas por esta auditoria | **3** (#255, #260, #265) |
 
-**Próxima da fila:** #265 (avaliar arquivada a ressuscita) — isolada da #108 de propósito, branch a partir de `develop`.
-
-**Fora da fila desta auditoria:** desde a última atualização (`12b0be9`), `develop` recebeu 7 outros PRs (#268, #270, #273, #275, #276, #278, #280) — refatorações de UI/UX, performance e arquitetura frontend não relacionados a nenhuma issue da fila. Nenhum toca #255, #260, #46, #48, #102, #104, #106, #107 ou #98.
-
-> ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`). Aconteceu com a #105, fechada na mão depois do PR #261.
+> ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).
