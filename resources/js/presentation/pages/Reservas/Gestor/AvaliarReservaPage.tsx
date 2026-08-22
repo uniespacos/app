@@ -4,6 +4,7 @@ import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-a
 import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
 import { Badge } from '@/components/ui/badge';
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
+import { useReservationValidation } from '@/hooks/useReservationValidation';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
@@ -51,6 +52,8 @@ export default function AvaliarReserva({
     const { form, submitEvaluation } = useAvaliarReservaUseCase({
         reserva,
     });
+
+    useReservationValidation(reserva.id);
 
     const semanaInicial = useMemo(() => parseISO(semana.referencia), [semana.referencia]);
     const dataInicialReserva = useMemo(() => new Date(reserva.data_inicial), [reserva.data_inicial]);
