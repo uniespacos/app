@@ -1,11 +1,15 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
-import { Search } from 'lucide-react';
+import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type FiltroBuscaEspacosProps = {
@@ -98,111 +102,138 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         });
     };
 
+    // No mobile, busca + 4 selects empilhados ocupavam a tela inteira antes
+    // do primeiro card de espaço aparecer. A busca continua sempre visível;
+    // os filtros avançados ficam recolhidos por padrão nesse breakpoint (o
+    // `sm:block` no conteúdo força a exibição sempre aberta a partir do
+    // tablet, onde cabem lado a lado sem esse problema).
+    const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+    const quantidadeFiltrosAtivos = [
+        localFilters.unidade !== 'all',
+        localFilters.modulo !== 'all',
+        localFilters.andar !== 'all',
+        localFilters.capacidade !== 'qualquer',
+    ].filter(Boolean).length;
+
     return (
-        <>
-            {/* Filtros e Busca */}
-            <Card className="mb-6">
-                <CardContent>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {/* Busca */}
-                        <div className="space-y-2 sm:col-span-4 lg:col-span-4">
-                            <Label htmlFor="espacos-busca">Buscar</Label>
-                            <div className="relative">
-                                <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-                                <Input
-                                    id="espacos-busca"
-                                    placeholder="Buscar por nome do espaço, andar ou módulo..."
-                                    className="pl-8"
-                                    value={localFilters.search}
-                                    onChange={(value) => handleFilterChange('search', value.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Filtro de Unidade */}
-                        <div className="space-y-2">
-                            <Label htmlFor="espacos-unidade">Unidade</Label>
-                            <Select value={localFilters.unidade} onValueChange={(value) => handleFilterChange('unidade', value)}>
-                                <SelectTrigger id="espacos-unidade">
-                                    <SelectValue placeholder="Unidade" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todas as Unidades</SelectItem>
-                                    {unidades.map((unidade) => (
-                                        <SelectItem key={unidade.id} value={unidade.id.toString()}>
-                                            {unidade.nome}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filtro de Módulo */}
-                        <div className="space-y-2">
-                            <Label htmlFor="espacos-modulo">Módulo</Label>
-                            <Select
-                                value={localFilters.modulo}
-                                onValueChange={(value) => handleFilterChange('modulo', value)}
-                                disabled={localFilters.unidade === 'all'}
-                            >
-                                <SelectTrigger id="espacos-modulo">
-                                    <SelectValue placeholder="Módulo" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os Módulos</SelectItem>
-                                    {filteredModulos.map((modulo) => (
-                                        <SelectItem key={modulo.id} value={modulo.id.toString()}>
-                                            {modulo.nome}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filtro de Andar */}
-                        <div className="space-y-2">
-                            <Label htmlFor="espacos-andar">Andar</Label>
-                            <Select
-                                value={localFilters.andar}
-                                onValueChange={(value) => handleFilterChange('andar', value)}
-                                disabled={localFilters.modulo === 'all'}
-                            >
-                                <SelectTrigger id="espacos-andar">
-                                    <SelectValue placeholder="Andar" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os Andares</SelectItem>
-                                    {filteredAndares.map((andar) => (
-                                        <SelectItem key={andar.id} value={andar.id.toString()}>
-                                            {nivelParaLabel(nomeParaNivel(andar.nome))}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filtro de Capacidade */}
-                        <div className="space-y-2">
-                            <Label htmlFor="espacos-capacidade">Capacidade</Label>
-                            <Select value={localFilters.capacidade} onValueChange={(value) => handleFilterChange('capacidade', value)}>
-                                <SelectTrigger id="espacos-capacidade">
-                                    <SelectValue placeholder="Capacidade" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="qualquer">Qualquer</SelectItem>
-                                    {capacidadeEspacos.map((capacidade) => {
-                                        return (
-                                            <SelectItem key={capacidade} value={capacidade.toString()}>
-                                                {capacidade} Lugares
-                                            </SelectItem>
-                                        );
-                                    })}
-                                </SelectContent>
-                            </Select>
-                        </div>
+        <Card className="mb-6">
+            <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                    {/* Busca */}
+                    <div className="relative flex-1">
+                        <Label htmlFor="espacos-busca" className="sr-only">
+                            Buscar
+                        </Label>
+                        <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
+                        <Input
+                            id="espacos-busca"
+                            placeholder="Buscar por nome do espaço, andar ou módulo..."
+                            className="pl-8"
+                            value={localFilters.search}
+                            onChange={(value) => handleFilterChange('search', value.target.value)}
+                        />
                     </div>
-                </CardContent>
-            </Card>
-        </>
+
+                    <Collapsible open={filtrosAbertos} onOpenChange={setFiltrosAbertos} className="sm:hidden">
+                        <CollapsibleTrigger asChild>
+                            <Button variant="outline" className="relative">
+                                <SlidersHorizontal className="h-4 w-4" />
+                                Filtros
+                                {quantidadeFiltrosAtivos > 0 && (
+                                    <Badge className="absolute -top-2 -right-2 h-5 min-w-5 justify-center rounded-full px-1">
+                                        {quantidadeFiltrosAtivos}
+                                    </Badge>
+                                )}
+                                <ChevronDown className={cn('h-4 w-4 transition-transform', filtrosAbertos && 'rotate-180')} />
+                            </Button>
+                        </CollapsibleTrigger>
+                    </Collapsible>
+                </div>
+
+                <div className={cn('grid grid-cols-2 gap-4 lg:grid-cols-4', !filtrosAbertos && 'hidden sm:grid')}>
+                    {/* Filtro de Unidade */}
+                    <div className="col-span-2 space-y-2 sm:col-span-1">
+                        <Label htmlFor="espacos-unidade">Unidade</Label>
+                        <Select value={localFilters.unidade} onValueChange={(value) => handleFilterChange('unidade', value)}>
+                            <SelectTrigger id="espacos-unidade" className="w-full">
+                                <SelectValue placeholder="Unidade" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Todas as Unidades</SelectItem>
+                                {unidades.map((unidade) => (
+                                    <SelectItem key={unidade.id} value={unidade.id.toString()}>
+                                        {unidade.nome}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Filtro de Módulo */}
+                    <div className="space-y-2">
+                        <Label htmlFor="espacos-modulo">Módulo</Label>
+                        <Select
+                            value={localFilters.modulo}
+                            onValueChange={(value) => handleFilterChange('modulo', value)}
+                            disabled={localFilters.unidade === 'all'}
+                        >
+                            <SelectTrigger id="espacos-modulo" className="w-full">
+                                <SelectValue placeholder="Módulo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Todos os Módulos</SelectItem>
+                                {filteredModulos.map((modulo) => (
+                                    <SelectItem key={modulo.id} value={modulo.id.toString()}>
+                                        {modulo.nome}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Filtro de Andar */}
+                    <div className="space-y-2">
+                        <Label htmlFor="espacos-andar">Andar</Label>
+                        <Select
+                            value={localFilters.andar}
+                            onValueChange={(value) => handleFilterChange('andar', value)}
+                            disabled={localFilters.modulo === 'all'}
+                        >
+                            <SelectTrigger id="espacos-andar" className="w-full">
+                                <SelectValue placeholder="Andar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Todos os Andares</SelectItem>
+                                {filteredAndares.map((andar) => (
+                                    <SelectItem key={andar.id} value={andar.id.toString()}>
+                                        {nivelParaLabel(nomeParaNivel(andar.nome))}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Filtro de Capacidade */}
+                    <div className="space-y-2">
+                        <Label htmlFor="espacos-capacidade">Capacidade</Label>
+                        <Select value={localFilters.capacidade} onValueChange={(value) => handleFilterChange('capacidade', value)}>
+                            <SelectTrigger id="espacos-capacidade" className="w-full">
+                                <SelectValue placeholder="Capacidade" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="qualquer">Qualquer</SelectItem>
+                                {capacidadeEspacos.map((capacidade) => {
+                                    return (
+                                        <SelectItem key={capacidade} value={capacidade.toString()}>
+                                            {capacidade} Lugares
+                                        </SelectItem>
+                                    );
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

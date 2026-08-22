@@ -36,7 +36,7 @@ export default function AgendaNavegacao({
             passam a ser ícones flanqueando a data, e "Voltar para semana atual"
             desce para a própria linha — onde há largura para o rótulo inteiro.
         */
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="bg-muted/30 flex flex-col gap-2 rounded-lg border px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="flex items-center justify-between gap-2 sm:justify-start">
                 <Button
                     variant="outline"

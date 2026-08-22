@@ -75,7 +75,7 @@ export default function CalendarDiaMobile({
     }
 
     return (
-        <div className="rounded-xl border">
+        <div className="rounded-xl border overflow-hidden">
             {/* Seletor de dia — alvos de toque de 44px, o mínimo confortável para o dedo */}
             <div className="flex border-b" role="tablist" aria-label="Dia da semana">
                 {diasSemana.map((dia, indice) => {
@@ -117,7 +117,7 @@ export default function CalendarDiaMobile({
 
             {slotsPorTurno.map(({ turno, slots }) => (
                 <div key={turno}>
-                    <div className="text-muted-foreground bg-muted/60 px-3 py-1.5 text-[11px] font-semibold tracking-wide uppercase">
+                    <div className="text-foreground bg-muted/40 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase">
                         {TURNO_LABEL[turno] ?? turno}
                     </div>
 

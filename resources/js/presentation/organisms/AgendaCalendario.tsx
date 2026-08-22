@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import AgendaLegenda from '@/presentation/molecules/AgendaLegenda';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
@@ -14,6 +15,7 @@ type AgendaCalendarioProps = {
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     // Adiciona a prop para passar os slots da reserva atual
     slotsDaReserva?: SlotCalendario[];
+    isEditMode?: boolean;
 };
 
 export default function AgendaCalendario({
@@ -22,6 +24,7 @@ export default function AgendaCalendario({
     isSlotSelecionado,
     alternarSelecaoSlot,
     slotsDaReserva, // Recebe a nova prop
+    isEditMode,
 }: AgendaCalendarioProps) {
     const isMobile = useIsMobile();
 
@@ -49,6 +52,7 @@ export default function AgendaCalendario({
 
     return (
         <Card className="p-0">
+            <AgendaLegenda isEditMode={isEditMode} />
             <div className="w-full overflow-auto">
                 <div className="min-w-[800px] rounded-xl">
                     {/* Cabeçalho com os dias da semana */}

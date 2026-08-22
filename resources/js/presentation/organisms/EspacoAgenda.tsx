@@ -103,6 +103,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
                     semanaInicio={semanaVisivel}
                     agendas={agendas || []}
                     slotsDaReserva={slotsSelecao}
+                    isEditMode={isEditMode}
                 />
                 {isLoading && (
                     <div className="bg-background/70 absolute inset-0 z-10 flex items-center justify-center rounded-md backdrop-blur-sm">
