@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.26](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.25...v1.3.0-rc.26) (2026-08-22)
+
+
+### Bug Fixes
+
+* corrigir eslint-suppressions.json órfão que quebrava o CI/CD Staging ([#291](https://github.com/uniespacos/uniespacos/issues/291)) ([f6293db](https://github.com/uniespacos/uniespacos/commit/f6293db67dc7d689dd0a0e7e24f550637f9d8254))
+
 ## [1.3.0-rc.25](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.24...v1.3.0-rc.25) (2026-08-22)
 
 
