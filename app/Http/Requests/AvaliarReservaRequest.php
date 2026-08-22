@@ -48,7 +48,20 @@ class AvaliarReservaRequest extends FormRequest
                 }
 
                 $agendasDoGestorIds = $gestor->agendas()->pluck('id')->toArray();
-                $horariosIds = collect($this->input('horarios_avaliados'))->pluck('id')->toArray();
+                $horariosAvaliados = $this->input('horarios_avaliados', []);
+
+                // Extrai IDs com múltiplas estratégias para suportar diferentes formatos
+                $horariosIds = [];
+                foreach ($horariosAvaliados as $item) {
+                    if (is_array($item)) {
+                        // Tenta 'id' na raiz, depois 'dadosReserva.horarioDB.id'
+                        if (isset($item['id'])) {
+                            $horariosIds[] = $item['id'];
+                        } elseif (isset($item['dadosReserva']['horarioDB']['id'])) {
+                            $horariosIds[] = $item['dadosReserva']['horarioDB']['id'];
+                        }
+                    }
+                }
 
                 if (empty($horariosIds)) {
                     return;
