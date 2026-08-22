@@ -8,8 +8,8 @@ import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { InstituicaoFilters } from '@/presentation/molecules/InstituicaoFilter';
+import { useMemo, useState } from 'react';
+import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 const breadcrumbs = [
     {
         title: 'Gerenciar Instituições',
@@ -26,17 +26,16 @@ export default function InstituicoesPage() {
         };
     }>().props;
     const [removerInstituicao, setRemoverInstituicao] = useState<Instituicao | null>(null);
-    const [filteredInstituicoes, setFilteredInstituicoes] = useState<Instituicao[]>(instituicoes.data);
     const [searchTerm, setSearchTerm] = useState('');
-    useEffect(() => {
-        // Filtra as instituições com base no termo de busca
-        const filtered = instituicoes.data.filter(
-            (instituicao) =>
-                instituicao.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                instituicao.sigla.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
-        setFilteredInstituicoes(filtered);
-    }, [instituicoes.data, searchTerm]);
+    const filteredInstituicoes = useMemo(
+        () =>
+            instituicoes.data.filter(
+                (instituicao) =>
+                    instituicao.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    instituicao.sigla.toLowerCase().includes(searchTerm.toLowerCase()),
+            ),
+        [instituicoes.data, searchTerm],
+    );
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Instituições" />
@@ -52,7 +51,12 @@ export default function InstituicoesPage() {
                             ButtonIcon={PlusCircle}
                             canSeeButton={true}
                         />
-                        <InstituicaoFilters searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
+                        <SearchFilter
+                            searchTerm={searchTerm}
+                            onSearchTermChange={setSearchTerm}
+                            placeholder="Buscar por nome ou sigla"
+                            variant="card"
+                        />
                         <Card>
                             <CardContent>
                                 <Table>

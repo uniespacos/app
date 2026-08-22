@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
+import { getTurnoText } from '@/lib/utils';
 import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
 import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import AppLayout from '@/presentation/templates/app-layout';
@@ -59,19 +60,6 @@ export default function Dashboard({
 
         setFilteredEspacosFavoritos(filtered);
     }, [espacosFavoritos, searchTerm]);
-
-    const getTurnoLabel = (turno: string) => {
-        switch (turno) {
-            case 'manha':
-                return 'Manhã';
-            case 'tarde':
-                return 'Tarde';
-            case 'noite':
-                return 'Noite';
-            default:
-                return turno;
-        }
-    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -183,7 +171,7 @@ export default function Dashboard({
                                                 <div className="flex flex-wrap gap-2">
                                                     {espaco.agendas?.map((agenda) => (
                                                         <div key={agenda.id} className="flex items-center gap-2">
-                                                            <Badge variant="outline">{getTurnoLabel(agenda.turno)}</Badge>
+                                                            <Badge variant="outline">{getTurnoText(agenda.turno)}</Badge>
                                                             {agenda.user ? (
                                                                 <span className="text-muted-foreground text-sm">{agenda.user.name}</span>
                                                             ) : (

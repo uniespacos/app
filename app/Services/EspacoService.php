@@ -57,13 +57,13 @@ class EspacoService
     }
 
     /**
-     * Returns all spaces for the admin/institucional listing.
+     * Returns a paginated list of spaces for the admin/institucional listing with optional filters.
      *
-     * @return Collection<int, Espaco>
+     * @param  array<string, mixed>  $filters
      */
-    public function getAdminListing(int $instituicaoId): Collection
+    public function getPaginatedForAdmin(int $instituicaoId, array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        return $this->repoEspaco->getAllByInstituicao($instituicaoId);
+        return $this->repoEspaco->getPaginatedForAdmin($instituicaoId, $filters, $perPage);
     }
 
     /**

@@ -371,14 +371,6 @@ export interface SelectedAgenda {
     instituicao: Instituicao;
 }
 
-export interface FiltrosEspacosType {
-    search?: string;
-    unidade?: string;
-    modulo?: string;
-    andar?: string;
-    capacidade?: string;
-}
-
 interface ReservaAvaliadaNotificationPayload {
     type: string; // 'App\\Notifications\\ReservaAvaliadaNotification'
     reserva_id: number;

@@ -8,7 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
+import { ROLE_COMUM } from '@/constants/permissions';
+import { getRoleBadgeClass, getRoleLabel } from '@/constants/role-labels';
 import DeleteItem from '@/presentation/molecules/delete-item';
 import { EditUserModal } from '@/presentation/molecules/EditUserModal';
 import GenericHeader from '@/presentation/molecules/generic-header';
@@ -65,30 +66,6 @@ export default function UsuariosPage() {
 
         return () => clearTimeout(timeout);
     }, [searchTerm, selectedSetorId]);
-
-    const getPermissionLabel = (roleName: string): string => {
-        switch (roleName) {
-            case ROLE_INSTITUCIONAL:
-                return 'Institucional';
-            case ROLE_GESTOR:
-                return 'Gestor';
-            case ROLE_COMUM:
-                return 'Comum';
-            default:
-                return roleName || 'Desconhecido';
-        }
-    };
-
-    const getPermissionColor = (roleName: string): string => {
-        switch (roleName) {
-            case ROLE_INSTITUCIONAL:
-                return 'bg-destructive-subtle text-destructive';
-            case ROLE_GESTOR:
-                return 'bg-info-subtle text-info-accent';
-            default:
-                return 'bg-muted text-foreground';
-        }
-    };
 
     const handleUserClick = (user: User) => {
         setSelectedUser(user);
@@ -181,8 +158,8 @@ export default function UsuariosPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
-                                                    <Badge className={getPermissionColor(user.roles?.[0] ?? ROLE_COMUM)}>
-                                                        {getPermissionLabel(user.roles?.[0] ?? ROLE_COMUM)}
+                                                    <Badge className={getRoleBadgeClass(user.roles?.[0] ?? ROLE_COMUM)}>
+                                                        {getRoleLabel(user.roles?.[0] ?? ROLE_COMUM)}
                                                     </Badge>
                                                     <div className="flex items-center space-x-2">
                                                         <div

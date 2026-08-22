@@ -1,5 +1,3 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,8 +5,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AppLayout from '@/presentation/templates/app-layout';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import AppLayout from '@/presentation/templates/app-layout';
 import { Modulo } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Building, ChevronDown, ChevronRight, Edit, Layers, MapPin, PlusCircle, Trash2, Users } from 'lucide-react';
@@ -43,7 +43,7 @@ export default function ModulosPage() {
         };
     }>().props;
     const [filtroNome, setFiltroNome] = useState('');
-    const [filtroUnidade, setFiltroUnidade] = useState('all'); // Updated default value
+    const [filtroUnidade, setFiltroUnidade] = useState('all');
     const [expandedModulos, setExpandedModulos] = useState<Set<number>>(new Set());
     const [removerModulo, setRemoverModulo] = useState<Modulo | null>(null);
     const toggleModulo = (moduloId: number) => {

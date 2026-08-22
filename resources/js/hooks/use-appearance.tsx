@@ -17,7 +17,6 @@ export function useAppearance() {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         updateAppearance: (_: Appearance) => {
             // Não faz nada - mantém sempre light
-            //console.log('Theme switching is disabled');
         },
     };
 }
