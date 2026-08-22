@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.25](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.24...v1.3.0-rc.25) (2026-08-22)
+
+
+### Miscellaneous Chores
+
+* elevar rigor de lint/análise estática e proibir comentário inline redundante ([#288](https://github.com/uniespacos/uniespacos/issues/288)) ([983277a](https://github.com/uniespacos/uniespacos/commit/983277ab7e561b9f96710393e3a8b1e1000579fc))
+
 ## [1.3.0-rc.24](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.23...v1.3.0-rc.24) (2026-08-22)
 
 
