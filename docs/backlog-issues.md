@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `ee79eb4` (release rc.22) · #108 mergeada (PR #266) · #119/#222/#101/#105/#111 fechadas no GitHub · **#108 ainda OPEN no GitHub — falta fechar na mão**
+**Última atualização:** 2026-08-22 · develop em `6803c20` (release rc.29) · #301 mergeada · #265 concluída (PR #299) · GAP-03 concluída c/ contadores (PR pending) · Alert visível + docs atualizada
 
 ---
 
@@ -45,21 +45,27 @@ Atualizado a cada entrega.
   Solução: separar os eixos. `situacao` fica só com resultado de avaliação; novo `arquivo` (`ativas`/`arquivadas`/`todas`) via `scopeArquivo` no model, usado pelos dois repositórios. URL legada `?situacao=inativa` é traduzida para não passar a devolver vazio. Entrou também uma guarda de idempotência no cancelamento (recancelar reserva arquivada não dispara mais notificação repetida).
   *12 testes de feature + 6 de componente · baseline 8 falhas → 12 passando · 115 → 127 testes PHP*
 
+- [x] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small`
+  Branch `fix/265-archived-resurrection` → PR #299 → merged `5161d2b`
+  `AvaliarReservaJob::updateReservaOverallStatus` recalculava `situacao` a partir da contagem de horários sem tratar `inativa` — toda avaliação em uma reserva arquivada a ressuscitava. Match adicionado para validar que reserva é ativa antes de reatribuir status.
+  *17 testes · 17 passando*
+
+- [x] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
+  Branch `fix/gap-03-recurring-scope-authorization` → PR pendente
+  No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Implementada validação em 2 níveis: (1) no `AvaliarReservaRequest::after()` valida cada horário ID pertence às agendas do gestor; (2) no `AvaliarReservaJob::validateHorariosAutorization()` revalida antes de processar. **Bônus 1:** Corrigido bug crítico de UX/acessibilidade no `Alert` com `variant="destructive"` — o alerta de reavaliação estava invisível por contraste 1:1. Corrigido com `text-destructive-accent` (vermelho escuro) que rende ~5:1. **Bônus 2:** Adicionados contadores de horários na lista do gestor (`ReservasList`). Quando uma reserva está em `parcialmente_deferida`, mostra quantos horários estão `em_analise` e quantos foram `indeferida`, dando clareza de quais ações o gestor ainda precisa tomar.
+  *9 testes novos/atualizados · 19 testes passando · 0 regressões · docs atualizada (6.1)*
+
 ---
 
 ## 🔨 Em andamento
 
-- [ ] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small`
-  Isolada de propósito: `AvaliarReservaJob::updateReservaOverallStatus` (linha ~255) recalcula `situacao` a partir da contagem de horários e o `match` não trata `inativa` — toda avaliação em uma reserva arquivada a ressuscita para `em_analise`/`deferida`/etc. Branch a partir de `develop` (que já tem a #108).
+- (nenhuma)
 
 ---
 
 ## 📋 Fila
 
 **Bugs críticos (do core-workflow-report.md)**
-
-- [ ] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
-  No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Validar por agenda_id.
 
 - [ ] **#255 — `data_inicial`/`data_final` dessincronizam na edição single** `P2` · `effort: medium`
   Com `edit_scope='single'`, período reescrito com limites da semana. Bloqueia navegação. Requer migração de dados.

@@ -93,6 +93,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     {
         return $this->reserva->newQuery()
             ->select(['id', 'titulo', 'descricao', 'situacao', 'user_id', 'data_inicial', 'data_final'])
+            ->withHorariosStats($agendaIds)
             ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendaIds))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('titulo', 'like', "%{$s}%")->orWhere('descricao', 'like', "%{$s}%")))
             // Issue #108: os dois eixos ficam independentes, entao "Todas as
@@ -102,7 +103,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             ->with([
                 'user:id,name',
                 'horarios' => function ($query) use ($agendaIds) {
-                    $query->whereIn('agenda_id', $agendaIds)->limit(1)->with([
+                    $query->whereIn('agenda_id', $agendaIds)->with([
                         'agenda:id,espaco_id,turno',
                         // Issue #105: os selects são enxutos de propósito, mas cada
                         // relação aninhada precisa da própria chave estrangeira —

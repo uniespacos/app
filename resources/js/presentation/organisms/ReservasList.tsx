@@ -1,19 +1,19 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { formatDate } from '@/lib/utils';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
+import { LocalReserva } from '@/presentation/molecules/LocalReserva';
+import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Edit, FileText, XCircle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
-import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
-import { LocalReserva } from '@/presentation/molecules/LocalReserva';
-import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
 import { comSituacaoEfetivaDoGestor } from '@/application/reservas/helpers/reserva-helpers';
 
@@ -34,10 +34,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     // A ordem já vem certa do backend (filtro "ordenar", issue de critério de
     // ordenação) — aqui só recalcula a situação efetiva exibida ao gestor
     // (parcial/em_analise por horário), sem reordenar a página no cliente.
-    const reservasFiltradas = useMemo(
-        () => (isGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas),
-        [isGestor, reservas],
-    );
+    const reservasFiltradas = useMemo(() => (isGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas), [isGestor, reservas]);
 
     useEffect(() => {
         if (reservaToShow) {
@@ -101,7 +98,9 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                             isGestor={isGestor}
                             onDetalhes={handleAbrirDetalhes}
                             onAvaliar={handleAvaliarButton}
-                            onEditar={(id) => { router.get(`reservas/${id}/edit`); }}
+                            onEditar={(id) => {
+                                router.get(`reservas/${id}/edit`);
+                            }}
                             onCancelar={setRemoverReserva}
                         />
                     ))}
@@ -171,20 +170,30 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     {formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                    <div>
-                                        <SituacaoBadge situacao={reserva.situacao} />
-                                    </div>
+                                    <SituacaoBadge situacao={reserva.situacao} />
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex flex-wrap justify-end gap-2">
-                                        <Button variant="outline" size="sm" onClick={() => { handleAbrirDetalhes(reserva); }}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                handleAbrirDetalhes(reserva);
+                                            }}
+                                        >
                                             <FileText className="mr-1.5 h-4 w-4" />
                                             Detalhes
                                         </Button>
 
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
-                                                <Button variant="outline" size="sm" onClick={() => { handleAvaliarButton(reserva.id); }}>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        handleAvaliarButton(reserva.id);
+                                                    }}
+                                                >
                                                     <Edit className="mr-1.5 h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
@@ -202,7 +211,13 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                                             Editar
                                                         </Button>
                                                     )}
-                                                    <Button variant="destructive" size="sm" onClick={() => { setRemoverReserva(reserva); }}>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setRemoverReserva(reserva);
+                                                        }}
+                                                    >
                                                         <XCircle className="mr-1.5 h-4 w-4" />
                                                         Cancelar
                                                     </Button>

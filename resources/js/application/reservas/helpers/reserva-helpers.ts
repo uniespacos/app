@@ -1,22 +1,27 @@
 import { Reserva, SituacaoReserva } from '@/types';
 
 export function calculateGestorStatus(reserva: Reserva): SituacaoReserva {
-    if (reserva.situacao === 'parcialmente_deferida' || reserva.situacao === 'em_analise') {
-        const horarios = reserva.horarios || [];
-        if (horarios.length > 0) {
-            const situacoes = horarios.map((h) => h.situacao);
-            if (situacoes.includes('em_analise')) {
-                return 'em_analise';
-            }
-            if (situacoes.every((s) => s === 'deferida')) {
-                return 'deferida';
-            }
-            if (situacoes.every((s) => s === 'indeferida')) {
-                return 'indeferida';
-            }
-        }
+    const horarios = reserva.horarios || [];
+
+    if (horarios.length === 0) {
+        return reserva.situacao;
     }
-    return reserva.situacao;
+
+    const situacoes = horarios.map((h) => h.situacao);
+
+    if (situacoes.includes('em_analise')) {
+        return 'em_analise';
+    }
+
+    if (situacoes.every((s) => s === 'deferida')) {
+        return 'deferida';
+    }
+
+    if (situacoes.every((s) => s === 'indeferida')) {
+        return 'indeferida';
+    }
+
+    return 'parcialmente_deferida';
 }
 
 /**

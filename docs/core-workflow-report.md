@@ -321,6 +321,29 @@ flowchart TD
     F -->|Não| H["situacao = 'parcialmente_deferida'\n(mix de deferida + indeferida)"]
 ```
 
+### 6.1 Exibição para o Gestor
+
+Na lista de reservas do gestor (`ReservasGestorPage`), o status é exibido com clareza sobre o que o gestor já fez:
+
+| Status | Exibição | Significado |
+|--------|----------|-------------|
+| `deferida` | 🟢 Deferida | Gestor aprovou todos os horários |
+| `indeferida` | 🔴 Indeferida | Gestor recusou todos os horários |
+| `em_analise` | 🟡 Em análise | Gestor ainda não avaliou nenhum horário ou há pendentes |
+| `parcialmente_deferida` | 🟠 Parcialmente Deferida **+ contadores** | Gestor aprovou alguns e recusou outros; mostra: <br/> ⏳ N em análise (se houver) <br/> ❌ N recusado(s) |
+| `inativa` | ⚫ Inativa | Reserva foi cancelada (arquivada) |
+
+**Exemplo:** Uma reserva com status "Parcialmente Deferida" na lista mostra:
+```
+Parcialmente Deferida
+⏳ 2 em análise
+❌ 1 recusado
+```
+
+Isso permite ao gestor rapidamente entender o que precisa fazer:
+- Se há "em análise", ainda faltam avaliações
+- Se há "recusado", alguns horários foram explicitamente indeferidos
+
 ---
 
 ## 7. Cascata de Revalidação de Conflitos {#cascata}
