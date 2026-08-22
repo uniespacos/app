@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.28](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.27...v1.3.0-rc.28) (2026-08-22)
+
+
+### Miscellaneous Chores
+
+* reorganizar .env.example e documentar secrets de deploy ([#295](https://github.com/uniespacos/uniespacos/issues/295)) ([466f550](https://github.com/uniespacos/uniespacos/commit/466f5502794bc75524e2841f528461434a534d2c))
+
 ## [1.3.0-rc.27](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.26...v1.3.0-rc.27) (2026-08-22)
 
 
