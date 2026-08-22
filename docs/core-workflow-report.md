@@ -1,9 +1,27 @@
 # UniEspaços — Core Workflow Report
-> Generated: 2026-06-02 | Base para definição de próximos passos
+> Última atualização: 2026-08-22 | Diagrama completo do fluxo de reservas, campos, validação e notificações
+
+## Índice
+
+1. [Visão Geral do Sistema](#visão-geral)
+2. [Modelo de Dados Central](#modelo-de-dados)
+3. [Estados da Reserva e Eixo de Arquivamento](#estados)
+4. [Fluxo Completo de Criação](#fluxo-criação)
+5. [Fluxo de Avaliação pelo Gestor](#fluxo-avaliação)
+6. [Regra de Status Agregado](#status-agregado)
+7. [Cascata de Revalidação](#cascata)
+8. [Fluxo de Cancelamento](#cancelamento)
+9. [Sistema de Notificações](#notificações)
+10. [Eixos de Filtro](#eixos-de-filtro)
+11. [Validação de Conflitos](#validação-conflitos)
+12. [Árvore Frontend](#frontend-tree)
+13. [Arquitetura Backend](#arquitetura)
+14. [Gaps Conhecidos](#gaps)
+15. [Referências de Código](#referências)
 
 ---
 
-## 1. Visão Geral do Sistema
+## 1. Visão Geral do Sistema {#visão-geral}
 
 UniEspaços é uma aplicação web de reserva de espaços acadêmicos com arquitetura full-stack desacoplada:
 
@@ -22,7 +40,7 @@ O **fluxo central** da aplicação tem dois atores principais:
 
 ---
 
-## 2. Modelo de Dados Central
+## 2. Modelo de Dados Central {#modelo-de-dados}
 
 ```mermaid
 erDiagram
@@ -56,6 +74,7 @@ erDiagram
         int user_id "solicitante"
         string validation_status "pending | processing | completed | failed"
         json conflict_cache
+        timestamp cache_validated_at
     }
 
     Horario {
@@ -79,9 +98,36 @@ erDiagram
 
 **Relação chave:** Uma `Reserva` agrupa vários `Horario`s. Cada `Horario` pertence a uma `Agenda` (que é vinculada a um `Espaco` e tem um `User` gestor). O status final da `Reserva` é **derivado** do conjunto de status dos seus `Horario`s.
 
+### Campos de Validação e Cache
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `validation_status` | ENUM (pending\|processing\|completed\|failed) | Estado da validação assíncrona de conflitos. Começa em `pending`, passa por `processing` enquanto o job roda, termina em `completed` (sucesso) ou `failed`. |
+| `conflict_cache` | JSON | Mapa de conflitos detectados pelo `ValidateReservationConflictsJob`. Armazena pares `horario_id → dados do conflito`. Atualizado pela cascata de revalidação. |
+| `cache_validated_at` | TIMESTAMP | Timestamp da última validação bem-sucedida. Usado para detectar quando o cache ficou obsoleto (ex.: após update da reserva). |
+
 ---
 
-## 3. Estados da Reserva
+## 3. Estados da Reserva e Eixo de Arquivamento {#estados}
+
+### 3.1 Separação: Situação vs Arquivo
+
+**Situação** é o resultado da **avaliação** (quem aprova/rejeita a reserva):
+- `em_analise`: aguardando avaliação do gestor
+- `deferida`: aprovada
+- `indeferida`: rejeitada
+- `parcialmente_deferida`: mix de aprovados e rejeitados
+
+**Arquivo** é um estado de **exclusão lógica** (arquivar = remover da visão padrão):
+- `inativa`: reserva arquivada (cancelada ou excluída)
+
+**Por quê separar?** Historicamente, `inativa` era tratada no mesmo field que os outros status, causando filtros contraditórios (ex.: "mostrar inativas E em_analise"). Agora:
+- Use `situacao` para filtrar por **resultado de avaliação** (4 valores)
+- Use `arquivo` (via `ModoArquivoEnum`) para filtrar por **visibilidade** (ATIVAS / ARQUIVADAS / TODAS)
+
+Ver seção [4.5 Eixos de Filtro](#eixos-de-filtro).
+
+### 3.2 Diagrama de Transição de Estados
 
 ```mermaid
 stateDiagram-v2
@@ -97,16 +143,30 @@ stateDiagram-v2
     indeferida --> deferida : Reavaliação (Gestor)
 
     note right of em_analise
-        Auto-deferida se solicitante
-        é o próprio gestor do espaço
+        Auto-aprovada se solicitante
+        é o único gestor de TODAS
+        as agendas solicitadas
     end note
 ```
 
-**Regra especial de auto-aprovação:** Se o solicitante for o único gestor de todos os espaços solicitados, a reserva já nasce com `situacao = deferida` (código em `ProcessarCriacaoReserva`).
+### 3.3 Regra de Auto-Aprovação
+
+Se o solicitante for o **único gestor de TODAS as agendas** na reserva:
+- Todos os horários nascem com `situacao = deferida`
+- A reserva nasce com `situacao = deferida`
+- Notificações gestores **não** são enviadas (pois solicitante = gestor)
+- **Supressão de email:** O canal `mail` é omitido (apenas `database` e `broadcast`)
+
+Ver seção [Notificações](#sistema-de-notificações) para detalhe de supressão.
+
+Se solicitante é gestor de **ALGUMAS** (mas não todas) agendas:
+- Horários das agendas que gerencia nascem com `situacao = deferida`
+- Horários de agendas de outros gestores nascem com `situacao = em_analise`
+- Reserva nasce com `situacao = parcialmente_deferida`
 
 ---
 
-## 4. Fluxo Completo de Criação de Reserva
+## 4. Fluxo Completo de Criação de Reserva {#fluxo-criação}
 
 ### 4.1 Frontend — Seleção de Slots
 
@@ -143,25 +203,39 @@ sequenceDiagram
 
     Queue->>ProcessarCriacaoReserva: handle()
     ProcessarCriacaoReserva->>DB: BEGIN TRANSACTION
-    ProcessarCriacaoReserva->>DB: INSERT INTO reservas (situacao='em_analise')
+    ProcessarCriacaoReserva->>DB: INSERT INTO reservas (situacao='em_analise', validation_status='pending')
     loop Para cada horario_solicitado com recorrência semanal
         ProcessarCriacaoReserva->>DB: INSERT INTO horarios (situacao='em_analise' ou 'deferida' se auto-aprovação)
     end
+    ProcessarCriacaoReserva->>DB: Auto-aprovação? Atualiza situacao='deferida' (se único gestor de TODAS)
     ProcessarCriacaoReserva->>DB: COMMIT
 
-    ProcessarCriacaoReserva->>Notification: NewReservationNotification → Gestores
+    ProcessarCriacaoReserva->>Notification: NewReservationNotification → Gestores (se não auto-aprovada)
     ProcessarCriacaoReserva->>Queue: ValidateReservationConflictsJob::dispatch(reserva)
-    ProcessarCriacaoReserva->>Notification: ReservationCreatedNotification → Solicitante
+    ProcessarCriacaoReserva->>Notification: ReservationCreatedNotification → Solicitante (suprime mail em auto-aprovação)
 
     Queue->>ValidateJob: handle()
     ValidateJob->>DB: UPDATE reservas SET validation_status='processing'
     ValidateJob->>DB: SQL JOIN horarios para detectar conflitos (mesma agenda, data, sobreposição de horário)
-    ValidateJob->>DB: UPDATE reservas SET conflict_cache=JSON, validation_status='completed'
+    ValidateJob->>DB: UPDATE reservas SET conflict_cache=JSON, validation_status='completed', cache_validated_at=NOW()
 ```
+
+### 4.3 Pipeline de Validação de Conflitos
+
+O field `validation_status` acompanha o progresso do `ValidateReservationConflictsJob`:
+
+| Status | Significado | Transição automática |
+|--------|-------------|-----|
+| `pending` | Job não iniciado ainda | → `processing` quando job inicia |
+| `processing` | Job rodando, detectando conflitos | → `completed` ou `failed` |
+| `completed` | Validação terminada com sucesso; `conflict_cache` está atualizado | Permanece até próxima revalidação |
+| `failed` | Job falhou após retries; cache pode estar desatualizado | Manual (não há retry automático) |
+
+**Nota:** Durante `pending` ou `processing`, a `AvaliarReservaPage` (gestor) exibe um spinner e bloqueia avaliação, pois não há conflitos verificados ainda.
 
 ---
 
-## 5. Fluxo de Avaliação pelo Gestor
+## 5. Fluxo de Avaliação pelo Gestor {#fluxo-avaliação}
 
 ### 5.1 Frontend — Tela de Avaliação
 
@@ -219,13 +293,20 @@ sequenceDiagram
     end
 
     AvaliarJob->>AvaliarJob: updateReservaOverallStatus()\nRecalcula situacao da Reserva pelo agregado dos Horarios
-    AvaliarJob->>Queue: triggerConflictRevalidation()\nDispara ValidateReservationConflictsJob para outras reservas\nem_analise que compartilham slots recém-aprovados
+    
+    alt Algum horário foi aprovado (deferida)?
+        AvaliarJob->>AvaliarJob: triggerConflictRevalidation()
+        loop Para cada reserva em_analise que compartilha (data, agenda_id)
+            AvaliarJob->>Queue: ValidateReservationConflictsJob::dispatch(reserva_afetada)
+        end
+    end
+    
     AvaliarJob->>Notification: ReservationEvaluatedNotification → Solicitante (database + broadcast + mail)
 ```
 
 ---
 
-## 6. Regra de Status Agregado da Reserva
+## 6. Regra de Status Agregado da Reserva {#status-agregado}
 
 A situação final da `Reserva` é calculada em `AvaliarReservaJob::updateReservaOverallStatus()`:
 
@@ -242,29 +323,50 @@ flowchart TD
 
 ---
 
-## 7. Cascata de Revalidação de Conflitos
+## 7. Cascata de Revalidação de Conflitos {#cascata}
 
-Quando o gestor aprova horários (`deferida`), o sistema automaticamente revalida outras reservas pendentes que disputam os mesmos slots:
+Quando o gestor aprova horários (`deferida`), o sistema automaticamente revalida outras reservas que disputam os mesmos slots. Isso evita que o cache de conflitos de outras reservas fique obsoleto.
+
+### 7.1 Mecanismo
+
+1. **Identificação de aprovações:** AvaliarReservaJob detecta quais horários foram aprovados (status `deferida`) nesta avaliação.
+
+2. **Busca de afetadas:** Procura outras reservas que:
+   - Estão em `situacao = 'em_analise'` (pendentes de avaliação)
+   - Têm `validation_status = 'completed'` (já validadas)
+   - Compartilham pelo menos um slot (`data`, `agenda_id`) com os horários recém-aprovados
+
+3. **Revalidação:** Para cada reserva afetada, dispara `ValidateReservationConflictsJob` para:
+   - Re-detectar conflitos contra os novos horários aprovados
+   - Atualizar `conflict_cache` com conflitos atualizados
+   - Atualizar `cache_validated_at`
+
+### 7.2 Diagrama
 
 ```mermaid
-sequenceDiagram
-    participant AvaliarJob
-    participant DB
-    participant ValidateJob as "ValidateReservationConflictsJob\n(para cada reserva afetada)"
-
-    AvaliarJob->>AvaliarJob: Identifica horários recém-aprovados
-    AvaliarJob->>DB: Busca outras Reservas em_analise\nque compartilham (data, agenda_id) com os aprovados
-    loop Para cada reserva afetada
-        AvaliarJob->>ValidateJob: dispatch(reserva_afetada)
-        ValidateJob->>DB: Atualiza conflict_cache da reserva afetada
-    end
+graph TD
+    A["AvaliarReservaJob aprova Horários\nda Reserva A"] -->|Identifica aprovações| B["Lista de slots aprovados:\ndata, agenda_id, horario_inicio/fim"]
+    B -->|Busca afetadas| C["Query: Reservas em_analise,\nvalidation_status=completed,\nque compartilham slots"]
+    C -->|Para cada reserva| D["ValidateReservationConflictsJob\ndispatchado"]
+    D -->|Atualiza| E["conflict_cache da reserva\ne cache_validated_at"]
+    
+    style A fill:#e1f5ff
+    style E fill:#c8e6c9
 ```
+
+### 7.3 Exemplo Prático
+
+- **Reserva A:** Solicitante pede segundo-feira 14h na Agenda X. Fica em análise.
+- **Reserva B:** Outro solicitante pede segunda-feira 14h na mesma Agenda X. Fica em análise, sem conflitos iniciais (pois A ainda não foi aprovada).
+- **Gestor aprova A:** `ValidateReservationConflictsJob` roda e marca os horários de A como `deferida`.
+- **Cascata:** AvaliarReservaJob detecta que B compartilha a mesma Agenda+Data+Hora, dispara novo `ValidateReservationConflictsJob` para B.
+- **B re-validado:** O novo job detecta conflito de B com A agora, atualiza `conflict_cache` de B.
 
 > **Objetivo:** Garantir que o gestor sempre veja o estado atual de conflitos ao avaliar uma reserva, mesmo que outra tenha sido aprovada após a submissão.
 
 ---
 
-## 8. Fluxo de Cancelamento
+## 8. Fluxo de Cancelamento {#cancelamento}
 
 ```mermaid
 sequenceDiagram
@@ -290,35 +392,184 @@ sequenceDiagram
 
 ---
 
-## 9. Sistema de Notificações
+## 9. Sistema de Notificações {#notificações}
 
-Todas as notificações estendem `BaseNotification` que implementa `ShouldQueue`:
+Todas as notificações relacionadas a reserva estendem `BaseNotification` que implementa `ShouldQueue`:
 
-```mermaid
-graph LR
-    subgraph "Canais de Entrega"
-        DB["database\n(notifications table)"]
-        BROADCAST["broadcast\n(Laravel Reverb / WebSocket)"]
-        MAIL["mail\n(Mailtrap/SMTP)"]
-    end
+### 9.1 Canais de Entrega
 
-    N1["NewReservationNotification"] -->|Gestor| DB & BROADCAST & MAIL
-    N2["ReservationCreatedNotification"] -->|Solicitante| DB & BROADCAST & MAIL
-    N3["ReservationEvaluatedNotification"] -->|Solicitante| DB & BROADCAST & MAIL
-    N4["ReservationCanceledNotification"] -->|Gestores| DB & BROADCAST & MAIL
-    N5["ReservationUpdatedNotification"] -->|Solicitante| DB & BROADCAST & MAIL
-    N6["ReservationFailedNotification"] -->|Solicitante| DB & BROADCAST & MAIL
+| Canal | Tecnologia | Timing | Quando suprimido |
+|-------|-----------|--------|-----------------|
+| `database` | Laravel notifications table | Sempre ativo | Nunca |
+| `broadcast` | Laravel Reverb (WebSocket) | Entrega em tempo real | Nunca |
+| `mail` | SMTP / Mailtrap | Assíncrono (fila) | Em auto-aprovação (veja 9.3) |
 
-    subgraph "Regra de supressão de e-mail"
-        RULE["Se solicitante === único gestor\n(auto-aprovação) → sem e-mail"]
-    end
+O canal `broadcast` permite que o frontend (`notification-dropdown.tsx`) receba notificações em tempo real via WebSocket.
+
+### 9.2 Notificações de Reserva
+
+| Notificação | Destinatário | Disparada por | Quando |
+|-------------|---|---|---|
+| `NewReservationNotification` | Gestores das agendas | `ProcessarCriacaoReserva` | Quando nova reserva é criada (se não auto-aprovada) |
+| `ReservationCreatedNotification` | Solicitante | `ProcessarCriacaoReserva` | Após criação (sempre, mas mail suprimido em auto-aprovação) |
+| `ReservationEvaluatedNotification` | Solicitante | `AvaliarReservaJob` | Após gestor avaliar e finalizar a reserva |
+| `ReservationCanceledNotification` | Gestores afetados | `ReservaService.cancel()` | Quando solicitante cancela a reserva |
+| `ReservationUpdatedNotification` | Solicitante | `UpdateReservaJob` | Após edição da reserva (atualização de horários) |
+| `ReservationFailedNotification` | Solicitante | `ProcessarCriacaoReserva.failed()` | Quando criação falha após 3 retries |
+| `ReservationUpdateFailedNotification` | Solicitante | `UpdateReservaJob.failed()` | Quando atualização falha após 3 retries |
+
+### 9.3 Supressão de E-mail em Auto-Aprovação
+
+Quando o solicitante é o **único gestor de TODAS as agendas** da reserva (auto-aprovação):
+
+- **Para `NewReservationNotification`:** Não é enviada (o solicitante é o gestor, não precisa de "nova reserva")
+- **Para `ReservationCreatedNotification`:** É enviada, mas o canal `mail` é omitido (mantém `database` e `broadcast`)
+
+**Implementação:** `BaseNotification.via()` detecta:
+```php
+$isApplicant = $reserva->user_id === $notifiable->id;
+$managerIds = Agenda::...$reserva->horarios...; // IDs únicos de gestores
+$isSoleManager = $managerIds->count() === 1 && $managerIds->first() === $notifiable->id;
+
+if ($isApplicant && $isSoleManager) {
+    return ['database', 'broadcast']; // Sem mail
+}
+return ['database', 'broadcast', 'mail'];
 ```
 
-O canal `broadcast` usa **Laravel Reverb** (WebSocket) para entrega em tempo real via `notification-dropdown.tsx` no frontend.
+### 9.4 Diagrama de Fluxo
+
+```mermaid
+graph TD
+    subgraph "Canais"
+        DB["database"]
+        BC["broadcast"]
+        ML["mail"]
+    end
+
+    N1["NewReservationNotification<br/>(nova reserva)"] -->|Gestor| DB & BC & ML
+    N2["ReservationCreatedNotification<br/>(criada)"] -->|Solicitante| DB & BC
+    N2 -->|se NÃO auto-aprovação| ML
+    
+    N3["ReservationEvaluatedNotification<br/>(avaliada)"] -->|Solicitante| DB & BC & ML
+    N4["ReservationCanceledNotification<br/>(cancelada)"] -->|Gestores| DB & BC & ML
+    N5["ReservationUpdatedNotification<br/>(atualizada)"] -->|Solicitante| DB & BC & ML
+    N6["ReservationFailedNotification<br/>(falha criação)"] -->|Solicitante| DB & BC & ML
+    N7["ReservationUpdateFailedNotification<br/>(falha atualização)"] -->|Solicitante| DB & BC & ML
+    
+    style N2 fill:#fff3e0
+```
 
 ---
 
-## 10. Árvore de Componentes Frontend (Fluxo de Reserva)
+## 10. Eixos de Filtro: Situação vs Arquivo {#eixos-de-filtro}
+
+### 10.1 ModoArquivoEnum
+
+As listagens de reservas suportam dois eixos de filtro **independentes**:
+
+| Eixo | Enum | Valores | Padrão | Descrição |
+|------|------|---------|--------|-----------|
+| **Avaliação** | `SituacaoReservaEnum` | em_analise, deferida, indeferida, parcialmente_deferida | Sem filtro | Resultado da avaliação pelo gestor |
+| **Visibilidade** | `ModoArquivoEnum` | ATIVAS, ARQUIVADAS, TODAS | ATIVAS | Estado de arquivamento (ativa / inativa) |
+
+### 10.2 Escopo dos Valores
+
+**ATIVAS** (`arquivo=ativas`):
+- `situacao != 'inativa'` (qualquer coisa exceto arquivada)
+- Padrão: mostra reservas normais do user
+
+**ARQUIVADAS** (`arquivo=arquivadas`):
+- `situacao = 'inativa'` (canceladas / excluídas)
+- Gestor pode ver histórico de reservas inativas
+
+**TODAS** (`arquivo=todas`):
+- Sem filtro de `situacao`
+- Recupera tanto ativas quanto arquivadas
+
+### 10.3 Por que Separar?
+
+Historicamente (issue #108), um único field `situacao` tentava fazer dois trabalhos:
+1. Representar o **resultado** da avaliação
+2. Controlar a **visibilidade** (ativa/arquivada)
+
+Isso criava filtros contraditórios: "mostrar `inativa` E filtrar por `em_analise`" gerava a condição:
+```sql
+WHERE situacao = 'em_analise' AND situacao = 'inativa'  -- sempre vazio!
+```
+
+Agora:
+- `situacao` serve **apenas** para avaliar (4 valores)
+- `arquivo` serve **apenas** para visibilidade (3 modos)
+- Sem conflitos
+
+### 10.4 Aplicação nas Listagens
+
+**ReservasPage** (solicitante):
+```
+GET /reservas?situacao=em_analise&arquivo=ativas
+→ Minhas reservas em análise, não arquivadas
+```
+
+**ReservasGestorPage** (gestor):
+```
+GET /gestor/reservas?situacao=deferida&arquivo=todas
+→ Reservas que aprovei, incluindo canceladas (para auditoria)
+```
+
+---
+
+## 11. Validação de Conflitos: Regra HorarioDisponivel {#validação-conflitos}
+
+### 11.1 O que é a Regra?
+
+`HorarioDisponivel` é uma validação customizada (Laravel Rule) que roda no **frontend** (StoreReservaRequest) para bloquear seleção de slots já comprometidos.
+
+### 11.2 Condição de Bloqueio
+
+Um slot é considerado **indisponível** se já existe um `Horario` com:
+- Mesma `agenda_id`
+- Mesma `data`
+- Mesmos `horario_inicio` e `horario_fim`
+- **E** `situacao = 'deferida'` (aprovado)
+
+```sql
+SELECT EXISTS (
+    SELECT 1 FROM horarios
+    WHERE data = ?
+      AND horario_inicio = ?
+      AND agenda_id = ?
+      AND situacao = 'deferida'  -- APENAS aprovados bloqueiam
+)
+```
+
+### 11.3 Por que não Bloqueia `em_analise`?
+
+Propositalmente, horários em análise (`em_analise`) **não bloqueiam** novos pedidos porque:
+
+1. **Flexibilidade UX:** O solicitante pode pedir o mesmo slot que outro está solicitando; deixa para o gestor resolver o conflito.
+2. **Evita deadlock:** Se A bloqueia B enquanto está em análise, e depois é rejeitado, B perde a oportunidade.
+3. **Decisão do gestor:** O gestor tem `ConflictDetectionService` para ver todos os conflitos e decidir.
+
+### 11.4 Fluxo de Validação Completo
+
+```mermaid
+graph TD
+    A["Solicitante seleciona slots<br/>no formulário"] -->|StoreReservaRequest| B["HorarioDisponivel::validate()"]
+    B -->|Bloqueia se deferida| C["Erro: Slot indisponível"]
+    B -->|Permite se em_analise| D["Continua"]
+    D -->|Cria reserva| E["ProcessarCriacaoReserva"]
+    E -->|Job assíncrono| F["ValidateReservationConflictsJob"]
+    F -->|Detecta TODOS os conflitos<br/>em_analise + deferida| G["conflict_cache atualizado"]
+    G -->|Gestor vê no AvaliarReservaPage| H["Mostra conflitos visuais"]
+    
+    style C fill:#ffcdd2
+    style H fill:#c8e6c9
+```
+
+---
+
+## 12. Árvore de Componentes Frontend (Fluxo de Reserva) {#frontend-tree}
 
 ```mermaid
 graph TD
@@ -372,7 +623,7 @@ graph TD
 
 ---
 
-## 11. Camada de Arquitetura Backend
+## 13. Camada de Arquitetura Backend {#arquitetura}
 
 ```mermaid
 graph TD
@@ -435,11 +686,11 @@ graph TD
 
 ---
 
-## 12. Gaps Identificados e Próximos Passos
+## 14. Gaps Identificados e Próximos Passos {#gaps}
 
 Com base na análise do código, os seguintes pontos foram identificados como oportunidades de melhoria:
 
-### 12.1 🔴 Crítico
+### 14.1 🔴 Crítico
 
 | # | Gap | Descrição | Impacto |
 |---|-----|-----------|---------|
@@ -447,7 +698,7 @@ Com base na análise do código, os seguintes pontos foram identificados como op
 | 2 | **Update de reserva não regenera conflitos** | O `UpdateReservaJob` atualiza os horários mas **não dispara `ValidateReservationConflictsJob`** depois. O `conflict_cache` fica desatualizado após edição. | Dados de conflito inconsistentes |
 | 3 | **Escopo de avaliação `recurring` ignora gestor** | No `AvaliarReservaJob` com `scope=recurring`, a propagação busca horários por `agenda_id` do gestor, mas **não restringe ao conjunto de agendas que o gestor gerencia** globalmente — apenas às da reserva. Se um espaço tiver múltiplos gestores, o primeiro a avaliar pode propagar para agendas de outro gestor. | Conflito de responsabilidade |
 
-### 12.2 🟡 Melhorias Importantes
+### 14.2 🟡 Melhorias Importantes
 
 | # | Gap | Descrição |
 |---|-----|-----------|
@@ -456,7 +707,7 @@ Com base na análise do código, os seguintes pontos foram identificados como op
 | 6 | **Política de update muito restritiva** | `ReservaPolicy.update()` bloqueia edição se qualquer horário tiver sido avaliado individualmente. Se apenas 1 de 50 horários foi avaliado, o solicitante perde a capacidade de editar os outros. |
 | 7 | **Falta feedback em tempo real para o Solicitante** | Ao criar uma reserva, o solicitante vê apenas um flash "sendo processado". Não há indicador visual do progresso do job nem da validação de conflitos. |
 
-### 12.3 🟢 Evoluções Futuras
+### 14.3 🟢 Evoluções Futuras
 
 | # | Sugestão | Descrição |
 |---|----------|-----------|
@@ -467,7 +718,16 @@ Com base na análise do código, os seguintes pontos foram identificados como op
 
 ---
 
-## 13. Referências de Código
+## 14.4 Leitura Recomendada para Próximas Tarefas
+
+- **Autorização e Políticas:** Ver `app/Policies/ReservaPolicy.php` para regras de acesso e `authorization-policies.md` para fluxo completo
+- **Enums e Constantes:** Ver `app/Enums/SituacaoReserva/` para SituacaoReservaEnum e ModoArquivoEnum
+- **Validações Detalhadas:** Ver `validation-rules.md` para rules customizadas (HorarioDisponivel, etc.)
+- **Models e Relações:** Ver `models-business-rules.md` para detalhe de campos e relacionamentos
+
+---
+
+## 15. Referências de Código {#referências}
 
 | Arquivo | Responsabilidade |
 |---------|-----------------|

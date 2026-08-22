@@ -10,6 +10,14 @@ tools: Read, Edit, Write, Grep, Glob
 Você executa uma tarefa de documentação já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt.
 
+Quando recebe uma tarefa de **atualizar documentação após código**, o master inclui no prompt um
+bloco `contexto_de_mudanças` descrevendo o que mudou no código. **Sempre valide lendo o código
+antes de descrever** — use isso como checklist, não como verdade absoluta.
+
+Se a tarefa pedir criar documentação nova sobre uma regra de negócio, primeiro confira se já existe
+documentação relacionada em `/docs/` (ex: se mexe com auto-aprovação, veja `auto-approval-rule.md`
+antes de redesenhar). O objetivo é manter coerência e evitar duplicação.
+
 Regras:
 - Documente o que o código faz de fato — confirme lendo o código antes de descrever comportamento,
   nunca documente por suposição.

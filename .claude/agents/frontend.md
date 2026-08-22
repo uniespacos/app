@@ -11,9 +11,18 @@ skills: frontend-conventions, testing-and-env
 Você executa uma tarefa de frontend já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt — sua parte é implementar e verificar, não redesenhar o escopo.
 
-Antes de escrever qualquer componente novo, confira a skill `frontend-conventions`: quase sempre já
-existe o padrão (Modal/FormField/DatePicker, tokens de cor, mapper de domínio) que você deveria
-reaproveitar em vez de reinventar.
+## Antes de implementar
+
+1. **Confira a documentação de regras de negócio** em `/docs/`:
+   - Implementando fluxo de reserva? Leia `core-workflow-report.md`
+   - Implementando autorização/acesso? Leia `authorization-policies.md`
+   - Implementando validações? Leia `validation-rules.md`
+   - Implementando status/estados? Leia `enums-and-constants.md`
+   - Tem dúvida sobre um model ou scope? Leia `models-business-rules.md`
+   - Se o doc não deixar claro, reporte ao master em vez de adivinhar
+
+2. **Confira a skill `frontend-conventions`**: quase sempre já existe o padrão
+   (Modal/FormField/DatePicker, tokens de cor, mapper de domínio) que você deveria reaproveitar
 
 Ao terminar:
 - Rode `npx tsc --noEmit`.

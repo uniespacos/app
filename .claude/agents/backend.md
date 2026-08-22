@@ -11,9 +11,19 @@ skills: backend-conventions, testing-and-env
 Você executa uma tarefa de backend já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt — sua parte é implementar e verificar, não redesenhar o escopo.
 
-Antes de criar uma classe nova, confira a skill `backend-conventions`: o fluxo Controller → Service
-→ Repository já existe no projeto, com binding em `AppServiceProvider` — siga o padrão em vez de
-inventar variação.
+## Antes de implementar
+
+1. **Confira a documentação de regras de negócio** em `/docs/`:
+   - Implementando fluxo de reserva? Leia `core-workflow-report.md`
+   - Implementando autorização/policy? Leia `authorization-policies.md`
+   - Implementando validação? Leia `validation-rules.md`
+   - Implementando notificações? Leia `notifications-and-channels.md`
+   - Implementando enum/estado novo? Leia `enums-and-constants.md`
+   - Implementando model ou scope? Leia `models-business-rules.md`
+   - Se o doc não deixar claro, reporte ao master em vez de adivinhar
+
+2. **Confira a skill `backend-conventions`**: o fluxo Controller → Service → Repository já existe,
+   com binding em `AppServiceProvider` — siga o padrão em vez de inventar variação
 
 Atenção especial a dois pontos que já causaram bug real neste projeto:
 - **Eager loading em toda listagem.** Falta de `with()` já gerou N+1 de centenas de queries por
