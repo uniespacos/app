@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/presentation/templates/app-layout';
-import { DashboardStatusReservasType, User, type BreadcrumbItem } from '@/types';
+import { User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { ArrowRight, Calendar, CalendarSearch, CheckCircle2, Clock, ListChecks, Star, XCircle } from 'lucide-react';
+import { ArrowRight, CalendarSearch, ListChecks, Star } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -12,44 +12,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-    const { user, statusDasReservas } = usePage<{
-        user: User;
-        statusDasReservas: DashboardStatusReservasType;
-    }>().props;
-
-    // Cada card decide seu próprio filtro em Minhas Reservas — antes eram só
-    // números sem nenhuma ação, o card mais clicado do painel não levava a
-    // lugar nenhum.
-    const statCards = [
-        {
-            label: 'Em Análise',
-            valor: statusDasReservas.em_analise,
-            descricao: 'Aguardando aprovação',
-            Icone: Clock,
-            situacao: 'em_analise',
-        },
-        {
-            label: 'Aprovadas',
-            valor: statusDasReservas.deferida,
-            descricao: 'Reservas confirmadas',
-            Icone: CheckCircle2,
-            situacao: 'deferida',
-        },
-        {
-            label: 'Parciais',
-            valor: statusDasReservas.parcialmente_deferida,
-            descricao: 'Parcialmente aprovadas',
-            Icone: Calendar,
-            situacao: 'parcialmente_deferida',
-        },
-        {
-            label: 'Rejeitadas',
-            valor: statusDasReservas.indeferida,
-            descricao: 'Não aprovadas',
-            Icone: XCircle,
-            situacao: 'indeferida',
-        },
-    ] as const;
+    const { user } = usePage<{ user: User }>().props;
 
     // Ações do usuário comum, em ordem de prioridade: reservar é o motivo de
     // ele estar aqui, então ganha destaque visual próprio (hero); as outras
@@ -97,28 +60,6 @@ export default function Dashboard() {
                         </Button>
                     </CardContent>
                 </Card>
-
-                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    {statCards.map(({ label, valor, descricao, Icone, situacao }) => (
-                        <Card
-                            key={label}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => router.get(route('reservas.index', { situacao }))}
-                            onKeyDown={(e) => e.key === 'Enter' && router.get(route('reservas.index', { situacao }))}
-                            className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
-                        >
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">{label}</CardTitle>
-                                <Icone className="text-muted-foreground h-4 w-4" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{valor}</div>
-                                <p className="text-muted-foreground text-xs">{descricao}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {atalhosSecundarios.map(({ label, descricao, Icone, href }) => (
