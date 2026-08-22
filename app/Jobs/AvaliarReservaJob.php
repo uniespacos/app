@@ -50,6 +50,8 @@ class AvaliarReservaJob implements ShouldQueue
             throw new Exception('Cannot evaluate an archived reservation.');
         }
 
+        $this->validateHorariosAutorization();
+
         try {
             DB::transaction(function () use ($conflictService) {
                 $scope = $this->validatedData['evaluation_scope'];
@@ -178,6 +180,27 @@ class AvaliarReservaJob implements ShouldQueue
                 'exception' => $e,
             ]);
             $this->fail($e);
+        }
+    }
+
+    /**
+     * Defense in depth: verify that all horarios being evaluated belong to agendas managed by the gestor.
+     */
+    private function validateHorariosAutorization(): void
+    {
+        $agendasDoGestorIds = $this->gestor->agendas()->pluck('id')->toArray();
+        $horariosIds = collect($this->validatedData['horarios_avaliados'])->pluck('id')->toArray();
+
+        if (empty($horariosIds)) {
+            return;
+        }
+
+        $horariosComAgendaInvalida = Horario::whereIn('id', $horariosIds)
+            ->whereNotIn('agenda_id', $agendasDoGestorIds)
+            ->exists();
+
+        if ($horariosComAgendaInvalida) {
+            throw new Exception('Authorization failed: one or more horarios do not belong to managed agendas.');
         }
     }
 

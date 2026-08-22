@@ -161,9 +161,9 @@ class ReservaAuthorizationTest extends TestCase
     /**
      * Privilege escalation found during the #119 audit (not in the issue body).
      *
-     * AvaliarReservaRequest::authorize() only checks the 'reservas.avaliar'
-     * permission, which every gestor holds — it answers "is this a gestor?"
-     * when the question is "is this THE gestor of this reservation?".
+     * Defense in depth: even if a gestor bypasses the policy authorization,
+     * AvaliarReservaRequest now validates that each horario belongs to managed agendas.
+     * The intruding gestor is redirected with a validation error.
      */
     public function test_gestor_cannot_evaluate_reservation_outside_their_agendas(): void
     {
@@ -177,7 +177,8 @@ class ReservaAuthorizationTest extends TestCase
         $response = $this->actingAs($gestorIntruso)
             ->patch(route('gestor.reservas.update', $reserva->id), $this->payloadDeAvaliacao($reserva));
 
-        $response->assertForbidden();
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('horarios_avaliados');
     }
 
     /**

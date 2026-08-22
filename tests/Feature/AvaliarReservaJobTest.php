@@ -177,4 +177,120 @@ class AvaliarReservaJobTest extends TestCase
         $reserva->refresh();
         $this->assertEquals('parcialmente_deferida', $reserva->situacao);
     }
+
+    public function test_gestor_can_evaluate_horario_from_own_agenda()
+    {
+        // Arrange: Gestor that manages agenda A
+        $gestor = User::factory()->create();
+        $agendaA = Agenda::factory()->create(['user_id' => $gestor->id]);
+        $reserva = Reserva::factory()->create(['situacao' => 'em_analise']);
+
+        $horario = Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agendaA->id,
+            'situacao' => 'em_analise',
+            'data' => now()->addDay()->toDateString(),
+        ]);
+
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [
+                [
+                    'id' => $horario->id,
+                    'status' => 'deferida',
+                ],
+            ],
+            'observacao' => null,
+        ];
+
+        // Act
+        $job = new AvaliarReservaJob($reserva, $validatedData, $gestor);
+        $job->handle(new ConflictDetectionService);
+
+        // Assert: Horario should be updated successfully
+        $this->assertDatabaseHas('horarios', [
+            'id' => $horario->id,
+            'situacao' => 'deferida',
+            'user_id' => $gestor->id,
+        ]);
+    }
+
+    public function test_gestor_cannot_evaluate_horario_from_unmanaged_agenda()
+    {
+        // Arrange: Gestor A manages agenda A, Gestor B manages agenda B
+        $gestorA = User::factory()->create();
+        $gestorB = User::factory()->create();
+        $agendaA = Agenda::factory()->create(['user_id' => $gestorA->id]);
+        $agendaB = Agenda::factory()->create(['user_id' => $gestorB->id]);
+
+        $reserva = Reserva::factory()->create(['situacao' => 'em_analise']);
+        $horarioEmAgendaB = Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agendaB->id,
+            'situacao' => 'em_analise',
+            'data' => now()->addDay()->toDateString(),
+        ]);
+
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [
+                [
+                    'id' => $horarioEmAgendaB->id,
+                    'status' => 'deferida',
+                ],
+            ],
+            'observacao' => null,
+        ];
+
+        // Act & Assert: Job should throw exception for unauthorized agenda
+        $job = new AvaliarReservaJob($reserva, $validatedData, $gestorA);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Authorization failed: one or more horarios do not belong to managed agendas.');
+        $job->handle(new ConflictDetectionService);
+    }
+
+    public function test_gestor_cannot_evaluate_mixed_horarios_with_unmanaged_agenda()
+    {
+        // Arrange: Gestor A manages agenda A, but reservation includes horarios from both A and B
+        $gestorA = User::factory()->create();
+        $gestorB = User::factory()->create();
+        $agendaA = Agenda::factory()->create(['user_id' => $gestorA->id]);
+        $agendaB = Agenda::factory()->create(['user_id' => $gestorB->id]);
+
+        $reserva = Reserva::factory()->create(['situacao' => 'em_analise']);
+        $horarioEmAgendaA = Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agendaA->id,
+            'situacao' => 'em_analise',
+        ]);
+        $horarioEmAgendaB = Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agendaB->id,
+            'situacao' => 'em_analise',
+        ]);
+
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [
+                [
+                    'id' => $horarioEmAgendaA->id,
+                    'status' => 'deferida',
+                ],
+                [
+                    'id' => $horarioEmAgendaB->id,
+                    'status' => 'deferida',
+                ],
+            ],
+            'observacao' => null,
+        ];
+
+        // Act & Assert: Job should throw exception because one horario is from unmanaged agenda
+        $job = new AvaliarReservaJob($reserva, $validatedData, $gestorA);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Authorization failed: one or more horarios do not belong to managed agendas.');
+        $job->handle(new ConflictDetectionService);
+    }
 }
