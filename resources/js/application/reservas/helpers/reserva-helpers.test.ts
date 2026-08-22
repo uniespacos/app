@@ -50,6 +50,14 @@ describe('reserva-helpers', () => {
             ]);
             expect(calculateGestorStatus(res)).toBe('indeferida');
         });
+
+        it('should return parcialmente_deferida if there is a mix of deferida and indeferida', () => {
+            const res = mockReserva(1, 'deferida', [
+                { situacao: 'deferida' },
+                { situacao: 'indeferida' }
+            ]);
+            expect(calculateGestorStatus(res)).toBe('parcialmente_deferida');
+        });
     });
 
     describe('comSituacaoEfetivaDoGestor', () => {

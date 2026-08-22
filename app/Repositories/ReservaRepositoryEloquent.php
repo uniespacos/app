@@ -103,7 +103,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             ->with([
                 'user:id,name',
                 'horarios' => function ($query) use ($agendaIds) {
-                    $query->whereIn('agenda_id', $agendaIds)->limit(1)->with([
+                    $query->whereIn('agenda_id', $agendaIds)->with([
                         'agenda:id,espaco_id,turno',
                         // Issue #105: os selects são enxutos de propósito, mas cada
                         // relação aninhada precisa da própria chave estrangeira —
