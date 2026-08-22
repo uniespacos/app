@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.31](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.30...v1.3.0-rc.31) (2026-08-22)
+
+
+### Features
+
+* disparar evento Reverb ao término de ValidateReservationConflictsJob ([f2d7dd0](https://github.com/uniespacos/uniespacos/commit/f2d7dd05fc7ad6d1f895dbe80814f097c07552b7))
+* implementar auto-reload em AvaliarReservaPage ao término de validação de conflitos ([11f5999](https://github.com/uniespacos/uniespacos/commit/11f59996d408993a625dbd94dedca799145ecc7a))
+
 ## [1.3.0-rc.30](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.29...v1.3.0-rc.30) (2026-08-22)
 
 
