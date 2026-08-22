@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
@@ -235,6 +236,10 @@ class AvaliarReservaJob implements ShouldQueue
      */
     private function updateReservaOverallStatus(Reserva $reserva): void
     {
+        if ($reserva->situacao === SituacaoReservaEnum::INATIVA->value) {
+            return;
+        }
+
         $statusCounts = DB::table('horarios')
             ->where('reserva_id', $reserva->id)
             ->select('situacao', DB::raw('count(*) as total'))

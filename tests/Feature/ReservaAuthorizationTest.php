@@ -180,6 +180,29 @@ class ReservaAuthorizationTest extends TestCase
         $response->assertForbidden();
     }
 
+    /**
+     * Issue #265: 'inativa' is a terminal, archived state — evaluating it
+     * would resurrect it with a live situacao. This is the entry guard: even
+     * with a direct ID and a legitimate gestor of the agenda, the route must
+     * refuse once the reservation is archived.
+     */
+    public function test_gestor_cannot_evaluate_archived_reservation(): void
+    {
+        $dono = User::factory()->create();
+        $gestorDono = User::factory()->create();
+        $gestorDono->assignRole('gestor');
+
+        $reserva = $this->criarReservaCom($dono, $gestorDono);
+        $reserva->horarios()->update(['situacao' => 'inativa']);
+        $reserva->update(['situacao' => 'inativa']);
+
+        $response = $this->actingAs($gestorDono)
+            ->patch(route('gestor.reservas.update', $reserva->id), $this->payloadDeAvaliacao($reserva));
+
+        $response->assertForbidden();
+        $this->assertDatabaseHas('reservas', ['id' => $reserva->id, 'situacao' => 'inativa']);
+    }
+
     public function test_gestor_modal_does_not_return_reservation_outside_their_agendas(): void
     {
         $dono = User::factory()->create();

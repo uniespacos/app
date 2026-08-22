@@ -106,6 +106,48 @@ class AvaliarReservaJobTest extends TestCase
         $this->assertEquals('em_analise', $reserva->situacao);
     }
 
+    /**
+     * Issue #265: the recalculation guard. Even if the job somehow runs
+     * against an archived reservation (e.g. a future write path that skips
+     * the ReservaPolicy::viewForGestor entry guard), updateReservaOverallStatus
+     * must not overwrite 'inativa' with a live situacao — it was the actual
+     * root cause: 'inativa' fell into the match's default branch.
+     */
+    public function test_evaluating_archived_reservation_does_not_resurrect_situacao()
+    {
+        // Arrange
+        $manager = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $manager->id]);
+        $reserva = Reserva::factory()->create(['situacao' => 'inativa']);
+
+        $horario = Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'inativa',
+            'data' => now()->addDay()->toDateString(),
+        ]);
+
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [
+                [
+                    'id' => $horario->id,
+                    'status' => 'deferida',
+                ],
+            ],
+            'observacao' => 'Test observation',
+        ];
+
+        // Act
+        $job = new AvaliarReservaJob($reserva, $validatedData, $manager);
+        $job->handle(new ConflictDetectionService);
+
+        // Assert
+        $reserva->refresh();
+        $this->assertEquals('inativa', $reserva->situacao);
+    }
+
     public function test_reservation_status_aggregation_becomes_parcialmente_deferida_when_all_assessed()
     {
         // Arrange
