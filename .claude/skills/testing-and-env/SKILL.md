@@ -28,16 +28,6 @@ docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test --filter=
 
 Sem `-e APP_ENV=testing` o ambiente vaza e a suíte quebra com 419 (CSRF).
 
-**Antes de rodar a suíte inteira**, mova `tests/Feature/ReservaEdicaoBloqueadaTest.php` para fora
-do diretório — ele tem um erro de sintaxe pré-existente que derruba a suíte toda na fase de
-descoberta. Devolva o arquivo ao lugar depois.
-
-```bash
-mv tests/Feature/ReservaEdicaoBloqueadaTest.php /tmp/
-# ... rodar a suite ...
-mv /tmp/ReservaEdicaoBloqueadaTest.php tests/Feature/
-```
-
 Falha conhecida e **não relacionada** a mudanças recentes: `ErrorHandlingTest > inertia request does
 not receive the envelope` — espera 403, recebe 409, só passa quando `public/build/manifest.json`
 não existe. Confirme com `git stash` antes de assumir que foi você.
