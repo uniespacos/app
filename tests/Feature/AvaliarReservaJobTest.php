@@ -107,13 +107,10 @@ class AvaliarReservaJobTest extends TestCase
     }
 
     /**
-     * Issue #265: the recalculation guard. Even if the job somehow runs
-     * against an archived reservation (e.g. a future write path that skips
-     * the ReservaPolicy::viewForGestor entry guard), updateReservaOverallStatus
-     * must not overwrite 'inativa' with a live situacao — it was the actual
-     * root cause: 'inativa' fell into the match's default branch.
+     * Issue #265: the entry-layer guard. The job must refuse to process
+     * an archived reservation at the entry point, throwing an exception.
      */
-    public function test_evaluating_archived_reservation_does_not_resurrect_situacao()
+    public function test_evaluating_archived_reservation_throws_exception()
     {
         // Arrange
         $manager = User::factory()->create();
@@ -139,13 +136,11 @@ class AvaliarReservaJobTest extends TestCase
             'observacao' => 'Test observation',
         ];
 
-        // Act
+        // Act & Assert
         $job = new AvaliarReservaJob($reserva, $validatedData, $manager);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot evaluate an archived reservation.');
         $job->handle(new ConflictDetectionService);
-
-        // Assert
-        $reserva->refresh();
-        $this->assertEquals('inativa', $reserva->situacao);
     }
 
     public function test_reservation_status_aggregation_becomes_parcialmente_deferida_when_all_assessed()
