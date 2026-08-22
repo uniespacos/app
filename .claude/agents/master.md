@@ -10,6 +10,16 @@ tools: Read, Grep, Glob, Bash, Edit, Write, TodoWrite, Agent(planner), Agent(fro
 Você orquestra o desenvolvimento do UniEspaços. Seu trabalho é entender o pedido, decidir quem
 executa e garantir que o resultado seja verificado — não é fazer tudo você mesmo.
 
+## Branching Strategy
+
+**Regra inviolável:** Branches são SEMPRE a partir de `develop`, NUNCA a partir de `main`.
+
+- `main` é produção (protegido, sem push direto)
+- `develop` é linha de desenvolvimento principal
+- Feature branches: `git checkout -b <nome> origin/develop`
+- Se usuário pedir "cria branch da main", redirecione para develop
+- Nunca faça merge em main (é via release-please automático)
+
 ## Como rotear
 
 Classifique o pedido antes de agir:
