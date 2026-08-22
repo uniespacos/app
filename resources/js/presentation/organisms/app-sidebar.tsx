@@ -2,59 +2,25 @@ import { NavMain } from '@/presentation/molecules/nav-main';
 import { NavUser } from '@/presentation/molecules/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
-import { hasPermission, hasRole } from '@/lib/auth';
+import { canAccessNavEntry } from '@/lib/auth';
 import AppLogo from '@/presentation/atoms/app-logo';
 import type { User } from '@/types';
-import {
-    PERMISSION_SECAO_GESTAO_RESERVAS,
-    PERMISSION_SECAO_GESTAO_ESPACOS,
-    PERMISSION_SECAO_GESTAO_USUARIOS,
-    PERMISSION_SECAO_GESTAO_INSTITUICOES,
-    PERMISSION_SECAO_GESTAO_UNIDADES,
-    PERMISSION_SECAO_GESTAO_MODULOS,
-    PERMISSION_SECAO_GESTAO_SETORES,
-    PERMISSION_SECAO_GESTAO_ROLES,
-    PERMISSION_SECAO_RELATORIOS,
-} from '@/constants/permissions';
-
-/* Ícones ---------------------------------------------------------------- */
-import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
-
-/* ------------- Tipo local de item de menu (não exportado) ------------- */
-import type { LucideIcon } from 'lucide-react';
-
-type MenuItem = {
-    title: string;
-    href: string;
-    icon: LucideIcon;
-};
-
-/* ----------------- Itens de navegação (agrupados) ---------------------- */
-const commonNav: MenuItem[] = [
-    { title: 'Painel Inicial', href: '/dashboard', icon: LayoutGrid },
-    { title: 'Consultar Espaços', href: '/espacos', icon: Calendar },
-    { title: 'Minhas Reservas', href: '/reservas', icon: BookOpen },
-];
-
+import { NAV_REGISTRY } from '@/config/nav-registry';
 
 /* --------------------------- Componente -------------------------------- */
 export function AppSidebar() {
     const { props } = usePage<{ auth: { user: User } }>();
     const user = props.auth.user;
 
-    const extraItems: MenuItem[] = user
-        ? [
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_RESERVAS)     ? [{ title: 'Gerir Reservas',          href: '/gestor/reservas',            icon: Eye        }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ESPACOS)      ? [{ title: 'Gerir Espaços',            href: '/institucional/espacos',      icon: Building   }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_USUARIOS)     ? [{ title: 'Gerenciar Usuários',       href: '/institucional/usuarios',     icon: Users      }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_ROLES)        ? [{ title: 'Gerenciar Papéis',         href: '/institucional/roles',        icon: ShieldCheck}] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_INSTITUICOES) ? [{ title: 'Gerenciar Instituições',   href: '/institucional/instituicoes', icon: School     }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_UNIDADES)     ? [{ title: 'Gerenciar Unidades',       href: '/institucional/unidades',     icon: MapPin     }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_MODULOS)      ? [{ title: 'Gerenciar Modulos',        href: '/institucional/modulos',      icon: Grid3X3    }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_GESTAO_SETORES)      ? [{ title: 'Gerenciar Setores',        href: '/institucional/setors',       icon: Briefcase  }] : []),
-              ...(hasPermission(user, PERMISSION_SECAO_RELATORIOS)          ? [{ title: 'Relatórios',               href: hasRole(user, 'institucional') ? '/institucional/relatorios' : '/gestor/relatorios', icon: FileBarChart2 }] : []),
-          ]
-        : [];
+    const visibleEntries = user ? NAV_REGISTRY.filter((entry) => canAccessNavEntry(user, entry)) : [];
+
+    const commonNav = visibleEntries
+        .filter((entry) => entry.group === 'painel')
+        .map((entry) => ({ title: entry.title, href: entry.href, icon: entry.icon }));
+
+    const extraItems = visibleEntries
+        .filter((entry) => entry.group === 'gerir')
+        .map((entry) => ({ title: entry.title, href: entry.resolveHref ? entry.resolveHref(user) : entry.href, icon: entry.icon }));
 
     return (
         <Sidebar collapsible="icon" variant="inset">
