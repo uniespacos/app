@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.30](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.29...v1.3.0-rc.30) (2026-08-22)
+
+
+### Features
+
+* GAP-03 com validação de autorização + UX de contadores ([#302](https://github.com/uniespacos/uniespacos/issues/302)) ([61e3c9a](https://github.com/uniespacos/uniespacos/commit/61e3c9ab371cf56c59752b93f00eb27563e6f65d))
+
 ## [1.3.0-rc.29](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.28...v1.3.0-rc.29) (2026-08-22)
 
 
