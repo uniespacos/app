@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.20](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.19...v1.3.0-rc.20) (2026-08-22)
+
+
+### Features
+
+* tornar fluxo do usuário comum mais direto até a reserva ([#276](https://github.com/uniespacos/uniespacos/issues/276)) ([7da06da](https://github.com/uniespacos/uniespacos/commit/7da06da6e46f981d7f6d5f795ed4e8d475345444))
+
 ## [1.3.0-rc.19](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.18...v1.3.0-rc.19) (2026-08-22)
 
 
