@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.27](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.26...v1.3.0-rc.27) (2026-08-22)
+
+
+### Miscellaneous Chores
+
+* remover documentação morta e duplicada ([#293](https://github.com/uniespacos/uniespacos/issues/293)) ([55399fc](https://github.com/uniespacos/uniespacos/commit/55399fcc3d6974f3c913b1b37f4302afc20439a0))
+
 ## [1.3.0-rc.26](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.25...v1.3.0-rc.26) (2026-08-22)
 
 
