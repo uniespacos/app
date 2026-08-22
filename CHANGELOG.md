@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.19](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.18...v1.3.0-rc.19) (2026-08-22)
+
+
+### Bug Fixes
+
+* padronizar arquitetura frontend e unificar filtro de espacos ([#273](https://github.com/uniespacos/uniespacos/issues/273)) ([aecbb0e](https://github.com/uniespacos/uniespacos/commit/aecbb0ecf0e30c0ab5c5023bff69d226226d982b))
+
 ## [1.3.0-rc.18](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.17...v1.3.0-rc.18) (2026-08-22)
 
 
