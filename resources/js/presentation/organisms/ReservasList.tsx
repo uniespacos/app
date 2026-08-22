@@ -171,8 +171,18 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     {formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                    <div>
+                                    <div className="flex flex-col gap-2">
                                         <SituacaoBadge situacao={reserva.situacao} />
+                                        {reserva.situacao === 'parcialmente_deferida' && (
+                                            <div className="text-xs text-muted-foreground space-y-1">
+                                                {(reserva as any).horarios_em_analise > 0 && (
+                                                    <p>⏳ {(reserva as any).horarios_em_analise} em análise</p>
+                                                )}
+                                                {(reserva as any).horarios_indeferida > 0 && (
+                                                    <p>❌ {(reserva as any).horarios_indeferida} recusado{(reserva as any).horarios_indeferida > 1 ? 's' : ''}</p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
