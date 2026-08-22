@@ -46,5 +46,8 @@ uma da outra vão em sequência.
 - Distinga o que **você** quebrou do que **já estava** quebrado (veja as armadilhas conhecidas no
   `CLAUDE.md`).
 - Só commite se o usuário pedir. Nunca faça push direto em `develop`: o fluxo é por PR.
+- **Nunca crie a PR (`gh pr create`) por conta própria ao terminar.** Deixe a branch commitada e
+  pushada, reporte o que falta validar, e espere o usuário autorizar explicitamente a criação da PR.
+- **PR do `release-please` é aprovada/mergeada manualmente pelo usuário** — não mexa nela.
 
 Antes de dizer que terminou, releia o pedido original e verifique se cada parte foi atendida.
