@@ -31,7 +31,7 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
     // Estados do formulário
     const [nome, setNome] = useState<string>(setor?.nome || '');
     const [sigla, setSigla] = useState<string>(setor?.sigla || '');
-    const [unidadeId, setUnidadeId] = useState<string>(setor?.unidade?.id?.toString() || '');
+    const [unidadeId, setUnidadeId] = useState<string>(setor?.unidade?.id.toString() || '');
 
     // Inicializar valores se estiver editando
     useEffect(() => {
@@ -42,13 +42,13 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
 
     // Filtrar unidades baseado na instituição selecionada
     useEffect(() => {
-        const newFilteredUnidades = instituicao?.unidades || [];
+        const newFilteredUnidades = instituicao.unidades || [];
         setFilteredUnidades(newFilteredUnidades);
 
         if (unidadeId && !newFilteredUnidades.find((u) => u.id.toString() === unidadeId)) {
             setUnidadeId('');
         }
-    }, [selectedInstituicao, unidadeId, setor?.unidade?.id, instituicao?.unidades]);
+    }, [selectedInstituicao, unidadeId, setor?.unidade?.id, instituicao.unidades]);
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
@@ -116,7 +116,7 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
                 <Label>Nome do Setor *</Label>
                 <Input
                     value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    onChange={(e) => { setNome(e.target.value); }}
                     placeholder="Ex: Recursos Humanos"
                     className={errors.nome ? 'border-destructive' : ''}
                 />
@@ -132,7 +132,7 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
                 <Label>Sigla *</Label>
                 <Input
                     value={sigla}
-                    onChange={(e) => setSigla(e.target.value.toUpperCase())}
+                    onChange={(e) => { setSigla(e.target.value.toUpperCase()); }}
                     placeholder="Ex: RH"
                     maxLength={10}
                     className={errors.sigla ? 'border-destructive' : ''}

@@ -38,7 +38,7 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => router.get(route('reservas.index', { reserva: reserva.id }))}
+                                        onClick={() => { router.get(route('reservas.index', { reserva: reserva.id })); }}
                                         className="sm:mt-5"
                                     >
                                         <FileText className="mr-1 h-4 w-4" />

@@ -74,6 +74,21 @@ procure o mapper antes de espalhar `switch`/`if` pela UI. Exemplo real:
 `lib/utils/andars/AndarOptions.ts` → `getAndarLabelByValue()`. Mesma lógica para outros enums de
 domínio (`getTurnoText` em `lib/utils.ts`).
 
+## Comentários — regra rígida
+
+Nada de comentário inline explicando o que o código faz — nome de componente/hook/variável já faz
+esse trabalho. Isso inclui comentário de "o quê", comentário referenciando a tarefa/issue atual,
+código comentado deixado para trás, e bloco decorativo separando seções.
+
+TSDoc é permitido, mas só quando agrega algo que a assinatura não deixa óbvio: um contrato de prop
+não expressável em tipo, uma constraint de uso não trivial. Componente/hook com nome e assinatura
+autoexplicativos não leva TSDoc nenhum.
+
+Antes de terminar a tarefa, rode `npx eslint <arquivo>` (ESLint com `strict-type-checked` +
+`stylistic-type-checked` em `resources/js/**`, dívida técnica pré-existente suprimida em
+`eslint-suppressions.json` — código novo ou tocado por você não pode entrar na suppression; se o
+lint reclamar de linha sua, corrija, não suprima) e `npx tsc --noEmit`.
+
 ## Antes de escrever componente novo
 
 Grep pelo nome do padrão que você está prestes a reimplementar. Vários bugs já resolvidos nesta base

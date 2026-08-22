@@ -11,12 +11,12 @@ import HeadingSmall from '@/presentation/atoms/heading-small';
 
 import { Modal } from '@/presentation/molecules/Modal';
 
-type DeleteItemProps = {
+interface DeleteItemProps {
     itemName: string;
     isOpen?: (open: boolean) => void;
     route: string;
     showHeading?: boolean;
-};
+}
 
 export default function DeleteItem({ isOpen, route, itemName, showHeading = true }: DeleteItemProps) {
     const [open, setOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
 
         destroy(route, {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => { closeModal(); },
             onError: () => passwordInput.current?.focus(),
             onFinish: () => {
                 closeModal();
@@ -46,7 +46,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
 
     return (
         <div className="space-y-6">
-            {showHeading && <HeadingSmall title={`${itemName}`} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
+            {showHeading && <HeadingSmall title={itemName} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
 
             <div className="space-y-4 rounded-lg border border-destructive/25 bg-destructive-subtle p-4">
                 <div className="relative space-y-0.5 text-destructive-accent">
@@ -54,7 +54,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Button variant="destructive" onClick={() => setOpen(true)}>
+                <Button variant="destructive" onClick={() => { setOpen(true); }}>
                     Excluir {itemName}
                 </Button>
 
@@ -76,7 +76,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
                                 name="password"
                                 ref={passwordInput}
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) => { setData('password', e.target.value); }}
                                 placeholder="Senha"
                                 autoComplete="current-password"
                             />

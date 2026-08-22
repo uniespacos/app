@@ -82,11 +82,11 @@ export default function GerenciarEspacos() {
                             <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
                         ) : (
                             <GerenciarGestoresDialog
-                                key={espacoParaGerenciar?.id}
+                                key={espacoParaGerenciar.id}
                                 espaco={espacoParaGerenciar}
                                 usuarios={users}
                                 isOpen={!!espacoParaGerenciar}
-                                onClose={() => setEspacoParaGerenciar(null)}
+                                onClose={() => { setEspacoParaGerenciar(null); }}
                                 onSave={handleSalvarGestores}
                             />
                         )}

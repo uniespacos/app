@@ -52,9 +52,9 @@ export default function Dashboard({
         const filtered = espacosFavoritos.filter(
             (espaco) =>
                 espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
-                espaco.andar?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                espaco.andar?.nome.toLowerCase().includes(lowerSearchTerm) ||
                 '' ||
-                espaco.andar?.modulo?.nome?.toLowerCase().includes(lowerSearchTerm) ||
+                espaco.andar?.modulo?.nome.toLowerCase().includes(lowerSearchTerm) ||
                 '',
         );
 
@@ -71,7 +71,7 @@ export default function Dashboard({
                         <h1 className="text-2xl font-bold tracking-tight">Painel Institucional</h1>
                         <p className="text-muted-foreground">Olá, {user.name} - Bem-vindo ao UniEspaços</p>
                     </div>
-                    <Button onClick={() => router.get(route('institucional.espacos.create'))}>
+                    <Button onClick={() => { router.get(route('institucional.espacos.create')); }}>
                         <Plus className="mr-2 h-4 w-4" />
                         Novo Espaço
                     </Button>
@@ -221,7 +221,7 @@ export default function Dashboard({
                                                     size="sm"
                                                     className="mt-3 w-full bg-transparent"
                                                     variant="outline"
-                                                    onClick={() => router.get(route('institucional.usuarios.index'))}
+                                                    onClick={() => { router.get(route('institucional.usuarios.index')); }}
                                                 >
                                                     <Calendar className="mr-2 h-4 w-4" />
                                                     Ver Delegações

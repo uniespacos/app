@@ -77,7 +77,7 @@ export default function Dashboard({
                             key={label}
                             role="button"
                             tabIndex={0}
-                            onClick={() => router.get(href)}
+                            onClick={() => { router.get(href); }}
                             onKeyDown={(e) => e.key === 'Enter' && router.get(href)}
                             className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
                         >
@@ -101,7 +101,7 @@ export default function Dashboard({
                                 <CardTitle>Visão Geral das Reservas</CardTitle>
                                 <CardDescription>Últimos 30 dias</CardDescription>
                             </div>
-                            <Button variant="outline" size="sm" onClick={() => router.get(route('gestor.relatorios.index'))}>
+                            <Button variant="outline" size="sm" onClick={() => { router.get(route('gestor.relatorios.index')); }}>
                                 <BarChart3 className="mr-2 h-4 w-4" />
                                 Relatório completo
                             </Button>

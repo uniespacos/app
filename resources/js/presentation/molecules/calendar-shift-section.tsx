@@ -3,7 +3,7 @@ import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo } from 'react';
 
-type CalendarShiftSectionProps = {
+interface CalendarShiftSectionProps {
     titulo: string;
     agenda: Agenda;
     diasSemana: AgendaDiasSemanaType[];
@@ -12,7 +12,7 @@ type CalendarShiftSectionProps = {
 
     // slotsSolicitados agora é usado para passar os horários da reserva em edição/visualização
     slotsSolicitados?: SlotCalendario[];
-};
+}
 
 export default function CalendarShiftSection({
     titulo,
@@ -65,7 +65,7 @@ export default function CalendarShiftSection({
                             key={slot.id}
                             slot={slot}
                             isSelecionado={isSlotSelecionadoFn(slot)}
-                            onSelect={() => alternarSelecaoSlotFn(slot)}
+                            onSelect={() => { alternarSelecaoSlotFn(slot); }}
                         />
                     ))}
                 </div>

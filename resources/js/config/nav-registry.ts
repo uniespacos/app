@@ -27,7 +27,7 @@ import type { User } from '@/types';
  */
 export type NavGroup = 'painel' | 'gerir';
 
-export type NavEntry = {
+export interface NavEntry {
     title: string;
     href: string;
     icon: LucideIcon;
@@ -36,7 +36,7 @@ export type NavEntry = {
     permission?: string | string[];
     /** Escolhe dinamicamente o href com base no usuário (ex.: relatórios por role). */
     resolveHref?: (user: User) => string;
-};
+}
 
 export const NAV_REGISTRY: NavEntry[] = [
     { title: 'Painel Inicial', href: '/dashboard', icon: LayoutGrid, group: 'painel' },

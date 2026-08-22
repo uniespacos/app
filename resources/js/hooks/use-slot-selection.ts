@@ -29,7 +29,7 @@ export function useSlotSelection({ hoje, slotsIniciais = [] }: UseSlotSelectionP
 
     const isSlotSelecionado = (slot: SlotCalendario) => slotsSelecao.some((s) => s.id === slot.id);
 
-    const limparSelecao = () => setSlotsSelecao([]);
+    const limparSelecao = () => { setSlotsSelecao([]); };
 
     const alternarSelecaoSlot = (slot: SlotCalendario) => {
         if (slot.status === 'reservado') {

@@ -56,7 +56,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                         <Input
                             id="name"
                             value={data.name}
-                            onChange={(e) => onInputChange('name', e.target.value)}
+                            onChange={(e) => { onInputChange('name', e.target.value); }}
                             placeholder="Digite seu nome completo"
                             required
                             className="h-11"
@@ -70,7 +70,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                             id="email"
                             type="email"
                             value={data.email}
-                            onChange={(e) => onInputChange('email', e.target.value)}
+                            onChange={(e) => { onInputChange('email', e.target.value); }}
                             placeholder="seu@email.com"
                             required
                             className="h-11"
@@ -102,8 +102,8 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                     <SeletorInstituicao
                         instituicaos={instituicaos}
                         processing={processing}
-                        onInstituicaoChange={(instId) => onInputChange('instituicao_id', instId)}
-                        onSetorChange={(setorId) => onInputChange('setor_id', setorId)}
+                        onInstituicaoChange={(instId) => { onInputChange('instituicao_id', instId); }}
+                        onSetorChange={(setorId) => { onInputChange('setor_id', setorId); }}
                         errors={errors}
                     />
                 </div>
@@ -120,7 +120,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 id="password"
                                 type="password"
                                 value={data.password}
-                                onChange={(e) => onInputChange('password', e.target.value)}
+                                onChange={(e) => { onInputChange('password', e.target.value); }}
                                 placeholder="Mínimo 8 caracteres"
                                 required
                                 className="h-11"
@@ -134,7 +134,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 id="password_confirmation"
                                 type="password"
                                 value={data.password_confirmation}
-                                onChange={(e) => onInputChange('password_confirmation', e.target.value)}
+                                onChange={(e) => { onInputChange('password_confirmation', e.target.value); }}
                                 placeholder="Digite a senha novamente"
                                 required
                                 className="h-11"

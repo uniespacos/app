@@ -1,9 +1,9 @@
 import { ESTILO_SLOT } from '@/constants/situacao-reserva';
 import { cn } from '@/lib/utils';
 
-type AgendaLegendaProps = {
+interface AgendaLegendaProps {
     isEditMode?: boolean;
-};
+}
 
 const ITEM_LIVRE = { label: 'Livre', swatch: 'border border-border bg-background' };
 const ITEM_PASSADO = { label: 'Passado', swatch: 'bg-muted-foreground/40' };

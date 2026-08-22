@@ -23,11 +23,11 @@ export function FiltroChips({ label, opcoes, selecionados, onChange }: Props) {
                         key={opcao.value}
                         pressed={selecionados.includes(opcao.value)}
                         onPressedChange={(on) =>
-                            onChange(
+                            { onChange(
                                 on
                                     ? [...selecionados, opcao.value]
                                     : selecionados.filter((v) => v !== opcao.value)
-                            )
+                            ); }
                         }
                         variant="outline"
                         size="sm"

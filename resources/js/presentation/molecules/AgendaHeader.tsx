@@ -5,10 +5,10 @@ import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { AgendaGestoresPorTurnoType, Espaco } from '@/types';
 import { Building2, Home, MapPin, User, Users } from 'lucide-react';
 
-type AgendaHeaderProps = {
+interface AgendaHeaderProps {
     espaco: Espaco;
     gestoresPorTurno: Map<string, AgendaGestoresPorTurnoType>;
-};
+}
 
 export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderProps) {
     return (

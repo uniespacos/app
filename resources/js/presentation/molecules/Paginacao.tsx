@@ -53,7 +53,7 @@ export function Paginacao({ totalItems, itemsPerPage, currentPage, onPageChange 
                     key={i}
                     variant={i === currentPage ? 'default' : 'outline'}
                     size="icon"
-                    onClick={() => handlePageChange(i)}
+                    onClick={() => { handlePageChange(i); }}
                     className="h-9 w-9"
                 >
                     {i}
@@ -68,11 +68,11 @@ export function Paginacao({ totalItems, itemsPerPage, currentPage, onPageChange 
         <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-muted-foreground text-sm">Total de {totalItems} item(s) encontrado(s).</div>
             <div className="flex items-center space-x-2">
-                <Button variant="outline" className="hidden h-9 w-9 p-0 lg:flex" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
+                <Button variant="outline" className="hidden h-9 w-9 p-0 lg:flex" onClick={() => { handlePageChange(1); }} disabled={currentPage === 1}>
                     <span className="sr-only">Primeira página</span>
                     <ChevronsLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" className="h-9 w-9 p-0" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <Button variant="outline" className="h-9 w-9 p-0" onClick={() => { handlePageChange(currentPage - 1); }} disabled={currentPage === 1}>
                     <span className="sr-only">Página anterior</span>
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -82,7 +82,7 @@ export function Paginacao({ totalItems, itemsPerPage, currentPage, onPageChange 
                 <Button
                     variant="outline"
                     className="h-9 w-9 p-0"
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => { handlePageChange(currentPage + 1); }}
                     disabled={currentPage === totalPages}
                 >
                     <span className="sr-only">Próxima página</span>
@@ -91,7 +91,7 @@ export function Paginacao({ totalItems, itemsPerPage, currentPage, onPageChange 
                 <Button
                     variant="outline"
                     className="hidden h-9 w-9 p-0 lg:flex"
-                    onClick={() => handlePageChange(totalPages)}
+                    onClick={() => { handlePageChange(totalPages); }}
                     disabled={currentPage === totalPages}
                 >
                     <span className="sr-only">Última página</span>

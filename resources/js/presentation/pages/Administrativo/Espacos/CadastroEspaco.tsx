@@ -58,22 +58,22 @@ export default function CadastroEspacoPage() {
         descricao: espaco?.descricao ?? '',
         imagens: [],
         main_image_index: espaco?.imagens ? espaco.imagens.findIndex((img) => img === espaco.main_image_index) : 0,
-        unidade_id: espaco?.andar?.modulo?.unidade?.id ?? undefined,
-        modulo_id: espaco?.andar?.modulo?.id ?? undefined,
-        andar_id: espaco?.andar?.id ?? undefined,
+        unidade_id: espaco?.andar.modulo.unidade.id ?? undefined,
+        modulo_id: espaco?.andar.modulo.id ?? undefined,
+        andar_id: espaco?.andar.id ?? undefined,
     });
 
     const handleSetMainImage = (index: number) => {
         setData((prevData) => ({ ...prevData, main_image_index: index }));
     };
     const handleImagesToDelete = (path: string) =>
-        setData((prevData) => ({ ...prevData, images_to_delete: [...(data.images_to_delete ?? []), path] }));
+        { setData((prevData) => ({ ...prevData, images_to_delete: [...(data.images_to_delete ?? []), path] })); };
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (isEditMode) {
-            patch(route('institucional.espacos.update', espaco!.id), {
+            patch(route('institucional.espacos.update', espaco.id), {
                 onSuccess: () => {
                     toast.success(`Espaço ${isEditMode ? 'atualizado' : 'cadastrado'} com sucesso!`);
                     if (!isEditMode) {
@@ -122,15 +122,15 @@ export default function CadastroEspacoPage() {
                                             andares={andares}
                                             unidadeSelecionada={data.unidade_id}
                                             setUnidadeSelecionada={(unidadeSelecionada) =>
-                                                setData((prevData) => ({ ...prevData, unidade_id: unidadeSelecionada }))
+                                                { setData((prevData) => ({ ...prevData, unidade_id: unidadeSelecionada })); }
                                             }
                                             moduloSelecionado={data.modulo_id}
                                             handleModuloChange={(moduloSelecionado) =>
-                                                setData((prevData) => ({ ...prevData, modulo_id: moduloSelecionado }))
+                                                { setData((prevData) => ({ ...prevData, modulo_id: moduloSelecionado })); }
                                             }
                                             andarSelecionado={data.andar_id}
                                             handleAndarChange={(andarSelecionado) =>
-                                                setData((prevData) => ({ ...prevData, andar_id: parseInt(andarSelecionado!, 10) }))
+                                                { setData((prevData) => ({ ...prevData, andar_id: parseInt(andarSelecionado!, 10) })); }
                                             }
                                             processing={processing}
                                             errors={errors}

@@ -4,18 +4,18 @@ import { Horario } from '@/types';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { useMemo } from 'react';
 
-type AvaliacaoGestoresResumoProps = {
+interface AvaliacaoGestoresResumoProps {
     horarios: Horario[];
-};
+}
 
-type ResumoTurno = {
+interface ResumoTurno {
     agendaId: number;
     turno: Turno;
     gestor: string;
     total: number;
     avaliados: number;
     avaliadoPor: string[];
-};
+}
 
 /**
  * Quem está aguardando uma reserva precisa saber quem avalia — não só que

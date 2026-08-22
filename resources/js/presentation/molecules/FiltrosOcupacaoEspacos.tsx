@@ -84,10 +84,10 @@ export function FiltrosOcupacaoEspacos({ filtros, onChange }: Props) {
                     opcoes={turnos}
                     selecionados={filtros.turnos ?? []}
                     onChange={(valores) =>
-                        onChange({
+                        { onChange({
                             ...filtros,
-                            turnos: valores as Array<'manha' | 'tarde' | 'noite'>,
-                        })
+                            turnos: valores as ('manha' | 'tarde' | 'noite')[],
+                        }); }
                     }
                 />
             </div>

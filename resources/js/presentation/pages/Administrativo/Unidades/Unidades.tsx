@@ -85,7 +85,7 @@ export default function UnidadesPage() {
                                                                 <FilePenLine className="h-4 w-4" />
                                                             </Button>
                                                         </Link>
-                                                        <Button variant="destructive" size="icon" onClick={() => setRemoverUnidade(unidade)}>
+                                                        <Button variant="destructive" size="icon" onClick={() => { setRemoverUnidade(unidade); }}>
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </TableCell>
@@ -104,7 +104,7 @@ export default function UnidadesPage() {
                                         setRemoverUnidade(null);
                                     }
                                 }}
-                                itemName={removerUnidade?.nome || 'Unidade'}
+                                itemName={removerUnidade.nome || 'Unidade'}
                                 route={route('institucional.unidades.destroy', removerUnidade.id)}
                             />
                         )}

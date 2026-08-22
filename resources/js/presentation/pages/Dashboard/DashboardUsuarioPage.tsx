@@ -40,7 +40,7 @@ export default function Dashboard() {
                 <Card
                     role="button"
                     tabIndex={0}
-                    onClick={() => router.get(route('espacos.index'))}
+                    onClick={() => { router.get(route('espacos.index')); }}
                     onKeyDown={(e) => e.key === 'Enter' && router.get(route('espacos.index'))}
                     className="bg-primary text-primary-foreground cursor-pointer border-none transition-opacity hover:opacity-90"
                 >
@@ -67,7 +67,7 @@ export default function Dashboard() {
                             key={label}
                             role="button"
                             tabIndex={0}
-                            onClick={() => router.get(href)}
+                            onClick={() => { router.get(href); }}
                             onKeyDown={(e) => e.key === 'Enter' && router.get(href)}
                             className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
                         >

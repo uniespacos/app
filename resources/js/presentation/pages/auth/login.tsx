@@ -9,11 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type LoginForm = {
+interface LoginForm {
     email: string;
     password: string;
     remember: boolean;
-};
+}
 
 export default function Login() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
@@ -26,7 +26,7 @@ export default function Login() {
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('login'), {
-            onFinish: () => reset('password'),
+            onFinish: () => { reset('password'); },
         });
     };
 
@@ -56,7 +56,7 @@ export default function Login() {
                                     type="email"
                                     placeholder="seu@email.com"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) => { setData('email', e.target.value); }}
                                     className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     disabled={processing}
                                 />
@@ -69,7 +69,7 @@ export default function Login() {
                                     <button
                                         type="button"
                                         className="text-primary text-sm hover:underline"
-                                        onClick={() => router.get(route('password.request'))}
+                                        onClick={() => { router.get(route('password.request')); }}
                                     >
                                         Esqueceu a senha?
                                     </button>
@@ -80,14 +80,14 @@ export default function Login() {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="********"
                                         value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
+                                        onChange={(e) => { setData('password', e.target.value); }}
                                         className={errors.password ? 'border-destructive pr-10 focus-visible:ring-destructive' : 'pr-10'}
                                         disabled={processing}
                                     />
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 right-0 flex items-center pr-3"
-                                        onClick={() => setShowPassword(!showPassword)}
+                                        onClick={() => { setShowPassword(!showPassword); }}
                                     >
                                         {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                                     </button>
@@ -99,7 +99,7 @@ export default function Login() {
                                 <Checkbox
                                     id="remember"
                                     checked={data.remember}
-                                    onCheckedChange={(checked) => setData('remember', !!checked)}
+                                    onCheckedChange={(checked) => { setData('remember', !!checked); }}
                                     disabled={processing}
                                 />
                                 <Label htmlFor="remember" className="cursor-pointer text-sm font-normal select-none">
@@ -125,7 +125,7 @@ export default function Login() {
                                 <button
                                     type="button"
                                     className="text-primary font-medium hover:underline"
-                                    onClick={() => router.get(route('register'))}
+                                    onClick={() => { router.get(route('register')); }}
                                 >
                                     Cadastre-se!
                                 </button>

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { CadastrarInstituicaoForm } from '@/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao';
 import { IFormHandler } from '@/application/ports/form-handler.interface';
 
-type InstituicaoFormProps = {
+interface InstituicaoFormProps {
     data: CadastrarInstituicaoForm;
     setData: IFormHandler<CadastrarInstituicaoForm>['setData'];
     submit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -13,7 +13,7 @@ type InstituicaoFormProps = {
     processing: boolean;
     title: string;
     description: string;
-};
+}
 
 export default function InstituicaoForm({ data, setData, submit, errors, processing, title, description }: InstituicaoFormProps) {
     return (
@@ -29,7 +29,7 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                         <Input
                              id="nome"
                              value={data.nome}
-                             onChange={(e) => setData('nome', e.target.value)}
+                             onChange={(e) => { setData('nome', e.target.value); }}
                              placeholder="Ex: Universidade Federal da Bahia"
                         />
                         {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
@@ -39,7 +39,7 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                         <Input
                              id="sigla"
                              value={data.sigla}
-                             onChange={(e) => setData('sigla', e.target.value)}
+                             onChange={(e) => { setData('sigla', e.target.value); }}
                              placeholder="Ex: UFBA"
                         />
                         {errors.sigla && <p className="mt-1 text-sm text-destructive">{errors.sigla}</p>}
@@ -49,7 +49,7 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                         <Input
                              id="endereco"
                              value={data.endereco}
-                             onChange={(e) => setData('endereco', e.target.value)}
+                             onChange={(e) => { setData('endereco', e.target.value); }}
                              placeholder="Ex: Rua Barão de Jeremoabo, s/n"
                         />
                         {errors.endereco && <p className="mt-1 text-sm text-destructive">{errors.endereco}</p>}

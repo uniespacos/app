@@ -25,6 +25,11 @@ Atenção especial a dois pontos que já causaram bug real neste projeto:
 Ao terminar, rode dentro do container (`docker exec uniespacos-workspace-1 ...`):
 - `php artisan test --filter=<algo relacionado>` (com `-e APP_ENV=testing`).
 - `vendor/bin/pint` no que você tocou.
+- `composer analyse` (PHPStan nível 9) — código novo ou tocado por você não pode gerar erro; ver
+  regra de baseline na skill `testing-and-env`.
+
+Comentário inline explicando "o quê" o código faz é proibido — ver regra em `backend-conventions`.
+PHPDoc só quando agrega algo que a assinatura não deixa óbvio.
 
 Se, no meio da tarefa, perceber que o escopo real é maior que o combinado (precisa de mudança de
 frontend, ou decisão de arquitetura que não estava no plano), pare e reporte isso em vez de expandir

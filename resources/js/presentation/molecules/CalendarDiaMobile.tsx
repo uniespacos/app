@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo, useState } from 'react';
 
-type CalendarDiaMobileProps = {
+interface CalendarDiaMobileProps {
     diasSemana: AgendaDiasSemanaType[];
     agendas: Agenda[];
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
@@ -18,7 +18,7 @@ type CalendarDiaMobileProps = {
      * do mesmo jeito: é a própria reserva, não uma oferta de horário livre.
      */
     exigirGestor?: boolean;
-};
+}
 
 /**
  * Visão do calendário para telas estreitas.
@@ -61,11 +61,11 @@ export default function CalendarDiaMobile({
 
     const slotsPorTurno = useMemo(() => {
         if (!diaVisivel) {
-            return [] as Array<{ turno: Turno; slots: SlotDerivado[] }>;
+            return [] as { turno: Turno; slots: SlotDerivado[] }[];
         }
 
         return agendasOrdenadas.map((agenda) => ({
-            turno: agenda.turno as Turno,
+            turno: agenda.turno,
             slots: derivarSlotsDoTurno(agenda, [diaVisivel], slotsDaReserva),
         }));
     }, [agendasOrdenadas, diaVisivel, slotsDaReserva]);
@@ -88,7 +88,7 @@ export default function CalendarDiaMobile({
                             role="tab"
                             aria-selected={ativo}
                             aria-label={`${dia.nome}, dia ${dia.diaMes}`}
-                            onClick={() => setIndiceDia(indice)}
+                            onClick={() => { setIndiceDia(indice); }}
                             className={cn(
                                 'relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors',
                                 'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
@@ -131,7 +131,7 @@ export default function CalendarDiaMobile({
                                 key={slot.id}
                                 type="button"
                                 disabled={!clicavel}
-                                onClick={clicavel ? () => alternarSelecaoSlot(slot) : undefined}
+                                onClick={clicavel ? () => { alternarSelecaoSlot(slot); } : undefined}
                                 className={cn(
                                     'flex min-h-[52px] w-full items-center gap-3 border-b px-3 py-2 text-left transition-colors last:border-b-0',
                                     'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',

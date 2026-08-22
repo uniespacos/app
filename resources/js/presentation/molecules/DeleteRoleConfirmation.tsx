@@ -27,7 +27,7 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
         setIsDeleting(true);
         router.delete(route('institucional.roles.destroy', role.id), {
             onSuccess: onClose,
-            onFinish: () => setIsDeleting(false),
+            onFinish: () => { setIsDeleting(false); },
         });
     };
 

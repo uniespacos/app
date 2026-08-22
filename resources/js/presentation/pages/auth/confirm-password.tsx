@@ -18,7 +18,7 @@ export default function ConfirmPassword() {
         e.preventDefault();
 
         post(route('password.confirm'), {
-            onFinish: () => reset('password'),
+            onFinish: () => { reset('password'); },
         });
     };
 
@@ -41,7 +41,7 @@ export default function ConfirmPassword() {
                             autoComplete="current-password"
                             value={data.password}
                             autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) => { setData('password', e.target.value); }}
                         />
 
                         <InputError message={errors.password} />

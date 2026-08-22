@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 import { useCallback } from 'react';
 
-type HeaderEspacoProps = {
+interface HeaderEspacoProps {
     titulo: string;
     descricao: string;
     canSeeButton?: boolean;
@@ -16,7 +16,7 @@ type HeaderEspacoProps = {
      *  com o usuário comum (Minhas Reservas), quase idênticas em layout. */
     badge?: string;
     BadgeIcon?: React.ComponentType<{ className?: string }>;
-};
+}
 
 export default function GenericHeader({
     canSeeButton,

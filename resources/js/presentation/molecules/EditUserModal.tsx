@@ -46,7 +46,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
         router.post(
             route('institucional.usuarios.resend-verification', { usuario: user.id }),
             {},
-            { preserveScroll: true, onFinish: () => setSendingVerification(false) },
+            { preserveScroll: true, onFinish: () => { setSendingVerification(false); } },
         );
     };
 
@@ -55,7 +55,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
         router.post(
             route('institucional.usuarios.reset-password', { usuario: user.id }),
             {},
-            { preserveScroll: true, onFinish: () => setSendingReset(false) },
+            { preserveScroll: true, onFinish: () => { setSendingReset(false); } },
         );
     };
 
@@ -68,15 +68,15 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
         >
             <form onSubmit={handleSubmit} className="space-y-5">
                 <FormField label="Nome" htmlFor="edit-user-name" error={errors.name} required>
-                    <Input id="edit-user-name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
+                    <Input id="edit-user-name" value={data.name} onChange={(e) => { setData('name', e.target.value); }} required />
                 </FormField>
 
                 <FormField label="E-mail" htmlFor="edit-user-email" error={errors.email} required>
-                    <Input id="edit-user-email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} required />
+                    <Input id="edit-user-email" type="email" value={data.email} onChange={(e) => { setData('email', e.target.value); }} required />
                 </FormField>
 
                 <FormField label="Telefone" htmlFor="edit-user-phone" error={errors.phone}>
-                    <Input id="edit-user-phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
+                    <Input id="edit-user-phone" value={data.phone} onChange={(e) => { setData('phone', e.target.value); }} />
                 </FormField>
 
                 <div className="space-y-3 rounded-lg border p-4">

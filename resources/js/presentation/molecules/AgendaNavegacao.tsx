@@ -3,14 +3,14 @@ import { endOfWeek, format, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-type AgendaNavegacaoProps = {
+interface AgendaNavegacaoProps {
     semanaAtual: Date;
     onAnterior: () => void;
     onProxima: () => void;
     onReset?: () => void;
     desabilitarAnterior?: boolean;
     desabilitarProxima?: boolean;
-};
+}
 export default function AgendaNavegacao({
     semanaAtual,
     onAnterior,

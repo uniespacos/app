@@ -61,13 +61,13 @@ export function ModaisSetor({
                         onCreateSetor(data);
                         setIsCreateModalOpen(false);
                     }}
-                    onCancel={() => setIsCreateModalOpen(false)}
+                    onCancel={() => { setIsCreateModalOpen(false); }}
                 />
             </Modal>
 
             <Modal
                 open={!!editingSetor}
-                onOpenChange={() => setEditingSetor(null)}
+                onOpenChange={() => { setEditingSetor(null); }}
                 title="Editar Setor"
                 description="Altere as informações do setor"
                 size="md"
@@ -81,14 +81,14 @@ export function ModaisSetor({
                             onUpdateSetor(editingSetor.id, data);
                             setEditingSetor(null);
                         }}
-                        onCancel={() => setEditingSetor(null)}
+                        onCancel={() => { setEditingSetor(null); }}
                     />
                 )}
             </Modal>
 
             <Modal
                 open={!!viewingUsuarios}
-                onOpenChange={() => setViewingUsuarios(null)}
+                onOpenChange={() => { setViewingUsuarios(null); }}
                 title="Usuários do Setor"
                 description={`${viewingUsuarios?.nome ?? ''} - ${viewingUsuarios?.unidade?.nome ?? ''}`}
                 size="xl"

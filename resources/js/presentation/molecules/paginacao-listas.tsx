@@ -1,13 +1,13 @@
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PaginacaoLink } from '@/presentation/atoms/PaginacaoLink';
 
-type PaginacaoListasProps = {
+interface PaginacaoListasProps {
     links: {
         label: string;
         url?: string | null;
         active?: boolean;
     }[];
-};
+}
 
 /**
  * O array `links` vem pronto do LengthAwarePaginator do Laravel: Anterior,

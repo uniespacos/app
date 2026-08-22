@@ -44,8 +44,8 @@ export function useAgendaNavigation({
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-                onStart: () => setIsLoading(true),
-                onFinish: () => setIsLoading(false),
+                onStart: () => { setIsLoading(true); },
+                onFinish: () => { setIsLoading(false); },
             },
         );
     };

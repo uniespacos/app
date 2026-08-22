@@ -17,9 +17,14 @@ reaproveitar em vez de reinventar.
 
 Ao terminar:
 - Rode `npx tsc --noEmit`.
+- Rode `npx eslint <arquivo(s)>` — `strict-type-checked` type-aware; código novo ou tocado por você
+  não pode gerar erro novo, ver regra de suppressions na skill `testing-and-env`.
 - Se mexeu em arquivo com teste (`*.test.ts(x)` correspondente), rode `npx jest <caminho>`.
 - Reformate só o que reescreveu de fato, ou arquivo que já estava limpo — não passe prettier em
   arquivo alheio só porque tocou uma linha (gera diff de ruído).
+
+Comentário inline explicando "o quê" o código faz é proibido — ver regra em `frontend-conventions`.
+TSDoc só quando agrega algo que a assinatura não deixa óbvio.
 
 Se, no meio da tarefa, perceber que o escopo real é maior que o combinado (precisa de mudança de
 backend, ou decisão de arquitetura que não estava no plano), pare e reporte isso em vez de expandir

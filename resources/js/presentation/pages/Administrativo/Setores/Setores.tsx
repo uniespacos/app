@@ -78,7 +78,7 @@ export default function SetoresPage() {
                             canSeeButton
                             buttonText="Cadastrar setor"
                             ButtonIcon={PlusCircle}
-                            buttonOnClick={() => setIsCreateModalOpen(true)}
+                            buttonOnClick={() => { setIsCreateModalOpen(true); }}
                         />
 
                         <FiltrosSetor
@@ -108,8 +108,8 @@ export default function SetoresPage() {
                             instituicao={instituicao}
                             unidades={unidades}
                             usuarios={usuarios}
-                            onCreateSetor={(data) => handleCreateSetor(data)}
-                            onUpdateSetor={(setorId, data) => handleUpdateSetor(setorId, data)}
+                            onCreateSetor={(data) => { handleCreateSetor(data); }}
+                            onUpdateSetor={(setorId, data) => { handleUpdateSetor(setorId, data); }}
                         />
                     </div>
                 </div>

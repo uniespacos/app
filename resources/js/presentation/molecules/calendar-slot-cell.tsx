@@ -4,11 +4,11 @@ import { cn } from '@/lib/utils';
 import { SlotCalendario } from '@/types';
 import { JSX } from 'react';
 
-type CalendarSlotCellProps = {
+interface CalendarSlotCellProps {
     slot: SlotCalendario;
     isSelecionado: boolean;
     onSelect: () => void;
-};
+}
 
 /**
  * Fundo e texto de cada estado vêm dos tokens semânticos. Antes eram pares

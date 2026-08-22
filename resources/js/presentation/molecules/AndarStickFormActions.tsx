@@ -26,7 +26,7 @@ export default function AndarStickFormActions({ onScrollToTop, andaresCount }: A
         };
 
         window.addEventListener('scroll', toggleVisibility);
-        return () => window.removeEventListener('scroll', toggleVisibility);
+        return () => { window.removeEventListener('scroll', toggleVisibility); };
     }, []);
 
     if (!isVisible) return null;

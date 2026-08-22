@@ -81,7 +81,7 @@ export default function InstituicoesPage() {
                                                                 <FilePenLine className="h-4 w-4" />
                                                             </Button>
                                                         </Link>
-                                                        <Button variant="destructive" size="icon" onClick={() => setRemoverInstituicao(instituicao)}>
+                                                        <Button variant="destructive" size="icon" onClick={() => { setRemoverInstituicao(instituicao); }}>
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </TableCell>
@@ -100,7 +100,7 @@ export default function InstituicoesPage() {
                                         setRemoverInstituicao(null);
                                     }
                                 }}
-                                itemName={removerInstituicao?.nome || 'Instituição'}
+                                itemName={removerInstituicao.nome || 'Instituição'}
                                 route={route('institucional.instituicoes.destroy', removerInstituicao.id)}
                             />
                         )}

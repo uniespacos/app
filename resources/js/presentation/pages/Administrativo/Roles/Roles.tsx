@@ -92,7 +92,7 @@ export default function RolesPage() {
                                 <Input
                                     placeholder="Buscar por nome ou descrição..."
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => { setSearchTerm(e.target.value); }}
                                 />
                             </div>
 
@@ -100,7 +100,7 @@ export default function RolesPage() {
                                 <Label>Tipo</Label>
                                 <Select
                                     value={typeFilter}
-                                    onValueChange={(v) => setTypeFilter(v as 'all' | 'system' | 'custom')}
+                                    onValueChange={(v) => { setTypeFilter(v as 'all' | 'system' | 'custom'); }}
                                 >
                                     <SelectTrigger className="w-full sm:w-[180px]">
                                         <SelectValue />
@@ -159,13 +159,13 @@ export default function RolesPage() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={() => handleEdit(role)}>
+                                                    <DropdownMenuItem onClick={() => { handleEdit(role); }}>
                                                         <Edit className="mr-2 h-4 w-4" />
                                                         Editar
                                                     </DropdownMenuItem>
                                                     {!role.is_system && (
                                                         <DropdownMenuItem
-                                                            onClick={() => handleDelete(role)}
+                                                            onClick={() => { handleDelete(role); }}
                                                             className="text-destructive"
                                                         >
                                                             <Trash2 className="mr-2 h-4 w-4" />

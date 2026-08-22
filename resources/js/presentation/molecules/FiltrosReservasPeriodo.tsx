@@ -18,7 +18,7 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
         filtros.data_fim ? new Date(filtros.data_fim) : undefined
     );
 
-    const situacoes: Array<{ value: SituacaoReserva; label: string }> = [
+    const situacoes: { value: SituacaoReserva; label: string }[] = [
         { value: 'em_analise', label: 'Em Análise' },
         { value: 'deferida', label: 'Deferida' },
         { value: 'indeferida', label: 'Indeferida' },
@@ -67,7 +67,7 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
                     opcoes={situacoes}
                     selecionados={filtros.situacoes ?? []}
                     onChange={(valores) =>
-                        onChange({ ...filtros, situacoes: valores as SituacaoReserva[] })
+                        { onChange({ ...filtros, situacoes: valores as SituacaoReserva[] }); }
                     }
                 />
 
@@ -76,10 +76,10 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
                     opcoes={turnos}
                     selecionados={filtros.turnos ?? []}
                     onChange={(valores) =>
-                        onChange({
+                        { onChange({
                             ...filtros,
-                            turnos: valores as Array<'manha' | 'tarde' | 'noite'>,
-                        })
+                            turnos: valores as ('manha' | 'tarde' | 'noite')[],
+                        }); }
                     }
                 />
             </div>

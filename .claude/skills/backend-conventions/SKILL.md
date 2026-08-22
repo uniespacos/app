@@ -59,6 +59,21 @@ Padrão: `->paginate(10)`. Se a tela tem busca/filtro, o filtro **tem que rodar 
 (`->where(...)` antes do `paginate()`), nunca filtrar o array já paginado no frontend — isso esconde
 resultados que estão em outras páginas.
 
+## Comentários — regra rígida
+
+Nada de comentário inline explicando o que o código faz — nome de classe/método/variável já
+faz esse trabalho. Isso inclui comentário de "o quê", comentário referenciando a tarefa/issue atual,
+código comentado deixado para trás, e bloco de comentário decorativo separando seções.
+
+PHPDoc é permitido, mas só quando agrega algo que a assinatura não deixa óbvio: `@throws` de exceção
+não convencional, contrato de efeito colateral, uma constraint de negócio não expressável em tipo.
+Método com nome e assinatura autoexplicativos não leva PHPDoc nenhum.
+
+Antes de terminar a tarefa, rode `vendor/bin/pint` e `composer analyse` (PHPStan nível 9, com
+baseline em `phpstan-baseline.neon` cobrindo dívida técnica pré-existente — código novo ou tocado
+por você não pode entrar na baseline; se `analyse` reclamar de linha sua, corrija o tipo, não
+adicione a linha na baseline).
+
 ## Rotas administrativas sob demanda
 
 Dado pesado que só uma tela específica de um fluxo (ex.: modal de edição de permissões) precisa não
