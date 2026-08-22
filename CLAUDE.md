@@ -38,6 +38,11 @@ npx prettier --write <arquivo>
 - Branch a partir de `develop`. **PR obrigatória** — há CI/CD, não existe push direto em `develop`.
 - Conventional commits, mensagem em português (`fix:`, `feat:`, `perf:`, `chore:`).
 - Antes de dar merge: `npx tsc --noEmit`, `npx jest` e os testes de backend precisam passar.
+- **Nunca criar a PR sozinho ao terminar uma tarefa.** Deixe branch e commit prontos, rode as
+  verificações, e pare — só abra a PR quando o usuário validar o trabalho e autorizar explicitamente
+  a criação. Commitar/pushar a branch de trabalho é ok; `gh pr create` não.
+- **A PR do `release-please` é aprovada e mergeada manualmente pelo usuário.** Não aprove, não
+  aprove-e-mergeie, não faça squash/merge nela por conta própria.
 
 ## Arquitetura
 
@@ -60,8 +65,6 @@ usar sempre o modelo mais leve).
 
 ## Armadilhas conhecidas
 
-- `tests/Feature/ReservaEdicaoBloqueadaTest.php` tem erro de sintaxe e derruba a suíte inteira.
-  Mova para fora antes de rodar tudo, e devolva depois.
 - `ErrorHandlingTest > inertia request does not receive the envelope` falha localmente quando existe
   `public/build/manifest.json`. É pré-existente, não é regressão sua.
 - O Vite às vezes passa a servir um módulo **vazio** (~167 bytes) depois de um arquivo ser reescrito;
