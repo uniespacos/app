@@ -13,6 +13,7 @@ use App\Models\Espaco;
 use App\Services\EspacoService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -29,19 +30,22 @@ class InstitucionalEspacoController extends Controller
     /**
      * Display the admin listing of spaces with managers and structural data.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', Espaco::class);
 
         $user = Auth::user();
         $instituicaoId = $user->setor->unidade->instituicao_id;
-        $formData = $this->service->getFormData($instituicaoId);
+        $filters = $request->only(['search', 'unidade', 'modulo', 'andar', 'capacidade']);
+        $filterOptions = $this->service->getFilterOptions($instituicaoId);
 
         return Inertia::render('Administrativo/Espacos/GerenciarEspacos', [
-            'espacos' => $this->service->getAdminListing($instituicaoId),
-            'andares' => $formData['andares'],
-            'modulos' => $formData['modulos'],
-            'unidades' => $formData['unidades'],
+            'espacos' => $this->service->getPaginatedForAdmin($instituicaoId, $filters)->withQueryString(),
+            'andares' => $filterOptions['andares'],
+            'modulos' => $filterOptions['modulos'],
+            'unidades' => $filterOptions['unidades'],
+            'capacidadeEspacos' => $filterOptions['capacidades'],
+            'filters' => $filters,
             'users' => $this->service->getUsersWithAgendas($instituicaoId),
         ]);
     }

@@ -1,7 +1,7 @@
 import { User } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -31,14 +31,16 @@ export function NotificationDropdown() {
     }>();
     const user = props.auth.user;
     const [notifications, setNotifications] = useState<UserNotification[]>(props.notifications || []);
-    const [unreadCount, setUnreadCount] = useState<number>(user.unread_notifications.length);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
+    // unreadCount é derivado do array de notificações (única fonte de verdade),
+    // que também recebe itens em tempo real via WebSocket.
+    const unreadCount = useMemo(() => notifications.filter((n) => n.read_at === null).length, [notifications]);
+
     // Função para marcar notificações como lidas
     const markAllAsRead = () => {
-        // Use a prop do Inertia para verificar se há não lidas
-        if (!user || user.unread_notifications.length === 0) return;
+        if (unreadCount === 0) return;
 
         setIsLoading(true);
 
@@ -48,7 +50,6 @@ export function NotificationDropdown() {
             {
                 onSuccess: () => {
                     setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() })));
-                    setUnreadCount(0); // Zera o contador local após marcar como lido
                 },
 
                 onFinish: () => {
@@ -83,9 +84,6 @@ export function NotificationDropdown() {
                     },
                     ...prevNotifications, // Adiciona as notificações antigas depois
                 ]);
-
-                // 3. Incrementa o contador de não lidas
-                setUnreadCount((prevCount) => prevCount + 1);
             });
 
             // Função de limpeza para quando o componente for desmontado
@@ -95,12 +93,6 @@ export function NotificationDropdown() {
             };
         }
     }, [user]);
-
-    useEffect(() => {
-        // Isso é crucial para quando o usuário navega para uma nova página Inertia
-        // ou recarrega, o contador local é reinicializado com o valor mais recente do servidor.
-        setUnreadCount(props.auth.user.unread_notifications.length);
-    }, [props.auth.user.unread_notifications.length]);
 
     // Função auxiliar para formatar a data
     const formatNotificationTime = (dateString: string) => {

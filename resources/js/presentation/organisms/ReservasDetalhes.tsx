@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 import { diasDaSemana, formatDate } from '@/lib/utils';
 import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import AvaliacaoGestoresResumo from '@/presentation/molecules/AvaliacaoGestoresResumo';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import { Modal } from '@/presentation/molecules/Modal';
-import { Agenda, Horario, Reserva, SlotCalendario } from '@/types';
+import { Agenda, Reserva, SlotCalendario } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, subDays } from 'date-fns';
 import { CalendarDays, Clock, Edit, ExternalLink, FileText, Home, Loader2, User, XCircle } from 'lucide-react';
@@ -19,37 +20,20 @@ type ReservaDetalhesProps = {
     selectedReserva: Reserva;
     isGestor?: boolean;
     setRemoverReserva: (selectedReserva: Reserva) => void;
-    routeName: string; // NOVO: Adicione esta prop
+    routeName: string;
 };
 
 export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, routeName }: ReservaDetalhesProps) {
     const { semana } = usePage().props as any;
 
-    // NOVO: Estado para controlar o carregamento dos dados da semana
     const [isLoading, setIsLoading] = useState(false);
 
-    // Este estado continua, mas agora não causará o "piscar"
     const [semanaVisivel, setSemanaVisivel] = useState(parseISO(semana.referencia));
 
     const slotsSelecao = useMemo<SlotCalendario[]>(() => {
-        const mapearStatusHorarioParaSlot = (statusHorario: Horario['situacao']): SlotCalendario['status'] => {
-            switch (statusHorario) {
-                case 'em_analise':
-                    return 'solicitado';
-                case 'deferida':
-                    return 'deferida';
-                case 'indeferida':
-                    return 'indeferida';
-                case 'inativa':
-                    return 'reservado';
-                default:
-                    return 'reservado';
-            }
-        };
-
         return selectedReserva.horarios.map((horario) => ({
             id: `${horario.data}|${horario.horario_inicio}`,
-            status: mapearStatusHorarioParaSlot(horario.situacao),
+            status: mapearStatusBackendParaSlot(horario.situacao),
             data: parseISO(horario.data + 'T12:00:00'),
             horario_inicio: horario.horario_inicio,
             horario_fim: horario.horario_fim,
@@ -71,14 +55,12 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
     const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
     const espaco = selectedReserva.horarios[0]?.agenda?.espaco;
 
-    // ALTERADO: A função de navegação agora controla o estado de loading
     const navegarParaSemana = (novaData: Date) => {
         setSemanaVisivel(novaData);
         const params = {
             reserva: selectedReserva.id,
             semana: format(novaData, 'yyyy-MM-dd'),
         };
-        // AQUI ESTÁ A MUDANÇA: Usa a rota dinâmica vinda da prop
         router.get(route(routeName), params, {
             preserveState: true,
             preserveScroll: true,
@@ -176,7 +158,6 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                     Horários Solicitados
                 </h4>
 
-                {/* NOVO: Wrapper para o indicador de loading sobre o calendário */}
                 <div className="relative mb-4 space-y-4">
                     <AgendaNavegacao
                         semanaAtual={semanaVisivel}

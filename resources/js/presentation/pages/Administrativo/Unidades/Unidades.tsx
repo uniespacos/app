@@ -8,8 +8,8 @@ import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { UnidadeFilters } from '@/presentation/molecules/UnidadeFilters';
+import { useMemo, useState } from 'react';
+import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 const breadcrumbs = [
     {
         title: 'Gerenciar Unidades',
@@ -26,25 +26,15 @@ export default function UnidadesPage() {
         };
         instituicoes: Instituicao[];
     }>().props;
-    const unidadesData = unidades.data;
     const [removerUnidade, setRemoverUnidade] = useState<Unidade | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedInstituicao] = useState<Instituicao | undefined>(undefined);
-    const [unidadesFilter, setUnidadesFilter] = useState<Unidade[]>(unidades.data);
-
-    useEffect(() => {
-        if (!searchTerm && selectedInstituicao === undefined) {
-            setUnidadesFilter(unidadesData);
-            return;
-        }
-        setUnidadesFilter(
-            unidadesData.filter((unidade) => {
-                const matchesSearch = unidade.nome.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesInstituicao = selectedInstituicao ? unidade.instituicao?.id === selectedInstituicao.id : true;
-                return matchesSearch && matchesInstituicao;
-            }),
-        );
-    }, [searchTerm, selectedInstituicao, unidadesData]);
+    const unidadesFilter = useMemo(
+        () =>
+            searchTerm
+                ? unidades.data.filter((unidade) => unidade.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+                : unidades.data,
+        [searchTerm, unidades.data],
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -63,7 +53,12 @@ export default function UnidadesPage() {
                         />
                         <Card>
                             <CardContent>
-                                <UnidadeFilters searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
+                                <SearchFilter
+                                    searchTerm={searchTerm}
+                                    onSearchTermChange={setSearchTerm}
+                                    placeholder="Buscar por nome"
+                                    variant="plain"
+                                />
                             </CardContent>
                         </Card>
                         <Card>

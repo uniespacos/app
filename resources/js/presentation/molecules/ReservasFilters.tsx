@@ -48,8 +48,8 @@ export function ReservasFilters({
                             type="search"
                             placeholder="Buscar por título ou descrição..."
                             className="w-full pl-8"
-                            value={searchTerm} // 3. O valor vem das props
-                            onChange={(e) => onSearchTermChange(e.target.value)} // 4. A mudança notifica o pai
+                            value={searchTerm}
+                            onChange={(e) => onSearchTermChange(e.target.value)}
                         />
                     </div>
                 </div>

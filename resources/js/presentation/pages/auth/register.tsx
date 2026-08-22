@@ -62,7 +62,8 @@ export default function Register() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        // Sem gradiente semântico equivalente no tema; usa fundo neutro que respeita dark mode.
+        <div className="flex min-h-screen items-center justify-center bg-muted">
             <Head title="Criar conta" />
             <div className="container mx-auto px-4 py-8">
                 <div className="mx-auto max-w-6xl">
