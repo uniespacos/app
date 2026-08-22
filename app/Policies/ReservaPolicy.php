@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Models\Reserva;
 use App\Models\User;
 
@@ -91,6 +92,10 @@ class ReservaPolicy
     public function viewForGestor(User $user, Reserva $reserva): bool
     {
         if (! $user->hasPermissionTo('reservas.avaliar')) {
+            return false;
+        }
+
+        if ($reserva->situacao === SituacaoReservaEnum::INATIVA->value) {
             return false;
         }
 
