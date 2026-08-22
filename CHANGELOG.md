@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.21](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.20...v1.3.0-rc.21) (2026-08-22)
+
+
+### Bug Fixes
+
+* remover cards de status de reservas do dashboard do usuário comum ([#278](https://github.com/uniespacos/uniespacos/issues/278)) ([678eb12](https://github.com/uniespacos/uniespacos/commit/678eb123ed2b6bf957642b5f1c858c35e5cea453))
+
 ## [1.3.0-rc.20](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.19...v1.3.0-rc.20) (2026-08-22)
 
 
