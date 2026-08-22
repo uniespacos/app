@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.22](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.21...v1.3.0-rc.22) (2026-08-22)
+
+
+### Bug Fixes
+
+* recolher filtros avançados da busca de espaços no mobile ([#280](https://github.com/uniespacos/uniespacos/issues/280)) ([3e2649a](https://github.com/uniespacos/uniespacos/commit/3e2649a2faaa864bfd08560ca88c24206e86bb17))
+
 ## [1.3.0-rc.21](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.20...v1.3.0-rc.21) (2026-08-22)
 
 
