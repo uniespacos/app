@@ -77,7 +77,7 @@ export default function MinhasReservas({
                 />
                 <Suspense fallback={<ReservasLoading />}>
                     <ReservasList
-                        fallback={<ReservasEmpty />}
+                        fallback={<ReservasEmpty isGestor />}
                         paginator={paginator}
                         isGestor={true}
                         user={user}

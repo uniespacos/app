@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { CalendarX } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { CalendarX, PlusCircle } from 'lucide-react';
 
-export function ReservasEmpty() {
+declare function route(name: string, params?: unknown): string;
+
+export function ReservasEmpty({ isGestor = false }: { isGestor?: boolean }) {
     return (
         <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="bg-muted mb-4 rounded-full p-6">
@@ -9,9 +12,18 @@ export function ReservasEmpty() {
             </div>
             <h3 className="text-lg font-semibold">Nenhuma reserva encontrada</h3>
             <p className="text-muted-foreground mt-2 mb-6 max-w-md">
-                Você ainda não possui reservas de espaços. Clique no botão abaixo para criar sua primeira reserva.
+                {isGestor
+                    ? 'Nenhuma solicitação de reserva corresponde aos filtros atuais.'
+                    : 'Você ainda não possui reservas de espaços. Escolha um espaço para criar sua primeira reserva.'}
             </p>
-            <Button>Criar Nova Reserva</Button>
+            {!isGestor && (
+                <Button asChild>
+                    <Link href={route('espacos.index')}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Consultar Espaços
+                    </Link>
+                </Button>
+            )}
         </div>
     );
 }

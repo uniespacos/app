@@ -7,7 +7,7 @@ import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
 import { hasPermission } from '@/lib/auth';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import type { Espaco, User } from '@/types';
-import { Building2, Calendar, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
+import { Building2, ChevronRight, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
 
 import { useFavoritarEspacoUseCase } from '@/application/espacos/use-cases/use-favoritar-espaco-usecase';
 import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
@@ -48,14 +48,30 @@ export default function EspacoCard({
             ? espaco.imagens.map((img) => `/storage/${img}`) // Assumindo que '/storage/' é o caminho correto
             : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
 
+    const isModoGerenciamento = Boolean(isGerenciarEspacos) && hasPermission(user, PERMISSION_ESPACOS_ATUALIZAR);
+    // Fora do modo de gerenciamento, o card inteiro é o link para a agenda do
+    // espaço — não faz sentido repetir a mesma ação num botão "Ver agenda" no
+    // rodapé quando clicar em qualquer parte do card já leva para lá.
+    const isClicavel = !isModoGerenciamento;
+    const irParaAgenda = () => handleSolicitarReserva?.(String(espaco.id));
+
     return (
         // Card sem o py-6/gap-6 padrão do shadcn: aquele padding é o que deixava
         // uma tarja da cor do card acima e abaixo da imagem (ela nunca alcançava
         // as bordas arredondadas). Com py-0 a imagem é o primeiro filho colado no
         // topo, e o overflow-hidden faz o efeito de máscara nos cantos do Card.
-        <Card className="flex flex-col gap-0 overflow-hidden py-0">
+        <Card
+            role={isClicavel ? 'button' : undefined}
+            tabIndex={isClicavel ? 0 : undefined}
+            onClick={isClicavel ? irParaAgenda : undefined}
+            onKeyDown={isClicavel ? (e) => e.key === 'Enter' && irParaAgenda() : undefined}
+            className={`flex flex-col gap-0 overflow-hidden py-0 ${isClicavel ? 'hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm' : ''}`}
+        >
             {/* --- Seção da Imagem/Carrossel --- */}
-            <div className="relative">
+            {/* stopPropagation: cliques nas setas do carrossel e no botão de
+                favoritar não podem "vazar" para o onClick do card e disparar
+                a navegação para a agenda. */}
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
                 <Carousel className="w-full">
                     <CarouselContent>
                         {imageSources.map((src, index) => (
@@ -129,34 +145,34 @@ export default function EspacoCard({
             </CardContent>
 
             {/* O rodapé se alinha na parte inferior do card */}
-            <CardFooter className="flex flex-wrap gap-2 py-4">
-                {isGerenciarEspacos && hasPermission(user, PERMISSION_ESPACOS_ATUALIZAR) ? (
-                    <>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                                /* Lógica para ver detalhes */
-                            }}
-                        >
-                            Ver Detalhes
-                        </Button>
-                        <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
-                            <Edit className="mr-1.5 h-4 w-4" />
-                            Editar
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
-                            <Trash2 className="mr-1.5 h-4 w-4" />
-                            Excluir
-                        </Button>
-                    </>
-                ) : (
-                    <Button className="w-full" variant="default" size="sm" onClick={() => handleSolicitarReserva?.(String(espaco.id))}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Ver agenda
+            {isModoGerenciamento ? (
+                <CardFooter className="flex flex-wrap gap-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            /* Lógica para ver detalhes */
+                        }}
+                    >
+                        Ver Detalhes
                     </Button>
-                )}
-            </CardFooter>
+                    <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
+                        <Edit className="mr-1.5 h-4 w-4" />
+                        Editar
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
+                        <Trash2 className="mr-1.5 h-4 w-4" />
+                        Excluir
+                    </Button>
+                </CardFooter>
+            ) : (
+                // Dica de que o card é clicável, não um botão — a ação já é
+                // acionada pelo card inteiro (ver `isClicavel` acima).
+                <CardFooter className="text-primary flex items-center justify-end gap-1 py-4 text-sm font-medium">
+                    Ver disponibilidade
+                    <ChevronRight className="h-4 w-4" />
+                </CardFooter>
+            )}
         </Card>
     );
 }
