@@ -7,12 +7,15 @@ Tailwind v4, PostgreSQL 16, Laravel Reverb (WebSocket), tudo em Docker.
 
 1. **Nunca use `RefreshDatabase` em teste.** Ele apaga o banco de desenvolvimento. Use sempre
    `DatabaseTransactions` (já é o padrão em `tests/TestCase.php`).
-2. **Toda Notification implementa `ShouldQueue`.** Envio síncrono trava a request.
-3. **`notify()` dentro de Job sempre em `try-catch`.** Sem isso, uma falha do provedor de e-mail
+2. **BANIDO: `migrate:fresh`, `migrate:reset`, `db:wipe`, `cache:clear --database`.** Não rode esses
+   comandos em ambiente local/desenvolvimento. Eles limpam o banco ou cache. Se um teste quebrou
+   e você acha que o banco está sujo, relata ao dev; nunca limpe por conta própria.
+3. **Toda Notification implementa `ShouldQueue`.** Envio síncrono trava a request.
+4. **`notify()` dentro de Job sempre em `try-catch`.** Sem isso, uma falha do provedor de e-mail
    derruba a lógica central do job e dispara alerta falso de "falha" para o usuário.
-4. **`REVERB_SCHEME=http` para comunicação interna** (backend → Reverb, dentro do Docker).
+5. **`REVERB_SCHEME=http` para comunicação interna** (backend → Reverb, dentro do Docker).
    HTTPS só no caminho externo (browser → Caddy → Reverb).
-5. **Não commitar com trailer de co-autoria.** Os commits saem só com a autoria do dev.
+6. **Não commitar com trailer de co-autoria.** Os commits saem só com a autoria do dev.
 
 ## Comandos
 
