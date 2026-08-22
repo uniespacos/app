@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.29](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.28...v1.3.0-rc.29) (2026-08-22)
+
+
+### Bug Fixes
+
+* impedir ressurreição de reserva arquivada em avaliação ([#265](https://github.com/uniespacos/uniespacos/issues/265)) ([#299](https://github.com/uniespacos/uniespacos/issues/299)) ([5161d2b](https://github.com/uniespacos/uniespacos/commit/5161d2bcc3eac1d7a5a94c2452967d184dba8b64))
+
 ## [1.3.0-rc.28](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.27...v1.3.0-rc.28) (2026-08-22)
 
 
