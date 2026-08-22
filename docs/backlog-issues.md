@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `6803c20` (release rc.29) · #301 mergeada · #265 concluída (PR #299)
+**Última atualização:** 2026-08-22 · develop em `6803c20` (release rc.29) · #301 mergeada · #265 concluída (PR #299) · GAP-03 concluída (PR pending) · Alert destructive variant corrigido
 
 ---
 
@@ -50,21 +50,22 @@ Atualizado a cada entrega.
   `AvaliarReservaJob::updateReservaOverallStatus` recalculava `situacao` a partir da contagem de horários sem tratar `inativa` — toda avaliação em uma reserva arquivada a ressuscitava. Match adicionado para validar que reserva é ativa antes de reatribuir status.
   *17 testes · 17 passando*
 
+- [x] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
+  Branch `fix/gap-03-recurring-scope-authorization` → PR pendente
+  No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Implementada validação em 2 níveis: (1) no `AvaliarReservaRequest::after()` valida cada horário ID pertence às agendas do gestor; (2) no `AvaliarReservaJob::validateHorariosAutorization()` revalida antes de processar. **Bônus:** Corrigido bug crítico de UX/acessibilidade no `Alert` com `variant="destructive"` — o alerta de reavaliação estava invisível por contraste 1:1 (texto branco sobre fundo quase-branco). Corrigido usando `text-destructive-accent` (vermelho escuro) que rende ~5:1 de contraste.
+  *9 testes novos/atualizados · 19 testes passando · 0 regressões*
+
 ---
 
 ## 🔨 Em andamento
 
-- [ ] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
-  Branch `fix/gap-03-recurring-scope-authorization`. No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Validar que cada `agenda_id` destino é gerenciado pelo gestor antes de propagar.
+- (nenhuma)
 
 ---
 
 ## 📋 Fila
 
 **Bugs críticos (do core-workflow-report.md)**
-
-- [ ] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
-  No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Validar por agenda_id.
 
 - [ ] **#255 — `data_inicial`/`data_final` dessincronizam na edição single** `P2` · `effort: medium`
   Com `edit_scope='single'`, período reescrito com limites da semana. Bloqueia navegação. Requer migração de dados.
