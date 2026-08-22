@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import AppLayout from '@/presentation/templates/app-layout';
 import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useReservationLiveUpdates } from '@/hooks/useReservationLiveUpdates';
 
 export default function VisualizarEspaço({
     espaco,
@@ -19,6 +21,20 @@ export default function VisualizarEspaço({
         referencia: string;
     };
 }) {
+    useReservationLiveUpdates();
+
+    useEffect(() => {
+        const handleUpdate = () => {
+            router.reload();
+        };
+
+        document.addEventListener('reserva:updated', handleUpdate);
+
+        return () => {
+            document.removeEventListener('reserva:updated', handleUpdate);
+        };
+    }, []);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: isEditMode ? 'Reservas' : 'Espaços',

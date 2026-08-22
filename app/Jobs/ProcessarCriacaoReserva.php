@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Events\ReservaEvent;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
@@ -132,6 +133,8 @@ class ProcessarCriacaoReserva implements ShouldQueue
             ValidateReservationConflictsJob::dispatch($reserva);
 
             Log::info('Conflict validation dispatched', ['reserva_id' => $reserva->id]);
+
+            ReservaEvent::dispatch('created', $reserva->id);
 
             try {
                 $this->solicitante->notify(new ReservationCreatedNotification($reserva));

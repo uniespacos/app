@@ -47,21 +47,23 @@ class ReservaController extends Controller
     /**
      * Dispatch the async job to create a new reservation.
      */
-    public function store(StoreReservaRequest $request): RedirectResponse
+    public function store(StoreReservaRequest $request)
     {
         try {
             $this->service->create($request->validated(), Auth::user());
 
-            return redirect()->route('espacos.index')
-                ->with('success', 'Sua solicitação foi recebida e está sendo processada em segundo plano!');
+            // Retorna 204 No Content para manter usuário na página (modal fecha via frontend)
+            // e permitir que atualizações em tempo real (Reverb) sejam recebidas enquanto aguarda processamento.
+            // Inertia interpreta 204 como sucesso sem redirecionar.
+            return response()->noContent();
         } catch (\Exception $error) {
             Log::error('Erro ao despachar o job de criação de reserva', [
                 'user_id' => Auth::id(),
                 'exception' => $error,
             ]);
 
-            return redirect()->route('espacos.index')
-                ->with('error', 'Não foi possível enviar sua solicitação para processamento. Tente novamente.');
+            // Retorna erro com flash message para toast de erro
+            return back()->withErrors(['error' => 'Não foi possível enviar sua solicitação para processamento. Tente novamente.']);
         }
     }
 

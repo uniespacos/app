@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Enums\SituacaoReserva\SituacaoReservaEnum;
+use App\Events\ReservaEvent;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
@@ -141,6 +142,8 @@ class AvaliarReservaJob implements ShouldQueue
             });
 
             $this->reserva->refresh();
+
+            ReservaEvent::dispatch('evaluated', $this->reserva->id);
 
             Log::info('AvaliarReservaJob completed', [
                 'reserva_id' => $this->reserva->id,
