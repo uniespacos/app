@@ -40,7 +40,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
     // Função interna para renderizar o conteúdo do slot
     const renderSlotContent = (): JSX.Element | null => {
         if (slot.isPast && slot.status === 'livre') {
-            return null;
+            return <p className="text-muted-foreground/70 text-[10px]">Passado</p>;
         }
 
         if (isSelecionado) {
@@ -96,6 +96,18 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 ],
             )}
         >
+            {/* Barra sólida à esquerda: o preenchimento pálido da célula some
+                contra o fundo da página, mas o tom sólido do mesmo token é
+                sempre visível — é a mesma barra que a lista mobile já usa. */}
+            <span
+                aria-hidden
+                className={cn(
+                    'absolute inset-y-0 left-0 w-1',
+                    isSelecionado && ESTILO_SLOT.selecionado.solido,
+                    !isSelecionado && slot.status !== 'livre' && ESTILO_SLOT[slot.status].solido,
+                    !isSelecionado && slot.status === 'livre' && slot.isPast && 'bg-muted-foreground/40',
+                )}
+            />
             {renderSlotContent()}
         </div>
     );

@@ -13,14 +13,14 @@ type AgendaHeaderProps = {
 export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderProps) {
     return (
         <Card className="shadow-sm">
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-xl">
                     <Home className="h-5 w-5" />
                     {espaco.nome}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="pb-3">
-                <div className="mb-3 flex flex-wrap gap-2">
+            <CardContent className="pb-4">
+                <div className="mb-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                     <Badge variant="outline" className="flex items-center gap-1">
                         <Building2 className="h-3 w-3" />
                         {espaco.andar?.modulo?.nome}
@@ -40,8 +40,8 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                         <p className="bg-muted/50 text-muted-foreground rounded-lg p-3 text-sm leading-relaxed">{espaco.descricao}</p>
                     </div>
                 )}
-                <div className="border-t pt-3">
-                    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">Gestores por turno</h3>
+                <div className="border-t pt-4">
+                    <h3 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">Gestores por turno</h3>
 
                     {/*
                         Antes: grid-cols-1 com `justify-center` e rótulo "MANHA:" colado
@@ -55,13 +55,13 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                         literal, e o rótulo de TURNO_LABEL — "MANHA" sem til era
                         `turno.toUpperCase()` cru.
                     */}
-                    <dl className="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-3">
+                    <dl className="bg-muted/30 grid grid-cols-1 gap-x-4 gap-y-3 rounded-lg p-3 sm:grid-cols-3">
                         {TURNOS_ORDENADOS.map((turno) => {
                             const gestor = gestoresPorTurno.get(turno);
 
                             return (
-                                <div key={turno} className="flex items-start gap-2 text-sm sm:flex-col sm:gap-1">
-                                    <dt className="text-muted-foreground w-16 shrink-0 text-xs font-semibold sm:w-auto">{TURNO_LABEL[turno]}</dt>
+                                <div key={turno} className="flex flex-col gap-1 text-sm">
+                                    <dt className="text-muted-foreground text-xs font-semibold">{TURNO_LABEL[turno]}</dt>
                                     <dd className="flex min-w-0 flex-1 items-start gap-1.5">
                                         <User className="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
                                         {gestor ? (
