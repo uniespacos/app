@@ -9,7 +9,7 @@ import type { NavEntry } from '@/config/nav-registry';
  * @returns true if the user has the role, false otherwise
  */
 export function hasRole(user: User | null | undefined, role: string): boolean {
-  if (!user || !user.roles) {
+  if (!user?.roles) {
     return false;
   }
 
@@ -24,11 +24,11 @@ export function hasRole(user: User | null | undefined, role: string): boolean {
  * @returns true if the user has at least one of the roles, false otherwise
  */
 export function hasAnyRole(user: User | null | undefined, roles: string[]): boolean {
-  if (!user || !user.roles) {
+  if (!user?.roles) {
     return false;
   }
 
-  return roles.some((role) => user.roles?.includes(role));
+  return roles.some((role) => user.roles.includes(role));
 }
 
 /**
@@ -39,11 +39,11 @@ export function hasAnyRole(user: User | null | undefined, roles: string[]): bool
  * @returns true if the user has all of the roles, false otherwise
  */
 export function hasAllRoles(user: User | null | undefined, roles: string[]): boolean {
-  if (!user || !user.roles) {
+  if (!user?.roles) {
     return false;
   }
 
-  return roles.every((role) => user.roles?.includes(role));
+  return roles.every((role) => user.roles.includes(role));
 }
 
 /**
@@ -54,7 +54,7 @@ export function hasAllRoles(user: User | null | undefined, roles: string[]): boo
  * @returns true if the user has the permission, false otherwise
  */
 export function hasPermission(user: User | null | undefined, permission: string): boolean {
-  if (!user || !user.permissions) {
+  if (!user?.permissions) {
     return false;
   }
 
@@ -69,11 +69,11 @@ export function hasPermission(user: User | null | undefined, permission: string)
  * @returns true if the user has at least one of the permissions, false otherwise
  */
 export function hasAnyPermission(user: User | null | undefined, permissions: string[]): boolean {
-  if (!user || !user.permissions) {
+  if (!user?.permissions) {
     return false;
   }
 
-  return permissions.some((permission) => user.permissions?.includes(permission));
+  return permissions.some((permission) => user.permissions.includes(permission));
 }
 
 /**
@@ -87,11 +87,11 @@ export function hasAllPermissions(
   user: User | null | undefined,
   permissions: string[]
 ): boolean {
-  if (!user || !user.permissions) {
+  if (!user?.permissions) {
     return false;
   }
 
-  return permissions.every((permission) => user.permissions?.includes(permission));
+  return permissions.every((permission) => user.permissions.includes(permission));
 }
 
 /**

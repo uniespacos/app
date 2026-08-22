@@ -29,7 +29,7 @@ export default function TabsItemEspacosFavoritos({
                         <Input
                             placeholder="Buscar espaços favoritos..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); }}
                             className="pl-8"
                         />
                     </div>
@@ -40,7 +40,7 @@ export default function TabsItemEspacosFavoritos({
                             key={espaco.id}
                             espaco={espaco}
                             user={user}
-                            handleSolicitarReserva={() => router.get(`/espacos/${espaco.id}`)}
+                            handleSolicitarReserva={() => { router.get(`/espacos/${espaco.id}`); }}
                         />
                     ))}
                 </div>

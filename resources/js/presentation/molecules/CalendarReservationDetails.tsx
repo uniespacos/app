@@ -5,12 +5,12 @@ import { cn } from '@/lib/utils';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
-type CalendarReservationDetailsProps = {
+interface CalendarReservationDetailsProps {
     diasSemana: AgendaDiasSemanaType[];
     agendas: Agenda[];
     slotsSolicitados: SlotCalendario[];
     alternarSelecaoSlot?: (slot: SlotCalendario) => void;
-};
+}
 
 const SEM_SELECAO = () => false;
 

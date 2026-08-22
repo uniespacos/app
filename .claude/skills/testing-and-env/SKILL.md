@@ -67,12 +67,30 @@ curl -s http://localhost:5173/resources/js/<caminho>.tsx | wc -c
 Se vier bem menor que o esperado, é isso — não é bug de import/export do componente. Resolve com
 `touch <arquivo>`.
 
-## Lint PHP
+## Lint e análise estática PHP
 
 ```bash
 docker exec uniespacos-workspace-1 vendor/bin/pint            # aplica
 docker exec uniespacos-workspace-1 vendor/bin/pint --test     # só verifica
+docker exec uniespacos-workspace-1 composer analyse           # PHPStan nível 9 (--memory-limit=1G)
 ```
+
+`composer analyse` só passa limpo se o código novo/tocado não tiver erro — a dívida técnica
+pré-existente está coberta por `phpstan-baseline.neon` (gerado com `--generate-baseline`, 477 erros
+no momento da migração pro nível 9). Não adicione linha nova na baseline para calar o PHPStan;
+regenerar a baseline só é aceitável se o usuário pedir explicitamente.
+
+## Lint TypeScript/React
+
+```bash
+npx eslint .              # eslint . --fix é o `npm run lint`
+npx tsc --noEmit
+```
+
+`resources/js/**` roda sob `typescript-eslint` `strict-type-checked` + `stylistic-type-checked`
+(type-aware). Dívida técnica pré-existente está suprimida em `eslint-suppressions.json` (gerado com
+`--suppress-all`, 315 erros no momento da migração). Mesma regra do PHPStan: não suprima erro novo,
+corrija.
 
 ## Usuário de teste descartável para verificação manual (CDP/browser)
 

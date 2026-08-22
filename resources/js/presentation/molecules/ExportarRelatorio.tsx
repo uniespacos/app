@@ -16,7 +16,7 @@ interface Props {
     disabled?: boolean;
 }
 
-const FORMATOS: Array<{ value: FormatoRelatorio; label: string }> = [
+const FORMATOS: { value: FormatoRelatorio; label: string }[] = [
     { value: 'pdf', label: 'PDF' },
     { value: 'csv', label: 'CSV' },
     { value: 'xlsx', label: 'XLSX' },
@@ -40,7 +40,7 @@ export function ExportarRelatorio({ onExport, estaGerando, disabled }: Props) {
                 <DropdownMenuLabel>Formato</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {FORMATOS.map((formato) => (
-                    <DropdownMenuItem key={formato.value} onSelect={() => onExport(formato.value)}>
+                    <DropdownMenuItem key={formato.value} onSelect={() => { onExport(formato.value); }}>
                         {formato.label}
                     </DropdownMenuItem>
                 ))}

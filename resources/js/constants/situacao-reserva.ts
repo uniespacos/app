@@ -13,7 +13,7 @@ import type { SituacaoReserva } from '@/types';
  * (success/warning/info/destructive) resolvem os dois problemas: uma definição
  * por significado, e o próprio token troca de valor no tema escuro.
  */
-export type EstiloSituacao = {
+export interface EstiloSituacao {
     /** Rótulo em português, já acentuado. */
     label: string;
     /** Preenchimento pálido + texto de contraste, para badges. */
@@ -22,7 +22,7 @@ export type EstiloSituacao = {
     solido: string;
     /** Preenchimento de célula do calendário. */
     celula: string;
-};
+}
 
 export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
     em_analise: {

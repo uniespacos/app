@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Filter, Search } from 'lucide-react';
 
-type ReservasFiltersProps = {
+interface ReservasFiltersProps {
     searchTerm: string;
     onSearchTermChange: (value: string) => void;
     selectedSituacao: string;
@@ -22,7 +22,7 @@ type ReservasFiltersProps = {
     onOrdenarChange: (value: string) => void;
     selectedDate?: Date; // Adicionei para o filtro de data
     onDateChange?: (date: Date | undefined) => void; // Função opcional para lidar com a mudança de data
-};
+}
 
 export function ReservasFilters({
     searchTerm,
@@ -49,7 +49,7 @@ export function ReservasFilters({
                             placeholder="Buscar por título ou descrição..."
                             className="w-full pl-8"
                             value={searchTerm}
-                            onChange={(e) => onSearchTermChange(e.target.value)}
+                            onChange={(e) => { onSearchTermChange(e.target.value); }}
                         />
                     </div>
                 </div>
@@ -70,7 +70,7 @@ export function ReservasFilters({
                             // texto normal no mesmo tipo de estado padrão. Mesmo padrão
                             // aqui: valor padrão mapeado para um item real.
                             value={selectedSituacao || 'todas'}
-                            onValueChange={(value) => onSituacaoChange(value === 'todas' ? '' : value)} // 6. A mudança notifica o pai
+                            onValueChange={(value) => { onSituacaoChange(value === 'todas' ? '' : value); }} // 6. A mudança notifica o pai
                         >
                             <SelectTrigger id="reservas-situacao" className="w-full sm:w-[180px]" aria-label="Situação">
                                 <SelectValue placeholder="Situação" />

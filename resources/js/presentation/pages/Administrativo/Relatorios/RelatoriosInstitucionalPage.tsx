@@ -73,7 +73,7 @@ export default function RelatoriosInstitucionalPage({
 
                     <Tabs
                         value={tipoSelecionado}
-                        onValueChange={(value) => setTipoSelecionado(value as TipoRelatorio)}
+                        onValueChange={(value) => { setTipoSelecionado(value as TipoRelatorio); }}
                     >
                         <TabsList className="flex h-auto flex-wrap justify-start gap-1">
                             {tipos_disponiveis.map((tipo) => (

@@ -90,7 +90,7 @@ export default function AvaliarReserva({
 
     useEffect(() => {
         const horariosParaEnviar = slotsSelecao
-            .filter((slot) => slot.dadosReserva?.horarioDB?.id)
+            .filter((slot) => slot.dadosReserva?.horarioDB.id)
             .map((slot) => ({
                 id: slot.dadosReserva!.horarioDB.id,
                 status: slot.status,

@@ -28,7 +28,7 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
                     <div className="border-border flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center">
                         <h2 className="text-xl font-semibold">Nenhum espaço encontrado</h2>
                         <p className="text-muted-foreground mt-2">Tente ajustar os filtros ou cadastre um novo espaço para que ele apareça aqui.</p>
-                        <Button onClick={() => router.get(route('institucional.espacos.create'))} className="mt-4">
+                        <Button onClick={() => { router.get(route('institucional.espacos.create')); }} className="mt-4">
                             Cadastrar Primeiro Espaço
                         </Button>
                     </div>
@@ -97,12 +97,12 @@ export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: T
                                                         <Edit className="mr-2 h-4 w-4" />
                                                         Editar
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => onGerenciarGestores(espaco)}>
+                                                    <DropdownMenuItem onClick={() => { onGerenciarGestores(espaco); }}>
                                                         <Users className="mr-2 h-4 w-4" />
                                                         Gerenciar Gestores
                                                     </DropdownMenuItem>
                                                     <Separator />
-                                                    <DropdownMenuItem onClick={() => setRemoverEspaco(espaco)} className="text-destructive">
+                                                    <DropdownMenuItem onClick={() => { setRemoverEspaco(espaco); }} className="text-destructive">
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         Excluir
                                                     </DropdownMenuItem>

@@ -142,7 +142,7 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                         {slugSuggestion && !errors.name?.message?.includes('obrigatório') && (
                             <button
                                 type="button"
-                                onClick={() => setValue('name', slugSuggestion, { shouldValidate: true })}
+                                onClick={() => { setValue('name', slugSuggestion, { shouldValidate: true }); }}
                                 className="text-info-accent mt-1 text-sm hover:underline"
                             >
                                 Usar sugestão: <strong>{slugSuggestion}</strong>
@@ -176,15 +176,15 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                 <Collapsible
                                     key={group}
                                     open={isOpen}
-                                    onOpenChange={(o) => setOpenGroups((prev) => ({ ...prev, [group]: o }))}
+                                    onOpenChange={(o) => { setOpenGroups((prev) => ({ ...prev, [group]: o })); }}
                                     className="rounded-md border"
                                 >
                                     <div className="hover:bg-muted/50 flex items-center justify-between p-3">
                                         <div className="flex flex-1 items-center gap-3">
                                             <Checkbox
                                                 checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                                                onCheckedChange={() => handleToggleGroup(group, perms)}
-                                                onClick={(e) => e.stopPropagation()}
+                                                onCheckedChange={() => { handleToggleGroup(group, perms); }}
+                                                onClick={(e) => { e.stopPropagation(); }}
                                             />
                                             <CollapsibleTrigger className="flex flex-1 items-center gap-2 text-left">
                                                 <span className="font-medium">{getGroupLabel(group)}</span>
@@ -205,7 +205,7 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                                                 >
                                                     <Checkbox
                                                         checked={selectedPermissions.includes(perm.name)}
-                                                        onCheckedChange={() => handleTogglePermission(perm.name)}
+                                                        onCheckedChange={() => { handleTogglePermission(perm.name); }}
                                                         className="mt-0.5"
                                                     />
                                                     <div className="min-w-0 flex-1">

@@ -89,7 +89,7 @@ export default function ModulosPage() {
                                         <Input
                                             placeholder="Filtrar por nome do módulo..."
                                             value={filtroNome}
-                                            onChange={(e) => setFiltroNome(e.target.value)}
+                                            onChange={(e) => { setFiltroNome(e.target.value); }}
                                             className="w-full max-w-sm"
                                         />
                                     </div>
@@ -127,7 +127,7 @@ export default function ModulosPage() {
                                 modulosFiltrados.map((modulo) => (
                                     <>
                                         <Card key={modulo.id} className="overflow-hidden">
-                                            <Collapsible open={expandedModulos.has(modulo.id)} onOpenChange={() => toggleModulo(modulo.id)}>
+                                            <Collapsible open={expandedModulos.has(modulo.id)} onOpenChange={() => { toggleModulo(modulo.id); }}>
                                                 <CollapsibleTrigger asChild>
                                                     <CardHeader className="hover:bg-muted/50 cursor-pointer transition-colors">
                                                         <div className="flex items-center justify-between">

@@ -7,7 +7,7 @@ import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { CadastrarUnidadeForm } from '@/presentation/pages/Administrativo/Unidades/CadastrarUnidade';
 
-type UnidadeFormProps = {
+interface UnidadeFormProps {
     data: CadastrarUnidadeForm;
     setData: ReturnType<typeof useForm<CadastrarUnidadeForm>>['setData'];
     submit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -16,7 +16,7 @@ type UnidadeFormProps = {
     title: string;
     description: string;
     instituicao: Instituicao;
-};
+}
 export default function UnidadeForm({ data, setData, submit, errors, processing, title, description, instituicao }: UnidadeFormProps) {
     useEffect(() => {
         setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, instituicao_id: instituicao.id.toString() }));
@@ -38,7 +38,7 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                         <Input
                             id="nome"
                             value={data.nome}
-                            onChange={(e) => setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value }))}
+                            onChange={(e) => { setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value })); }}
                             placeholder="Ex: Jequié ou Vitória da Conquista ..."
                         />
                         {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
@@ -48,7 +48,7 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                         <Input
                             id="sigla"
                             value={data.sigla}
-                            onChange={(e) => setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value }))}
+                            onChange={(e) => { setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value })); }}
                             placeholder="Ex: JQ ou VCA ..."
                         />
                         {errors.sigla && <p className="mt-1 text-sm text-destructive">{errors.sigla}</p>}

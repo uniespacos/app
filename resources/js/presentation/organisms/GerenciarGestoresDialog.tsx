@@ -62,7 +62,7 @@ export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: G
     // Verificar se houve mudanças para habilitar/desabilitar o botão salvar
     const hasChanges = useMemo(() => {
         return Object.keys(gestores).some(
-            (turno) => gestores[turno as keyof typeof gestores] !== gestoresIniciais[turno as keyof typeof gestoresIniciais],
+            (turno) => gestores[turno] !== gestoresIniciais[turno as keyof typeof gestoresIniciais],
         );
     }, [gestores, gestoresIniciais]);
 
@@ -85,7 +85,7 @@ export function GerenciarGestoresDialog({ espaco, usuarios, onClose, onSave }: G
                             <UserSearchCombobox
                                 usuarios={usuarios}
                                 value={gestores[turno]}
-                                onValueChange={(value) => handleGestorChange(turno, value)}
+                                onValueChange={(value) => { handleGestorChange(turno, value); }}
                                 placeholder={`Buscar gestor para o turno da ${TURNO_LABEL[turno].toLowerCase()}...`}
                             />
                         </div>

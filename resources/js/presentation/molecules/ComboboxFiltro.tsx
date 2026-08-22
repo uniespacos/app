@@ -96,7 +96,7 @@ export function ComboboxFiltro({
                                 <CommandItem
                                     key={opcao.id}
                                     value={opcao.nome}
-                                    onSelect={() => handleSelect(opcao.id)}
+                                    onSelect={() => { handleSelect(opcao.id); }}
                                 >
                                     <Check
                                         className={cn(

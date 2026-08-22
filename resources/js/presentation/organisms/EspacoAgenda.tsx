@@ -12,12 +12,12 @@ import { useAgendaSelectionUseCase } from '@/application/espacos/use-cases/use-a
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { parseISO } from 'date-fns';
 
-type AgendaEspacoProps = {
+interface AgendaEspacoProps {
     isEditMode?: boolean;
     espaco: Espaco;
     reserva?: Reserva;
     semana: { referencia: string };
-};
+}
 
 export default function AgendaEspaço({ isEditMode = false, espaco, reserva, semana }: AgendaEspacoProps) {
     const { agendas } = espaco;

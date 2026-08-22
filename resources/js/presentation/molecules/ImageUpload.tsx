@@ -112,7 +112,7 @@ export function ImageUpload({
                                         variant="outline"
                                         size="icon"
                                         className="h-6 w-6 rounded-full bg-background shadow-md"
-                                        onClick={() => setMainImageIndex(index)}
+                                        onClick={() => { setMainImageIndex(index); }}
                                         disabled={processing || mainImageIndex === index}
                                         title="Definir como imagem principal"
                                     >
@@ -136,7 +136,7 @@ export function ImageUpload({
                                         variant="destructive"
                                         size="icon"
                                         className="h-6 w-6 rounded-full opacity-90 shadow-md"
-                                        onClick={() => handleRemoveImage(index)}
+                                        onClick={() => { handleRemoveImage(index); }}
                                         disabled={processing}
                                     >
                                         <X className="h-3 w-3" />

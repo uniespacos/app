@@ -152,10 +152,10 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                     </CardHeader>
                     <CardContent>
                         {(() => {
-                            const chartConfig = topEspacos.reduce((acc, e, i) => {
+                            const chartConfig = topEspacos.reduce<ChartConfig>((acc, e, i) => {
                                 acc[e.nome] = { label: e.nome, color: CORES[i % CORES.length] };
                                 return acc;
-                            }, {} as ChartConfig);
+                            }, {});
                             return (
                                 <ChartContainer
                                     config={chartConfig}

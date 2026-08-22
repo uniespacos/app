@@ -70,10 +70,10 @@ export const formatDateTime = (dateString: string | Date) => {
 export const diasSemanaParser = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
 /** Tom sólido da situação. A definição vive em ESTILO_SITUACAO. */
-export const getStatusReservaColor = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao]?.solido ?? 'bg-muted-foreground';
+export const getStatusReservaColor = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao].solido ?? 'bg-muted-foreground';
 
 /** Rótulo da situação. Idem — inclusive os acentos, que aqui faltavam. */
-export const getStatusReservaText = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao]?.label ?? 'Desconhecido';
+export const getStatusReservaText = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao].label ?? 'Desconhecido';
 
 export const getTurnoText = (turno: 'manha' | 'tarde' | 'noite' | undefined) => {
     switch (turno) {

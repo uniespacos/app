@@ -2,12 +2,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-type SearchFilterProps = {
+interface SearchFilterProps {
     searchTerm: string;
     onSearchTermChange: (value: string) => void;
     placeholder: string;
     variant?: 'card' | 'plain';
-};
+}
 
 export function SearchFilter({ searchTerm, onSearchTermChange, placeholder, variant = 'plain' }: SearchFilterProps) {
     const field = (
@@ -18,7 +18,7 @@ export function SearchFilter({ searchTerm, onSearchTermChange, placeholder, vari
                 placeholder={placeholder}
                 className="w-full pl-8"
                 value={searchTerm}
-                onChange={(e) => onSearchTermChange(e.target.value)}
+                onChange={(e) => { onSearchTermChange(e.target.value); }}
             />
         </div>
     );

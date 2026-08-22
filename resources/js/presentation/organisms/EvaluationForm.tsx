@@ -10,15 +10,15 @@ import { router } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 // Define o tipo para o objeto 'data' que vem do useForm
-type FormData = {
+interface FormData {
     situacao: SituacaoReserva;
     motivo: string;
     observacao: string;
     evaluation_scope: 'single' | 'recurring';
-};
+}
 
 // Define as props que o componente espera receber
-type EvaluationFormProps = {
+interface EvaluationFormProps {
     data: FormData;
     setData: (field: keyof FormData, value: any) => void; // Função para alterar os dados do formulário
 
@@ -29,7 +29,7 @@ type EvaluationFormProps = {
     isReavaliacao: boolean; // <-- RECEBA A NOVA PROP
     onDecisaoChange: (value: SituacaoReserva) => void;
     onSubmit: (e: React.FormEvent) => void;
-};
+}
 
 export default function EvaluationForm({
     data,
@@ -66,7 +66,7 @@ export default function EvaluationForm({
                         <Label className="font-medium">Aplicar esta avaliação para:</Label>
                         <RadioGroup
                             value={data.evaluation_scope}
-                            onValueChange={(value: 'single' | 'recurring') => setData('evaluation_scope', value)}
+                            onValueChange={(value: 'single' | 'recurring') => { setData('evaluation_scope', value); }}
                             className="space-y-2"
                         >
                             <div className="flex items-center space-x-2">
@@ -116,7 +116,7 @@ export default function EvaluationForm({
                                 id="motivo"
                                 placeholder="Descreva o motivo pelo qual um ou mais horários estão sendo indeferidos..."
                                 value={data.motivo}
-                                onChange={(e) => setData('motivo', e.target.value)}
+                                onChange={(e) => { setData('motivo', e.target.value); }}
                                 className="min-h-[100px] border-destructive/25 focus:border-destructive"
                             />
                             <p className="text-sm text-destructive">Este campo é obrigatório se algum horário for indeferido.</p>
@@ -131,7 +131,7 @@ export default function EvaluationForm({
                             id="observacao"
                             placeholder="Caso haja uma observação adicional para o solicitante, descreva aqui..."
                             value={data.observacao}
-                            onChange={(e) => setData('observacao', e.target.value)}
+                            onChange={(e) => { setData('observacao', e.target.value); }}
                             className="min-h-[100px] border-info/25 focus:border-info/25"
                         />
                     </div>
@@ -140,7 +140,7 @@ export default function EvaluationForm({
                         <Button type="submit" disabled={isSubmitting} className="flex-1">
                             {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
                         </Button>
-                        <Button type="button" variant="outline" className="px-8" onClick={() => router.get(route('gestor.reservas.index'))}>
+                        <Button type="button" variant="outline" className="px-8" onClick={() => { router.get(route('gestor.reservas.index')); }}>
                             Cancelar
                         </Button>
                     </div>

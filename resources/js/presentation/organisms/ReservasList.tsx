@@ -101,7 +101,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                             isGestor={isGestor}
                             onDetalhes={handleAbrirDetalhes}
                             onAvaliar={handleAvaliarButton}
-                            onEditar={(id) => router.get(`reservas/${id}/edit`)}
+                            onEditar={(id) => { router.get(`reservas/${id}/edit`); }}
                             onCancelar={setRemoverReserva}
                         />
                     ))}
@@ -177,14 +177,14 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex flex-wrap justify-end gap-2">
-                                        <Button variant="outline" size="sm" onClick={() => handleAbrirDetalhes(reserva)}>
+                                        <Button variant="outline" size="sm" onClick={() => { handleAbrirDetalhes(reserva); }}>
                                             <FileText className="mr-1.5 h-4 w-4" />
                                             Detalhes
                                         </Button>
 
                                         {reserva.situacao !== 'inativa' ? (
                                             isGestor ? (
-                                                <Button variant="outline" size="sm" onClick={() => handleAvaliarButton(reserva.id)}>
+                                                <Button variant="outline" size="sm" onClick={() => { handleAvaliarButton(reserva.id); }}>
                                                     <Edit className="mr-1.5 h-4 w-4" />
                                                     {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                                                 </Button>
@@ -202,7 +202,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                                             Editar
                                                         </Button>
                                                     )}
-                                                    <Button variant="destructive" size="sm" onClick={() => setRemoverReserva(reserva)}>
+                                                    <Button variant="destructive" size="sm" onClick={() => { setRemoverReserva(reserva); }}>
                                                         <XCircle className="mr-1.5 h-4 w-4" />
                                                         Cancelar
                                                     </Button>

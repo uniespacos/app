@@ -2,7 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Reserva } from '@/types';
 import { Pencil } from 'lucide-react';
 
-type AgendaEditModeAlertProps = { reserva: Reserva };
+interface AgendaEditModeAlertProps { reserva: Reserva }
 
 export default function AgendaEditModeAlert({ reserva }: AgendaEditModeAlertProps) {
     return (

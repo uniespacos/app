@@ -21,9 +21,9 @@ export default function DeleteUser() {
 
         destroy(route('settings.profile.destroy'), {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => { closeModal(); },
             onError: () => passwordInput.current?.focus(),
-            onFinish: () => reset(),
+            onFinish: () => { reset(); },
         });
     };
 
@@ -43,7 +43,7 @@ export default function DeleteUser() {
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Button variant="destructive" onClick={() => setOpen(true)}>
+                <Button variant="destructive" onClick={() => { setOpen(true); }}>
                     Excluir conta
                 </Button>
 
@@ -65,7 +65,7 @@ export default function DeleteUser() {
                                 name="password"
                                 ref={passwordInput}
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) => { setData('password', e.target.value); }}
                                 placeholder="Senha"
                                 autoComplete="current-password"
                             />

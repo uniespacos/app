@@ -47,7 +47,7 @@ export function LocationSelector({
                     </Label>
                     <SelectUI
                         value={unidadeSelecionada?.toString()}
-                        onValueChange={(value) => setUnidadeSelecionada(parseInt(value))}
+                        onValueChange={(value) => { setUnidadeSelecionada(parseInt(value)); }}
                         disabled={processing}
                     >
                         <SelectTrigger>
@@ -71,7 +71,7 @@ export function LocationSelector({
                     </Label>
                     <SelectUI
                         value={moduloSelecionado?.toString()}
-                        onValueChange={(value) => handleModuloChange(parseInt(value))}
+                        onValueChange={(value) => { handleModuloChange(parseInt(value)); }}
                         disabled={!unidadeSelecionada || processing}
                     >
                         <SelectTrigger>

@@ -71,7 +71,7 @@ export function useGerarRelatorio(endpoint: string) {
 
             if (contentDisposition) {
                 // Aceita filename com ou sem aspas (o backend envia sem aspas).
-                const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+                const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(contentDisposition);
                 if (match && match[1]) {
                     filename = decodeURIComponent(match[1].trim());
                 }

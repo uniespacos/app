@@ -7,7 +7,7 @@ import AgendaLegenda from '@/presentation/molecules/AgendaLegenda';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
-type AgendaCalendarioProps = {
+interface AgendaCalendarioProps {
     semanaInicio: Date;
     diasSemana: AgendaDiasSemanaType[];
     agendas: Agenda[];
@@ -16,7 +16,7 @@ type AgendaCalendarioProps = {
     // Adiciona a prop para passar os slots da reserva atual
     slotsDaReserva?: SlotCalendario[];
     isEditMode?: boolean;
-};
+}
 
 export default function AgendaCalendario({
     diasSemana,

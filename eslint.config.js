@@ -5,10 +5,19 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import typescript from 'typescript-eslint';
 
-/** @type {import('eslint').Linter.Config[]} */
-export default [
+export default typescript.config(
     js.configs.recommended,
     ...typescript.configs.recommended,
+    {
+        files: ['resources/js/**/*.ts', 'resources/js/**/*.tsx'],
+        extends: [...typescript.configs.strictTypeChecked, ...typescript.configs.stylisticTypeChecked],
+        languageOptions: {
+            parserOptions: {
+                project: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+    },
     {
         ...react.configs.flat.recommended,
         ...react.configs.flat['jsx-runtime'], // Required for React 17+
@@ -53,4 +62,4 @@ export default [
             '@typescript-eslint/no-require-imports': 'off',
         },
     },
-];
+);

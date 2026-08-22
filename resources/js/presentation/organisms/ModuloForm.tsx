@@ -14,7 +14,7 @@ import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import AndaresManager from '@/presentation/organisms/AndarManager';
 import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
 
-export type ModuloFormProps = {
+export interface ModuloFormProps {
     data: CadastrarModuloForm;
     setData: ReturnType<typeof useForm<CadastrarModuloForm>>['setData'];
     submit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -25,7 +25,7 @@ export type ModuloFormProps = {
     instituicao: Instituicao;
     unidades: Unidade[];
     modulo?: Modulo;
-};
+}
 export default function ModuloForm({
     data,
     setData,
@@ -140,7 +140,7 @@ export default function ModuloForm({
                             <Label htmlFor="unidade_id">Unidade</Label>
                             <SelectUI
                                 value={data.unidade_id}
-                                onValueChange={(value) => setData((prev: CadastrarModuloForm) => ({ ...prev, unidade_id: value }))}
+                                onValueChange={(value) => { setData((prev: CadastrarModuloForm) => ({ ...prev, unidade_id: value })); }}
                                 disabled={processing}
                             >
                                 <SelectTrigger>
@@ -163,7 +163,7 @@ export default function ModuloForm({
                             <Input
                                 id="nome"
                                 value={data.nome}
-                                onChange={(e) => setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value }))}
+                                onChange={(e) => { setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value })); }}
                                 placeholder="Ex: Bloco Administrativo"
                             />
                             {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}

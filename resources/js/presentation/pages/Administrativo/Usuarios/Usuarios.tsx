@@ -21,10 +21,10 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Edit, Settings, Shield, Trash } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-type PaginatedUsers = {
+interface PaginatedUsers {
     data: User[];
     links: { url: string | null; label: string; active: boolean }[];
-};
+}
 
 const breadcrumbs = [
     {
@@ -64,7 +64,7 @@ export default function UsuariosPage() {
             );
         }, 400);
 
-        return () => clearTimeout(timeout);
+        return () => { clearTimeout(timeout); };
     }, [searchTerm, selectedSetorId]);
 
     const handleUserClick = (user: User) => {
@@ -113,7 +113,7 @@ export default function UsuariosPage() {
                                     <Input
                                         placeholder="Buscar por nome ou email..."
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e) => { setSearchTerm(e.target.value); }}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -158,8 +158,8 @@ export default function UsuariosPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-3">
-                                                    <Badge className={getRoleBadgeClass(user.roles?.[0] ?? ROLE_COMUM)}>
-                                                        {getRoleLabel(user.roles?.[0] ?? ROLE_COMUM)}
+                                                    <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>
+                                                        {getRoleLabel(user.roles[0] ?? ROLE_COMUM)}
                                                     </Badge>
                                                     <div className="flex items-center space-x-2">
                                                         <div
@@ -177,15 +177,15 @@ export default function UsuariosPage() {
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                                                            <DropdownMenuItem onClick={() => { handleEditUser(user); }}>
                                                                 <Edit className="mr-2 h-4 w-4" />
                                                                 Editar
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleUserClick(user)}>
+                                                            <DropdownMenuItem onClick={() => { handleUserClick(user); }}>
                                                                 <Shield className="mr-2 h-4 w-4" />
                                                                 Permissões
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => setRemoverUsuario(user)} className="text-destructive">
+                                                            <DropdownMenuItem onClick={() => { setRemoverUsuario(user); }} className="text-destructive">
                                                                 <Trash className="mr-2 h-4 w-4" />
                                                                 Excluir
                                                             </DropdownMenuItem>
@@ -215,7 +215,7 @@ export default function UsuariosPage() {
 
                         <PaginacaoListas links={users.links} />
 
-                        <EditUserModal user={editingUser} isOpen={!!editingUser} onClose={() => setEditingUser(undefined)} />
+                        <EditUserModal user={editingUser} isOpen={!!editingUser} onClose={() => { setEditingUser(undefined); }} />
 
                         {isModalOpen && selectedUser && (
                             <PermissionModal

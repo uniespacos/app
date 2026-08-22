@@ -33,11 +33,11 @@ interface PermissionModalProps {
 }
 
 /** Payload de institucional.usuarios.permission-context. */
-type PermissionContext = {
+interface PermissionContext {
     user: User;
     instituicoes: Instituicao[];
     permissionCatalog: Record<string, Permission[]>;
-};
+}
 
 export function PermissionModal({ user, isOpen, onClose, onUpdate, processing = false }: PermissionModalProps) {
     const { props } = usePage<{ auth: { user: User } }>();
@@ -75,7 +75,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, processing = 
             .then((data) => {
                 if (cancelled) return;
                 setContext(data);
-                setSelectedRole(data.user.roles?.[0] ?? ROLE_COMUM);
+                setSelectedRole(data.user.roles[0] ?? ROLE_COMUM);
                 setDirectPermissions(data.user.direct_permissions ?? []);
                 setSelectedAgendas(
                     (data.user.agendas ?? []).map(
@@ -198,7 +198,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, processing = 
                                         <Collapsible
                                             key={group}
                                             open={isOpen}
-                                            onOpenChange={(o) => setOpenGroups((prev) => ({ ...prev, [group]: o }))}
+                                            onOpenChange={(o) => { setOpenGroups((prev) => ({ ...prev, [group]: o })); }}
                                             className="rounded-md border"
                                         >
                                             <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center gap-2 p-3 text-left">

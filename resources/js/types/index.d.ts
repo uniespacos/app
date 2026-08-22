@@ -272,12 +272,12 @@ export interface ReservaFormData {
 /**
  * Tipo para o painel de controle que mostra o resumo dos status.
  */
-export type DashboardStatusReservasType = {
+export interface DashboardStatusReservasType {
     em_analise: number;
     parcialmente_deferida: number; // Novo status adicionado
     deferida: number;
     indeferida: number;
-};
+}
 
 // =============================================================================
 // 5. Tipoas para "View Model"
@@ -345,21 +345,21 @@ export interface ImageWithPreview {
     path?: string; // Path relativo para imagens existentes
 }
 
-export type AgendaGestoresPorTurnoType = {
+export interface AgendaGestoresPorTurnoType {
     nome: string;
     email: string;
     departamento: string;
     agenda_id: number;
-};
+}
 
-export type AgendaDiasSemanaType = {
+export interface AgendaDiasSemanaType {
     data: Date;
     nome: string;
     abreviado: string;
     diaMes: string;
     valor: string;
     ehHoje: boolean;
-};
+}
 
 export type AgendaSlotsDoTurnoType = Record<string, SlotCalendario[]>;
 export interface SelectedAgenda {
@@ -391,7 +391,7 @@ export interface FiltrosRelatorio {
     data_inicio?: string;
     data_fim?: string;
     situacoes?: SituacaoReserva[];
-    turnos?: Array<'manha' | 'tarde' | 'noite'>;
+    turnos?: ('manha' | 'tarde' | 'noite')[];
     unidade_id?: number;
     modulo_id?: number;
     andar_id?: number;
@@ -405,10 +405,10 @@ export interface TipoRelatorioOption {
 }
 
 export interface OpcoesInventario {
-    unidades: Array<{ id: number; nome: string }>;
-    modulos: Array<{ id: number; nome: string; unidade_id: number }>;
-    andares: Array<{ id: number; nome: string; modulo_id: number }>;
-    espacos: Array<{ id: number; nome: string; andar_id: number }>;
+    unidades: { id: number; nome: string }[];
+    modulos: { id: number; nome: string; unidade_id: number }[];
+    andares: { id: number; nome: string; modulo_id: number }[];
+    espacos: { id: number; nome: string; andar_id: number }[];
 }
 
 export interface ColunaRelatorio {

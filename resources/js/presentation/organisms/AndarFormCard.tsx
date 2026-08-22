@@ -146,7 +146,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                     <Checkbox
                                         id={`${andar.id}-${tipo.id}`}
                                         checked={andar.tipo_acesso.includes(tipo.id)}
-                                        onCheckedChange={(checked) => handleTipoAcessoChange(tipo.id, checked as boolean)}
+                                        onCheckedChange={(checked) => { handleTipoAcessoChange(tipo.id, checked as boolean); }}
                                     />
                                     <Label htmlFor={`${andar.id}-${tipo.id}`} className="flex-1 cursor-pointer text-sm font-normal">
                                         {tipo.label}

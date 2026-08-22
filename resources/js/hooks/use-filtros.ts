@@ -9,12 +9,12 @@ export function useFiltros(instituicao: Instituicao, unidades: Unidade[], setore
 
     // Filtrar unidades baseado na instituição selecionada
     useEffect(() => {
-        const newFilteredUnidades = instituicao?.unidades || [];
+        const newFilteredUnidades = instituicao.unidades || [];
         setFilteredUnidades(newFilteredUnidades);
         if (selectedUnidade !== 'all' && !newFilteredUnidades.find((u) => u.id.toString() === selectedUnidade)) {
             setSelectedUnidade('all');
         }
-    }, [selectedInstituicao, unidades, selectedUnidade, instituicao?.unidades]);
+    }, [selectedInstituicao, unidades, selectedUnidade, instituicao.unidades]);
 
     // Filtrar setores baseado nos filtros aplicados
     const filteredSetores = useMemo(() => {

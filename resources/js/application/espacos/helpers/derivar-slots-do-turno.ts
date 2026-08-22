@@ -16,17 +16,17 @@ import { format } from 'date-fns';
  *
  * `agora` é injetável para que `isPast` seja testável sem mockar o relógio.
  */
-export type SlotDerivado = {
+export interface SlotDerivado {
     dia: AgendaDiasSemanaType;
     horaLabel: string;
     slot: SlotCalendario;
-};
+}
 
-type HorarioReservado = {
+interface HorarioReservado {
     horario: Horario;
     autor: string;
     reserva_titulo: string;
-};
+}
 
 /**
  * Horários já deferidos que pertencem a OUTRAS reservas.
@@ -63,7 +63,7 @@ export function derivarSlotsDoTurno(
     const slotsSolicitadosMap = new Map<string, SlotCalendario>();
     slotsSolicitados?.forEach((slot) => slotsSolicitadosMap.set(slot.id, slot));
 
-    const horariosDoTurno = HORARIOS_PADRAO[agenda.turno as keyof typeof HORARIOS_PADRAO] ?? [];
+    const horariosDoTurno = HORARIOS_PADRAO[agenda.turno] ?? [];
 
     const derivados: SlotDerivado[] = [];
 

@@ -14,14 +14,14 @@ import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, s
 import { CalendarDays, Clock, Edit, ExternalLink, FileText, Home, Loader2, User, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-type ReservaDetalhesProps = {
+interface ReservaDetalhesProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
     selectedReserva: Reserva;
     isGestor?: boolean;
     setRemoverReserva: (selectedReserva: Reserva) => void;
     routeName: string;
-};
+}
 
 export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, routeName }: ReservaDetalhesProps) {
     const { semana } = usePage().props as any;
@@ -65,13 +65,13 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             preserveState: true,
             preserveScroll: true,
             replace: true,
-            onStart: () => setIsLoading(true),
-            onFinish: () => setIsLoading(false),
+            onStart: () => { setIsLoading(true); },
+            onFinish: () => { setIsLoading(false); },
         });
     };
 
-    const handleSemanaAnterior = () => navegarParaSemana(subDays(semanaVisivel, 7));
-    const handleProximaSemana = () => navegarParaSemana(addDays(semanaVisivel, 7));
+    const handleSemanaAnterior = () => { navegarParaSemana(subDays(semanaVisivel, 7)); };
+    const handleProximaSemana = () => { navegarParaSemana(addDays(semanaVisivel, 7)); };
 
     const dataInicialReserva = useMemo(() => new Date(selectedReserva.data_inicial), [selectedReserva.data_inicial]);
     const dataFinalReserva = useMemo(() => new Date(selectedReserva.data_final), [selectedReserva.data_final]);
@@ -107,7 +107,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                                 variant="link"
                                 size="sm"
                                 className="h-auto p-0 text-xs"
-                                onClick={() => router.get(route('espacos.show', espaco.id))}
+                                onClick={() => { router.get(route('espacos.show', espaco.id)); }}
                             >
                                 Ver agenda do espaço <ExternalLink className="ml-1 h-3 w-3" />
                             </Button>
@@ -120,17 +120,17 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             }
             footer={
                 isGestor ? (
-                    <Button variant="outline" onClick={() => router.get(`/gestor/reservas/${selectedReserva.id}`)}>
+                    <Button variant="outline" onClick={() => { router.get(`/gestor/reservas/${selectedReserva.id}`); }}>
                         <Edit className="mr-1 h-4 w-4" /> Avaliar
                     </Button>
                 ) : (
                     <div className="flex gap-2">
                         {selectedReserva.can_update && (
-                            <Button variant="outline" onClick={() => router.get(route('reservas.edit', selectedReserva.id))}>
+                            <Button variant="outline" onClick={() => { router.get(route('reservas.edit', selectedReserva.id)); }}>
                                 <Edit className="mr-1 h-4 w-4" /> Editar
                             </Button>
                         )}
-                        <Button variant="destructive" onClick={() => setRemoverReserva(selectedReserva)}>
+                        <Button variant="destructive" onClick={() => { setRemoverReserva(selectedReserva); }}>
                             <XCircle className="mr-1 h-4 w-4" /> Cancelar
                         </Button>
                     </div>

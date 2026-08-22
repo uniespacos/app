@@ -69,10 +69,10 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                    <Button variant="outline" onClick={() => window.history.back()}>
+                    <Button variant="outline" onClick={() => { window.history.back(); }}>
                         <ArrowLeft className="mr-1 h-4 w-4" /> Voltar
                     </Button>
-                    <Button onClick={() => router.get(route('dashboard'))}>Ir para o painel</Button>
+                    <Button onClick={() => { router.get(route('dashboard')); }}>Ir para o painel</Button>
                 </div>
             </div>
         </>

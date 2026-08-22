@@ -13,12 +13,12 @@ interface ResetPasswordProps {
     email: string;
 }
 
-type ResetPasswordForm = {
+interface ResetPasswordForm {
     token: string;
     email: string;
     password: string;
     password_confirmation: string;
-};
+}
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
@@ -31,7 +31,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('password.update'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+            onFinish: () => { reset('password', 'password_confirmation'); },
         });
     };
 
@@ -51,7 +51,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             value={data.email}
                             className="mt-1 block w-full"
                             readOnly
-                            onChange={(e) => setData('email', e.target.value)}
+                            onChange={(e) => { setData('email', e.target.value); }}
                         />
                         <InputError message={errors.email} className="mt-2" />
                     </div>
@@ -66,7 +66,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             value={data.password}
                             className="mt-1 block w-full"
                             autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) => { setData('password', e.target.value); }}
                             placeholder="Senha"
                         />
                         <InputError message={errors.password} />
@@ -81,7 +81,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             className="mt-1 block w-full"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            onChange={(e) => { setData('password_confirmation', e.target.value); }}
                             placeholder="Confirmar senha"
                         />
                         <InputError message={errors.password_confirmation} className="mt-2" />

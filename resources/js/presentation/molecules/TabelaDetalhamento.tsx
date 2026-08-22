@@ -137,7 +137,7 @@ export function TabelaDetalhamento({
                     </Label>
                     <Select
                         value={String(porPagina)}
-                        onValueChange={(valor) => setPorPagina(Number(valor))}
+                        onValueChange={(valor) => { setPorPagina(Number(valor)); }}
                     >
                         <SelectTrigger id="registros-por-pagina" className="h-8 w-[80px]">
                             <SelectValue />
@@ -169,7 +169,7 @@ export function TabelaDetalhamento({
                                         <TableHead key={coluna.chave} className="p-0">
                                             <button
                                                 type="button"
-                                                onClick={() => alternarOrdenacao(coluna.chave)}
+                                                onClick={() => { alternarOrdenacao(coluna.chave); }}
                                                 aria-label={`Ordenar por ${coluna.rotulo}`}
                                                 className="hover:text-foreground flex w-full items-center gap-1 px-4 py-3 text-left font-medium"
                                             >

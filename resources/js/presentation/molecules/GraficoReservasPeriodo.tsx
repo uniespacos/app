@@ -47,8 +47,8 @@ function GraficoReservasPeriodo({ dados }: Props) {
     }
 
     const distribuicao = [
-        { situacao: 'Deferidas', total: numero(dados.sumario['Deferidas']) },
-        { situacao: 'Indeferidas', total: numero(dados.sumario['Indeferidas']) },
+        { situacao: 'Deferidas', total: numero(dados.sumario.Deferidas) },
+        { situacao: 'Indeferidas', total: numero(dados.sumario.Indeferidas) },
         { situacao: 'Em Análise', total: numero(dados.sumario['Em Análise']) },
     ];
 
@@ -74,7 +74,7 @@ function GraficoReservasPeriodo({ dados }: Props) {
                         <CircleCheck className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Deferidas'])}</div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario.Deferidas)}</div>
                         <p className="text-muted-foreground text-xs">Aprovadas</p>
                     </CardContent>
                 </Card>
@@ -85,7 +85,7 @@ function GraficoReservasPeriodo({ dados }: Props) {
                         <CircleX className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Indeferidas'])}</div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario.Indeferidas)}</div>
                         <p className="text-muted-foreground text-xs">Recusadas</p>
                     </CardContent>
                 </Card>
@@ -109,10 +109,10 @@ function GraficoReservasPeriodo({ dados }: Props) {
                     </CardHeader>
                     <CardContent>
                         {(() => {
-                            const chartConfig = distribuicao.reduce((acc, d, i) => {
+                            const chartConfig = distribuicao.reduce<ChartConfig>((acc, d, i) => {
                                 acc[d.situacao] = { label: d.situacao, color: CORES[i % CORES.length] };
                                 return acc;
-                            }, {} as ChartConfig);
+                            }, {});
                             return (
                                 <ChartContainer
                                     config={chartConfig}
