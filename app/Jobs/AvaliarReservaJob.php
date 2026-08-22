@@ -46,6 +46,10 @@ class AvaliarReservaJob implements ShouldQueue
             'horarios_count' => count($this->validatedData['horarios_avaliados']),
         ]);
 
+        if ($this->reserva->situacao === SituacaoReservaEnum::INATIVA->value) {
+            throw new Exception('Cannot evaluate an archived reservation.');
+        }
+
         try {
             DB::transaction(function () use ($conflictService) {
                 $scope = $this->validatedData['evaluation_scope'];
