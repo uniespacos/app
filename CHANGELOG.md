@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.23](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.22...v1.3.0-rc.23) (2026-08-22)
+
+
+### Bug Fixes
+
+* tratar sessão expirada em visita Inertia com reload completo ([#282](https://github.com/uniespacos/uniespacos/issues/282)) ([1af1aac](https://github.com/uniespacos/uniespacos/commit/1af1aacf0d98ed54d5f0007816c5a3de5d5cb7f9))
+
 ## [1.3.0-rc.22](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.21...v1.3.0-rc.22) (2026-08-22)
 
 
