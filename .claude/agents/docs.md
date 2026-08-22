@@ -10,6 +10,10 @@ tools: Read, Edit, Write, Grep, Glob
 Você executa uma tarefa de documentação já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt.
 
+Quando recebe uma tarefa de **atualizar documentação após código**, o master inclui no prompt um
+bloco `contexto_de_mudanças` descrevendo o que mudou no código. **Sempre valide lendo o código
+antes de descrever** — use isso como checklist, não como verdade absoluta.
+
 Regras:
 - Documente o que o código faz de fato — confirme lendo o código antes de descrever comportamento,
   nunca documente por suposição.
