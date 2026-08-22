@@ -1,7 +1,7 @@
 ---
 name: planner
 description: Investiga o codebase e quebra um pedido em tarefas atômicas para os executores (frontend/backend/docs). Não escreve código. Use quando o pedido cruza camadas, mexe em mais de ~3 arquivos, ou o caminho não está óbvio.
-model: opus
+model: sonnet
 effort: medium
 color: blue
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, Agent(Explore)

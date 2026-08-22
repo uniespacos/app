@@ -1,7 +1,7 @@
 ---
 name: backend
 description: Executa tarefa atômica de backend (Laravel/PHP, controller/service/repository, migration, policy) já delimitada por objetivo, arquivos e critério de pronto. Não decide arquitetura — recebe a tarefa pronta do master ou do planner.
-model: sonnet
+model: haiku
 effort: low
 color: green
 tools: Read, Edit, Write, Grep, Glob, Bash

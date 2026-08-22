@@ -1,7 +1,7 @@
 ---
 name: frontend
 description: Executa tarefa atômica de frontend (React/Inertia/TypeScript/Tailwind) já delimitada por objetivo, arquivos e critério de pronto. Não decide arquitetura — recebe a tarefa pronta do master ou do planner.
-model: sonnet
+model: haiku
 effort: low
 color: cyan
 tools: Read, Edit, Write, Grep, Glob, Bash
