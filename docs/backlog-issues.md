@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `ee79eb4` (release rc.22) · #108 mergeada (PR #266) · #119/#222/#101/#105/#111 fechadas no GitHub · **#108 ainda OPEN no GitHub — falta fechar na mão**
+**Última atualização:** 2026-08-22 · develop em `6803c20` (release rc.29) · #301 mergeada · #265 concluída (PR #299)
 
 ---
 
@@ -45,12 +45,17 @@ Atualizado a cada entrega.
   Solução: separar os eixos. `situacao` fica só com resultado de avaliação; novo `arquivo` (`ativas`/`arquivadas`/`todas`) via `scopeArquivo` no model, usado pelos dois repositórios. URL legada `?situacao=inativa` é traduzida para não passar a devolver vazio. Entrou também uma guarda de idempotência no cancelamento (recancelar reserva arquivada não dispara mais notificação repetida).
   *12 testes de feature + 6 de componente · baseline 8 falhas → 12 passando · 115 → 127 testes PHP*
 
+- [x] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small`
+  Branch `fix/265-archived-resurrection` → PR #299 → merged `5161d2b`
+  `AvaliarReservaJob::updateReservaOverallStatus` recalculava `situacao` a partir da contagem de horários sem tratar `inativa` — toda avaliação em uma reserva arquivada a ressuscitava. Match adicionado para validar que reserva é ativa antes de reatribuir status.
+  *17 testes · 17 passando*
+
 ---
 
 ## 🔨 Em andamento
 
-- [ ] **#265 — Avaliar uma reserva arquivada a ressuscita** `P1` · `effort: small`
-  Isolada de propósito: `AvaliarReservaJob::updateReservaOverallStatus` (linha ~255) recalcula `situacao` a partir da contagem de horários e o `match` não trata `inativa` — toda avaliação em uma reserva arquivada a ressuscita para `em_analise`/`deferida`/etc. Branch a partir de `develop` (que já tem a #108).
+- [ ] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
+  Branch `fix/gap-03-recurring-scope-authorization`. No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Validar que cada `agenda_id` destino é gerenciado pelo gestor antes de propagar.
 
 ---
 
