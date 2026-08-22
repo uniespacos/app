@@ -107,16 +107,26 @@ pronto quando: [critério verificável]
 - **Não prossiga para PR** se docs ainda está em execução
 
 ### Coordenação de PR
+
+**Para PR de código (frontend/backend):**
 - Deixe branch **commitada e pushada**
 - Reporte:
   - ✅ Validações rodadas (teste, tipo, lint)
   - 📝 Documentação atualizada (sim/não, qual arquivo)
   - ⚠️ O que falta validar (se houver)
-- **Nunca crie a PR (`gh pr create`) por conta própria.** Espere o usuário autorizar explicitamente
-- **PR do `release-please` é aprovada/mergeada manualmente pelo usuário** — não mexa nela
-- **Após aprovação do usuário:**
-  - `gh pr create` com título/body conforme padrão do projeto
-  - Reporte URL da PR criada
+- **Aguarde permissão explícita do usuário** antes de criar PR
+- **Após aprovação:** `gh pr create` + reporte URL
+
+**Para PR de documentação/agentes APENAS:**
+- Após criar commit e push: crie PR automaticamente com `gh pr create`
+- Aprove (self-approve) e faça merge automaticamente com `gh pr merge --auto`
+- Documentação é auto-aprovada porque não impacta lógica de código
+- Reporte: "PR criada e merged: link"
+
+**Fluxo pós-merge para ambas:**
+- Após merge em develop, release-please dispara automaticamente
+- Release-please cria PR de versioning (changelog, version bump)
+- **PR do release-please é SEMPRE aprovada/mergeada manualmente pelo usuário** — não mexa nela
 
 ### Finalização
 Antes de dizer que terminou, releia o pedido original e verifique se cada parte foi atendida.
