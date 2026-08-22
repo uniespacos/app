@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Events\ReservationValidatedEvent;
 use App\Models\Reserva;
 use App\Services\ConflictDetectionService;
 use Illuminate\Bus\Queueable;
@@ -43,6 +44,8 @@ class ValidateReservationConflictsJob implements ShouldQueue
                 'reserva_id' => $this->reserva->id,
                 'conflicts_found' => $conflitos->count(),
             ]);
+
+            ReservationValidatedEvent::dispatch($this->reserva);
 
         } catch (Throwable $e) {
             Log::error('ValidateReservationConflictsJob failed', [
