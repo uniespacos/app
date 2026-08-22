@@ -1,4 +1,5 @@
 import { User } from '@/types';
+import type { NavEntry } from '@/config/nav-registry';
 
 /**
  * Verifies if a user has a specific role.
@@ -91,4 +92,19 @@ export function hasAllPermissions(
   }
 
   return permissions.every((permission) => user.permissions?.includes(permission));
+}
+
+/**
+ * Verifica se o usuário atende ao requisito de permissão de uma entrada de
+ * navegação: sem `permission` é liberado a todo autenticado; string exige
+ * essa permissão; array exige ao menos uma delas.
+ */
+export function canAccessNavEntry(user: User | null | undefined, entry: Pick<NavEntry, 'permission'>): boolean {
+  if (!entry.permission) {
+    return true;
+  }
+
+  return Array.isArray(entry.permission)
+    ? hasAnyPermission(user, entry.permission)
+    : hasPermission(user, entry.permission);
 }
