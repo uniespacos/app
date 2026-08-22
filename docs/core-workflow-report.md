@@ -323,26 +323,24 @@ flowchart TD
 
 ### 6.1 Exibição para o Gestor
 
-Na lista de reservas do gestor (`ReservasGestorPage`), o status é exibido com clareza sobre o que o gestor já fez:
+Na lista de reservas do gestor (`ReservasGestorPage`), o status é exibido com clareza sobre o que o gestor já fez. A situação é **recalculada dinamicamente no frontend** a partir dos horários individuais:
 
-| Status | Exibição | Significado |
-|--------|----------|-------------|
-| `deferida` | 🟢 Deferida | Gestor aprovou todos os horários |
-| `indeferida` | 🔴 Indeferida | Gestor recusou todos os horários |
-| `em_analise` | 🟡 Em análise | Gestor ainda não avaliou nenhum horário ou há pendentes |
-| `parcialmente_deferida` | 🟠 Parcialmente Deferida **+ contadores** | Gestor aprovou alguns e recusou outros; mostra: <br/> ⏳ N em análise (se houver) <br/> ❌ N recusado(s) |
-| `inativa` | ⚫ Inativa | Reserva foi cancelada (arquivada) |
+| Status | Exibição | Significado | Cálculo |
+|--------|----------|-------------|---------|
+| `deferida` | 🟢 Deferida | Gestor aprovou todos os horários | Todos os horários têm `situacao = 'deferida'` |
+| `indeferida` | 🔴 Indeferida | Gestor recusou todos os horários | Todos os horários têm `situacao = 'indeferida'` |
+| `em_analise` | 🟡 Em análise | Gestor ainda não avaliou algum horário ou nenhum foi avaliado | Algum horário tem `situacao = 'em_analise'` (prioridade máxima) |
+| `parcialmente_deferida` | 🟠 Parcialmente Deferida | Gestor aprovou alguns horários e recusou outros | Há mix de `'deferida'` + `'indeferida'` (sem `'em_analise'`) |
+| `inativa` | ⚫ Inativa | Reserva foi cancelada (arquivada) | Reserva cancelada pelo solicitante |
 
-**Exemplo:** Uma reserva com status "Parcialmente Deferida" na lista mostra:
-```
-Parcialmente Deferida
-⏳ 2 em análise
-❌ 1 recusado
-```
+**Detalhe técnico:** O recálculo acontece em `calculateGestorStatus()` no frontend (`reserva-helpers.ts`). O repositório backend retorna **todos os horários** de cada reserva (sem limite), permitindo que o frontend analise cada um individualmente e derive a situação correta.
 
-Isso permite ao gestor rapidamente entender o que precisa fazer:
-- Se há "em análise", ainda faltam avaliações
-- Se há "recusado", alguns horários foram explicitamente indeferidos
+**Exemplo:** Uma reserva com 3 horários:
+- Horário 1 (segunda 14h): ✅ deferida
+- Horário 2 (quarta 14h): ❌ indeferida  
+- Horário 3 (sexta 14h): ✅ deferida
+
+→ Status exibido na listagem: **🟠 Parcialmente Deferida** (pois tem mix de aprovados + recusados)
 
 ---
 
