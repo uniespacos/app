@@ -82,6 +82,18 @@ npx tsc --noEmit
 `--suppress-all`, 315 erros no momento da migração). Mesma regra do PHPStan: não suprima erro novo,
 corrija.
 
+**Armadilha: `--fix` desfaz reversão manual de autofix a cada execução.** Quando um autofix de regra
+(ex.: `consistent-type-definitions`, `type` → `interface`) precisa ser revertido à mão por causa de
+um caso legítimo (ex.: `useForm<T>` do Inertia exige index signature que `interface` não tem), **não
+suprima o erro em `eslint-suppressions.json`** — isso não impede o `--fix` de reaplicar a mudança na
+próxima execução (suprimir só afeta o relatório, não o fix). Toda vez que alguém rodar
+`npm run lint`, o arquivo volta a quebrar e a suppression sobra órfã, o que faz o `eslint` sair com
+código 2 num checkout limpo (`--suppress-all` não é idempotente contra `--fix`; já causou falha real
+no CI/CD Staging da tag rc.25). A correção certa é `// eslint-disable-next-line <regra> -- motivo`
+na linha exata — isso impede o `--fix` de tocar ali. Depois de mexer em suppression/disable,
+sempre rode `npm run lint` **duas vezes seguidas** e confira exit code 0 nas duas — simula o que o
+CI faz num checkout limpo.
+
 ## Usuário de teste descartável para verificação manual (CDP/browser)
 
 ```bash

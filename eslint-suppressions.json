@@ -654,9 +654,6 @@
     }
   },
   "resources/js/presentation/pages/settings/profile.tsx": {
-    "@typescript-eslint/consistent-type-definitions": {
-      "count": 1
-    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 2
     }

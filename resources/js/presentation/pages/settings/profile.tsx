@@ -29,6 +29,7 @@ const ROLE_LABEL: Record<string, string> = {
     comum: 'Usuário',
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- useForm<T> do Inertia exige um index signature que `interface` não satisfaz.
 type ProfileForm = {
     name: string;
     email: string;
