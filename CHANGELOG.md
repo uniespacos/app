@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.24](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.23...v1.3.0-rc.24) (2026-08-22)
+
+
+### Bug Fixes
+
+* tratar reserva arquivada como estado terminal na avaliação ([#284](https://github.com/uniespacos/uniespacos/issues/284)) ([3efe7a7](https://github.com/uniespacos/uniespacos/commit/3efe7a70abd657a58658c7b8874bfdedbf7f27f7)), closes [#265](https://github.com/uniespacos/uniespacos/issues/265)
+
 ## [1.3.0-rc.23](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.22...v1.3.0-rc.23) (2026-08-22)
 
 
