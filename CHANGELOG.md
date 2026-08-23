@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.52](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.51...v1.3.0-rc.52) (2026-08-23)
+
+
+### Bug Fixes
+
+* excluir arquivos de teste do glob de páginas do Vite ([#357](https://github.com/uniespacos/uniespacos/issues/357)) ([c617533](https://github.com/uniespacos/uniespacos/commit/c617533b60684ff450e2f9e4f2f8a0881da86020))
+
 ## [1.3.0-rc.51](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.50...v1.3.0-rc.51) (2026-08-23)
 
 
