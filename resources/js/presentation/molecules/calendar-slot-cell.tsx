@@ -94,7 +94,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 !isSelecionado && [
                     FUNDO_STATUS[slot.status],
                     {
-                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked || slot.isPast,
+                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked === true || slot.isPast === true,
                         // Livre fica neutro em repouso; o verde só aparece no
                         // hover, como convite a interagir — mantém a cor
                         // reservada para os estados que o usuário precisa notar
