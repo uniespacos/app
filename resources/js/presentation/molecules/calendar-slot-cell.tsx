@@ -35,7 +35,12 @@ const TEXTO_STATUS: Record<SlotCalendario['status'], string> = {
 };
 
 export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: CalendarSlotCellProps) {
-    const isClickable = slot.status !== 'reservado' && !slot.isLocked;
+    // Passado nunca é clicável: clicar nele acionava a lógica de
+    // "mover para a semana seguinte" do hook de seleção, que troca
+    // silenciosamente a célula selecionada por outra em outro dia —
+    // confuso, já que quem clica não vê nenhuma relação entre a célula
+    // que tocou e a que realmente foi marcada.
+    const isClickable = slot.status !== 'reservado' && !slot.isLocked && !slot.isPast;
 
     // Função interna para renderizar o conteúdo do slot
     const renderSlotContent = (): JSX.Element | null => {
@@ -89,12 +94,12 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 !isSelecionado && [
                     FUNDO_STATUS[slot.status],
                     {
-                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked,
+                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked || slot.isPast,
                         // Livre fica neutro em repouso; o verde só aparece no
                         // hover, como convite a interagir — mantém a cor
                         // reservada para os estados que o usuário precisa notar
                         // rápido (reservado, selecionado, passado).
-                        'hover:bg-success-subtle cursor-pointer': slot.status === 'livre' && !slot.isLocked,
+                        'hover:bg-success-subtle cursor-pointer': slot.status === 'livre' && !slot.isLocked && !slot.isPast,
                         'bg-muted/60 opacity-90 grayscale': slot.isPast,
                     },
                 ],

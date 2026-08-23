@@ -136,7 +136,11 @@ export default function CalendarDiaMobile({
 
                     {slots.map(({ horaLabel, slot }) => {
                         const selecionado = isSlotSelecionado(slot);
-                        const clicavel = slot.status !== 'reservado' && !slot.isLocked;
+                        // Passado nunca é clicável: clicar nele acionava a lógica de
+                        // "mover para a semana seguinte" do hook de seleção, que
+                        // troca silenciosamente o horário marcado por outro em
+                        // outro dia — confuso, sem relação visível com o toque.
+                        const clicavel = slot.status !== 'reservado' && !slot.isLocked && !slot.isPast;
                         const status = selecionado ? 'selecionado' : slot.status;
 
                         return (
