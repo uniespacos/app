@@ -404,6 +404,140 @@ $this->authorize('show', $reserva);  // Lança AuthorizationException se false
 // → Resposta 403: { "error_code": "FORBIDDEN", ... }
 ```
 
+## Contrato de Resposta em Rotas Inertia
+
+Endpoints alcançados por `useForm` ou chamadas `router.*` do cliente possuem um contrato rigoroso de resposta. Violações causam comportamento confuso e difícil de diagnosticar.
+
+### A Regra Prática
+
+**Todo endpoint consumido por `useForm` ou `router.*` deve devolver um dos seguintes:**
+
+1. **Redirect** (`redirect()`, `back()`)
+2. **Página Inertia** (`Inertia::render()`)
+
+**Nunca devolver:**
+
+- HTTP 204 (No Content)
+- `response()->json()` ou JsonResponse genérico
+- Qualquer resposta sem o header `x-inertia`
+
+Endpoints consumidos diretamente por `fetch` ou `axios` podem devolver JSON normalmente — a regra se aplica apenas a rotas que formulários reativos do frontend acessam.
+
+### Por Que o Header `x-inertia` é Crítico
+
+Inertia detecta respostas válidas verificando a presença do header `x-inertia`:
+
+```typescript
+// Classe Response (@inertiajs/core)
+isInertiaResponse() {
+    return this.hasHeader("x-inertia");
+}
+```
+
+**Não há tratamento especial para status 204, 200 ou qualquer outro código.** A presença do header é **o único critério**. Uma resposta 204 sem `x-inertia` é tão não-Inertia quanto um JSON genérico.
+
+Quando a resposta não contém o header, Inertia ativa `handleNonInertiaResponse()`, que abre o **modal de erro da aplicação**.
+
+### Consequência 1: Modal de Erro Visual
+
+O modal de erro do Inertia é um `<div>` com:
+- `position: fixed`
+- `background: rgba(0, 0, 0, 0.6)` (overlay escuro)
+- `z-index: 200000`
+
+Contém um `<iframe>` que executa `document.write()` com o corpo da resposta.
+
+**Quando a resposta é 204 (corpo vazio):**
+
+O iframe recebe um corpo vazio, resultando em uma **caixa branca sobre um overlay escuro** — indistinguível de um erro real, mas sem nenhuma mensagem ou interação possível.
+
+```html
+<!-- Modal do Inertia renderizado -->
+<div style="position: fixed; background: rgba(0,0,0,0.6); z-index: 200000;">
+    <iframe>
+        <!-- document.write() com corpo vazio (204) -->
+    </iframe>
+</div>
+```
+
+**Assinatura no console:** O `document.write()` não inclui `<!DOCTYPE html>`, então o navegador reclama: `"This page is in Quirks Mode"`. Esse aviso é específico dessa situação e facilita o diagnóstico.
+
+**Por que é difícil encontrar:** O modal não possui atributos `data-slot` nem nenhuma classe descritiva, então buscas por `[data-slot="dialog-overlay"]` no DevTools falham silenciosamente.
+
+### Consequência 2: Callback `onSuccess` Nunca Dispara
+
+Quando `handleNonInertiaResponse()` é acionado, Inertia **retorna imediatamente**, antes de invocar o callback `onSuccess` do `useForm`:
+
+```typescript
+// Fluxo simplificado do Inertia em resposta não-Inertia
+if (!isInertiaResponse(response)) {
+    handleNonInertiaResponse(response);  // ← Abre modal e retorna
+    return;  // onSuccess nunca é alcançado
+}
+
+// onSuccess só é chamado se a resposta for válida
+onSuccess(response);  // ← Alcançado apenas se a resposta tiver x-inertia
+```
+
+**Impacto no frontend:**
+
+- Modal da aplicação nunca fecha
+- Formulário nunca é resetado
+- Toast de sucesso nunca aparece
+- Busca por bugs no React/TypeScript será infrutífera — o problema está no contrato HTTP
+
+### Reconhecer o Problema Rapidamente
+
+Procure pelos seguintes sinais em conjunto:
+
+1. **Visual:** Caixa branca sobre overlay escuro que não responde a interações
+2. **Console:** Aviso `"This page is in Quirks Mode"` (iframe sem DOCTYPE)
+3. **Rede:** Requisição respondeu com status 200 ou 204, mas sem header `x-inertia`
+4. **Frontend:** Callback `onSuccess` não foi executado (não disparou logs, não fechou modal da app)
+
+Se encontrar (3) + (4), é esta armadilha. Se encontrar também (2), é confirmado.
+
+### Caso Concreto: ReservaController::store()
+
+O controlador inicialmente retornava:
+
+```php
+public function store(StoreReservaRequest $request)
+{
+    // ... validação e dispatch ...
+
+    // ❌ ERRADO: 204 sem x-inertia
+    return response()->noContent();  // 204 vazio
+}
+```
+
+Um comentário no código afirmava que "Inertia interpreta 204 como sucesso sem redirecionar". **Isso é falso** — 204 sem `x-inertia` é tratado como resposta inválida.
+
+**Correção:**
+
+```php
+public function store(StoreReservaRequest $request)
+{
+    // ... validação e dispatch ...
+
+    // ✅ CORRETO: redirect 302, que o cliente Inertia segue
+    // O cliente faz GET seguinte com X-Inertia header, e essa resposta
+    // terá o header x-inertia que Inertia espera
+    return back();
+}
+```
+
+**Teste de regressão:** `tests/Feature/ReservaStoreResponseTest.php` implementa quatro asserções:
+
+1. `assertRedirect()` — Resposta é um redirect (status 302)
+2. `assertNotEquals(204, $response->getStatusCode())` — Garante que **não é** 204 (a armadilha original)
+3. `assertSessionHasNoErrors()` — Verifica que não há erros de validação na sessão
+4. `Queue::assertPushed(ProcessarCriacaoReserva::class)` — Verifica que o job foi enfileirado
+
+As duas últimas (3 e 4) existem porque, sem elas, o teste passaria verde mesmo se a validação rejeitasse o payload silenciosamente: uma `ValidationException` também retorna 302, e o job não seria despachado — então essas asserções fecham a brecha.
+
+Esse teste previne que esse bug ressurja em futuras refatorações.
+
 ## Diferença: Erros Esperados vs Inesperados
 
 | Tipo | Exemplos | Logging | Stack Trace |

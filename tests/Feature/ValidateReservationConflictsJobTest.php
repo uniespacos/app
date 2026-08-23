@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Events\ReservationValidatedEvent;
+use App\Events\ReservaEvent;
 use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Reserva;
 use App\Models\User;
@@ -29,9 +29,8 @@ class ValidateReservationConflictsJobTest extends TestCase
 
         $job->handle($conflictService);
 
-        Event::assertDispatched(ReservationValidatedEvent::class, function ($event) use ($reserva) {
-            return $event->reserva->id === $reserva->id
-                && $event->reserva->validation_status === 'completed';
+        Event::assertDispatched(ReservaEvent::class, function ($event) use ($reserva) {
+            return $event->action === 'validated' && $event->reservaId === $reserva->id;
         });
     }
 

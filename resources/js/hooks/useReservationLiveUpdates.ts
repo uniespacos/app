@@ -14,8 +14,12 @@ export function useReservationLiveUpdates(): void {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const channel = window.Echo.channel('reserva-channel');
 
+        // O ponto inicial em '.reserva-event' é obrigatório: sem ele o
+        // EventFormatter do laravel-echo prefixa o namespace padrão e passa a
+        // escutar 'App\Events\reserva-event', enquanto ReservaEvent::broadcastAs()
+        // publica apenas 'reserva-event'. Sem o ponto, o handler nunca dispara.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        channel.listen('reserva-event', (event: ReservationEvent) => {
+        channel.listen('.reserva-event', (event: ReservationEvent) => {
             if (event.action === 'created' || event.action === 'validated') {
                 document.dispatchEvent(
                     new CustomEvent('reserva:updated', {
@@ -30,7 +34,7 @@ export function useReservationLiveUpdates(): void {
 
         return () => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            channel.stopListening('reserva-event');
+            channel.stopListening('.reserva-event');
         };
     }, []);
 }

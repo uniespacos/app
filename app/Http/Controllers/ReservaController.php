@@ -52,17 +52,13 @@ class ReservaController extends Controller
         try {
             $this->service->create($request->validated(), Auth::user());
 
-            // Retorna 204 No Content para manter usuário na página (modal fecha via frontend)
-            // e permitir que atualizações em tempo real (Reverb) sejam recebidas enquanto aguarda processamento.
-            // Inertia interpreta 204 como sucesso sem redirecionar.
-            return response()->noContent();
+            return back();
         } catch (\Exception $error) {
             Log::error('Erro ao despachar o job de criação de reserva', [
                 'user_id' => Auth::id(),
                 'exception' => $error,
             ]);
 
-            // Retorna erro com flash message para toast de erro
             return back()->withErrors(['error' => 'Não foi possível enviar sua solicitação para processamento. Tente novamente.']);
         }
     }
