@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `554e85a` · GAP-02 concluída · GAP-01 descontinuado (fluxo desatualizado)
+**Última atualização:** 2026-08-23 · develop em `3a87d43` · #106 concluída
 
 ---
 
@@ -51,7 +51,7 @@ Atualizado a cada entrega.
       _17 testes · 17 passando_
 
 - [x] **GAP-03 — Escopo `recurring` em AvaliarReservaJob excede agendas do gestor** `P1` · `effort: small`
-      Branch `fix/gap-03-recurring-scope-authorization` → PR pendente
+      Branch `fix/gap-03-recurring-scope-authorization` → PR #302 → merged 2026-08-22
       No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Implementada validação em 2 níveis: (1) no `AvaliarReservaRequest::after()` valida cada horário ID pertence às agendas do gestor; (2) no `AvaliarReservaJob::validateHorariosAutorization()` revalida antes de processar. **Bônus 1:** Corrigido bug crítico de UX/acessibilidade no `Alert` com `variant="destructive"` — o alerta de reavaliação estava invisível por contraste 1:1. Corrigido com `text-destructive-accent` (vermelho escuro) que rende ~5:1. **Bônus 2:** Adicionados contadores de horários na lista do gestor (`ReservasList`). Quando uma reserva está em `parcialmente_deferida`, mostra quantos horários estão `em_analise` e quantos foram `indeferida`, dando clareza de quais ações o gestor ainda precisa tomar.
       _9 testes novos/atualizados · 19 testes passando · 0 regressões · docs atualizada (6.1)_
 
@@ -65,12 +65,15 @@ Atualizado a cada entrega.
       Após edição de reserva (single ou recurring), o `conflict_cache` fica obsoleto. Solução: despachar `ValidateReservationConflictsJob` ao final de `UpdateReservaJob::handle()`, fora da transaction, garantindo que o cache é regenerado após cada edição. Job é idempotente e funciona para ambos os escopos. Padrão segue `ProcessarCriacaoReserva` e `AvaliarReservaJob`.
       _2 testes novos · 12 testes passando_
 
+- [x] **#106 — Dia da semana nos grupos de turno** `P4`
+      Branch `feature/106-dias-turno` → PR #323 → merged `c52b4e7` (squash)
+      O dia da semana passou a aparecer no header de cada grupo de turno (`AgendaCalendario`, `calendar-shift-section`) e o header global duplicado de dias da semana foi removido. No mobile, `CalendarDiaMobile` passou a agrupar as agendas por turno, eliminando linhas repetidas. Ajuste visual: removido o `gap-6` herdado do `Card` entre a legenda e o cabeçalho do turno. A ressalva "o header sticky já entrega o essencial" foi levantada antes da execução, mas a entrega foi validada e mergeada.
+
 ---
 
 ## 🔨 Em andamento
 
-- [ ] **#106 — Dia da semana nos grupos de turno** `P4`
-      ⚠️ **Validar antes de investir:** o header sticky já entrega o essencial.
+_Nada em andamento._
 
 ---
 
@@ -155,7 +158,7 @@ Atualizado a cada entrega.
 - [ ] Repriorizar a **#119** de `P2` → `P0` no GitHub (registro histórico; a issue já está fechada)
 - [ ] Decidir se `institucional` sem agendas **deveria** avaliar reservas (efeito colateral documentado na #119)
 - [ ] Decidir o escopo pretendido de `reservas.atualizar` — ver as três opções na **#260**
-- [ ] Validar a **#106** com o time antes de investir
+- [x] Validar a **#106** com o time antes de investir — entregue e mergeada em 2026-08-23 (PR #323)
 
 > A ressalva sobre o corpo da #119 (`ReservaPolicy::view()` desatualizada) ficou registrada no comentário de fechamento, então não é mais necessário editar o corpo da issue.
 
@@ -163,13 +166,13 @@ Atualizado a cada entrega.
 
 ## Placar
 
-|                        |                                                                            |
-| ---------------------- | -------------------------------------------------------------------------- |
-| Concluídas e mergeadas | **8** (#119, #222, #101, #105, #112, #108, #255, GAP-02)                   |
-| Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar** |
-| Em andamento           | **0**                                                                      |
-| Na fila                | **18** (7 GitHub issues + 8 GAPs + futuro)                                 |
-| Obsoletos              | **1** (GAP-01)                                                             |
-| Wontfix                | **1** (#41)                                                                |
+|                        |                                                                               |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| Concluídas e mergeadas | **11** (#119, #222, #101, #105, #112, #108, #265, GAP-03, #255, GAP-02, #106) |
+| Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar**    |
+| Em andamento           | **0**                                                                         |
+| Na fila                | **18** (7 GitHub issues + 8 GAPs + futuro)                                    |
+| Obsoletos              | **1** (GAP-01)                                                                |
+| Wontfix                | **1** (#41)                                                                   |
 
 > ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).
