@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.41](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.40...v1.3.0-rc.41) (2026-08-23)
+
+
+### Bug Fixes
+
+* gerar e-mail com entropia real em UserFactory para evitar colisão entre testes ([#328](https://github.com/uniespacos/uniespacos/issues/328)) ([cca81aa](https://github.com/uniespacos/uniespacos/commit/cca81aa5981bfa86073d56f816a9a8be3dfef711))
+
 ## [1.3.0-rc.40](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.39...v1.3.0-rc.40) (2026-08-23)
 
 
