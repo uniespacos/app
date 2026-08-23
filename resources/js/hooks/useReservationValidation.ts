@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useEffect } from 'react';
+import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
 
 export function useReservationValidation(reservaId: number): void {
     useEffect(() => {
@@ -7,15 +8,16 @@ export function useReservationValidation(reservaId: number): void {
             return;
         }
 
-        const echo = window.Echo as { private: (channel: string) => { on: (event: string, callback: () => void) => void; leave: () => void } };
-        const channel = echo.private(`reserva.${String(reservaId)}`);
+        const channel = acquirePrivateChannel(`reserva.${String(reservaId)}`);
+        if (!channel) return;
 
-        channel.on('ReservationValidated', () => {
+        channel.listen('ReservationValidated', () => {
             router.reload();
         });
 
         return () => {
-            channel.leave();
+            channel.stopListening('ReservationValidated');
+            releasePrivateChannel(`reserva.${String(reservaId)}`);
         };
     }, [reservaId]);
 }

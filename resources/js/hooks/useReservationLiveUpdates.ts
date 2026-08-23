@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { acquirePublicChannel, releasePublicChannel } from '@/lib/echo-channel-registry';
 
 interface ReservationEvent {
     action: string;
@@ -13,8 +14,8 @@ export function useReservationLiveUpdates(): void {
 
         const ACOES_QUE_ATUALIZAM = new Set(['created', 'validated', 'evaluated']);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const channel = window.Echo.channel('reserva-channel');
+        const channel = acquirePublicChannel('reserva-channel');
+        if (!channel) return;
 
         // O ponto inicial em '.reserva-event' é obrigatório: sem ele o
         // EventFormatter do laravel-echo prefixa o namespace padrão e passa a
@@ -37,6 +38,7 @@ export function useReservationLiveUpdates(): void {
         return () => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             channel.stopListening('.reserva-event');
+            releasePublicChannel('reserva-channel');
         };
     }, []);
 }

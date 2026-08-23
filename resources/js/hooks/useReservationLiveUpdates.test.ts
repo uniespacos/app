@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { useReservationLiveUpdates } from './useReservationLiveUpdates';
+import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 
 describe('useReservationLiveUpdates', () => {
     let mockListen: jest.Mock;
@@ -18,10 +19,13 @@ describe('useReservationLiveUpdates', () => {
         Object.defineProperty(window, 'Echo', {
             value: {
                 channel: mockChannel,
+                leave: jest.fn(),
             },
             writable: true,
             configurable: true,
         });
+
+        __resetEchoChannelRegistryForTests();
 
         dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
     });
