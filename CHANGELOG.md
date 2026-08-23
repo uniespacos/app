@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.34](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.33...v1.3.0-rc.34) (2026-08-23)
+
+
+### Bug Fixes
+
+* **#255:** recalcular data_inicial/data_final no escopo single ([fa758ae](https://github.com/uniespacos/uniespacos/commit/fa758ae39539fb4c112786da33e42cca877f78d9))
+
 ## [1.3.0-rc.33](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.32...v1.3.0-rc.33) (2026-08-23)
 
 
