@@ -25,7 +25,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
         if (user) {
             setData({ name: user.name, email: user.email, phone: user.telefone ?? '' });
         }
-    }, [user]);
+    }, [user, setData]);
 
     if (!user) return null;
 

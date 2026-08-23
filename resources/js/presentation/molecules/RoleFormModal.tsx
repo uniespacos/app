@@ -62,8 +62,8 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
         },
     });
 
-    const selectedPermissions = watch('permissions') || [];
-    const nameValue = watch('name') || '';
+    const selectedPermissions = useMemo(() => watch('permissions') || [], [watch]);
+    const nameValue = useMemo(() => watch('name') || '', [watch]);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
     useEffect(() => {

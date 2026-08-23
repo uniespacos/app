@@ -5,6 +5,7 @@ describe('useReservationLiveUpdates', () => {
     let mockListen: jest.Mock;
     let mockStopListening: jest.Mock;
     let mockChannel: jest.Mock;
+    let dispatchEventSpy: jest.SpyInstance;
 
     beforeEach(() => {
         mockListen = jest.fn();
@@ -22,7 +23,7 @@ describe('useReservationLiveUpdates', () => {
             configurable: true,
         });
 
-        jest.spyOn(document, 'dispatchEvent');
+        dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
     });
 
     afterEach(() => {
@@ -31,19 +32,25 @@ describe('useReservationLiveUpdates', () => {
     });
 
     it('should call window.Echo.channel with the correct channel name', () => {
-        renderHook(() => useReservationLiveUpdates());
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
         expect(mockChannel).toHaveBeenCalledWith('reserva-channel');
     });
 
     it('should listen for .reserva-event with leading dot to prevent namespace prefixing', () => {
-        renderHook(() => useReservationLiveUpdates());
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
         expect(mockListen).toHaveBeenCalledWith('.reserva-event', expect.any(Function));
     });
 
     it('should stop listening for .reserva-event when unmounting', () => {
-        const { unmount } = renderHook(() => useReservationLiveUpdates());
+        const { unmount } = renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
         unmount();
 
@@ -51,16 +58,22 @@ describe('useReservationLiveUpdates', () => {
     });
 
     it('should dispatch reserva:updated event when callback receives created action', () => {
-        renderHook(() => useReservationLiveUpdates());
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
-        const callback = mockListen.mock.calls[0][1] as (event: {
+        const callArgs = mockListen.mock.calls.at(0) as (
+            | string
+            | ((event: { action: string; reservaId: number }) => void)
+        )[];
+        const callback = callArgs.at(1) as (event: {
             action: string;
             reservaId: number;
         }) => void;
 
         callback({ action: 'created', reservaId: 1 });
 
-        expect(document.dispatchEvent).toHaveBeenCalledWith(
+        expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'reserva:updated',
             })
@@ -68,16 +81,22 @@ describe('useReservationLiveUpdates', () => {
     });
 
     it('should dispatch reserva:updated event when callback receives validated action', () => {
-        renderHook(() => useReservationLiveUpdates());
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
-        const callback = mockListen.mock.calls[0][1] as (event: {
+        const callArgs = mockListen.mock.calls.at(0) as (
+            | string
+            | ((event: { action: string; reservaId: number }) => void)
+        )[];
+        const callback = callArgs.at(1) as (event: {
             action: string;
             reservaId: number;
         }) => void;
 
         callback({ action: 'validated', reservaId: 2 });
 
-        expect(document.dispatchEvent).toHaveBeenCalledWith(
+        expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'reserva:updated',
             })
@@ -85,9 +104,15 @@ describe('useReservationLiveUpdates', () => {
     });
 
     it('should not dispatch event when callback receives unknown action', () => {
-        renderHook(() => useReservationLiveUpdates());
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
 
-        const callback = mockListen.mock.calls[0][1] as (event: {
+        const callArgs = mockListen.mock.calls.at(0) as (
+            | string
+            | ((event: { action: string; reservaId: number }) => void)
+        )[];
+        const callback = callArgs.at(1) as (event: {
             action: string;
             reservaId: number;
         }) => void;
@@ -96,14 +121,16 @@ describe('useReservationLiveUpdates', () => {
 
         callback({ action: 'ignorada', reservaId: 1 });
 
-        expect(document.dispatchEvent).not.toHaveBeenCalled();
+        expect(dispatchEventSpy).not.toHaveBeenCalled();
     });
 
     it('should handle undefined window.Echo gracefully', () => {
         delete (window as unknown as { Echo?: unknown }).Echo;
 
         expect(() => {
-            renderHook(() => useReservationLiveUpdates());
+            renderHook(() => {
+                useReservationLiveUpdates();
+            });
         }).not.toThrow();
 
         expect(mockChannel).not.toHaveBeenCalled();
