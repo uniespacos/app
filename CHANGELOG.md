@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.40](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.39...v1.3.0-rc.40) (2026-08-23)
+
+
+### Features
+
+* auto-reload da agenda para qualquer usuário (GAP-11, fase 1) ([#326](https://github.com/uniespacos/uniespacos/issues/326)) ([f9c03af](https://github.com/uniespacos/uniespacos/commit/f9c03aff9698a463619b77effac850ebb5ffa135))
+
 ## [1.3.0-rc.39](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.38...v1.3.0-rc.39) (2026-08-23)
 
 
