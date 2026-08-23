@@ -79,8 +79,7 @@ Atualizado a cada entrega.
 **Melhorias de dados (do core-workflow-report.md)**
 
 - [ ] **GAP-06 — ReservaPolicy.update muito restritiva** `P2` · `effort: small`
-  Bloqueia qualquer edição se 1+ horário foi avaliado. Permitir granularmente (só dos não-avaliados).
-
+  Bloqueia qualquer edição se 1+ horário foi avaliado. a ideia é que o usuario possa editar o titulo ou a 
 - [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
   Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 

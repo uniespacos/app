@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
@@ -161,6 +162,8 @@ class UpdateReservaJob implements ShouldQueue
                     'exception' => $e,
                 ]);
             }
+
+            ValidateReservationConflictsJob::dispatch($this->reserva);
 
         } catch (Exception $e) {
             Log::error('UpdateReservaJob failed', [
