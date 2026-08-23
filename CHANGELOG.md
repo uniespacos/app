@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.37](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.36...v1.3.0-rc.37) (2026-08-23)
+
+
+### Bug Fixes
+
+* remove gap 01 obsolete ([#318](https://github.com/uniespacos/uniespacos/issues/318)) ([b7404ab](https://github.com/uniespacos/uniespacos/commit/b7404abe9b17635902b0fe533b218475f8dfcd67))
+
 ## [1.3.0-rc.36](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.35...v1.3.0-rc.36) (2026-08-23)
 
 
