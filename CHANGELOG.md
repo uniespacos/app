@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.46](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.45...v1.3.0-rc.46) (2026-08-23)
+
+
+### Bug Fixes
+
+* **echo:** parametrizar tipos e eliminar suppressões de eslint ([#341](https://github.com/uniespacos/uniespacos/issues/341)) ([4ac7692](https://github.com/uniespacos/uniespacos/commit/4ac7692216b984c1e8ab8047169ba40e405bc6ce))
+
 ## [1.3.0-rc.45](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.44...v1.3.0-rc.45) (2026-08-23)
 
 
