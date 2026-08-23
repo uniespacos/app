@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.45](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.44...v1.3.0-rc.45) (2026-08-23)
+
+
+### Features
+
+* Fase 4 - Enriquecimento de canais WebSocket e atualização em tempo real de espaços ([#338](https://github.com/uniespacos/uniespacos/issues/338)) ([197b202](https://github.com/uniespacos/uniespacos/commit/197b2022c5dbdaba35b9e71ecd7df23bcf0488c9))
+
 ## [1.3.0-rc.44](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.43...v1.3.0-rc.44) (2026-08-23)
 
 
