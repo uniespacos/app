@@ -6,6 +6,7 @@ Este documento descreve todas as Rules customizadas, FormRequests que as usam, e
 
 - [Rules Customizadas](#rules-customizadas)
   - [HorarioDisponivel](#horariodisponivel)
+  - [HorariosMesmoEspaco](#horariosmesmoespaco)
   - [UsuarioDaMesmaInstituicaoDaAgenda](#usuariodamesmainstituicaodaagenda)
   - [UniqueNormalizedFloorName](#uniquenormalizedfloorname)
 - [FormRequests e Suas Rules](#formrequests-e-suas-rules)
@@ -64,6 +65,63 @@ $conflict = DB::table('horarios')
 
 - **Backend:** Determinante; regra de negócio crítica
 - **Frontend:** Feedback visual (ConflictDetectionService, ver seção abaixo)
+
+---
+
+### HorariosMesmoEspaco
+
+**Localização:** `app/Rules/HorariosMesmoEspaco.php`
+
+**Responsabilidade:** Garantir que todos os horários solicitados em uma reserva apontam para agendas do mesmo espaço. Previne incoerência de dados onde uma única Reserva teria horários em múltiplos espaços.
+
+#### Quando é Usada
+
+- `StoreReservaRequest::rules()` — ao criar uma nova reserva
+- `UpdateReservaRequest::rules()` — ao editar horários de uma reserva existente
+- Aplicada ao campo `horarios_solicitados` (o array inteiro)
+
+#### Lógica de Validação
+
+```php
+// Para cada horário solicitado, busca o espaco_id da agenda
+$espacoIds = [];
+foreach ($value as $horario) {
+    $espacoId = DB::table('agendas')
+        ->where('id', $horario['agenda_id'])
+        ->value('espaco_id');
+    
+    $espacoIds[] = $espacoId;
+}
+
+// Valida que todos os IDs são idênticos
+if (count(array_unique($espacoIds)) > 1) {
+    // Falha: múltiplos espaços detectados
+}
+```
+
+#### Caso de Uso: Cenário Prático
+
+1. **Espaço A** tem agendas com IDs 1, 2, 3
+2. **Espaço B** tem agendas com IDs 4, 5, 6
+3. Usuário tenta criar reserva com:
+   - Horário 1: `agenda_id = 1` (Espaço A)
+   - Horário 2: `agenda_id = 4` (Espaço B)
+4. **Resultado:** Validação falha; todos os horários devem estar no mesmo espaço
+
+#### Implicação de Negócio
+
+- **Integridade de dados:** Uma Reserva representa um compromisso único e coeso; não faz sentido que abranja múltiplos espaços simultaneamente
+- **Prevenção de anomalias:** Sem essa validação, fluxos downstream (análise de disponibilidade, notificações por espaço, relatórios) podem gerar comportamento imprevisível
+
+#### Mensagem de Erro
+
+```
+"Todos os horários solicitados devem estar no mesmo espaço."
+```
+
+#### Nível de Validação
+
+- **Backend:** Determinante; regra de negócio de integridade estrutural
 
 ---
 
@@ -185,15 +243,17 @@ public static function normalizarNome(string $nome): string
 | `data_inicial` | `required` | Início do período (fallback se sem horários) |
 | `data_final` | `required` | Término do período |
 | `recorrencia` | `required`, `in:unica,15dias,1mes,personalizado` | Padrão de repetição |
-| `horarios_solicitados` | `required`, `array`, `min:1` | Array de time slots solicitados |
+| `horarios_solicitados` | `required`, `array`, `min:1`, **`HorariosMesmoEspaco`** | Array de time slots solicitados (validação de espaço único) |
 | `horarios_solicitados.*.data` | `required` | Data de cada horário |
 | `horarios_solicitados.*.horario_inicio` | `required`, `date_format:H:i:s` | Hora de início (HH:MM:SS) |
 | `horarios_solicitados.*.horario_fim` | `required`, `date_format:H:i:s` | Hora de término |
 | `horarios_solicitados.*.agenda_id` | `required`, `integer`, `exists:agendas,id`, **`HorarioDisponivel`** | Validação de disponibilidade |
 
 **Ordem de Validação Crítica:**
-1. `horarios_solicitados.*.agenda_id` é validado quanto à existência (`exists:agendas,id`)
-2. Logo após, `HorarioDisponivel` executa e checa banco de dados por conflitos
+1. `horarios_solicitados` é validado quanto à estrutura (`required`, `array`, `min:1`)
+2. `HorariosMesmoEspaco` executa e verifica se todas as agendas apontam para o mesmo espaço
+3. `horarios_solicitados.*.agenda_id` é validado quanto à existência (`exists:agendas,id`)
+4. `HorarioDisponivel` executa (por item) e checa banco de dados por conflitos
 
 ---
 
@@ -212,6 +272,8 @@ public static function normalizarNome(string $nome): string
 **Diferenças:**
 - `horarios_solicitados` é `present, array` (pode ser vazio) em vez de `required, array, min:1`
 - Adiciona campos de escopo de edição (single vs série inteira)
+
+**Validação HorariosMesmoEspaco:** Mesmo comportamento que em `StoreReservaRequest` — valida que todos os horários estão no mesmo espaço
 
 **Validação HorarioDisponivel:** Mesmo comportamento, mesma regra aplicada aos horários solicitados
 
@@ -342,6 +404,7 @@ Se há ≥1 horário em_analise no intervalo:
 
 | Validação | Nível | Bloqueante |
 |-----------|-------|-----------|
+| `HorariosMesmoEspaco` | Backend (Rule) | ✅ Sim |
 | `HorarioDisponivel` (deferida) | Backend (Rule) | ✅ Sim |
 | Conflitos deferidos (frontend) | Frontend (Service) | ⚠️ Info apenas |
 | Pendências (em_analise) | Frontend (Future) | ⚠️ Info apenas |
