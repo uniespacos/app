@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Jobs;
 
+use App\Events\ReservaEvent;
 use App\Jobs\UpdateReservaJob;
 use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
@@ -13,6 +14,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -496,5 +498,41 @@ class UpdateReservaJobTest extends TestCase
         $this->executar($reserva, $this->dados($slots, '1mes', '2026-09-01', '2026-09-28'), $user);
 
         Bus::assertDispatched(ValidateReservationConflictsJob::class, fn ($job) => $job->reserva->id === $reserva->id);
+    }
+
+    public function test_dispatches_reserva_event_with_updated_action(): void
+    {
+        Event::fake();
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'titulo' => 'Original Title',
+            'data_inicial' => '2026-09-01',
+            'data_final' => '2026-09-28',
+            'recorrencia' => '1mes',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'data' => '2026-09-01',
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '10:00:00',
+            'situacao' => 'em_analise',
+        ]);
+
+        $slots = [
+            $this->slot($agenda->id, '2026-09-01'),
+        ];
+
+        $this->executar($reserva, $this->dados($slots, '1mes', '2026-09-01', '2026-09-28'), $user);
+
+        Event::assertDispatched(ReservaEvent::class, function ($event) use ($reserva) {
+            return $event->action === 'updated' && $event->reservaId === $reserva->id;
+        });
     }
 }

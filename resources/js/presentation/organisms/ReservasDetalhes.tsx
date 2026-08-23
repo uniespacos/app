@@ -67,6 +67,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             replace: true,
             onStart: () => { setIsLoading(true); },
             onFinish: () => { setIsLoading(false); },
+            only: ['reservaToShow', 'semana'],
         });
     };
 

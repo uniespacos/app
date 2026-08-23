@@ -11,6 +11,8 @@ export function useReservationLiveUpdates(): void {
             return;
         }
 
+        const ACOES_QUE_ATUALIZAM = new Set(['created', 'validated', 'evaluated']);
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const channel = window.Echo.channel('reserva-channel');
 
@@ -20,7 +22,7 @@ export function useReservationLiveUpdates(): void {
         // publica apenas 'reserva-event'. Sem o ponto, o handler nunca dispara.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         channel.listen('.reserva-event', (event: ReservationEvent) => {
-            if (event.action === 'created' || event.action === 'validated') {
+            if (ACOES_QUE_ATUALIZAM.has(event.action)) {
                 document.dispatchEvent(
                     new CustomEvent('reserva:updated', {
                         detail: {

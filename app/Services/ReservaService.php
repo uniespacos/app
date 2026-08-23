@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\SituacaoReserva\ModoArquivoEnum;
 use App\Enums\SituacaoReserva\OrdenacaoReservaEnum;
 use App\Enums\SituacaoReserva\SituacaoReservaEnum;
+use App\Events\ReservaEvent;
 use App\Jobs\AvaliarReservaJob;
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Jobs\UpdateReservaJob;
@@ -234,6 +235,8 @@ class ReservaService
                 ]);
             }
         }
+
+        ReservaEvent::dispatch('canceled', $reserva->id);
     }
 
     /**
