@@ -141,7 +141,10 @@ export function useAgendaSelectionUseCase({
         if (isEditMode) {
             patch(route('reservas.update', { reserva: reserva?.id }), options);
         } else {
-            post(route('reservas.store'), options);
+            // A criação volta com `back()` para esta mesma página, então preservar
+            // scroll e estado evita o salto e a remontagem da agenda. O `patch`
+            // acima redireciona para outra rota e não quer nenhum dos dois.
+            post(route('reservas.store'), { ...options, preserveScroll: true, preserveState: true });
         }
     };
 

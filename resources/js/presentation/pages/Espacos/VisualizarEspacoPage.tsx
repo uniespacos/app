@@ -24,14 +24,27 @@ export default function VisualizarEspaço({
     useReservationLiveUpdates();
 
     useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+
         const handleUpdate = () => {
-            router.reload();
+            // Uma única reserva emite 'created' e logo em seguida 'validated';
+            // o debounce colapsa a rajada num único request.
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                // `only: ['espaco']` mantém 'semana' e, principalmente, 'flash'
+                // fora da resposta — sem isso, a reserva feita por outro usuário
+                // dispararia um toast sem sentido aqui (app-layout.tsx observa
+                // `flash`). preserveScroll/preserveState não aparecem aqui porque
+                // `reload()` já os força internamente (por isso ReloadOptions os omite).
+                router.reload({ only: ['espaco'] });
+            }, 400);
         };
 
         document.addEventListener('reserva:updated', handleUpdate);
 
         return () => {
             document.removeEventListener('reserva:updated', handleUpdate);
+            clearTimeout(timer);
         };
     }, []);
 

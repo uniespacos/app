@@ -29,7 +29,6 @@ interface AgendaDialogReservaProps {
     formData: ReservaFormData;
     setFormData: (key: keyof ReservaFormData, value: any) => void;
     setSlotsSelecao?: (slots: SlotCalendario[]) => void;
-    onSuccess?: () => void;
 }
 
 /**
@@ -81,11 +80,9 @@ export default function AgendaDialogReserva({
     formData,
     setFormData,
     setSlotsSelecao,
-    onSuccess,
 }: AgendaDialogReservaProps) {
     const [showRecurrenceAlert, setShowRecurrenceAlert] = useState(false);
     const [datasComConflito, setDatasComConflito] = useState<string[]>([]);
-    const [wasSubmitted, setWasSubmitted] = useState(false);
 
     const verificarConflitos = useCallback(
         (horarios: any[]) => {
@@ -117,7 +114,6 @@ export default function AgendaDialogReserva({
 
     const handleSubmit = useCallback(
         (e: FormEvent) => {
-            setWasSubmitted(true);
             onSubmit(e);
         },
         [onSubmit],
@@ -186,20 +182,6 @@ export default function AgendaDialogReserva({
             }
         }
     }, [isOpen, formData.recorrencia, formData.data_inicial, formData.horarios_solicitados, hoje, handleSetFormData, verificarConflitos]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setWasSubmitted(false);
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        if (wasSubmitted && !isSubmitting) {
-            onSuccess?.();
-            onOpenChange(false);
-            setWasSubmitted(false);
-        }
-    }, [wasSubmitted, isSubmitting, onSuccess, onOpenChange]);
 
     const periodoRecorrencia = useMemo(
         () => ({
