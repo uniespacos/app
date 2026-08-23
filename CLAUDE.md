@@ -73,3 +73,12 @@ usar sempre o modelo mais leve).
 - O Vite às vezes passa a servir um módulo **vazio** (~167 bytes) depois de um arquivo ser reescrito;
   a tela quebra com `Element type is invalid`. Confirme com
   `curl -s http://localhost:5173/<caminho>.tsx | wc -c` e resolva com `touch` no arquivo.
+- **`queue:work` não relê código.** O worker carrega a aplicação na memória ao subir; qualquer
+  alteração em Job, Event, Notification ou nas classes que eles usam só passa a valer depois de
+  `docker restart uniespacos-queue-worker-1`. O sintoma engana: o job roda, é marcado DONE e a parte
+  antiga do código funciona normalmente — só o trecho novo é que nunca executa, sem erro nenhum.
+  Antes de investigar comportamento assíncrono que "não acontece", compare
+  `docker inspect uniespacos-queue-worker-1 --format '{{.State.StartedAt}}'` (UTC) com a data do
+  commit que introduziu o código. Para broadcast, `docker logs uniespacos-reverb-1 | grep
+  "Broadcasting To"` mostra se o evento chegou ao Reverb, separando problema de backend de
+  problema de frontend.
