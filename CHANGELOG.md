@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.43](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.42...v1.3.0-rc.43) (2026-08-23)
+
+
+### Features
+
+* add agent infrastructure, project documentation, and development conventions for UniEspaços ([#333](https://github.com/uniespacos/uniespacos/issues/333)) ([aac8dbf](https://github.com/uniespacos/uniespacos/commit/aac8dbf1b1d9278ed0c70e73da2f738b13faf4f7))
+
 ## [1.3.0-rc.42](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.41...v1.3.0-rc.42) (2026-08-23)
 
 
