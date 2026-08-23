@@ -53,29 +53,40 @@ export default function CalendarDiaMobile({
 
     const agendasOrdenadas = useMemo(
         () =>
-            [...agendas]
-                .filter((a) => !exigirGestor || a.user)
-                .sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
+            [...agendas].filter((a) => !exigirGestor || a.user).sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
         [agendas, exigirGestor],
     );
 
+    // Agrupa por turno e pega a primeira de cada um, igual ao AgendaCalendario
+    // Evita renderizar múltiplas seções para o mesmo turno
+    const agendasPorTurno = useMemo(() => {
+        const mapa = new Map<string, Agenda>();
+        agendasOrdenadas.forEach((agenda) => {
+            if (!mapa.has(agenda.turno) && agenda.user) {
+                mapa.set(agenda.turno, agenda);
+            }
+        });
+        return Array.from(mapa.values());
+    }, [agendasOrdenadas]);
+
     const slotsPorTurno = useMemo(() => {
         if (!diaVisivel) {
-            return [] as { turno: Turno; slots: SlotDerivado[] }[];
+            return [] as { agendaId: number; turno: Turno; slots: SlotDerivado[] }[];
         }
 
-        return agendasOrdenadas.map((agenda) => ({
+        return agendasPorTurno.map((agenda) => ({
+            agendaId: agenda.id,
             turno: agenda.turno,
             slots: derivarSlotsDoTurno(agenda, [diaVisivel], slotsDaReserva),
         }));
-    }, [agendasOrdenadas, diaVisivel, slotsDaReserva]);
+    }, [agendasPorTurno, diaVisivel, slotsDaReserva]);
 
     if (!diaVisivel) {
         return null;
     }
 
     return (
-        <div className="rounded-xl border overflow-hidden">
+        <div className="overflow-hidden rounded-xl border">
             {/* Seletor de dia — alvos de toque de 44px, o mínimo confortável para o dedo */}
             <div className="flex border-b" role="tablist" aria-label="Dia da semana">
                 {diasSemana.map((dia, indice) => {
@@ -88,7 +99,9 @@ export default function CalendarDiaMobile({
                             role="tab"
                             aria-selected={ativo}
                             aria-label={`${dia.nome}, dia ${dia.diaMes}`}
-                            onClick={() => { setIndiceDia(indice); }}
+                            onClick={() => {
+                                setIndiceDia(indice);
+                            }}
                             className={cn(
                                 'relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors',
                                 'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
@@ -115,8 +128,8 @@ export default function CalendarDiaMobile({
 
             {slotsPorTurno.length === 0 && <p className="text-muted-foreground p-4 text-center text-sm">Nenhum turno disponível neste espaço.</p>}
 
-            {slotsPorTurno.map(({ turno, slots }) => (
-                <div key={turno}>
+            {slotsPorTurno.map(({ agendaId, turno, slots }) => (
+                <div key={agendaId}>
                     <div className="text-foreground bg-muted/40 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase">
                         {TURNO_LABEL[turno] ?? turno}
                     </div>
@@ -131,7 +144,13 @@ export default function CalendarDiaMobile({
                                 key={slot.id}
                                 type="button"
                                 disabled={!clicavel}
-                                onClick={clicavel ? () => { alternarSelecaoSlot(slot); } : undefined}
+                                onClick={
+                                    clicavel
+                                        ? () => {
+                                              alternarSelecaoSlot(slot);
+                                          }
+                                        : undefined
+                                }
                                 className={cn(
                                     'flex min-h-[52px] w-full items-center gap-3 border-b px-3 py-2 text-left transition-colors last:border-b-0',
                                     'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
