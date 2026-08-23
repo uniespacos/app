@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.38](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.37...v1.3.0-rc.38) (2026-08-23)
+
+
+### Bug Fixes
+
+* corrige estilo de código no UpdateReservaJob (Pint) ([fe74b12](https://github.com/uniespacos/uniespacos/commit/fe74b121137166fcda6a41cede75b4eff2d3f8bd))
+
 ## [1.3.0-rc.37](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.36...v1.3.0-rc.37) (2026-08-23)
 
 
