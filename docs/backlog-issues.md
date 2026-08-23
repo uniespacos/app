@@ -83,7 +83,9 @@ Atualizado a cada entrega.
 
 ## 🔨 Em andamento
 
-_Nada em andamento._
+- [ ] **Revogar `reservas.deletar` do institucional** `P3` · `effort: small`
+      Branch `fix/remove-admin-reserva-deletar`
+      Mesma inconsistência de regra de negócio identificada no #260: admin não deveria cancelar reserva alheia, só a própria — cancelamento de reserva de terceiros é decisão do próprio dono, não do admin. Achado colateral da revisão de `reservas.atualizar`.
 
 ---
 
@@ -91,11 +93,6 @@ _Nada em andamento._
 
 - [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
       Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
-
-**Melhorias de dados (do core-workflow-report.md)**
-
-- [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
-      Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 
 **UX em tempo real (do core-workflow-report.md)**
 
@@ -164,7 +161,8 @@ _Nada em andamento._
 - [ ] Fechar **#112** e **#108** no GitHub com comentário — mergeadas (PR #263 e #266) mas seguem OPEN, mesmo problema do `Closes #NNN` não disparar auto-close em merge para `develop`
 - [ ] Repriorizar a **#119** de `P2` → `P0` no GitHub (registro histórico; a issue já está fechada)
 - [ ] Decidir se `institucional` sem agendas **deveria** avaliar reservas (efeito colateral documentado na #119)
-- [ ] Decidir o escopo pretendido de `reservas.atualizar` — ver as três opções na **#260**
+- [x] Decidir o escopo pretendido de `reservas.atualizar` — resolvido: revogada do institucional, admin edita só a própria reserva
+- [ ] Fechar a **#260** no GitHub com comentário explicando a revisão de escopo (após merge da PR)
 - [x] Validar a **#106** com o time antes de investir — entregue e mergeada em 2026-08-23 (PR #323)
 
 > A ressalva sobre o corpo da #119 (`ReservaPolicy::view()` desatualizada) ficou registrada no comentário de fechamento, então não é mais necessário editar o corpo da issue.
