@@ -1,4 +1,5 @@
 import { derivarSlotsDoTurno } from '@/application/espacos/helpers/derivar-slots-do-turno';
+import { cn } from '@/lib/utils';
 import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo } from 'react';
@@ -28,10 +29,7 @@ export default function CalendarShiftSection({
 
     // A derivação dos slots vive em derivar-slots-do-turno para que a visão
     // mobile use exatamente os mesmos slots — ver o comentário de lá.
-    const derivados = useMemo(
-        () => derivarSlotsDoTurno(agenda, diasSemana, slotsSolicitados),
-        [agenda, diasSemana, slotsSolicitados],
-    );
+    const derivados = useMemo(() => derivarSlotsDoTurno(agenda, diasSemana, slotsSolicitados), [agenda, diasSemana, slotsSolicitados]);
 
     // Reagrupa por linha de horário, que é como a grade é desenhada.
     const linhasPorHorario = useMemo(() => {
@@ -47,10 +45,16 @@ export default function CalendarShiftSection({
     return (
         <div key={agenda.id}>
             {/* Cabeçalho do Turno */}
-            <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b bg-muted/50">
+            <div className="bg-muted/50 grid grid-cols-[80px_repeat(7,1fr)] border-b">
                 <div className="p-2 text-center text-xs font-semibold">{titulo.charAt(0).toUpperCase() + titulo.slice(1)}</div>
                 {diasSemana.map((dia) => (
-                    <div key={`${titulo}-${dia.valor}`} className="p-2 text-center text-xs font-medium"></div>
+                    <div
+                        key={`${titulo}-${dia.valor}`}
+                        className={cn('bg-muted/50 border-l p-2 text-center text-xs font-medium', dia.ehHoje && 'bg-primary/5')}
+                    >
+                        <div className="capitalize">{dia.abreviado}</div>
+                        <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
+                    </div>
                 ))}
             </div>
 
@@ -65,7 +69,9 @@ export default function CalendarShiftSection({
                             key={slot.id}
                             slot={slot}
                             isSelecionado={isSlotSelecionadoFn(slot)}
-                            onSelect={() => { alternarSelecaoSlotFn(slot); }}
+                            onSelect={() => {
+                                alternarSelecaoSlotFn(slot);
+                            }}
                         />
                     ))}
                 </div>

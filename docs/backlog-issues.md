@@ -69,20 +69,21 @@ Atualizado a cada entrega.
 
 ## 🔨 Em andamento
 
-(nenhum)
+- [ ] **#106 — Dia da semana nos grupos de turno** `P4`
+  ⚠️ **Validar antes de investir:** o header sticky já entrega o essencial.
 
 ---
 
 ## 📋 Fila
 
-**Bugs críticos (do core-workflow-report.md)**
+- [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
+  Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
 
-(nenhum restante)
-
+- [ ] **GAP-11 — Reverb completo (auto-reload em ReservasPage, etc.)** `P3` · `effort: large`
+  Eventos só notificam novas notificações. Estruturar canais (ex.: `reservas.{user_id}`) para recarregar dados.
+  
 **Melhorias de dados (do core-workflow-report.md)**
 
-- [ ] **GAP-06 — ReservaPolicy.update muito restritiva** `P2` · `effort: small`
-  Bloqueia qualquer edição se 1+ horário foi avaliado. a ideia é que o usuario possa editar o titulo ou a descrição da reserva mediante autorização do gestor
 - [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
   Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 
@@ -93,8 +94,6 @@ Atualizado a cada entrega.
 
 **Escalabilidade e UX (do core-workflow-report.md)**
 
-- [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
-  Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
 
 - [ ] **GAP-04 — Notificações de e-mail sem template HTML** `P2` · `effort: small`
   `BaseNotification.toMail()` usa texto puro. Usar template Blade customizado.
@@ -104,22 +103,15 @@ Atualizado a cada entrega.
 - [ ] **#104 — Templates de horário configuráveis pelo gestor** `P0 de negócio` · `effort: large`
   Nenhuma base no código. Exige migration, revisão da lógica de conflito e do calendário. **Precisa de design antes da execução.**
 
-- [ ] **#102 — Ordenação na "Gerenciar Reservas"** `P3` · `effort: large`
+- [ ] **#98 — Versão de build no footer** `P3`
+  a ideia é sempre ter ciencia de qual versão está em produção, quando reportado um problema saber qual branch corrigir
 
-- [ ] **#48 — Filtro/busca no dashboard do gestor** `P3`
-  Parcial: busca na aba "Favoritos" sem debounce. Falta na aba "Espaços que gerencio" e filtro de pavilhão.
-
-- [ ] **#98 — Versão de build no footer admin via CI/CD** `P3`
-
-- [ ] **#106 — Dia da semana nos grupos de turno** `P4`
-  ⚠️ **Validar antes de investir:** o header sticky já entrega o essencial.
-
-- [ ] **#107 — Alerta de solicitações pendentes sobrepostas** `P4` · `effort: large`
+- [ ] **#107 — Alerta de solicitações pendentes sobrepostas** `P4` · `effort: large` no caso quando o usuario gestor estiver com reservas que sao sobrepostas ele ter noção que há duas solicitações de interesse
 
 - [ ] **#46 — Edição administrativa de reserva** `P4`
-  Escopo maior: exige audit log, notificação ao dono, habilitar permission `reservas.atualizar`.
+  Escopo maior: exige audit log, notificação ao dono, habilitar permission `reservas.atualizar`.a ideia é que o usuario possa editar o titulo ou a descrição da reserva mediante autorização do gestor, envolve planejar uma forma de validar como esse fluxo vai acontecer, voce precisa criar um brainstorm comigo para entender as regras e oque pode ser feito
 
-- [ ] **#49 — Navegação rápida entre salas do pavilhão** `P4`
+- [ ] **#49 — Navegação rápida entre salas do pavilhão** `P4` a ideia é que o gestor quando estiver buscando uma sala ele possa atraves do visualizar agenda selecionar a proxima sala do modulo que ele está, para percorrer entre a lista de salas 
 
 **Futuro (requer design)**
 
@@ -131,9 +123,6 @@ Atualizado a cada entrega.
 
 - [ ] **GAP-10 — Histórico e audit trail de avaliações** `P3` · `effort: medium`
   Falta rastreabilidade além de `user_id` no `Horario`. Tabela de log ou eventos de domínio.
-
-- [ ] **GAP-11 — Reverb completo (auto-reload em ReservasPage, etc.)** `P3` · `effort: large`
-  Eventos só notificam novas notificações. Estruturar canais (ex.: `reservas.{user_id}`) para recarregar dados.
 
 ---
 
