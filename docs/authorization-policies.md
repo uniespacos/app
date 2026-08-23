@@ -51,24 +51,21 @@ O sistema de autorização reconhece **quatro atores** no contexto de reservas:
 
 ### 3. Usuário Institucional
 
-**Quem é:** Usuário com permissão genérica `'reservas.visualizar'`. Corresponde ao papel Spatie `'institucional'` (recebe todas as permissões reservas.* durante a seed).
+**Quem é:** Usuário com permissão genérica `'reservas.visualizar'`. Corresponde ao papel Spatie `'institucional'` (gestão institucional geral: usuários, espaços, instituições, unidades, módulos, setores, roles).
 
 **Permissões implícitas:**
-- Visualizar qualquer reserva no sistema
-- Atualizar qualquer reserva (permissão `'reservas.atualizar'`)
-- Deletar qualquer reserva (permissão `'reservas.deletar'`)
-- Avaliar reservas como gestor (se tiver `'reservas.avaliar'`)
+- Visualizar qualquer reserva no sistema (para fins de monitoramento e métricas)
+- Editar apenas sua própria reserva (mesma regra de um usuário comum: se situação `em_analise` e nenhum horário avaliado)
+- Cancelar qualquer reserva (permissão `'reservas.deletar'`, mantida — fora do escopo da revisão de 2026-08-23)
 
 **Permissões requeridas:**
-- `'reservas.visualizar'` — permissão broad que permite ver qualquer reserva
+- `'reservas.visualizar'` — permissão para visualizar qualquer reserva (monitoramento macro)
 - `'reservas.listar'` — para acessar listagens
-- `'reservas.atualizar'` (opcional) — se precisa editar reservas de terceiros
-- `'reservas.deletar'` (opcional) — se precisa deletar reservas de terceiros
-- `'reservas.avaliar'` (opcional) — se é também gestor de agendas
+- `'reservas.deletar'` — para cancelar reserva de terceiros
 
-**Escopo:** Acesso irrestrito ao domínio de reservas.
+**Escopo:** Gestor institucional (domínio administrativo) com acesso irrestrito de visualização/cancelamento de reservas. **Não edita reservas de terceiros** — isso é exclusivo do proprietário; a avaliação (aprovar/reprovar) é exclusiva do papel `'gestor'` (via `'reservas.avaliar'` e agendas).
 
-**Exemplo:** Coordenador administrativo pode visualizar qualquer reserva, aprovar todas, editar qualquer uma, mesmo sem ser dono ou gestor de agenda.
+**Exemplo:** Coordenador administrativo pode visualizar qualquer reserva, acompanhar distribuição de espaços e cancelar uma reserva problemática, mas não pode editar dados (título, horário) de uma reserva que não é sua.
 
 ---
 
@@ -90,7 +87,7 @@ As permissões Spatie relacionadas a reservas são:
 |-----------|-----------|----------|
 | `'reservas.listar'` | Listar reservas (acesso ao index) | `ReservaPolicy::viewAny()` |
 | `'reservas.visualizar'` | Visualizar qualquer reserva (bypass de propriedade) | `ReservaPolicy::view()` |
-| `'reservas.atualizar'` | Editar qualquer reserva (bypass de propriedade e situacao) | `ReservaPolicy::update()` |
+| `'reservas.atualizar'` | Editar qualquer reserva (bypass de propriedade e situacao) — **não concedida a nenhum role atualmente** (reservada para futuro fluxo de correção administrativa, ver backlog #260) | `ReservaPolicy::update()` |
 | `'reservas.deletar'` | Deletar qualquer reserva (bypass de propriedade) | `ReservaPolicy::delete()` |
 | `'reservas.avaliar'` | Avaliar (aprovar/indeferir) horários de reservas em suas agendas | `ReservaPolicy::viewForGestor()`, `GestorReservaController::show()`, `GestorReservaController::update()` |
 
@@ -202,7 +199,7 @@ return ! $hasProcessedSlots;
 - **Proprietário:** Apenas se:
   1. Situação é `'em_analise'` (não pode editar após aprovação/rejeição)
   2. Nenhum horário foi avaliado ainda (status `'deferida'` ou `'indeferida'`)
-- **Institucional:** Sempre, se tem `'reservas.atualizar'`
+- **Institucional/Admin:** Não pode (permissão `'reservas.atualizar'` foi revogada em 2026-08-23; admin segue as mesmas regras do proprietário)
 
 **Quem NÃO pode:**
 - Gestor de agenda (mesmo que gerencie a agenda)
@@ -225,7 +222,7 @@ return ! $hasProcessedSlots;
 
 **Segurança (IDOR Prevention):**
 - Sem `$user->id === $reserva->user_id`, qualquer usuário autenticado poderia editar reserva alheia.
-- `'reservas.atualizar'` é **intencional**: permite admin atualizar qualquer reserva (ex: corrigir título).
+- Permissão `'reservas.atualizar'` existe no código para futuro bypass de admin (backlog #260), mas está **revogada de todos os roles atualmente** — nenhum usuário pode editar reserva alheia.
 
 ---
 
@@ -241,7 +238,7 @@ return $user->hasPermissionTo('reservas.deletar')  // Institucional/Admin
 
 **Quem pode executar:**
 - **Proprietário:** Sempre (independente de situação ou data)
-- **Institucional:** Com `'reservas.deletar'`
+- **Institucional/Admin:** Com `'reservas.deletar'` (permissão mantida — fora do escopo da revisão de 2026-08-23, que tratou apenas de `'reservas.atualizar'`)
 
 **Quem NÃO pode:**
 - Gestor de agenda (mesmo que gerencie a agenda)
@@ -459,7 +456,7 @@ Cada papel tem escopo bem definido e não se sobrepõe:
 | Ver própria | ✅ | — | — | ✅ |
 | Ver alheia (via `reservas.visualizar`) | ❌ | ❌ | ✅ | ✅ |
 | Editar própria (se `em_analise`) | ✅ | — | — | ✅ |
-| Editar alheia (via `reservas.atualizar`) | ❌ | ❌ | ✅ (se admin) | ✅ |
+| Editar alheia (via `reservas.atualizar`) | ❌ | ❌ | ❌ | ❌ |
 | Cancelar própria | ✅ | — | — | ✅ |
 | Cancelar alheia (via `reservas.deletar`) | ❌ | ❌ | ✅ (se admin) | ✅ |
 | Avaliar (via `reservas.avaliar` + agendas) | ❌ | ✅ | — | ✅ (se admin + agendas) |
@@ -471,8 +468,8 @@ Cada papel tem escopo bem definido e não se sobrepõe:
 Conceder permissão é explícito e centralizado:
 
 - **`'reservas.listar'`** — Acesso à listagem (não filtra o quê vê, mas não há filtragem em policy)
-- **`'reservas.visualizar'`** — Acesso irrestrito a qualquer reserva (implicação: staff confiável)
-- **`'reservas.atualizar'`** — Edição irrestrita (implicação: staff confiável)
+- **`'reservas.visualizar'`** — Acesso irrestrito a qualquer reserva (implicação: staff confiável; admin usa isso para monitoramento)
+- **`'reservas.atualizar'`** — Edição irrestrita (**reservada; não concedida a nenhum role atualmente**; planejado para futuro fluxo de correção administrativa)
 - **`'reservas.deletar'`** — Cancelamento irrestrito (implicação: staff confiável)
 - **`'reservas.avaliar'`** — Avaliação de reservas em agendas do gestor (implicação: responsável por agenda)
 
@@ -510,6 +507,12 @@ A intersecção garante que:
 | `/gestor/reservas` | GET | GestorReservaController::index | — | `reservas.avaliar` + middleware | Listagem do gestor |
 | `/gestor/reservas/{id}` | GET | GestorReservaController::show | viewForGestor | `reservas.avaliar` | Página de avaliação |
 | `/gestor/reservas/{id}` | PUT/PATCH | GestorReservaController::update | viewForGestor | `reservas.avaliar` | Despatch job de avaliação |
+
+---
+
+## Histórico de Mudanças
+
+**2026-08-23:** Revogada a permissão `'reservas.atualizar'` do role `'institucional'` (admin). Antes, admin podia editar qualquer reserva indevidamente, contrariando a separação de papéis da arquitetura: admin é gestão institucional geral (usuários, espaços, instituições etc.), a gestão de reservas (editar/avaliar) é exclusiva do gestor de agenda. Agora admin edita apenas sua própria reserva, se estiver `em_analise` e nenhum horário foi avaliado — mesma regra de um usuário comum. Admin mantém `'reservas.visualizar'` (monitoramento/métricas) e `'reservas.deletar'` (cancelamento de reserva alheia, fora do escopo desta revisão). Ver migration `2026_08_23_184530_revoke_reservas_atualizar_from_institucional.php`.
 
 ---
 
