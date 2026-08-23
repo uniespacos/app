@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 export function useReservationValidation(reservaId: number): void {
     useEffect(() => {
