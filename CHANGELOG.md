@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.42](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.41...v1.3.0-rc.42) (2026-08-23)
+
+
+### Miscellaneous Chores
+
+* **ci:** remover build de frontend órfão dos jobs de build da imagem ([#331](https://github.com/uniespacos/uniespacos/issues/331)) ([038c057](https://github.com/uniespacos/uniespacos/commit/038c0574fe345fded323ebdcfb0821456b23ba27))
+
 ## [1.3.0-rc.41](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.40...v1.3.0-rc.41) (2026-08-23)
 
 
