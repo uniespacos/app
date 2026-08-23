@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.35](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.34...v1.3.0-rc.35) (2026-08-23)
+
+
+### Features
+
+* despachar ValidateReservationConflictsJob ao final de UpdateReservaJob ([#313](https://github.com/uniespacos/uniespacos/issues/313)) ([2202940](https://github.com/uniespacos/uniespacos/commit/2202940a60a9707a8ff7cfbcee08229c3a1660df))
+
 ## [1.3.0-rc.34](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.33...v1.3.0-rc.34) (2026-08-23)
 
 
