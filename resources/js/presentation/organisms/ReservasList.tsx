@@ -62,6 +62,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 semana: format(new Date(reserva.data_inicial), 'yyyy-MM-dd'),
             },
             {
+                only: ['reservaToShow'],
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
@@ -80,6 +81,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 reserva: undefined,
             },
             {
+                only: ['reservaToShow'],
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
