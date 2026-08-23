@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.50](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.49...v1.3.0-rc.50) (2026-08-23)
+
+
+### Bug Fixes
+
+* improve type safety in calendar-slot-cell with explicit boolean comparisons ([#353](https://github.com/uniespacos/uniespacos/issues/353)) ([c9ddf2a](https://github.com/uniespacos/uniespacos/commit/c9ddf2a01802154987e86f9bdcd7fc8ff80fa572))
+
 ## [1.3.0-rc.49](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.48...v1.3.0-rc.49) (2026-08-23)
 
 
