@@ -17,7 +17,7 @@ interface CalendarSlotCellProps {
  * texto quase preto por cima, ou o inverso, dependendo da célula.
  */
 const FUNDO_STATUS: Record<SlotCalendario['status'], string> = {
-    livre: 'border-success-accent/20 bg-success-subtle',
+    livre: '',
     reservado: 'border-info-accent/30 bg-info-subtle',
     selecionado: 'border-primary bg-primary/15',
     solicitado: 'border-warning-accent/30 bg-warning-subtle',
@@ -39,8 +39,10 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
 
     // Função interna para renderizar o conteúdo do slot
     const renderSlotContent = (): JSX.Element | null => {
+        // Passado não escreve rótulo: opacidade + grayscale já comunicam o
+        // estado, e a legenda explica o que significa.
         if (slot.isPast && slot.status === 'livre') {
-            return <p className="text-muted-foreground/70 text-[10px]">Passado</p>;
+            return null;
         }
 
         if (isSelecionado) {
@@ -88,9 +90,12 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                     FUNDO_STATUS[slot.status],
                     {
                         'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked,
-                        // Hover genérico apenas para slots livres e clicáveis
-                        'hover:bg-muted cursor-pointer': slot.status === 'livre' && !slot.isLocked,
-                        'opacity-90 grayscale': slot.isPast,
+                        // Livre fica neutro em repouso; o verde só aparece no
+                        // hover, como convite a interagir — mantém a cor
+                        // reservada para os estados que o usuário precisa notar
+                        // rápido (reservado, selecionado, passado).
+                        'hover:bg-success-subtle cursor-pointer': slot.status === 'livre' && !slot.isLocked,
+                        'bg-muted/60 opacity-90 grayscale': slot.isPast,
                     },
                 ],
             )}

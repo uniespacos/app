@@ -5,8 +5,8 @@ interface AgendaLegendaProps {
     isEditMode?: boolean;
 }
 
-const ITEM_LIVRE = { label: 'Livre', swatch: 'border border-border bg-background' };
-const ITEM_PASSADO = { label: 'Passado', swatch: 'bg-muted-foreground/40' };
+const ITEM_LIVRE = { label: 'Disponível para reservar', swatch: 'border border-border bg-background' };
+const ITEM_PASSADO = { label: 'Horário encerrado', swatch: 'bg-muted-foreground/40' };
 
 /**
  * Só a grade de desktop depende só de cor para comunicar o estado do slot — a
@@ -19,12 +19,12 @@ export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps
     const itens = [
         ITEM_LIVRE,
         ITEM_PASSADO,
-        { label: ESTILO_SLOT.reservado.label, swatch: ESTILO_SLOT.reservado.solido },
-        { label: ESTILO_SLOT.selecionado.label, swatch: ESTILO_SLOT.selecionado.solido },
+        { label: 'Reservado por outra pessoa', swatch: ESTILO_SLOT.reservado.solido },
+        { label: 'Selecionado por você', swatch: ESTILO_SLOT.selecionado.solido },
         ...(isEditMode
             ? [
-                  { label: ESTILO_SLOT.solicitado.label, swatch: ESTILO_SLOT.solicitado.solido },
-                  { label: ESTILO_SLOT.indeferida.label, swatch: ESTILO_SLOT.indeferida.solido },
+                  { label: 'Solicitado, aguardando avaliação', swatch: ESTILO_SLOT.solicitado.solido },
+                  { label: 'Indeferido pelo gestor', swatch: ESTILO_SLOT.indeferida.solido },
               ]
             : []),
     ];
