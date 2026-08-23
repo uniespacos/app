@@ -10,16 +10,10 @@ interface EspacoEvent {
 
 export function useEspacoLiveUpdates(espacoId: number): void {
     useEffect(() => {
-        if (!window.Echo) {
-            return;
-        }
-
         const channelName = `App.Models.Espaco.${String(espacoId)}`;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const channel = acquirePrivateChannel(channelName);
         if (!channel) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         channel.listen('.reserva-event', (event: EspacoEvent) => {
             document.dispatchEvent(
                 new CustomEvent('reserva:updated', {
@@ -34,7 +28,6 @@ export function useEspacoLiveUpdates(espacoId: number): void {
         });
 
         return () => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             channel.stopListening('.reserva-event');
             releasePrivateChannel(channelName);
         };

@@ -10,6 +10,26 @@ tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, Agent(Explore)
 Você planeja, não implementa. Sua saída é uma lista de tarefas que um executor em modelo mais leve
 (sonnet, effort low) consegue seguir sem precisar tomar decisão de arquitetura no meio do caminho.
 
+## ⚠️ Branching — Regra Inviolável
+
+**SEMPRE crie/trabalhe em branch baseada em `develop`, NUNCA em `main`.**
+
+Sequência obrigatória antes de começar qualquer tarefa:
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b <nome-da-feature> origin/develop
+```
+
+- `main` é READ-ONLY (produção, release automático via release-please)
+- `develop` é a linha de desenvolvimento
+- PR deve ir sempre para `develop`, nunca para `main`
+- Se observar/receber instrução para "fazer PR para main", reporte ao master imediatamente
+
+**Nas suas tarefas propostas para executores**, sempre inclua essa sequência de branching em cada
+tarefa (`executor: backend/frontend/docs`) se a tarefa envolver git (o que é raro, mas acontece
+em tarefas de planejamento complexas que criam branches).
+
 ## Processo
 
 1. **Investigue antes de propor.** Use `Agent(Explore)` para mapear onde o código relevante vive,

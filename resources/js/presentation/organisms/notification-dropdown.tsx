@@ -31,7 +31,7 @@ export function NotificationDropdown() {
         notifications: UserNotification[];
     }>();
     const user = props.auth.user;
-    const [notifications, setNotifications] = useState<UserNotification[]>(props.notifications || []);
+    const [notifications, setNotifications] = useState<UserNotification[]>(props.notifications ?? []);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -50,7 +50,7 @@ export function NotificationDropdown() {
             {},
             {
                 onSuccess: () => {
-                    setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() })));
+                    setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
                 },
 
                 onFinish: () => {
@@ -60,8 +60,8 @@ export function NotificationDropdown() {
         );
     };
     useEffect(() => {
-        if (user && window.Echo) {
-            const channel = acquirePrivateChannel(`App.Models.User.${user.id}`);
+        if (user) {
+            const channel = acquirePrivateChannel(`App.Models.User.${String(user.id)}`);
             if (!channel) return;
 
             channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
@@ -74,7 +74,7 @@ export function NotificationDropdown() {
                 setNotifications((prevNotifications) => [
                     {
                         // O payload do broadcast não vem com ID, então geramos um temporário ou usamos o que vier
-                        id: notification.id || String(Date.now()),
+                        id: notification.id ?? String(Date.now()),
                         type: notification.type, // O Laravel Echo adiciona o 'type' automaticamente
                         read_at: null,
                         created_at: new Date().toISOString(),
@@ -92,7 +92,7 @@ export function NotificationDropdown() {
             // Função de limpeza para quando o componente for desmontado
             return () => {
                 channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
-                releasePrivateChannel(`App.Models.User.${user.id}`);
+                releasePrivateChannel(`App.Models.User.${String(user.id)}`);
             };
         }
     }, [user]);
@@ -121,7 +121,7 @@ export function NotificationDropdown() {
                 da tela no celular; sm:w-80 volta ao tamanho fixo no desktop. */}
             <PopoverContent className="w-[calc(100vw-2rem)] p-0 sm:w-80" align="end">
                 <div className="flex items-center justify-between p-3">
-                    <h4 className="text-sm font-semibold">Notificações{unreadCount > 0 && ` (${unreadCount})`}</h4>
+                    <h4 className="text-sm font-semibold">Notificações{unreadCount > 0 && ` (${String(unreadCount)})`}</h4>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"

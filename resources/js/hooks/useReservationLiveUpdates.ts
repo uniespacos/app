@@ -8,13 +8,8 @@ interface ReservationEvent {
 
 export function useReservationLiveUpdates(): void {
     useEffect(() => {
-        if (!window.Echo) {
-            return;
-        }
-
         const ACOES_QUE_ATUALIZAM = new Set(['created', 'validated', 'evaluated']);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const channel = acquirePublicChannel('reserva-channel');
         if (!channel) return;
 
@@ -22,7 +17,6 @@ export function useReservationLiveUpdates(): void {
         // EventFormatter do laravel-echo prefixa o namespace padrão e passa a
         // escutar 'App\Events\reserva-event', enquanto ReservaEvent::broadcastAs()
         // publica apenas 'reserva-event'. Sem o ponto, o handler nunca dispara.
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         channel.listen('.reserva-event', (event: ReservationEvent) => {
             if (ACOES_QUE_ATUALIZAM.has(event.action)) {
                 document.dispatchEvent(
@@ -37,7 +31,6 @@ export function useReservationLiveUpdates(): void {
         });
 
         return () => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             channel.stopListening('.reserva-event');
             releasePublicChannel('reserva-channel');
         };

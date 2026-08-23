@@ -11,6 +11,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'UniEspaços';
 window.Pusher = Pusher as unknown as typeof window.Pusher; // Certifique-se de que o Pusher está disponível globalmente
 
 // Configure Echo using Vite environment variables directly from .env.dev
+// Cast para Echo<'reverb'> conforme declarado em global.d.ts (Window.Echo: Echo<'reverb'>)
 window.Echo = new Echo({
     broadcaster: import.meta.env.BROADCAST_CONNECTION || 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -21,7 +22,7 @@ window.Echo = new Echo({
     forceTLS: import.meta.env.VITE_REVERB_SCHEME === 'https',
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
-});
+}) as Window['Echo'];
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
