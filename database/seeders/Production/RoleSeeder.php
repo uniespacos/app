@@ -31,7 +31,10 @@ class RoleSeeder extends Seeder
         );
 
         $institucional->syncPermissions(
-            Permission::where('guard_name', 'web')->pluck('name')->toArray()
+            Permission::where('guard_name', 'web')
+                ->where('name', '!=', 'reservas.deletar')
+                ->pluck('name')
+                ->toArray()
         );
 
         $gestor->syncPermissions([
