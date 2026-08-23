@@ -1,7 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import AgendaLegenda from '@/presentation/molecules/AgendaLegenda';
 import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
@@ -65,20 +64,8 @@ export default function AgendaCalendario({
             <AgendaLegenda isEditMode={isEditMode} />
             <div className="w-full overflow-auto">
                 <div className="min-w-[800px] rounded-xl">
-                    {/* Cabeçalho com os dias da semana */}
-                    <div className="bg-background sticky top-0 z-10 grid grid-cols-[80px_repeat(7,1fr)] border-b">
-                        <div className="text-muted-foreground p-2 text-center text-sm font-medium"></div>
-                        {diasSemana.map((dia) => (
-                            <div
-                                key={dia.valor}
-                                className={cn('bg-muted/50 border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
-                            >
-                                <div className="capitalize">{dia.abreviado}</div>
-                                <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
-                            </div>
-                        ))}
-                    </div>
-                    {/* Renderiza uma seção para cada turno (Manhã, Tarde, Noite) */}
+                    {/* Renderiza uma seção para cada turno (Manhã, Tarde, Noite)
+                        Cada seção tem seu próprio header com dias da semana (#106) */}
                     {agendasPorTurno.map((agenda) => (
                         <CalendarShiftSection
                             key={agenda.id}
