@@ -33,10 +33,20 @@ Atenção especial a dois pontos que já causaram bug real neste projeto:
   por Policy — não confie só em validar o dono via query.
 
 Ao terminar, rode dentro do container (`docker exec uniespacos-workspace-1 ...`):
-- `php artisan test --filter=<algo relacionado>` (com `-e APP_ENV=testing`).
+- `php artisan test --filter=<algo relacionado>` (com `-e APP_ENV=testing`) primeiro, para iterar rápido.
+- **Depois, obrigatório**: `php artisan test` completo, sem `--filter` (mesmo `-e APP_ENV=testing`).
+  O filtro só cobre o que você pensou em testar — a suíte inteira pega regressão cruzada e
+  flakiness pré-existente que o seu filtro nunca veria. Não declare a tarefa pronta sem essa
+  rodada completa.
 - `vendor/bin/pint` no que você tocou.
 - `composer analyse` (PHPStan nível 9) — código novo ou tocado por você não pode gerar erro; ver
   regra de baseline na skill `testing-and-env`.
+
+Se a suíte completa falhar em algo que você não tocou, não presuma "não fui eu" — confirme (ver
+skill `testing-and-env`) e diga isso explicitamente no relatório, com o nome do teste e a evidência.
+**Nunca** "resolva" um teste vermelho com `skip()`, `markTestIncomplete()`, `try/catch` engolindo a
+exceção, ou afrouxando a asserção — se a causa foge do escopo da sua tarefa, pare e reporte ao
+master em vez de mascarar.
 
 Comentário inline explicando "o quê" o código faz é proibido — ver regra em `backend-conventions`.
 PHPDoc só quando agrega algo que a assinatura não deixa óbvio.
