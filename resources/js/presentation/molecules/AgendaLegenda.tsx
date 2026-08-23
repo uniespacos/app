@@ -32,7 +32,11 @@ export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps
     ];
 
     return (
-        <div className="bg-muted/30 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b px-3 py-2 text-xs">
+        // `grid grid-cols-2` no mobile: os itens têm larguras diferentes, e
+        // `flex flex-wrap` deixava a segunda linha de bolinhas desalinhada
+        // com a primeira. Grade força as duas colunas a alinhar. No desktop
+        // cabe tudo numa linha só, então volta a ser `flex`.
+        <div className="bg-muted/30 grid grid-cols-2 items-center gap-x-4 gap-y-1.5 border-b px-3 py-2 text-xs md:flex md:flex-wrap">
             {itens.map((item) => (
                 <div key={item.label} className="flex items-center gap-1.5">
                     <span aria-hidden className={cn('h-2.5 w-2.5 shrink-0 rounded-full', item.swatch)} />

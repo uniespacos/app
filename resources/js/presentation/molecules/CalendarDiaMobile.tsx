@@ -181,7 +181,19 @@ export default function CalendarDiaMobile({
                                 {/* Ao contrário da célula da grade, aqui há largura
                                     para o título inteiro da reserva. */}
                                 <span className="text-muted-foreground ml-auto truncate text-right text-xs">
-                                    {slot.status === 'reservado' && !selecionado ? slot.dadosReserva?.reserva_titulo : ESTILO_SLOT[status].label}
+                                    {(() => {
+                                        if (slot.status === 'reservado' && !selecionado) {
+                                            return slot.dadosReserva?.reserva_titulo;
+                                        }
+                                        // Livre + passado ainda diz "Livre" no texto padrão,
+                                        // e o cinza sozinho é sutil demais no mobile para
+                                        // avisar que o dia já passou — troca o texto para
+                                        // não deixar dúvida (mesma linguagem da legenda).
+                                        if (slot.status === 'livre' && slot.isPast && !selecionado) {
+                                            return 'Horário encerrado';
+                                        }
+                                        return ESTILO_SLOT[status].label;
+                                    })()}
                                 </span>
                             </button>
                         );
