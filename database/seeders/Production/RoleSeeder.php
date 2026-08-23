@@ -36,6 +36,7 @@ class RoleSeeder extends Seeder
         // (ver ReservaPolicy::update()).
         $institucional->syncPermissions(
             Permission::where('guard_name', 'web')
+                ->where('name', '!=', 'reservas.deletar')
                 ->where('name', '!=', 'reservas.atualizar')
                 ->pluck('name')
                 ->toArray()
