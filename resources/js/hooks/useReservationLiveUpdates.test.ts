@@ -103,6 +103,29 @@ describe('useReservationLiveUpdates', () => {
         );
     });
 
+    it('should dispatch reserva:updated event when callback receives evaluated action', () => {
+        renderHook(() => {
+            useReservationLiveUpdates();
+        });
+
+        const callArgs = mockListen.mock.calls.at(0) as (
+            | string
+            | ((event: { action: string; reservaId: number }) => void)
+        )[];
+        const callback = callArgs.at(1) as (event: {
+            action: string;
+            reservaId: number;
+        }) => void;
+
+        callback({ action: 'evaluated', reservaId: 3 });
+
+        expect(dispatchEventSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'reserva:updated',
+            })
+        );
+    });
+
     it('should not dispatch event when callback receives unknown action', () => {
         renderHook(() => {
             useReservationLiveUpdates();
