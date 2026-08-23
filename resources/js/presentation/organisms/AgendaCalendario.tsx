@@ -60,7 +60,7 @@ export default function AgendaCalendario({
     }
 
     return (
-        <Card className="p-0">
+        <Card className="gap-0 p-0">
             <AgendaLegenda isEditMode={isEditMode} />
             <div className="w-full overflow-auto">
                 <div className="min-w-[800px] rounded-xl">
