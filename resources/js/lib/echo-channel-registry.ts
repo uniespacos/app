@@ -7,8 +7,10 @@
  * - Não há colisão entre Echo.leave() de um consumidor derrubando listeners de outros
  */
 
-export type EchoPublicChannel = ReturnType<Window['Echo']['channel']>;
-export type EchoPrivateChannel = ReturnType<Window['Echo']['private']>;
+// Tipos derivados diretamente de Window['Echo'] (parametrizado como Echo<'reverb'> em global.d.ts)
+type EchoInstance = Window['Echo'];
+export type EchoPublicChannel = ReturnType<EchoInstance['channel']>;
+export type EchoPrivateChannel = ReturnType<EchoInstance['private']>;
 
 interface ChannelRef<T> {
     channel: T;
@@ -19,6 +21,12 @@ interface ChannelRef<T> {
 const publicChannels = new Map<string, ChannelRef<EchoPublicChannel>>();
 const privateChannels = new Map<string, ChannelRef<EchoPrivateChannel>>();
 
+// Helpers para acessar Echo de forma type-safe
+// Cast é necessário apenas para cobrir runtime onde Echo pode estar ausente antes de app.tsx rodar
+function getEchoInstance(): EchoInstance | undefined {
+    return window.Echo as EchoInstance | undefined;
+}
+
 /**
  * Adquire uma referência a um canal público Echo.
  * Se já existe, incrementa o refCount e devolve a instância cacheada.
@@ -26,7 +34,8 @@ const privateChannels = new Map<string, ChannelRef<EchoPrivateChannel>>();
  * Se window.Echo não existir, retorna undefined.
  */
 export function acquirePublicChannel(name: string): EchoPublicChannel | undefined {
-    if (!window.Echo) {
+    const echo = getEchoInstance();
+    if (!echo) {
         return undefined;
     }
 
@@ -36,7 +45,7 @@ export function acquirePublicChannel(name: string): EchoPublicChannel | undefine
         return existing.channel;
     }
 
-    const channel = window.Echo.channel(name);
+    const channel = echo.channel(name);
     publicChannels.set(name, { channel, refCount: 1 });
     return channel;
 }
@@ -54,7 +63,10 @@ export function releasePublicChannel(name: string): void {
 
     existing.refCount -= 1;
     if (existing.refCount <= 0) {
-        window.Echo?.leave(name);
+        const echo = getEchoInstance();
+        if (echo) {
+            echo.leave(name);
+        }
         publicChannels.delete(name);
     }
 }
@@ -66,7 +78,8 @@ export function releasePublicChannel(name: string): void {
  * Se window.Echo não existir, retorna undefined.
  */
 export function acquirePrivateChannel(name: string): EchoPrivateChannel | undefined {
-    if (!window.Echo) {
+    const echo = getEchoInstance();
+    if (!echo) {
         return undefined;
     }
 
@@ -76,7 +89,7 @@ export function acquirePrivateChannel(name: string): EchoPrivateChannel | undefi
         return existing.channel;
     }
 
-    const channel = window.Echo.private(name);
+    const channel = echo.private(name);
     privateChannels.set(name, { channel, refCount: 1 });
     return channel;
 }
@@ -94,7 +107,10 @@ export function releasePrivateChannel(name: string): void {
 
     existing.refCount -= 1;
     if (existing.refCount <= 0) {
-        window.Echo?.leave(name);
+        const echo = getEchoInstance();
+        if (echo) {
+            echo.leave(name);
+        }
         privateChannels.delete(name);
     }
 }

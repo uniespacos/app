@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-23 · develop em `3a87d43` · #106 concluída
+**Última atualização:** 2026-08-23 · develop em `854bf76` · GAP-11 Fase 4 concluída
 
 ---
 
@@ -69,6 +69,11 @@ Atualizado a cada entrega.
       Branch `feature/106-dias-turno` → PR #323 → merged `c52b4e7` (squash)
       O dia da semana passou a aparecer no header de cada grupo de turno (`AgendaCalendario`, `calendar-shift-section`) e o header global duplicado de dias da semana foi removido. No mobile, `CalendarDiaMobile` passou a agrupar as agendas por turno, eliminando linhas repetidas. Ajuste visual: removido o `gap-6` herdado do `Card` entre a legenda e o cabeçalho do turno. A ressalva "o header sticky já entrega o essencial" foi levantada antes da execução, mas a entrega foi validada e mergeada.
 
+- [x] **GAP-11 Fase 4 — Canais WebSocket privados por espaço** `P3` · `effort: medium`
+      Branch `feature/gap-11-fase-4-expand-channels` → PR #338 → merged `197b202` (2026-08-23)
+      Implementação de broadcasting em tempo real específico por espaço. **Backend:** ReservaEvent enriquecido com `espacoId` e `horariosCount`, broadcast dual (público `reserva-channel` + privado `App.Models.Espaco.{id}`), autorização via policy em `routes/channels.php`. **Validação:** Nova rule `HorariosMesmoEspaco` garante que todas as reservas abrangem um único espaço. **Frontend:** Novo hook `useEspacoLiveUpdates(espacoId)` subscreve a atualizações privadas de espaço; hook `useReservationLiveUpdates()` reutiliza o público. **Infraestrutura:** Channel registry com reference counting integrado em ambos os hooks. **Testes:** 7 testes de integração em `VisualizarEspacoPage`, 8 de unitário em hooks, cobertura de registry. Atualizado em `docs/realtime-websocket-channels.md` (novo arquivo) e `docs/validation-rules.md`.
+      _24 testes novos · ESLint/TypeScript/PHPUnit limpos · 0 regressões_
+
 ---
 
 ## 🔨 Em andamento
@@ -81,9 +86,6 @@ _Nada em andamento._
 
 - [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
       Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
-
-- [ ] **GAP-11 — Reverb completo (auto-reload em ReservasPage, etc.)** `P3` · `effort: large`
-      Eventos só notificam novas notificações. Estruturar canais (ex.: `reservas.{user_id}`) para recarregar dados.
 
 **Melhorias de dados (do core-workflow-report.md)**
 
@@ -166,13 +168,13 @@ _Nada em andamento._
 
 ## Placar
 
-|                        |                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------- |
-| Concluídas e mergeadas | **11** (#119, #222, #101, #105, #112, #108, #265, GAP-03, #255, GAP-02, #106) |
-| Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar**    |
-| Em andamento           | **0**                                                                         |
-| Na fila                | **18** (7 GitHub issues + 8 GAPs + futuro)                                    |
-| Obsoletos              | **1** (GAP-01)                                                                |
-| Wontfix                | **1** (#41)                                                                   |
+|                        |                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Concluídas e mergeadas | **12** (#119, #222, #101, #105, #112, #108, #265, GAP-03, #255, GAP-02, #106, GAP-11-F4) |
+| Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar**               |
+| Em andamento           | **0**                                                                                     |
+| Na fila                | **17** (7 GitHub issues + 7 GAPs + futuro)                                               |
+| Obsoletos              | **1** (GAP-01)                                                                           |
+| Wontfix                | **1** (#41)                                                                              |
 
 > ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).
