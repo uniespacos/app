@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.36](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.35...v1.3.0-rc.36) (2026-08-23)
+
+
+### Bug Fixes
+
+* remover hook obsoleto useReservationValidation de AvaliarReservaPage ([#316](https://github.com/uniespacos/uniespacos/issues/316)) ([f1609fa](https://github.com/uniespacos/uniespacos/commit/f1609fa6793d374cffc04c05fa33a74076b252ad))
+
 ## [1.3.0-rc.35](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.34...v1.3.0-rc.35) (2026-08-23)
 
 
