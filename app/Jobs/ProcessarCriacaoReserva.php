@@ -134,7 +134,9 @@ class ProcessarCriacaoReserva implements ShouldQueue
 
             Log::info('Conflict validation dispatched', ['reserva_id' => $reserva->id]);
 
-            ReservaEvent::dispatch('created', $reserva->id);
+            $espacoId = $reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
+            $horariosCount = $reserva->horarios()->count();
+            ReservaEvent::dispatch('created', $reserva->id, $espacoId, $horariosCount);
 
             try {
                 $this->solicitante->notify(new ReservationCreatedNotification($reserva));

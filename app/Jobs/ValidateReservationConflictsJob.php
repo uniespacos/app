@@ -40,7 +40,9 @@ class ValidateReservationConflictsJob implements ShouldQueue
                 'validation_status' => 'completed',
             ]);
 
-            ReservaEvent::dispatch('validated', $this->reserva->id);
+            $espacoId = $this->reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
+            $horariosCount = $this->reserva->horarios()->count();
+            ReservaEvent::dispatch('validated', $this->reserva->id, $espacoId, $horariosCount);
 
             Log::info('ValidateReservationConflictsJob completed', [
                 'reserva_id' => $this->reserva->id,

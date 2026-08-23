@@ -165,7 +165,9 @@ class UpdateReservaJob implements ShouldQueue
 
             ValidateReservationConflictsJob::dispatch($this->reserva);
 
-            ReservaEvent::dispatch('updated', $this->reserva->id);
+            $espacoId = $this->reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
+            $horariosCount = $this->reserva->horarios()->count();
+            ReservaEvent::dispatch('updated', $this->reserva->id, $espacoId, $horariosCount);
 
         } catch (Exception $e) {
             Log::error('UpdateReservaJob failed', [

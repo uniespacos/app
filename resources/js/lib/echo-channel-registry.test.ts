@@ -52,7 +52,9 @@ describe('echo-channel-registry', () => {
 
     describe('acquirePublicChannel', () => {
         it('should call window.Echo.channel only once for multiple acquisitions of the same channel', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePublicChannel('test-channel');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePublicChannel('test-channel');
 
             expect(mockChannel).toHaveBeenCalledTimes(1);
@@ -63,6 +65,7 @@ describe('echo-channel-registry', () => {
         it('should return undefined and not create a channel entry if window.Echo is undefined', () => {
             delete (window as unknown as { Echo?: unknown }).Echo;
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel = acquirePublicChannel('test-channel');
 
             expect(channel).toBeUndefined();
@@ -70,7 +73,9 @@ describe('echo-channel-registry', () => {
         });
 
         it('should handle different public channel names independently', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePublicChannel('channel-1');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePublicChannel('channel-2');
 
             expect(mockChannel).toHaveBeenCalledTimes(2);
@@ -102,11 +107,13 @@ describe('echo-channel-registry', () => {
         });
 
         it('should allow re-acquiring a channel after it has been fully released', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePublicChannel('test-channel');
             releasePublicChannel('test-channel');
 
             // Reset mocks to verify new acquisition
             mockChannel.mockClear();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePublicChannel('test-channel');
 
             expect(mockChannel).toHaveBeenCalledTimes(1);
@@ -124,7 +131,9 @@ describe('echo-channel-registry', () => {
 
     describe('acquirePrivateChannel', () => {
         it('should call window.Echo.private only once for multiple acquisitions of the same channel', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePrivateChannel('App.Models.User.1');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePrivateChannel('App.Models.User.1');
 
             expect(mockPrivate).toHaveBeenCalledTimes(1);
@@ -135,6 +144,7 @@ describe('echo-channel-registry', () => {
         it('should return undefined and not create a channel entry if window.Echo is undefined', () => {
             delete (window as unknown as { Echo?: unknown }).Echo;
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel = acquirePrivateChannel('App.Models.User.1');
 
             expect(channel).toBeUndefined();
@@ -142,7 +152,9 @@ describe('echo-channel-registry', () => {
         });
 
         it('should handle different private channel names independently', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePrivateChannel('App.Models.User.1');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePrivateChannel('App.Models.User.2');
 
             expect(mockPrivate).toHaveBeenCalledTimes(2);
@@ -174,10 +186,12 @@ describe('echo-channel-registry', () => {
         });
 
         it('should allow re-acquiring a channel after it has been fully released', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel1 = acquirePrivateChannel('App.Models.User.1');
             releasePrivateChannel('App.Models.User.1');
 
             mockPrivate.mockClear();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const channel2 = acquirePrivateChannel('App.Models.User.1');
 
             expect(mockPrivate).toHaveBeenCalledTimes(1);
@@ -195,7 +209,9 @@ describe('echo-channel-registry', () => {
 
     describe('mixed public and private channels', () => {
         it('should handle public and private channels with the same name independently', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const publicChannel = acquirePublicChannel('same-name');
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const privateChannel = acquirePrivateChannel('same-name');
 
             expect(mockChannel).toHaveBeenCalledWith('same-name');

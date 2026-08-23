@@ -236,7 +236,9 @@ class ReservaService
             }
         }
 
-        ReservaEvent::dispatch('canceled', $reserva->id);
+        $espacoId = $reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
+        $horariosCount = $reserva->horarios()->count();
+        ReservaEvent::dispatch('canceled', $reserva->id, $espacoId, $horariosCount);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Rules\HorarioDisponivel;
+use App\Rules\HorariosMesmoEspaco;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,7 +30,7 @@ class StoreReservaRequest extends FormRequest
             'data_inicial' => ['required'],
             'data_final' => ['required'],
             'recorrencia' => ['required', 'in:unica,15dias,1mes,personalizado'],
-            'horarios_solicitados' => ['required', 'array', 'min:1'],
+            'horarios_solicitados' => ['required', 'array', 'min:1', new HorariosMesmoEspaco],
             'horarios_solicitados.*.data' => ['required'],
             'horarios_solicitados.*.horario_inicio' => ['required', 'date_format:H:i:s'],
             'horarios_solicitados.*.horario_fim' => ['required', 'date_format:H:i:s'],
