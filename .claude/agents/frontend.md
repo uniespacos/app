@@ -28,9 +28,18 @@ Ao terminar:
 - Rode `npx tsc --noEmit`.
 - Rode `npx eslint <arquivo(s)>` — `strict-type-checked` type-aware; código novo ou tocado por você
   não pode gerar erro novo, ver regra de suppressions na skill `testing-and-env`.
-- Se mexeu em arquivo com teste (`*.test.ts(x)` correspondente), rode `npx jest <caminho>`.
+- Se mexeu em arquivo com teste (`*.test.ts(x)` correspondente), rode `npx jest <caminho>` primeiro,
+  para iterar rápido.
+- **Depois, obrigatório**: `npx jest` completo, sem caminho específico. O teste isolado só cobre o
+  que você pensou em testar — a suíte inteira pega regressão cruzada que o seu teste nunca veria.
+  Não declare a tarefa pronta sem essa rodada completa.
 - Reformate só o que reescreveu de fato, ou arquivo que já estava limpo — não passe prettier em
   arquivo alheio só porque tocou uma linha (gera diff de ruído).
+
+Se a suíte completa falhar em algo que você não tocou, não presuma "não fui eu" — confirme (ver
+skill `testing-and-env`) e diga isso explicitamente no relatório, com o nome do teste e a evidência.
+**Nunca** "resolva" um teste vermelho com `.skip`, `it.todo`, mock que engole o erro, ou afrouxando
+a asserção — se a causa foge do escopo da sua tarefa, pare e reporte ao master em vez de mascarar.
 
 Comentário inline explicando "o quê" o código faz é proibido — ver regra em `frontend-conventions`.
 TSDoc só quando agrega algo que a assinatura não deixa óbvio.

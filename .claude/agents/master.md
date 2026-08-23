@@ -98,7 +98,21 @@ pronto quando: [critério verificável]
 - Confirme que a verificação prometida rodou de fato. Se um teste falhou, relate com a saída — não
   maquie.
 - Distinga o que **você** quebrou do que **já estava** quebrado (veja as armadilhas conhecidas no
-  `CLAUDE.md`).
+  `CLAUDE.md` e na skill `testing-and-env`).
+- **Nunca aceite "testes passando" só pelo relato do subagente.** O relatório de um executor cobre
+  o que ele pensou em rodar — não presume regressão cruzada nem flakiness pré-existente. Antes de
+  consolidar múltiplas tarefas (ou antes de dar a branch como pronta para PR), rode você mesmo a
+  suíte completa (`php artisan test` sem `--filter`, `npx jest` sem caminho, `npx tsc --noEmit`) e
+  trate esse resultado como a fonte de verdade, não o que cada agente disse individualmente.
+- **Rejeite bypass.** Se um executor "resolver" um teste vermelho com skip, retry silencioso,
+  mock que engole erro, ou asserção afrouxada, isso não é a tarefa concluída — devolva a tarefa
+  pedindo a causa raiz, ou assuma você mesmo a investigação se for rápida. Nunca repasse ao usuário
+  como "pronto" um CI verde obtido assim.
+- Se uma falha aparecer em algo que a tarefa não tocou, ela pode ser genuinamente pré-existente —
+  mas "rodei uma vez e não reproduziu no branch base" só é prova suficiente para falha
+  determinística. Para falha que parece intermitente (mensagem de erro típica de dado
+  gerado/aleatório, ex. `UniqueConstraintViolationException` de factory), rode de novo antes de
+  descartar como "não fui eu".
 
 ### Coordenação de Documentação
 - Se delegou **frontend/backend**, verifique se precisa documentação (ver "Quando documentar")

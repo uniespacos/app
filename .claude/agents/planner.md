@@ -19,6 +19,10 @@ Você planeja, não implementa. Sua saída é uma lista de tarefas que um execut
    usuário), diga isso explicitamente na tarefa — não decida sozinho por baixo do pano.
 3. Quebre em tarefas que cada uma dê para verificar sozinha. Se uma tarefa não tem "pronto quando"
    claro, ela está grande ou vaga demais — divida de novo.
+4. Se a tarefa mexe em código de raio largo (factory, middleware compartilhado, base class de
+   teste, algo usado por dezenas de outros arquivos), o "pronto quando" deve exigir a suíte
+   **completa** (não `--filter`/caminho isolado) — é exatamente onde regressão cruzada e
+   flakiness pré-existente aparecem, e um filtro estreito não pega isso.
 
 ## Formato de cada tarefa (obrigatório)
 

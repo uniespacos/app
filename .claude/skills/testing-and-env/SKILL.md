@@ -32,6 +32,34 @@ Falha conhecida e **não relacionada** a mudanças recentes: `ErrorHandlingTest 
 not receive the envelope` — espera 403, recebe 409, só passa quando `public/build/manifest.json`
 não existe. Confirme com `git stash` antes de assumir que foi você.
 
+**Armadilha: `fake()->unique()` não garante unicidade entre testes, só dentro de um.** O
+`TestCase` do Laravel recria a aplicação (e o container) a cada método de teste, o que reseta o
+rastreamento interno do `Faker::unique()`. Com ~170 testes cada um criando vários usuários, dois
+métodos diferentes podem gerar o mesmo e-mail por puro paradoxo do aniversário —
+`UniqueConstraintViolationException` em `users_email_unique`, intermitente (passa na maioria das
+vezes, falha de vez em quando). Já quebrou o CI/CD Staging mais de uma vez sem nenhuma relação com
+o PR que disparou o build — antes de culpar sua mudança, rode o teste isolado 3-5 vezes; se ele
+falhar só às vezes e usar `fake()->unique()->safeEmail()` (ou similar) em algum factory, é isso.
+Correção correta: dar entropia real ao valor gerado (ex.: sufixo com `Str::random()`), nunca
+`retry()`/`markTestIncomplete()`/capturar a exceção — isso esconde a falha em vez de eliminar a
+causa.
+
+## Falha de teste não é para disfarçar
+
+Nunca "conserte" um teste vermelho com `skip()`, `markTestIncomplete()`, `try/catch` engolindo a
+exceção, laço de retry, ou afrouxando a asserção até ela passar. Se a causa raiz não está clara ou
+foge do escopo da tarefa, pare e reporte ao master em vez de fazer o CI ficar verde por baixo do
+pano — um bypass silencioso vira uma armadilha nova para a próxima pessoa (ou para você, na próxima
+sessão) e o incidente só reaparece mais tarde, mais caro de rastrear.
+
+Antes de declarar qualquer tarefa "pronta": rode a suíte **completa** relevante (não só
+`--filter=<seu teste>`) pelo menos uma vez. O filtro focado serve para iterar rápido; só a suíte
+inteira revela regressão cruzada e flakiness pré-existente que o seu filtro nunca veria. Se algo
+falhar fora do que você tocou, confirme se é determinístico (mesmo teste falha sempre, ex.:
+`ErrorHandlingTest` acima) ou probabilístico (falha intermitente, ex.: a armadilha do `Faker`
+acima) antes de rotular como "pré-existente, não é meu" — rodar uma vez só e não reproduzir não é
+prova suficiente para falha probabilística.
+
 ## Testes e checagem de frontend (rodam no host)
 
 ```bash
