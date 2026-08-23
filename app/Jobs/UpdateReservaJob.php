@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
