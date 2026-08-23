@@ -9,11 +9,13 @@ const ITEM_LIVRE = { label: 'Disponível para reservar', swatch: 'border border-
 const ITEM_PASSADO = { label: 'Horário encerrado', swatch: 'bg-muted-foreground/40' };
 
 /**
- * Só a grade de desktop depende só de cor para comunicar o estado do slot — a
- * lista mobile já escreve o rótulo ("Reservado", "Livre") em cada linha, então
- * a legenda só aparece ali. Em modo de agendamento normal um slot só pode ser
- * livre, passado, reservado ou selecionado; "em análise" e "indeferida" só
- * existem enquanto se edita uma reserva específica, então só aparecem nesse modo.
+ * Compartilhada entre a grade desktop e a lista mobile — as duas usam a mesma
+ * paleta (fundo por status via `ESTILO_SLOT[status].fundo`), então a legenda
+ * vale para as duas. A lista mobile também escreve o rótulo por linha, mas a
+ * legenda ainda ajuda: explica o "porquê" da cor sem precisar tocar em cada
+ * linha. Em modo de agendamento normal um slot só pode ser livre, passado,
+ * reservado ou selecionado; "em análise" e "indeferida" só existem enquanto
+ * se edita uma reserva específica, então só aparecem nesse modo.
  */
 export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps) {
     const itens = [
