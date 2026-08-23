@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
 
 interface NotificationData {
     titulo: string;
@@ -60,7 +61,9 @@ export function NotificationDropdown() {
     };
     useEffect(() => {
         if (user && window.Echo) {
-            const channel = window.Echo.private(`App.Models.User.${user.id}`);
+            const channel = acquirePrivateChannel(`App.Models.User.${user.id}`);
+            if (!channel) return;
+
             channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
                 // Linha essencial para debug: veja exatamente o que está chegando!
 
@@ -89,7 +92,7 @@ export function NotificationDropdown() {
             // Função de limpeza para quando o componente for desmontado
             return () => {
                 channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
-                // Usar window.Echo.leave() também é uma opção
+                releasePrivateChannel(`App.Models.User.${user.id}`);
             };
         }
     }, [user]);
