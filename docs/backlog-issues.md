@@ -3,11 +3,17 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-23 · develop em `854bf76` · GAP-11 Fase 4 concluída
+**Última atualização:** 2026-08-23 · develop em `854bf76` · #260 revisado (premissa incorreta, virou correção de autorização)
 
 ---
 
 ## ✅ Concluídas
+
+- [x] **#260 — Edição admin não registra log nem notifica dono** `P3` → **premissa incorreta, revisado**
+      Branch `fix/remove-admin-reserva-atualizar`
+      A issue partia do princípio de que a edição admin de reserva alheia era um comportamento desejado, só faltando auditoria. Revisão de regra de negócio: admin (`institucional`) é gestão institucional geral (usuários, espaços, instituições, métricas) — **não gerencia reservas de terceiros**, isso é exclusivo do gestor de agenda (via avaliação). A permissão `reservas.atualizar` foi **revogada** do role `institucional` (não deletada da tabela — `ReservaPolicy::update()` chama `hasPermissionTo()` incondicionalmente para todo usuário, deletar a permissão quebraria a edição para todo mundo). `RoleSeeder` corrigido, pois fazia `syncPermissions(Permission::all())` e reatribuía a permissão a cada seed. Admin agora edita apenas a própria reserva, como um usuário comum — não há mais necessidade de log/notificação de edição alheia, pois ela não existe mais.
+      Achado colateral: a mesma inconsistência existe em `reservas.deletar` (cancelamento de reserva alheia) — tratado separadamente na tarefa `fix/remove-admin-reserva-deletar`.
+      _174 testes passando · 1 falha pré-existente isolada (ErrorHandlingTest, não relacionada)_
 
 - [x] **#119 — IDOR em detalhes/edição de reserva** `P0`
       Branch `fix/idor-reserva-authorization` → PR #253 → merged `4a59670`
@@ -78,7 +84,9 @@ Atualizado a cada entrega.
 
 ## 🔨 Em andamento
 
-_Nada em andamento._
+- [ ] **Revogar `reservas.deletar` do institucional** `P3` · `effort: small`
+      Branch `fix/remove-admin-reserva-deletar`
+      Mesma inconsistência de regra de negócio identificada no #260: admin não deveria cancelar reserva alheia, só a própria — cancelamento de reserva de terceiros é decisão do próprio dono, não do admin. Achado colateral da revisão de `reservas.atualizar`.
 
 ---
 
@@ -86,11 +94,6 @@ _Nada em andamento._
 
 - [ ] **GAP-05 — ReservasGestorPage sem filtro de período** `P2` · `effort: medium`
       Lista traz todas as reservas sem data filter — lento em produção. Adicionar período + índice.
-
-**Melhorias de dados (do core-workflow-report.md)**
-
-- [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
-      Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 
 **UX em tempo real (do core-workflow-report.md)**
 
@@ -159,7 +162,8 @@ _Nada em andamento._
 - [ ] Fechar **#112** e **#108** no GitHub com comentário — mergeadas (PR #263 e #266) mas seguem OPEN, mesmo problema do `Closes #NNN` não disparar auto-close em merge para `develop`
 - [ ] Repriorizar a **#119** de `P2` → `P0` no GitHub (registro histórico; a issue já está fechada)
 - [ ] Decidir se `institucional` sem agendas **deveria** avaliar reservas (efeito colateral documentado na #119)
-- [ ] Decidir o escopo pretendido de `reservas.atualizar` — ver as três opções na **#260**
+- [x] Decidir o escopo pretendido de `reservas.atualizar` — resolvido: revogada do institucional, admin edita só a própria reserva
+- [ ] Fechar a **#260** no GitHub com comentário explicando a revisão de escopo (após merge da PR)
 - [x] Validar a **#106** com o time antes de investir — entregue e mergeada em 2026-08-23 (PR #323)
 
 > A ressalva sobre o corpo da #119 (`ReservaPolicy::view()` desatualizada) ficou registrada no comentário de fechamento, então não é mais necessário editar o corpo da issue.
@@ -171,9 +175,10 @@ _Nada em andamento._
 |                        |                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
 | Concluídas e mergeadas | **12** (#119, #222, #101, #105, #112, #108, #265, GAP-03, #255, GAP-02, #106, GAP-11-F4) |
+| Concluída, aguardando PR | **1** (#260 — branch `fix/remove-admin-reserva-atualizar` pronta, aguardando abertura de PR) |
 | Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar**               |
-| Em andamento           | **0**                                                                                     |
-| Na fila                | **17** (7 GitHub issues + 7 GAPs + futuro)                                               |
+| Em andamento           | **1** (revogar `reservas.deletar` do institucional — branch `fix/remove-admin-reserva-deletar`) |
+| Na fila                | **16** (6 GitHub issues + 7 GAPs + futuro)                                               |
 | Obsoletos              | **1** (GAP-01)                                                                           |
 | Wontfix                | **1** (#41)                                                                              |
 

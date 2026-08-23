@@ -29,7 +29,6 @@ class PermissionSeeder extends Seeder
         // Reservas
         'reservas.listar',
         'reservas.visualizar',
-        'reservas.atualizar',
         'reservas.deletar',
         'reservas.avaliar',
         // Roles
