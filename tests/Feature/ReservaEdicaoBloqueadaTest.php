@@ -111,10 +111,10 @@ class ReservaEdicaoBloqueadaTest extends TestCase
     }
 
     /**
-     * Documents the permission path: 'reservas.atualizar' short-circuits the
-     * policy, and only the 'institucional' role holds it.
+     * After removing 'reservas.atualizar' from the 'institucional' role,
+     * admin can only edit their own reservations in 'em_analise' status.
      */
-    public function test_institucional_can_edit_an_evaluated_reservation(): void
+    public function test_institucional_cannot_edit_evaluated_reservation_of_another_user(): void
     {
         $dono = User::factory()->create();
         $dono->assignRole('comum');
@@ -122,6 +122,18 @@ class ReservaEdicaoBloqueadaTest extends TestCase
         $institucional->assignRole('institucional');
 
         $reserva = $this->criarReserva($dono, 'deferida', 'deferida');
+
+        $this->actingAs($institucional)
+            ->get(route('reservas.edit', $reserva->id))
+            ->assertForbidden();
+    }
+
+    public function test_institucional_can_edit_own_pending_reservation(): void
+    {
+        $institucional = User::factory()->create();
+        $institucional->assignRole('institucional');
+
+        $reserva = $this->criarReserva($institucional, 'em_analise', 'em_analise');
 
         $this->actingAs($institucional)
             ->get(route('reservas.edit', $reserva->id))
