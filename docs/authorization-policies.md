@@ -51,24 +51,23 @@ O sistema de autorização reconhece **quatro atores** no contexto de reservas:
 
 ### 3. Usuário Institucional
 
-**Quem é:** Usuário com permissão genérica `'reservas.visualizar'`. Corresponde ao papel Spatie `'institucional'` (recebe todas as permissões reservas.* durante a seed).
+**Quem é:** Usuário com permissão genérica `'reservas.visualizar'`. Corresponde ao papel Spatie `'institucional'` (recebe a maioria das permissões reservas.*, exceto `'reservas.deletar'`, durante a seed).
 
 **Permissões implícitas:**
 - Visualizar qualquer reserva no sistema
 - Atualizar qualquer reserva (permissão `'reservas.atualizar'`)
-- Deletar qualquer reserva (permissão `'reservas.deletar'`)
+- Cancelar apenas a própria reserva (proprietário, não permissão de admin)
 - Avaliar reservas como gestor (se tiver `'reservas.avaliar'`)
 
 **Permissões requeridas:**
 - `'reservas.visualizar'` — permissão broad que permite ver qualquer reserva
 - `'reservas.listar'` — para acessar listagens
 - `'reservas.atualizar'` (opcional) — se precisa editar reservas de terceiros
-- `'reservas.deletar'` (opcional) — se precisa deletar reservas de terceiros
 - `'reservas.avaliar'` (opcional) — se é também gestor de agendas
 
-**Escopo:** Acesso irrestrito ao domínio de reservas.
+**Escopo:** Acesso irrestrito ao domínio de reservas, exceto cancelamento de reservas alheias.
 
-**Exemplo:** Coordenador administrativo pode visualizar qualquer reserva, aprovar todas, editar qualquer uma, mesmo sem ser dono ou gestor de agenda.
+**Exemplo:** Coordenador administrativo pode visualizar qualquer reserva, aprovar todas, editar qualquer uma — mas não pode cancelar reservas de terceiros (cancelamento é exclusivo do proprietário ou decisão do staff operacional específico).
 
 ---
 
@@ -91,7 +90,7 @@ As permissões Spatie relacionadas a reservas são:
 | `'reservas.listar'` | Listar reservas (acesso ao index) | `ReservaPolicy::viewAny()` |
 | `'reservas.visualizar'` | Visualizar qualquer reserva (bypass de propriedade) | `ReservaPolicy::view()` |
 | `'reservas.atualizar'` | Editar qualquer reserva (bypass de propriedade e situacao) | `ReservaPolicy::update()` |
-| `'reservas.deletar'` | Deletar qualquer reserva (bypass de propriedade) | `ReservaPolicy::delete()` |
+| `'reservas.deletar'` | ~~Deletar qualquer reserva (bypass de propriedade)~~ Permissão **não concedida a nenhum role desde 2026-08-23** (migration `2026_08_23_155138_revoke_reservas_deletar_from_institucional`) — cancelamento é exclusivamente por proprietário. | `ReservaPolicy::delete()` |
 | `'reservas.avaliar'` | Avaliar (aprovar/indeferir) horários de reservas em suas agendas | `ReservaPolicy::viewForGestor()`, `GestorReservaController::show()`, `GestorReservaController::update()` |
 
 **Permissões de controle de seção:**
@@ -233,17 +232,18 @@ return ! $hasProcessedSlots;
 
 **Propósito:** Autorizar cancelamento de uma reserva (soft-delete).
 
-**Lógica:**
+**Lógica (código real, inalterado):**
 ```
-return $user->hasPermissionTo('reservas.deletar')  // Institucional/Admin
-    || $user->id === $reserva->user_id;             // Solicitante
+return $user->hasPermissionTo('reservas.deletar')  // Bypass de propriedade, se concedida
+    || $user->id === $reserva->user_id;             // Solicitante (proprietário)
 ```
 
 **Quem pode executar:**
 - **Proprietário:** Sempre (independente de situação ou data)
-- **Institucional:** Com `'reservas.deletar'`
+- **Institucional/Admin:** Não pode — a permissão `'reservas.deletar'` continua existindo na tabela (necessária para o `hasPermissionTo()` acima não lançar exceção), mas não é mais concedida a nenhum role desde 2026-08-23 (migration `2026_08_23_155138_revoke_reservas_deletar_from_institucional.php`)
 
 **Quem NÃO pode:**
+- Institucional/Admin (sem `'reservas.deletar'`, não é proprietário)
 - Gestor de agenda (mesmo que gerencie a agenda)
 - Usuário comum sem `'reservas.deletar'` e que não é proprietário
 
@@ -392,18 +392,19 @@ return ! $hasProcessedSlots;
 
 #### `delete()` — Proteção contra cancelamento indevido
 
-**Implementação:**
+**Implementação (código real, inalterado):**
 ```php
-return $user->hasPermissionTo('reservas.deletar') 
+return $user->hasPermissionTo('reservas.deletar')
     || $user->id === $reserva->user_id;
 ```
 
 **Defesa:**
-- Proprietário pode cancelar qualquer hora
-- Admin com `'reservas.deletar'` pode cancelar qualquer reserva
+- Proprietário pode cancelar qualquer hora (check de propriedade)
+- Permissão `'reservas.deletar'` não é mais concedida a nenhum role (desde 2026-08-23) — na prática, só o check de propriedade se aplica hoje
 - Gestor (sem `'reservas.deletar'`) não consegue cancelar reserva de outro usuário
+- Admin (sem `'reservas.deletar'`, desde a revogação) não consegue cancelar reserva de terceiros
 
-**Invasor consegue deletar se:** Conseguir fazer parecer que é proprietário OU conseguir permissão `'reservas.deletar'`.
+**Invasor consegue deletar se:** Conseguir fazer parecer que é proprietário. A permissão `'reservas.deletar'` continua existindo na tabela mas não está concedida a nenhum role — se um dia for reatribuída a algum role, esse role volta a ser um vetor de bypass válido (não é uma vulnerabilidade, é a mesma lógica de `'reservas.atualizar'`).
 
 ---
 
@@ -461,7 +462,7 @@ Cada papel tem escopo bem definido e não se sobrepõe:
 | Editar própria (se `em_analise`) | ✅ | — | — | ✅ |
 | Editar alheia (via `reservas.atualizar`) | ❌ | ❌ | ✅ (se admin) | ✅ |
 | Cancelar própria | ✅ | — | — | ✅ |
-| Cancelar alheia (via `reservas.deletar`) | ❌ | ❌ | ✅ (se admin) | ✅ |
+| Cancelar alheia (via `reservas.deletar`) | ❌ | ❌ | ❌ | ❌ |
 | Avaliar (via `reservas.avaliar` + agendas) | ❌ | ✅ | — | ✅ (se admin + agendas) |
 
 ---
@@ -473,7 +474,7 @@ Conceder permissão é explícito e centralizado:
 - **`'reservas.listar'`** — Acesso à listagem (não filtra o quê vê, mas não há filtragem em policy)
 - **`'reservas.visualizar'`** — Acesso irrestrito a qualquer reserva (implicação: staff confiável)
 - **`'reservas.atualizar'`** — Edição irrestrita (implicação: staff confiável)
-- **`'reservas.deletar'`** — Cancelamento irrestrito (implicação: staff confiável)
+- **`'reservas.deletar'`** — **Não concedida a nenhum role desde 2026-08-23.** Cancelamento é direito exclusivo do proprietário (decisão de negócio).
 - **`'reservas.avaliar'`** — Avaliação de reservas em agendas do gestor (implicação: responsável por agenda)
 
 ---
@@ -524,4 +525,16 @@ Ao adicionar novo método a `ReservaPolicy`:
 - [ ] Documentar invariantes no topo do método
 - [ ] Adicionar teste de regressão em `ReservaAuthorizationTest`
 - [ ] Atualizar este documento
+
+---
+
+## Histórico de Mudanças
+
+### 2026-08-23
+
+- **Revogação de `reservas.deletar` do role `institucional`** (migration `2026_08_23_155138_revoke_reservas_deletar_from_institucional.php`)
+  - Admin não pode mais cancelar (soft-delete) reservas de terceiros
+  - Cancelamento agora é direito exclusivo do proprietário
+  - Afeta `ReservaPolicy::delete()` e verificação de `IDOR Prevention`
+  - Teste: `ReservaCancelamentoAdminTest`
 
