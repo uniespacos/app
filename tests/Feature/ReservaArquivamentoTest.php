@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Events\ReservaEvent;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
@@ -11,6 +12,7 @@ use App\Models\Reserva;
 use App\Models\User;
 use App\Notifications\ReservationCanceledNotification;
 use App\Services\ReservaService;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -308,5 +310,21 @@ class ReservaArquivamentoTest extends TestCase
 
         Notification::assertSentTo($gestor, ReservationCanceledNotification::class);
         $this->assertSame('inativa', $reserva->fresh()->situacao);
+    }
+
+    /** Ao cancelar uma reserva, um evento de WebSocket é disparado. */
+    public function test_cancelar_reserva_dispara_evento_websocket(): void
+    {
+        Event::fake();
+
+        $dono = User::factory()->create();
+        $gestor = User::factory()->create();
+        $reserva = $this->criarReserva($dono, $gestor, 'em_analise', 'Ativa');
+
+        app(ReservaService::class)->cancel($reserva, $dono);
+
+        Event::assertDispatched(ReservaEvent::class, function ($event) use ($reserva) {
+            return $event->action === 'canceled' && $event->reservaId === $reserva->id;
+        });
     }
 }
