@@ -14,6 +14,7 @@ export function useReservationLiveUpdates(): void {
 
         const ACOES_QUE_ATUALIZAM = new Set(['created', 'validated', 'evaluated']);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const channel = acquirePublicChannel('reserva-channel');
         if (!channel) return;
 

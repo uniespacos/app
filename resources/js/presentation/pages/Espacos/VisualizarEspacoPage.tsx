@@ -4,6 +4,7 @@ import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useReservationLiveUpdates } from '@/hooks/useReservationLiveUpdates';
+import { useEspacoLiveUpdates } from '@/hooks/useEspacoLiveUpdates';
 
 export default function VisualizarEspaço({
     espaco,
@@ -22,20 +23,14 @@ export default function VisualizarEspaço({
     };
 }) {
     useReservationLiveUpdates();
+    useEspacoLiveUpdates(espaco.id);
 
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout> | undefined;
 
         const handleUpdate = () => {
-            // Uma única reserva emite 'created' e logo em seguida 'validated';
-            // o debounce colapsa a rajada num único request.
             clearTimeout(timer);
             timer = setTimeout(() => {
-                // `only: ['espaco']` mantém 'semana' e, principalmente, 'flash'
-                // fora da resposta — sem isso, a reserva feita por outro usuário
-                // dispararia um toast sem sentido aqui (app-layout.tsx observa
-                // `flash`). preserveScroll/preserveState não aparecem aqui porque
-                // `reload()` já os força internamente (por isso ReloadOptions os omite).
                 router.reload({ only: ['espaco'] });
             }, 400);
         };

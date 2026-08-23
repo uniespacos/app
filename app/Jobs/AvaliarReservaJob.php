@@ -143,7 +143,9 @@ class AvaliarReservaJob implements ShouldQueue
 
             $this->reserva->refresh();
 
-            ReservaEvent::dispatch('evaluated', $this->reserva->id);
+            $espacoId = $this->reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
+            $horariosCount = $this->reserva->horarios()->count();
+            ReservaEvent::dispatch('evaluated', $this->reserva->id, $espacoId, $horariosCount);
 
             Log::info('AvaliarReservaJob completed', [
                 'reserva_id' => $this->reserva->id,

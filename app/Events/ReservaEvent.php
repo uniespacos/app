@@ -16,11 +16,13 @@ class ReservaEvent implements ShouldBroadcastNow
     public function __construct(
         public string $action,
         public int $reservaId,
+        public int $espacoId,
+        public int $horariosCount,
     ) {}
 
     public function broadcastOn()
     {
-        return ['reserva-channel'];
+        return ['reserva-channel', "App.Models.Espaco.{$this->espacoId}"];
     }
 
     public function broadcastAs()
@@ -33,6 +35,11 @@ class ReservaEvent implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
-        return ['action' => $this->action, 'reservaId' => $this->reservaId];
+        return [
+            'action' => $this->action,
+            'reservaId' => $this->reservaId,
+            'espacoId' => $this->espacoId,
+            'horariosCount' => $this->horariosCount,
+        ];
     }
 }
