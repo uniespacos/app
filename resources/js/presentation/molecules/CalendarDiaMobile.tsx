@@ -159,7 +159,7 @@ export default function CalendarDiaMobile({
                                     // escolhendo para reservar agora, não a cor
                                     // de marca (que aqui é o seletor de dia acima).
                                     selecionado && 'bg-success-subtle',
-                                    slot.isPast && !selecionado && 'opacity-55',
+                                    slot.isPast && !selecionado && 'opacity-90 grayscale',
                                 )}
                             >
                                 {/* Faixa de cor à esquerda: o status fica legível sem

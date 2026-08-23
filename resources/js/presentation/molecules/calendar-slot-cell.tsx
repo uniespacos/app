@@ -17,7 +17,7 @@ interface CalendarSlotCellProps {
  * texto quase preto por cima, ou o inverso, dependendo da célula.
  */
 const FUNDO_STATUS: Record<SlotCalendario['status'], string> = {
-    livre: '',
+    livre: 'border-success-accent/20 bg-success-subtle',
     reservado: 'border-info-accent/30 bg-info-subtle',
     selecionado: 'border-primary bg-primary/15',
     solicitado: 'border-warning-accent/30 bg-warning-subtle',
@@ -90,8 +90,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                         'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked,
                         // Hover genérico apenas para slots livres e clicáveis
                         'hover:bg-muted cursor-pointer': slot.status === 'livre' && !slot.isLocked,
-                        'bg-muted/60': slot.isPast && slot.status === 'livre',
-                        'opacity-60 grayscale': slot.isPast && slot.status !== 'livre',
+                        'opacity-90 grayscale': slot.isPast,
                     },
                 ],
             )}

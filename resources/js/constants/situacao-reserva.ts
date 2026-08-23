@@ -63,7 +63,7 @@ export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
  * situações de reserva nenhuma.
  */
 export const ESTILO_SLOT = {
-    livre: { label: 'Livre', solido: 'bg-muted-foreground/25' },
+    livre: { label: 'Livre', solido: 'bg-success-subtle' },
     reservado: { label: 'Reservado', solido: 'bg-info' },
     /*
       `selecionado` é o horário que o usuário está escolhendo para reservar
