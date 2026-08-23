@@ -63,8 +63,12 @@ export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
  * situações de reserva nenhuma.
  */
 export const ESTILO_SLOT = {
-    livre: { label: 'Livre', solido: 'bg-muted-foreground/25' },
-    reservado: { label: 'Reservado', solido: 'bg-info' },
+    // `fundo` fica vazio de propósito: livre é o estado neutro de repouso, a
+    // cor entra só no hover (grade desktop e lista mobile aplicam isso na
+    // própria classe do container, não aqui, porque hover não é um valor
+    // estático). Mantido aqui só para as duas visões usarem o mesmo shape.
+    livre: { label: 'Livre', solido: 'bg-muted-foreground/25', fundo: '' },
+    reservado: { label: 'Reservado', solido: 'bg-info', fundo: 'bg-info-subtle' },
     /*
       `selecionado` é o horário que o usuário está escolhendo para reservar
       agora — verde, não a cor de marca. Reutiliza o mesmo token de `deferida`
@@ -73,8 +77,8 @@ export const ESTILO_SLOT = {
       positivo, e usar cores diferentes para os dois criaria uma distinção que
       o usuário não precisa fazer nesse momento.
     */
-    selecionado: { label: 'Selecionado', solido: 'bg-success' },
-    solicitado: { label: 'Em análise', solido: 'bg-warning' },
-    deferida: { label: 'Deferida', solido: 'bg-success' },
-    indeferida: { label: 'Indeferida', solido: 'bg-destructive' },
+    selecionado: { label: 'Selecionado', solido: 'bg-success', fundo: 'bg-success-subtle' },
+    solicitado: { label: 'Em análise', solido: 'bg-warning', fundo: 'bg-warning-subtle' },
+    deferida: { label: 'Deferida', solido: 'bg-success', fundo: 'bg-success-subtle' },
+    indeferida: { label: 'Indeferida', solido: 'bg-destructive', fundo: 'bg-destructive-subtle' },
 } as const;

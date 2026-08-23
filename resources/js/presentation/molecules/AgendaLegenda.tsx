@@ -5,32 +5,38 @@ interface AgendaLegendaProps {
     isEditMode?: boolean;
 }
 
-const ITEM_LIVRE = { label: 'Livre', swatch: 'border border-border bg-background' };
-const ITEM_PASSADO = { label: 'Passado', swatch: 'bg-muted-foreground/40' };
+const ITEM_LIVRE = { label: 'Disponível para reservar', swatch: 'border border-border bg-background' };
+const ITEM_PASSADO = { label: 'Horário encerrado', swatch: 'bg-muted-foreground/40' };
 
 /**
- * Só a grade de desktop depende só de cor para comunicar o estado do slot — a
- * lista mobile já escreve o rótulo ("Reservado", "Livre") em cada linha, então
- * a legenda só aparece ali. Em modo de agendamento normal um slot só pode ser
- * livre, passado, reservado ou selecionado; "em análise" e "indeferida" só
- * existem enquanto se edita uma reserva específica, então só aparecem nesse modo.
+ * Compartilhada entre a grade desktop e a lista mobile — as duas usam a mesma
+ * paleta (fundo por status via `ESTILO_SLOT[status].fundo`), então a legenda
+ * vale para as duas. A lista mobile também escreve o rótulo por linha, mas a
+ * legenda ainda ajuda: explica o "porquê" da cor sem precisar tocar em cada
+ * linha. Em modo de agendamento normal um slot só pode ser livre, passado,
+ * reservado ou selecionado; "em análise" e "indeferida" só existem enquanto
+ * se edita uma reserva específica, então só aparecem nesse modo.
  */
 export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps) {
     const itens = [
         ITEM_LIVRE,
         ITEM_PASSADO,
-        { label: ESTILO_SLOT.reservado.label, swatch: ESTILO_SLOT.reservado.solido },
-        { label: ESTILO_SLOT.selecionado.label, swatch: ESTILO_SLOT.selecionado.solido },
+        { label: 'Reservado por outra pessoa', swatch: ESTILO_SLOT.reservado.solido },
+        { label: 'Selecionado por você', swatch: ESTILO_SLOT.selecionado.solido },
         ...(isEditMode
             ? [
-                  { label: ESTILO_SLOT.solicitado.label, swatch: ESTILO_SLOT.solicitado.solido },
-                  { label: ESTILO_SLOT.indeferida.label, swatch: ESTILO_SLOT.indeferida.solido },
+                  { label: 'Solicitado, aguardando avaliação', swatch: ESTILO_SLOT.solicitado.solido },
+                  { label: 'Indeferido pelo gestor', swatch: ESTILO_SLOT.indeferida.solido },
               ]
             : []),
     ];
 
     return (
-        <div className="bg-muted/30 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b px-3 py-2 text-xs">
+        // `grid grid-cols-2` no mobile: os itens têm larguras diferentes, e
+        // `flex flex-wrap` deixava a segunda linha de bolinhas desalinhada
+        // com a primeira. Grade força as duas colunas a alinhar. No desktop
+        // cabe tudo numa linha só, então volta a ser `flex`.
+        <div className="bg-muted/30 grid grid-cols-2 items-center gap-x-4 gap-y-1.5 border-b px-3 py-2 text-xs md:flex md:flex-wrap">
             {itens.map((item) => (
                 <div key={item.label} className="flex items-center gap-1.5">
                     <span aria-hidden className={cn('h-2.5 w-2.5 shrink-0 rounded-full', item.swatch)} />

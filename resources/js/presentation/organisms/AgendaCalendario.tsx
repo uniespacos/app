@@ -47,7 +47,8 @@ export default function AgendaCalendario({
     // desperdiçaria trabalho justamente no aparelho que queremos aliviar.
     if (isMobile) {
         return (
-            <Card className="p-0">
+            <Card className="gap-0 p-0">
+                <AgendaLegenda isEditMode={isEditMode} />
                 <CalendarDiaMobile
                     diasSemana={diasSemana}
                     agendas={agendas}

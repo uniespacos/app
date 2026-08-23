@@ -35,12 +35,19 @@ const TEXTO_STATUS: Record<SlotCalendario['status'], string> = {
 };
 
 export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: CalendarSlotCellProps) {
-    const isClickable = slot.status !== 'reservado' && !slot.isLocked;
+    // Passado nunca é clicável: clicar nele acionava a lógica de
+    // "mover para a semana seguinte" do hook de seleção, que troca
+    // silenciosamente a célula selecionada por outra em outro dia —
+    // confuso, já que quem clica não vê nenhuma relação entre a célula
+    // que tocou e a que realmente foi marcada.
+    const isClickable = slot.status !== 'reservado' && !slot.isLocked && !slot.isPast;
 
     // Função interna para renderizar o conteúdo do slot
     const renderSlotContent = (): JSX.Element | null => {
+        // Passado não escreve rótulo: opacidade + grayscale já comunicam o
+        // estado, e a legenda explica o que significa.
         if (slot.isPast && slot.status === 'livre') {
-            return <p className="text-muted-foreground/70 text-[10px]">Passado</p>;
+            return null;
         }
 
         if (isSelecionado) {
@@ -87,11 +94,13 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 !isSelecionado && [
                     FUNDO_STATUS[slot.status],
                     {
-                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked,
-                        // Hover genérico apenas para slots livres e clicáveis
-                        'hover:bg-muted cursor-pointer': slot.status === 'livre' && !slot.isLocked,
-                        'bg-muted/60': slot.isPast && slot.status === 'livre',
-                        'opacity-60 grayscale': slot.isPast && slot.status !== 'livre',
+                        'cursor-not-allowed': slot.status === 'reservado' || slot.isLocked || slot.isPast,
+                        // Livre fica neutro em repouso; o verde só aparece no
+                        // hover, como convite a interagir — mantém a cor
+                        // reservada para os estados que o usuário precisa notar
+                        // rápido (reservado, selecionado, passado).
+                        'hover:bg-success-subtle cursor-pointer': slot.status === 'livre' && !slot.isLocked && !slot.isPast,
+                        'bg-muted/60 opacity-90 grayscale': slot.isPast,
                     },
                 ],
             )}
