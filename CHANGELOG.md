@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.33](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.32...v1.3.0-rc.33) (2026-08-23)
+
+
+### Bug Fixes
+
+* corrigir erros ESLint no teste e componentes React ([#309](https://github.com/uniespacos/uniespacos/issues/309)) ([e6b64ff](https://github.com/uniespacos/uniespacos/commit/e6b64ff751e4b767e033fa1a7dba2316127fb87c))
+
 ## [1.3.0-rc.32](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.31...v1.3.0-rc.32) (2026-08-23)
 
 
