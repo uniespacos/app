@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.47](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.46...v1.3.0-rc.47) (2026-08-23)
+
+
+### Bug Fixes
+
+* admin não gerencia mais reservas de terceiros (cancelamento) ([#344](https://github.com/uniespacos/uniespacos/issues/344)) ([a6c69df](https://github.com/uniespacos/uniespacos/commit/a6c69df0fb80d8a40fa306339562cd199dc66de4))
+
 ## [1.3.0-rc.46](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.45...v1.3.0-rc.46) (2026-08-23)
 
 
