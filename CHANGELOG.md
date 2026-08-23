@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.49](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.48...v1.3.0-rc.49) (2026-08-23)
+
+
+### Bug Fixes
+
+* melhora contraste e clareza dos slots de horário no calendário ([#349](https://github.com/uniespacos/uniespacos/issues/349)) ([0053c48](https://github.com/uniespacos/uniespacos/commit/0053c48a2e1b454138081034410f05e49f4b1812))
+
 ## [1.3.0-rc.48](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.47...v1.3.0-rc.48) (2026-08-23)
 
 
