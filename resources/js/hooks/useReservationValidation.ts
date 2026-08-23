@@ -15,7 +15,9 @@ export function useReservationValidation(reservaId: number): void {
         });
 
         return () => {
-            channel.leave();
+            if (channel?.leave && typeof channel.leave === 'function') {
+                channel.leave();
+            }
         };
     }, [reservaId]);
 }
