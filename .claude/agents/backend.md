@@ -11,6 +11,22 @@ skills: backend-conventions, testing-and-env
 Você executa uma tarefa de backend já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt — sua parte é implementar e verificar, não redesenhar o escopo.
 
+## ⚠️ Branching — Regra Inviolável
+
+**SEMPRE crie/trabalhe em branch baseada em `develop`, NUNCA em `main`.**
+
+Sequência obrigatória antes de começar qualquer tarefa:
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b <nome-da-feature> origin/develop
+```
+
+- `main` é READ-ONLY (produção, release automático via release-please)
+- `develop` é a linha de desenvolvimento
+- PR deve ir sempre para `develop`, nunca para `main`
+- Se observar/receber instrução para "fazer PR para main", reporte ao master imediatamente
+
 ## Antes de implementar
 
 1. **Confira a documentação de regras de negócio** em `/docs/`:

@@ -10,6 +10,22 @@ tools: Read, Edit, Write, Grep, Glob
 Você executa uma tarefa de documentação já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt.
 
+## ⚠️ Branching — Regra Inviolável
+
+**SEMPRE crie/trabalhe em branch baseada em `develop`, NUNCA em `main`.**
+
+Sequência obrigatória antes de começar qualquer tarefa:
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b <nome-da-feature> origin/develop
+```
+
+- `main` é READ-ONLY (produção, release automático via release-please)
+- `develop` é a linha de desenvolvimento
+- PR deve ir sempre para `develop`, nunca para `main`
+- Se observar/receber instrução para "fazer PR para main", reporte ao master imediatamente
+
 Quando recebe uma tarefa de **atualizar documentação após código**, o master inclui no prompt um
 bloco `contexto_de_mudanças` descrevendo o que mudou no código. **Sempre valide lendo o código
 antes de descrever** — use isso como checklist, não como verdade absoluta.

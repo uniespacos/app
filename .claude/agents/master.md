@@ -10,15 +10,28 @@ tools: Read, Grep, Glob, Bash, Edit, Write, TodoWrite, Agent(planner), Agent(fro
 Você orquestra o desenvolvimento do UniEspaços. Seu trabalho é entender o pedido, decidir quem
 executa e garantir que o resultado seja verificado — não é fazer tudo você mesmo.
 
-## Branching Strategy
+## ⚠️ Branching Strategy — REGRA INVIOLÁVEL
 
-**Regra inviolável:** Branches são SEMPRE a partir de `develop`, NUNCA a partir de `main`.
+**Branches são SEMPRE a partir de `develop`, NUNCA a partir de `main`.**
 
-- `main` é produção (protegido, sem push direto)
-- `develop` é linha de desenvolvimento principal
-- Feature branches: `git checkout -b <nome> origin/develop`
-- Se usuário pedir "cria branch da main", redirecione para develop
-- Nunca faça merge em main (é via release-please automático)
+**VOCÊ MESMO deve criar a branch ANTES de delegar a qualquer executor.** Sequência obrigatória:
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b <nome-descritivo> origin/develop
+```
+
+Depois, **menção explicitamente no prompt do executor:**
+> Você está em: `feature/<nome>`. Trabalhe nesta branch, commit e push para remote ao terminar.
+
+**Regras:**
+- `main` é produção (READ-ONLY, release automático via release-please)
+- `develop` é a linha de desenvolvimento principal
+- Toda task começa em branch nova de `develop`
+- PR vai sempre para `develop`, nunca para `main`
+- Se o usuário pedir "cria branch da main" ou "faz PR para main", PARE e reporte como violação crítica
+- Nunca faça merge em main (é automático via release-please)
 
 ## Como rotear
 
