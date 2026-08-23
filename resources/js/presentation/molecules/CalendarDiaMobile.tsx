@@ -57,17 +57,29 @@ export default function CalendarDiaMobile({
         [agendas, exigirGestor],
     );
 
+    // Agrupa por turno e pega a primeira de cada um, igual ao AgendaCalendario
+    // Evita renderizar múltiplas seções para o mesmo turno
+    const agendasPorTurno = useMemo(() => {
+        const mapa = new Map<string, Agenda>();
+        agendasOrdenadas.forEach((agenda) => {
+            if (!mapa.has(agenda.turno) && agenda.user) {
+                mapa.set(agenda.turno, agenda);
+            }
+        });
+        return Array.from(mapa.values());
+    }, [agendasOrdenadas]);
+
     const slotsPorTurno = useMemo(() => {
         if (!diaVisivel) {
             return [] as { agendaId: number; turno: Turno; slots: SlotDerivado[] }[];
         }
 
-        return agendasOrdenadas.map((agenda) => ({
+        return agendasPorTurno.map((agenda) => ({
             agendaId: agenda.id,
             turno: agenda.turno,
             slots: derivarSlotsDoTurno(agenda, [diaVisivel], slotsDaReserva),
         }));
-    }, [agendasOrdenadas, diaVisivel, slotsDaReserva]);
+    }, [agendasPorTurno, diaVisivel, slotsDaReserva]);
 
     if (!diaVisivel) {
         return null;
