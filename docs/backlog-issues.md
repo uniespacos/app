@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `554e85a` · GAP-02 concluída · iniciando GAP-01
+**Última atualização:** 2026-08-22 · develop em `554e85a` · GAP-02 concluída · GAP-01 descontinuado (fluxo desatualizado)
 
 ---
 
@@ -69,9 +69,7 @@ Atualizado a cada entrega.
 
 ## 🔨 Em andamento
 
-- [ ] **GAP-01 — AvaliarReservaPage não auto-reload após ValidateJob terminar** `P0` · `effort: medium`
-  Branch `fix/gap-01-evaluation-auto-reload`
-  Gestor fica vendo loading indefinidamente. Implementar evento Reverb `ReservationValidatedBroadcast` ao fim do `ValidateReservationConflictsJob`, disparando re-render da página com resultados da validação.
+(nenhum)
 
 ---
 
@@ -84,7 +82,7 @@ Atualizado a cada entrega.
 **Melhorias de dados (do core-workflow-report.md)**
 
 - [ ] **GAP-06 — ReservaPolicy.update muito restritiva** `P2` · `effort: small`
-  Bloqueia qualquer edição se 1+ horário foi avaliado. a ideia é que o usuario possa editar o titulo ou a descrição da reserva mediante autorização do gesto
+  Bloqueia qualquer edição se 1+ horário foi avaliado. a ideia é que o usuario possa editar o titulo ou a descrição da reserva mediante autorização do gestor
 - [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
   Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 
@@ -149,6 +147,18 @@ Atualizado a cada entrega.
 
 ---
 
+## 🗑️ Obsoletos/Descontinuados
+
+- [x] **GAP-01 — AvaliarReservaPage não auto-reload após ValidateJob terminar** `P0` · `effort: medium`
+  **Status:** Descontinuado em 2026-08-22 — O fluxo mudou.
+  **Motivo:** A página `AvaliarReservaPage` redireciona **imediatamente** após submit para `gestor.reservas.index`. O hook `useReservationValidation` que deveria escutar o evento `ReservationValidated` nunca executa porque o usuário já saiu da página. O cenário descrito (gestor vendo loader + auto-reload) não ocorre mais. O hook causava erro `channel.leave is not a function` sem propósito. Removido do código e do backlog.
+  **Ações tomadas:** 
+  - Removido import de `useReservationValidation` de `AvaliarReservaPage.tsx`
+  - Removido hook call (linha 56)
+  - Adicionado guard defensivo ao hook para futuros usos (`channel?.leave`)
+
+---
+
 ## Pendências de gestão (não são código)
 
 - [x] Fechar a **#111** — feita em 2026-08-20
@@ -169,8 +179,9 @@ Atualizado a cada entrega.
 |---|---|
 | Concluídas e mergeadas | **8** (#119, #222, #101, #105, #112, #108, #255, GAP-02) |
 | Fechadas no GitHub | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar** |
-| Em andamento | **1** (GAP-01) |
-| Na fila | **19** (7 GitHub issues + 9 GAPs + futuro) |
+| Em andamento | **0** |
+| Na fila | **18** (7 GitHub issues + 8 GAPs + futuro) |
+| Obsoletos | **1** (GAP-01) |
 | Wontfix | **1** (#41) |
 
 > ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).
