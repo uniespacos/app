@@ -244,4 +244,164 @@ class UpdateReservaJobTest extends TestCase
 
         $this->assertSame('deferida', $reserva->fresh()->horarios->first()->situacao);
     }
+
+    public function test_single_scope_preserves_period_for_other_weeks(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'data_inicial' => '2026-09-01',
+            'data_final' => '2026-09-28',
+            'recorrencia' => '1mes',
+        ]);
+
+        foreach (range(0, 3) as $i) {
+            Horario::factory()->create([
+                'reserva_id' => $reserva->id,
+                'agenda_id' => $agenda->id,
+                'data' => Carbon::parse('2026-09-01')->addWeeks($i)->toDateString(),
+                'horario_inicio' => '08:00:00',
+                'horario_fim' => '10:00:00',
+                'situacao' => 'em_analise',
+            ]);
+        }
+
+        $weekOneHorario = $reserva->horarios->first();
+        $this->assertNotNull($weekOneHorario);
+
+        $slots = [
+            $this->slot(
+                $weekOneHorario->agenda_id,
+                Carbon::parse($weekOneHorario->data)->toDateString(),
+                $weekOneHorario->horario_inicio,
+                $weekOneHorario->horario_fim
+            ),
+        ];
+
+        $this->executar(
+            $reserva,
+            $this->dados(
+                $slots,
+                '1mes',
+                '2026-09-01',
+                '2026-09-28',
+                'single'
+            ) + ['edited_week_date' => '2026-09-05'],
+            $user
+        );
+
+        $reserva->refresh();
+
+        $this->assertSame('2026-09-01', Carbon::parse($reserva->data_inicial)->toDateString());
+        $this->assertSame('2026-09-22', Carbon::parse($reserva->data_final)->toDateString());
+        $this->assertCount(4, $reserva->horarios);
+    }
+
+    public function test_single_scope_recalculates_period_when_date_moves_outside_range(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'data_inicial' => '2026-09-08',
+            'data_final' => '2026-09-22',
+            'recorrencia' => '1mes',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'data' => '2026-09-08',
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '10:00:00',
+            'situacao' => 'em_analise',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'data' => '2026-09-15',
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '10:00:00',
+            'situacao' => 'em_analise',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'data' => '2026-09-22',
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '10:00:00',
+            'situacao' => 'em_analise',
+        ]);
+
+        $slots = [
+            $this->slot($agenda->id, '2026-08-25', '08:00:00', '10:00:00'),
+        ];
+
+        $this->executar(
+            $reserva,
+            $this->dados(
+                $slots,
+                '1mes',
+                '2026-08-25',
+                '2026-09-22',
+                'single'
+            ) + ['edited_week_date' => '2026-09-05'],
+            $user
+        );
+
+        $reserva->refresh();
+
+        $this->assertSame('2026-08-25', Carbon::parse($reserva->data_inicial)->toDateString());
+        $this->assertSame('2026-09-22', Carbon::parse($reserva->data_final)->toDateString());
+    }
+
+    public function test_single_scope_fallback_when_no_horarios_remain(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'data_inicial' => '2026-09-01',
+            'data_final' => '2026-09-07',
+            'recorrencia' => 'unica',
+        ]);
+
+        Horario::factory()->create([
+            'reserva_id' => $reserva->id,
+            'agenda_id' => $agenda->id,
+            'data' => '2026-09-03',
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '10:00:00',
+            'situacao' => 'em_analise',
+        ]);
+
+        $this->executar(
+            $reserva,
+            $this->dados(
+                [],
+                'unica',
+                '2026-09-01',
+                '2026-09-07',
+                'single'
+            ) + ['edited_week_date' => '2026-09-05'],
+            $user
+        );
+
+        $reserva->refresh();
+
+        $this->assertSame('2026-09-01', Carbon::parse($reserva->data_inicial)->toDateString());
+        $this->assertSame('2026-09-07', Carbon::parse($reserva->data_final)->toDateString());
+    }
 }

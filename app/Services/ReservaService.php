@@ -80,14 +80,14 @@ class ReservaService
     }
 
     /**
-     * Reference date used to open a reservation on the calendar: its first
-     * chronological slot, falling back to data_inicial only when it has none.
+     * Returns the first slot date for a reservation as the navigation anchor,
+     * instead of relying solely on data_inicial.
      *
-     * Issue #222. Do not simplify this to data_inicial alone: editing a single
-     * occurrence rewrites data_inicial with the smallest slot of the edited week
-     * (use-agenda-selection-usecase.ts:78-79 feeding UpdateReservaJob.php:56), so
-     * it can drift ahead of the reservation's real first slot and send the
-     * calendar back to a week with nothing in it.
+     * Acts as a defensive safeguard against legacy data prior to the fix of #222
+     * (where UpdateReservaJob incorrectly rewrote data_inicial with the week's
+     * earliest slot when editing single occurrences), or for isolated slots without
+     * others in the same week. The bug was fixed in UpdateReservaJob to correctly
+     * recalculate periods within the single-occurrence scope.
      */
     public function resolveDataAncora(Reserva $reserva): string
     {

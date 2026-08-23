@@ -39,6 +39,10 @@ class UpdateReservaJob implements ShouldQueue
      *
      * O servico e injetado aqui, e nao no construtor: o job e serializado para a
      * fila e so as propriedades do construtor viajam junto.
+     *
+     * No escopo 'single', data_inicial e data_final sao recalculadas a partir do
+     * MIN/MAX dos horarios restantes apos a edicao, garantindo que nenhum horario
+     * fique fora do range. No escopo 'recurring', as datas vem do validatedData.
      */
     public function handle(ExpansaoHorariosService $expansao): void
     {
@@ -53,8 +57,6 @@ class UpdateReservaJob implements ShouldQueue
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
                     'descricao' => $this->validatedData['descricao'] ?? '',
-                    'data_inicial' => $this->validatedData['data_inicial'],
-                    'data_final' => $this->validatedData['data_final'],
                     'recorrencia' => $this->validatedData['recorrencia'],
                 ]);
 
@@ -81,7 +83,21 @@ class UpdateReservaJob implements ShouldQueue
                     foreach ($horariosSolicitados->whereNull('id') as $novoHorario) {
                         $this->reserva->horarios()->create($novoHorario);
                     }
+
+                    $dataInicial = $this->reserva->horarios()->min('data')
+                        ?? $this->validatedData['data_inicial'];
+                    $dataFinal = $this->reserva->horarios()->max('data')
+                        ?? $this->validatedData['data_final'];
+
+                    $this->reserva->update([
+                        'data_inicial' => $dataInicial,
+                        'data_final' => $dataFinal,
+                    ]);
                 } else {
+                    $this->reserva->update([
+                        'data_inicial' => $this->validatedData['data_inicial'],
+                        'data_final' => $this->validatedData['data_final'],
+                    ]);
                     $agendasMap = Agenda::with('user')
                         ->whereIn('id', $horariosSolicitados->pluck('agenda_id')->unique()->filter()->all())
                         ->get()
