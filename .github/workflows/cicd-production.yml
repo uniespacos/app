@@ -125,15 +125,6 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install & Build Frontend
-        env:
-          VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
-        run: npm ci && npm run build
-
       - name: Build and push PHP App Image
         env:
           APP_NAME: ${{ secrets.APP_NAME}}
