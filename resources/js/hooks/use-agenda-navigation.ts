@@ -41,6 +41,7 @@ export function useAgendaNavigation({
             route(routeName, routeParams),
             { semana: format(novaData, 'yyyy-MM-dd') },
             {
+                only: ['espaco', 'semana'],
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
