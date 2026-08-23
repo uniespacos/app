@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0-rc.32](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.31...v1.3.0-rc.32) (2026-08-23)
+
+
+### Features
+
+* acompanhamento em tempo real de reservas na agenda do espaço ([9f00dec](https://github.com/uniespacos/uniespacos/commit/9f00decc9a842b2e831c4e1440dddf0a0fb6d189))
+
+
+### Bug Fixes
+
+* modal branco ao criar reserva e calendário sem atualização em tempo real ([#307](https://github.com/uniespacos/uniespacos/issues/307)) ([9058b73](https://github.com/uniespacos/uniespacos/commit/9058b737cde9a47beb0b9508d9df1795fe3cf4f4))
+
 ## [1.3.0-rc.31](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.30...v1.3.0-rc.31) (2026-08-22)
 
 
