@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.48](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.47...v1.3.0-rc.48) (2026-08-23)
+
+
+### Bug Fixes
+
+* adiciona declare(strict_types=1) na migration de revogação de permissão ([#347](https://github.com/uniespacos/uniespacos/issues/347)) ([f234e23](https://github.com/uniespacos/uniespacos/commit/f234e2360c343a0449baa1f951b20494d7290127))
+
 ## [1.3.0-rc.47](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.46...v1.3.0-rc.47) (2026-08-23)
 
 
