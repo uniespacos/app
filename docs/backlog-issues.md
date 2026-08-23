@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-22 · develop em `6803c20` (release rc.29) · #301 mergeada · #265 concluída (PR #299) · GAP-03 concluída c/ contadores (PR pending) · Alert visível + docs atualizada
+**Última atualização:** 2026-08-22 · develop em `554e85a` · GAP-02 concluída · iniciando GAP-01
 
 ---
 
@@ -55,11 +55,23 @@ Atualizado a cada entrega.
   No `AvaliarReservaJob` com `scope=recurring`, a propagação não restringe às agendas que o gestor gerencia — pode exceder responsabilidade. Implementada validação em 2 níveis: (1) no `AvaliarReservaRequest::after()` valida cada horário ID pertence às agendas do gestor; (2) no `AvaliarReservaJob::validateHorariosAutorization()` revalida antes de processar. **Bônus 1:** Corrigido bug crítico de UX/acessibilidade no `Alert` com `variant="destructive"` — o alerta de reavaliação estava invisível por contraste 1:1. Corrigido com `text-destructive-accent` (vermelho escuro) que rende ~5:1. **Bônus 2:** Adicionados contadores de horários na lista do gestor (`ReservasList`). Quando uma reserva está em `parcialmente_deferida`, mostra quantos horários estão `em_analise` e quantos foram `indeferida`, dando clareza de quais ações o gestor ainda precisa tomar.
   *9 testes novos/atualizados · 19 testes passando · 0 regressões · docs atualizada (6.1)*
 
+- [x] **#255 — `data_inicial`/`data_final` dessincronizam na edição single** `P2` · `effort: medium`
+  Branch `fix/255-data-dessincronizam` → PR #311 → merged `fa758ae`
+  Ao editar com `edit_scope='single'` (dia/horário específico), o `UpdateReservaJob` reescrevia `data_inicial`/`data_final` com os limites da semana editada em vez de recalcular a partir do MIN/MAX real dos horários restantes. Bloqueava navegação para semanas fora do range incorreto. Solução: na scope 'single', recalcula datas a partir dos horários após a edição; na scope 'recurring', usa as datas do `validatedData`. Incluída command `reservas:fix-datas-periodo` para correção de dados legados com opções `--dry-run` e `--force`.
+  *3 testes novos + 1 command de migração · 160+ testes passando*
+
+- [x] **GAP-02 — UpdateReservaJob não regenera conflitos** `P1` · `effort: medium`
+  Branch `fix/gap-02-regenerate-conflicts` → commit `554e85a`
+  Após edição de reserva (single ou recurring), o `conflict_cache` fica obsoleto. Solução: despachar `ValidateReservationConflictsJob` ao final de `UpdateReservaJob::handle()`, fora da transaction, garantindo que o cache é regenerado após cada edição. Job é idempotente e funciona para ambos os escopos. Padrão segue `ProcessarCriacaoReserva` e `AvaliarReservaJob`.
+  *2 testes novos · 12 testes passando*
+
 ---
 
 ## 🔨 Em andamento
 
-- (nenhuma)
+- [ ] **GAP-01 — AvaliarReservaPage não auto-reload após ValidateJob terminar** `P0` · `effort: medium`
+  Branch `fix/gap-01-evaluation-auto-reload`
+  Gestor fica vendo loading indefinidamente. Implementar evento Reverb `ReservationValidatedBroadcast` ao fim do `ValidateReservationConflictsJob`, disparando re-render da página com resultados da validação.
 
 ---
 
@@ -67,24 +79,16 @@ Atualizado a cada entrega.
 
 **Bugs críticos (do core-workflow-report.md)**
 
-- [ ] **#255 — `data_inicial`/`data_final` dessincronizam na edição single** `P2` · `effort: medium`
-  Com `edit_scope='single'`, período reescrito com limites da semana. Bloqueia navegação. Requer migração de dados.
+(nenhum restante)
 
 **Melhorias de dados (do core-workflow-report.md)**
 
-- [ ] **GAP-02 — UpdateReservaJob não regenera conflitos** `P1` · `effort: medium`
-  Após edição, `conflict_cache` fica obsoleto. Despachar `ValidateReservationConflictsJob` ao final do job.
-
 - [ ] **GAP-06 — ReservaPolicy.update muito restritiva** `P2` · `effort: small`
-  Bloqueia qualquer edição se 1+ horário foi avaliado. Permitir granularmente (só dos não-avaliados).
-
+  Bloqueia qualquer edição se 1+ horário foi avaliado. a ideia é que o usuario possa editar o titulo ou a descrição da reserva mediante autorização do gesto
 - [ ] **#260 — Edição admin não registra log nem notifica dono** `P3` · `effort: medium`
   Permission `reservas.atualizar` já permite edições, mas falta auditoria e notificação ao dono.
 
 **UX em tempo real (do core-workflow-report.md)**
-
-- [ ] **GAP-01 — AvaliarReservaPage não auto-reload após ValidateJob terminar** `P0` · `effort: medium`
-  Gestor vê loading indefinidamente. Implementar evento Reverb `ReservationValidatedBroadcast` ao fim do job.
 
 - [ ] **GAP-07 — Falta feedback de progresso para solicitante na criação** `P2` · `effort: medium`
   Flash genérico "sendo processado". Adicionar dashboard com barra de progresso via Reverb.
@@ -163,10 +167,10 @@ Atualizado a cada entrega.
 
 | | |
 |---|---|
-| Concluídas e mergeadas | **6** (#119, #222, #101, #105, #112, #108) |
-| Fechadas no GitHub | **6** (#119, #222, #101, #105, #111, #112) — **#108 falta fechar** |
-| Em andamento | **1** (#265) |
-| Na fila | **23** (9 GitHub issues + 11 GAPs + futuro) |
+| Concluídas e mergeadas | **8** (#119, #222, #101, #105, #112, #108, #255, GAP-02) |
+| Fechadas no GitHub | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar** |
+| Em andamento | **1** (GAP-01) |
+| Na fila | **19** (7 GitHub issues + 9 GAPs + futuro) |
 | Wontfix | **1** (#41) |
 
 > ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).

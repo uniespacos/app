@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\UpdateReservaJob;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -403,5 +405,96 @@ class UpdateReservaJobTest extends TestCase
 
         $this->assertSame('2026-09-01', Carbon::parse($reserva->data_inicial)->toDateString());
         $this->assertSame('2026-09-07', Carbon::parse($reserva->data_final)->toDateString());
+    }
+
+    public function test_dispatches_validate_reservation_conflicts_job_after_update_single_scope(): void
+    {
+        Bus::fake();
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'data_inicial' => '2026-09-01',
+            'data_final' => '2026-09-28',
+            'recorrencia' => '1mes',
+        ]);
+
+        foreach (range(0, 3) as $i) {
+            Horario::factory()->create([
+                'reserva_id' => $reserva->id,
+                'agenda_id' => $agenda->id,
+                'data' => Carbon::parse('2026-09-01')->addWeeks($i)->toDateString(),
+                'horario_inicio' => '08:00:00',
+                'horario_fim' => '10:00:00',
+                'situacao' => 'em_analise',
+            ]);
+        }
+
+        $weekOneHorario = $reserva->horarios->first();
+        $this->assertNotNull($weekOneHorario);
+
+        $slots = [
+            $this->slot(
+                $weekOneHorario->agenda_id,
+                Carbon::parse($weekOneHorario->data)->toDateString(),
+                $weekOneHorario->horario_inicio,
+                $weekOneHorario->horario_fim
+            ),
+        ];
+
+        $this->executar(
+            $reserva,
+            $this->dados(
+                $slots,
+                '1mes',
+                '2026-09-01',
+                '2026-09-28',
+                'single'
+            ) + ['edited_week_date' => '2026-09-05'],
+            $user
+        );
+
+        Bus::assertDispatched(ValidateReservationConflictsJob::class, fn ($job) => $job->reserva->id === $reserva->id);
+    }
+
+    public function test_dispatches_validate_reservation_conflicts_job_after_update_recurring_scope(): void
+    {
+        Bus::fake();
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => User::factory()->create()->id]);
+
+        $reserva = Reserva::factory()->create([
+            'user_id' => $user->id,
+            'data_inicial' => '2026-09-01',
+            'data_final' => '2026-09-28',
+            'recorrencia' => '1mes',
+        ]);
+
+        foreach (range(0, 3) as $i) {
+            Horario::factory()->create([
+                'reserva_id' => $reserva->id,
+                'agenda_id' => $agenda->id,
+                'data' => Carbon::parse('2026-09-01')->addWeeks($i)->toDateString(),
+                'horario_inicio' => '08:00:00',
+                'horario_fim' => '10:00:00',
+                'situacao' => 'em_analise',
+            ]);
+        }
+
+        $slots = $reserva->horarios->map(fn ($h) => $this->slot(
+            $h->agenda_id,
+            Carbon::parse($h->data)->toDateString(),
+            $h->horario_inicio,
+            $h->horario_fim
+        ))->all();
+
+        $this->executar($reserva, $this->dados($slots, '1mes', '2026-09-01', '2026-09-28'), $user);
+
+        Bus::assertDispatched(ValidateReservationConflictsJob::class, fn ($job) => $job->reserva->id === $reserva->id);
     }
 }
