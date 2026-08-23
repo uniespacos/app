@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.39](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.38...v1.3.0-rc.39) (2026-08-23)
+
+
+### Features
+
+* [#106](https://github.com/uniespacos/uniespacos/issues/106) — dia da semana nos headers de turno ([#323](https://github.com/uniespacos/uniespacos/issues/323)) ([c52b4e7](https://github.com/uniespacos/uniespacos/commit/c52b4e7cc226e0edee16991c2d0251aac36a3a7b))
+
 ## [1.3.0-rc.38](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.37...v1.3.0-rc.38) (2026-08-23)
 
 
