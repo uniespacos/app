@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.44](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.43...v1.3.0-rc.44) (2026-08-23)
+
+
+### Features
+
+* registry singleton de canais Echo com migração de consumidores (GAP-11, Fase 3) ([8c4bb98](https://github.com/uniespacos/uniespacos/commit/8c4bb9867150626d0715163c5fda09a3262e6ab1))
+
 ## [1.3.0-rc.43](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.42...v1.3.0-rc.43) (2026-08-23)
 
 
