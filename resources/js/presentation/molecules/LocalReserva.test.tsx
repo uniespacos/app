@@ -12,7 +12,7 @@ const espaco = (overrides: Partial<Espaco> = {}): Espaco =>
         imagens: [],
         main_image_index: null,
         ...overrides,
-    }) as Espaco;
+    });
 
 const comLocalizacao = (modulo?: string, andar?: string): Espaco =>
     espaco({
@@ -22,7 +22,7 @@ const comLocalizacao = (modulo?: string, andar?: string): Espaco =>
             tipo_acesso: [],
             modulo_id: 1,
             ...(modulo ? { modulo: { id: 1, nome: modulo, unidade_id: 1 } } : {}),
-        } as Espaco['andar'],
+        },
     });
 
 describe('LocalReserva', () => {

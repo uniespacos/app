@@ -90,11 +90,6 @@
       "count": 1
     }
   },
-  "resources/js/hooks/use-slot-selection.ts": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
   "resources/js/lib/utils.ts": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 2

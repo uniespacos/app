@@ -1,7 +1,7 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Head } from '@inertiajs/react';
-import { Building2, Link, Settings, Users } from 'lucide-react';
-import { Button } from 'react-day-picker';
+import { Head, Link } from '@inertiajs/react';
+import { Building2, Settings, Users } from 'lucide-react';
 
 export default function Home() {
     return (

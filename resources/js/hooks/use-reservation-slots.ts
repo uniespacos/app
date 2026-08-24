@@ -25,7 +25,7 @@ export function useReservationSlots(reserva: Reserva) {
                     reserva_titulo: reserva.titulo,
                 },
                 isShowReservation: true,
-            } as SlotCalendario;
+            };
         });
     }, [reserva]);
 

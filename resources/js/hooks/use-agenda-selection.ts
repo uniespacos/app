@@ -18,7 +18,7 @@ interface UseAgendaSelectionProps {
 export function useAgendaSelection({ reserva, isEditMode, semanaVisivel }: UseAgendaSelectionProps) {
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
 
-    const slotsIniciais = useMemo(() => {
+    const slotsIniciais = useMemo<SlotCalendario[]>(() => {
         if (!reserva?.horarios) {
             return [];
         }
@@ -36,7 +36,7 @@ export function useAgendaSelection({ reserva, isEditMode, semanaVisivel }: UseAg
                         autor: reserva.user?.name ?? 'Indefinido',
                         reserva_titulo: reserva.titulo,
                     },
-                }) as SlotCalendario,
+                }),
         );
     }, [reserva]);
 

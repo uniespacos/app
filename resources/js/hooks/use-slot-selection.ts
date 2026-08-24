@@ -19,7 +19,7 @@ export function useSlotSelection({ hoje, slotsIniciais = [] }: UseSlotSelectionP
             slotsIniciais.length !== lastInitialSlotsRef.current.length ||
             slotsIniciais.some((slot, idx) => {
                 const prev = lastInitialSlotsRef.current[idx];
-                return !prev || slot.id !== prev.id || slot.status !== prev.status;
+                return slot.id !== prev.id || slot.status !== prev.status;
             });
 
         if (hasChanged) {

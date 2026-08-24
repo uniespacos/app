@@ -320,7 +320,7 @@ export default function Modulos() {
                                         </CollapsibleContent>
                                     </Collapsible>
                                 </Card>
-                                {removerModulo && removerModulo.id === modulo.id && (
+                                {removerModulo?.id === modulo.id && (
                                     <DeleteItem
                                         itemName={removerModulo.nome}
                                         isOpen={(open) => {

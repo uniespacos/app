@@ -91,7 +91,7 @@ export default function ModuloForm({
         setData((prev: CadastrarModuloForm) => {
             const andarParaRemover = prev.andares.find((a: AndarFormData) => a.id === andarId);
 
-            if (andarParaRemover && andarParaRemover.nivel === 0) {
+            if (andarParaRemover?.nivel === 0) {
                 console.warn('Tentativa de remover térreo bloqueada no handleRemoveAndar');
                 return prev;
             }

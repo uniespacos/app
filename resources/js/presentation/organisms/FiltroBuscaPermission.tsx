@@ -126,7 +126,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                         <div className="space-y-2">
                             <Label>Instituição</Label>
                             <Select
-                                value={localFilters.selectedInstituicao.toString()}
+                                value={localFilters.selectedInstituicao}
                                 onValueChange={(value) => {
                                     handleFilterChange('selectedInstituicao', value);
                                 }}
