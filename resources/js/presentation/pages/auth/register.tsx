@@ -80,10 +80,7 @@ export default function Register() {
                 </div>
             </div>
 
-            <ModalNovaInstituicao
-                open={showModal}
-                onOpenChange={setShowModal}
-            />
+            <ModalNovaInstituicao open={showModal} onOpenChange={setShowModal} />
         </div>
     );
 }

@@ -22,22 +22,19 @@ export function useAgendaSelection({ reserva, isEditMode, semanaVisivel }: UseAg
         if (!reserva?.horarios) {
             return [];
         }
-        return reserva.horarios.map(
-            (horario) =>
-                ({
-                    id: `${horario.data}|${horario.horario_inicio}`,
-                    status: 'selecionado',
-                    data: parse(horario.data, 'yyyy-MM-dd', new Date()),
-                    horario_inicio: horario.horario_inicio,
-                    horario_fim: horario.horario_fim,
-                    agenda_id: horario.agenda?.id,
-                    dadosReserva: {
-                        horarioDB: horario,
-                        autor: reserva.user?.name ?? 'Indefinido',
-                        reserva_titulo: reserva.titulo,
-                    },
-                }),
-        );
+        return reserva.horarios.map((horario) => ({
+            id: `${horario.data}|${horario.horario_inicio}`,
+            status: 'selecionado',
+            data: parse(horario.data, 'yyyy-MM-dd', new Date()),
+            horario_inicio: horario.horario_inicio,
+            horario_fim: horario.horario_fim,
+            agenda_id: horario.agenda?.id,
+            dadosReserva: {
+                horarioDB: horario,
+                autor: reserva.user?.name ?? 'Indefinido',
+                reserva_titulo: reserva.titulo,
+            },
+        }));
     }, [reserva]);
 
     const { slotsSelecao, alternarSelecaoSlot, isSlotSelecionado, limparSelecao, setSlotsSelecao } = useSlotSelection({ hoje, slotsIniciais });

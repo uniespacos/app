@@ -55,7 +55,7 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                                         {gestor ? (
                                             <div className="min-w-0">
                                                 <p className="text-sm leading-snug break-words">{gestor.nome}</p>
-                                                                            {gestor.email && <p className="text-muted-foreground text-xs break-all">{gestor.email}</p>}
+                                                {gestor.email && <p className="text-muted-foreground text-xs break-all">{gestor.email}</p>}
                                             </div>
                                         ) : (
                                             <span className="text-muted-foreground text-sm">Sem gestor</span>

@@ -2,7 +2,6 @@ import type { Agenda } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { GestoresEspaco } from './GestoresEspaco';
 
-
 const agenda = (id: number, turno: Agenda['turno'], nomeGestor?: string): Agenda => ({
     id,
     turno,

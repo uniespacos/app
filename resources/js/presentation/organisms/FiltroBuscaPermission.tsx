@@ -31,7 +31,6 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
     const [andares, setAndares] = useState<Andar[]>(modulos.find((m) => m.id.toString() === localFilters.selectedModulo)?.andars || []);
     const [espacos, setEspacos] = useState<Espaco[]>(andares.find((a) => a.id.toString() === localFilters.selectedAndar)?.espacos || []);
 
-
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
         setLocalFilters((prevFilters) => {
             const newFilters = { ...prevFilters, [name]: value };

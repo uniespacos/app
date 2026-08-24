@@ -2,17 +2,15 @@ import type { Espaco } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { LocalReserva } from './LocalReserva';
 
-
-const espaco = (overrides: Partial<Espaco> = {}): Espaco =>
-    ({
-        id: 1,
-        nome: 'Sala 203',
-        capacidade_pessoas: 40,
-        descricao: 'Sala de aula',
-        imagens: [],
-        main_image_index: null,
-        ...overrides,
-    });
+const espaco = (overrides: Partial<Espaco> = {}): Espaco => ({
+    id: 1,
+    nome: 'Sala 203',
+    capacidade_pessoas: 40,
+    descricao: 'Sala de aula',
+    imagens: [],
+    main_image_index: null,
+    ...overrides,
+});
 
 const comLocalizacao = (modulo?: string, andar?: string): Espaco =>
     espaco({

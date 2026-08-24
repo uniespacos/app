@@ -248,7 +248,7 @@ export interface Reserva {
     user?: User; // O usuário que fez a reserva (carregar com with('usuario'))
     horarios: Horario[]; // O array de horários pertencentes a esta reserva
     can_update?: boolean; // Permissão de edição dinâmica
-    validation_status?: 'processing' | 'pending' | 'completed' | string; // Validação de conflitos em segundo plano
+    validation_status?: ValidationStatus; // Validação de conflitos em segundo plano
 }
 
 // =============================================================================
