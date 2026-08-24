@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
+import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AgendaNavegacaoProps {

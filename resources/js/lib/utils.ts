@@ -2,7 +2,7 @@ import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
 import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
+import { ptBR } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 

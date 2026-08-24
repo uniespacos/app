@@ -1,6 +1,6 @@
 import { SlotCalendario } from '@/types';
 import { addWeeks, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
+import { ptBR } from 'date-fns/locale';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 

@@ -1,8 +1,8 @@
 # Fase 4: Formulários, Validação, Gráficos e Datas
 
 > **Diretório:** `docs/update-uniespacos/fase-04-forms-dates-charts/`  
-> **Objetivo:** Atualizar o ecossistema de formulários e validação (`react-hook-form@^7.86.0`, `@hookform/resolvers@^5.9.1`, `zod@^3.25.76`), gráficos de indicadores (`recharts@^3.10.1`), e manipulação de datas e calendário (`date-fns@^4.4.0`, `react-day-picker@^8.10.2`), garantindo zero regressão em regras de negócio e cálculos de reservas/agendas.  
-> **Severidade Mitigada:** 🔴 Alta (Formulários críticos de criação de setores/cargos, agendamento de slots e relatórios gerenciais).  
+> **Objetivo:** Atualizar o ecossistema de formulários e validação (`react-hook-form@^7.86.0`, `@hookform/resolvers@^5.9.1`, `zod@^3.25.76`), gráficos de indicadores (`recharts@^3.10.1`), e manipulação de datas e calendário (`date-fns@^4.4.0`, `react-day-picker@^8.10.2`), garantindo zero regressão em regras de negócio, formulários reativos e cálculos matemáticos de slots e agendas.  
+> **Severidade Mitigada:** 🔴 Alta (Formulários de criação de setores/cargos, integridade de agendamento de slots e relatórios gerenciais).  
 > **Independência:** 100% autônoma. Não altera estruturas do banco de dados ou endpoints do backend.
 
 ---
@@ -14,10 +14,10 @@
    *Compreenda como o `zodResolver` infere tipos estritos a partir do schema Zod sem necessidade de casting manual `as any`.*
 2. **Date-fns v4 Upgrade Guide:**  
    [https://date-fns.org/v4.0.0/docs/Upgrade-Guide](https://date-fns.org/v4.0.0/docs/Upgrade-Guide)  
-   *Note a padronização de export do locale para `date-fns/locale` e suporte ESM modular.*
-3. **Recharts 3.x com React 19:**  
+   *Note a padronização oficial de export do locale para `date-fns/locale` e a arquitetura ESM modular.*
+3. **Recharts 3.x com React 19 & ChartContainer:**  
    [https://recharts.org/en-US/guide/getting-started](https://recharts.org/en-US/guide/getting-started)  
-   *Entenda o funcionamento dos containers responsivos e renderização de `BarChart` / `PieChart`.*
+   *Entenda o funcionamento do wrapper `ChartContainer` em `components/ui/chart.tsx` e renderização de `BarChart` / `PieChart`.*
 
 ---
 
@@ -37,7 +37,7 @@
 - **Ação:** Atualizar dependências:
   - `"date-fns"`: `"^4.4.0"`
   - `"react-day-picker"`: `"^8.10.2"`
-- **Verificação:** Manter o bloco `"overrides"` em `package.json` para o `react-day-picker`:
+- **Verificação Crítica:** Manter o bloco `"overrides"` em `package.json` para o `react-day-picker`:
   ```json
   "overrides": {
       "react-day-picker": {
@@ -51,12 +51,12 @@
 
 ### 🔹 Tarefa T4.3: Padronizar Imports do Locale `ptBR` do `date-fns`
 - **Arquivos Alvo:**
-  - `resources/js/hooks/use-slot-selection.ts`
-  - `resources/js/lib/utils.ts`
-  - `resources/js/presentation/molecules/AgendaNavegacao.tsx`
-  - `resources/js/presentation/molecules/DatePicker.tsx`
-  - `resources/js/presentation/organisms/AgendaDialogReserva.tsx`
-- **Ação:** Substituir eventuais caminhos legados `from 'date-fns/locale/pt-BR'` pela forma canônica e unificada:
+  1. `resources/js/hooks/use-slot-selection.ts`
+  2. `resources/js/lib/utils.ts`
+  3. `resources/js/presentation/molecules/AgendaNavegacao.tsx`
+  4. `resources/js/presentation/molecules/DatePicker.tsx`
+  5. `resources/js/presentation/organisms/AgendaDialogReserva.tsx`
+- **Ação:** Substituir quaisquer caminhos legados `from 'date-fns/locale/pt-BR'` pela forma canônica e unificada do date-fns v4:
   ```ts
   import { ptBR } from 'date-fns/locale';
   ```
@@ -66,7 +66,7 @@
 ### 🔹 Tarefa T4.4: Atualizar `recharts` e Validar Gráficos
 - **Arquivo Alvo:** `package.json`
 - **Ação:** Atualizar `"recharts"` para `"^3.10.1"`.
-- **Validação:** Confirmar que os 4 componentes de gráficos compilam sem erros de tipo:
+- **Validação:** Confirmar que os 4 componentes de gráficos compilam e tipam perfeitamente com `ChartConfig`:
   - `resources/js/presentation/organisms/GraficoIndicadoresConsolidados.tsx`
   - `resources/js/presentation/organisms/GraficoInventarioEspacos.tsx`
   - `resources/js/presentation/organisms/GraficoOcupacaoEspacos.tsx`
@@ -74,8 +74,8 @@
 
 ---
 
-### 🔹 Tarefa T4.5: Validar Testes de Domínio de Datas e Slots de Reserva
-- **Ação:** Executar a suíte de testes unitários que cobre toda a matemática e regras de agendamento:
+### 🔹 Tarefa T4.5: Validar a Suíte Completa de Testes de Datas e Agendamentos
+- **Ação:** Executar a bateria de testes unitários que cobre toda a matemática e regras de agendamento de horários:
   - `resources/js/hooks/use-agenda-navigation.test.ts`
   - `resources/js/hooks/use-agenda-selection.test.ts`
   - `resources/js/hooks/use-reservation-slots.test.ts`
@@ -86,22 +86,26 @@
 
 ---
 
-## ⚠️ 3. O Que Pode Quebrar & Como Mitigar
+## ⚠️ 3. O Que Pode Quebrar & Como Mitigar (Pontos Críticos & Armadilhas)
 
-| Risco | Probabilidade | Impacto | Estratégia de Mitigação |
+| Risco / Ponto Crítico | Probabilidade | Impacto | Estratégia de Mitigação |
 |---|---|---|---|
-| Incompatibilidade de tipos no `zodResolver` | Baixa | Médio | `@hookform/resolvers@5.9.1` foi desenhado especificamente para paridade com Zod 3.25+. |
-| Falha no cálculo de semanas/dias no `date-fns` v4 | Muito Baixa | Alto | A suíte de 6 arquivos de testes automatizados de datas e turnos cobre rigorosamente todas as funções utilizadas. |
-| Gráficos do Recharts renderizarem em branco | Baixa | Médio | Com o alinhamento de `react-is@^19.2.8` realizado na Fase 1, o Recharts 3.10 renderiza normalmente sem falhas de `ResponsiveContainer`. |
+| Incompatibilidade de tipos no `zodResolver` no `react-hook-form@7.86` | Baixa | Médio | `@hookform/resolvers@5.9.1` foi desenhado especificamente para paridade com Zod 3.25+. Os formulários que usam Zod (`RoleFormModal.tsx`, `SetorForm.tsx`) devem tipar o generic `useForm<FormValues>` alinhado com `z.infer<typeof schema>`. |
+| Imports fragmentados de locale `pt-BR` no `date-fns` v4 | Média | Baixo | Usar estritamente `import { ptBR } from 'date-fns/locale'`. O date-fns v4 padronizou os locales sob o export raiz `date-fns/locale`. |
+| Gráficos do Recharts não renderizarem em produção | Baixa | Alto | Com `react-is@^19.2.8` (atualizado na Fase 1) e `recharts@^3.10.1`, o `ResponsiveContainer` não sofre do bug de minificação de displayNames. |
+| Testes de backend falharem por presença de `manifest.json` | Média | Baixo | Conforme a regra de armadilhas conhecidas (`GEMINI.md`), antes de rodar os testes de backend, execute `rm -rf public/build` para evitar a falha de envelope no `ErrorHandlingTest`. |
+| Erro de tipos em `format(date, ...)` com strings ISO | Baixa | Médio | Sempre realizar o parsing de strings de data com `parseISO(dateString)` ou `new Date(dateString)` antes de passar ao `format()` do date-fns v4. |
 
 ---
 
 ## 🔄 4. Fluxos Alternativos & Troubleshooting
 
-- **Problema:** Erro de tipo ao passar `resolver: zodResolver(schema)` no `useForm`.  
-  **Solução:** Assegurar que os tipos inferidos do schema Zod correspondam à interface do formulário (`z.infer<typeof schema>`).
-- **Problema:** O DatePicker exibe meses em inglês.  
-  **Solução:** Confirmar que `locale={ptBR}` está passado para o componente `DayPicker` em `resources/js/components/ui/calendar.tsx`.
+- **Problema:** O TypeScript reporta que `date-fns/locale/pt-BR` não foi encontrado.  
+  **Solução:** Atualizar o import para `import { ptBR } from 'date-fns/locale'`.
+- **Problema:** `npm install` reporta conflito de peer dependencies no `react-day-picker`.  
+  **Solução:** Garantir que o bloco `"overrides"` no `package.json` contém `"react-day-picker": { "react": "$react", "react-dom": "$react-dom" }`.
+- **Problema:** O DatePicker exibe meses ou dias em inglês.  
+  **Solução:** Confirmar que `locale={ptBR}` é passado explicitamente para o componente `<DayPicker />` em `resources/js/components/ui/calendar.tsx`.
 
 ---
 
@@ -118,8 +122,8 @@ npx tsc --noEmit
 # 3. Suíte de testes de frontend (todos os 170 testes devem passar)
 npm test
 
-# 4. Suíte de testes de backend (garantir zero regressão)
-docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test
+# 4. Limpar assets para ambiente de teste isolado e rodar testes do backend
+rm -rf public/build && docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test
 
 # 5. Verificação de Linter
 npx eslint resources/js
@@ -129,10 +133,11 @@ npx eslint resources/js
 
 ## ✅ 6. Critérios de Aceite
 
-- [ ] `react-hook-form: ^7.86.0`, `@hookform/resolvers: ^5.9.1` e `zod: ^3.25.76` instalados.
-- [ ] `date-fns: ^4.4.0` e `recharts: ^3.10.1` instalados.
-- [ ] Imports de `ptBR` padronizados para `date-fns/locale`.
-- [ ] 170 testes de frontend e 191 testes de backend passando com sucesso.
+- [ ] `react-hook-form: ^7.86.0`, `@hookform/resolvers: ^5.9.1` e `zod: ^3.25.76` instalados e sincronizados.
+- [ ] `date-fns: ^4.4.0`, `react-day-picker: ^8.10.2` e `recharts: ^3.10.1` instalados.
+- [ ] Todos os imports de locale `ptBR` padronizados para `date-fns/locale`.
+- [ ] `npx tsc --noEmit` executando com zero erros.
+- [ ] 170 testes de frontend e 192 testes de backend passando com sucesso.
 
 ---
 
@@ -145,19 +150,20 @@ Ao finalizar esta fase, crie o arquivo `RELATORIO_IMPLEMENTACAO.md` nesta pasta 
 
 - **Data de Conclusão:** AAAA-MM-DD
 - **Executor:** [Nome do Desenvolvedor / Agente]
-- **Status:** [Concluído / Parcial]
+- **Status:** Concluído
 
 ## Alterações Realizadas
 - [x] T4.1: Atualizados react-hook-form, @hookform/resolvers e zod
-- [x] T4.2: Atualizados date-fns e react-day-picker
+- [x] T4.2: Atualizados date-fns e react-day-picker mantendo overrides
 - [x] T4.3: Padronizados imports de ptBR de date-fns/locale
-- [x] T4.4: Atualizado recharts para 3.10.1 e validados componentes de gráficos
-- [x] T4.5: Validados testes de agendamento e slots
+- [x] T4.4: Atualizado recharts para 3.10.1 e validados gráficos de indicadores
+- [x] T4.5: Validados todos os testes de agendamento, slots e formulários
 
 ## Evidências de Testes
-- `npx tsc --noEmit`: [Colar resumo]
-- `npm test`: [Colar resumo: 30 suites, 170 passed]
-- `php artisan test`: [Colar resumo: 191 passed]
+- `npx tsc --noEmit`: 0 erros
+- `npm test`: 30 suites passadas, 170 testes passados
+- `php artisan test`: 192 testes passados
+- `npx eslint resources/js`: 0 erros
 
 ## Desvios ou Observações
 [Registrar qualquer particularidade encontrada durante a execução]
