@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.57](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.56...v1.3.0-rc.57) (2026-08-24)
+
+
+### Bug Fixes
+
+* integridade arquitetural no backend, payload sob demanda de setores e adocao de enums ([#367](https://github.com/uniespacos/uniespacos/issues/367)) ([41702c7](https://github.com/uniespacos/uniespacos/commit/41702c7e6fc4218794a803f42ebf4b7b96a5b825))
+
 ## [1.3.0-rc.56](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.55...v1.3.0-rc.56) (2026-08-24)
 
 
