@@ -5,20 +5,20 @@ import { Input } from '@/components/ui/input';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { criarTerreoInicial, garantirTerreo, nivelParaNome } from '@/lib/utils/andars/AndarHelpers';
 import { isEditMode, transformModuloToFormData } from '@/lib/utils/andars/ModuloDataFormTransformer';
-import AndarStickFormActions from '@/presentation/organisms/AndarStickFormActions';
 import { FormField } from '@/presentation/molecules/FormField';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import AndaresManager from '@/presentation/organisms/AndarManager';
+import AndarStickFormActions from '@/presentation/organisms/AndarStickFormActions';
 import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
 import { Instituicao, Modulo, Unidade } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { forwardRef, useEffect, useMemo, useRef } from 'react';
 import type React from 'react';
+import { forwardRef, useEffect, useMemo, useRef } from 'react';
 
 export interface ModuloFormProps {
     data: CadastrarModuloForm;
     setData: ReturnType<typeof useForm<CadastrarModuloForm>>['setData'];
-    submit: (e: React.FormEvent<HTMLFormElement>) => void;
+    submit: (e: React.SyntheticEvent) => void;
     errors: Record<string, string>;
     processing: boolean;
     title: string;

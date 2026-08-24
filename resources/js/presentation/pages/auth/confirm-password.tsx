@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ export default function ConfirmPassword() {
         password: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: SyntheticEvent) => {
         e.preventDefault();
 
         post(route('password.confirm'), {

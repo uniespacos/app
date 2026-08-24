@@ -25,7 +25,7 @@ export default function CadastrarUnidadePage() {
     const { instituicao } = usePage<{ instituicao: Instituicao }>().props;
     const { data, setData, post, processing, errors } = useForm<CadastrarUnidadeForm>();
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         setData((prevData) => ({ ...prevData, instituicao_id: instituicao.id.toString() }));
 
         e.preventDefault();

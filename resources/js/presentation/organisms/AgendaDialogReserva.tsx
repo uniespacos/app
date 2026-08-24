@@ -14,12 +14,12 @@ import { Espaco, ReservaFormData, SlotCalendario } from '@/types';
 import { addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 interface AgendaDialogReservaProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (e: FormEvent) => void;
+    onSubmit: (e: SyntheticEvent) => void;
     slotsSelecao: SlotCalendario[];
     hoje: Date;
     isSubmitting: boolean;
@@ -105,7 +105,7 @@ export default function AgendaDialogReserva({
     );
 
     const handleSubmit = useCallback(
-        (e: FormEvent) => {
+        (e: SyntheticEvent) => {
             onSubmit(e);
         },
         [onSubmit],

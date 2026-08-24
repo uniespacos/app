@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { AddAndarDialog } from '@/presentation/organisms/AddAndarDialog';
-import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 import { LocationSelector } from '@/presentation/molecules/LocationSelector';
+import { AddAndarDialog } from '@/presentation/organisms/AddAndarDialog';
+import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
 import AppLayout from '@/presentation/templates/AppLayout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -69,7 +69,7 @@ export default function CadastroEspacoPage() {
         setData((prevData) => ({ ...prevData, images_to_delete: [...(data.images_to_delete ?? []), path] }));
     };
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         if (isEditMode) {

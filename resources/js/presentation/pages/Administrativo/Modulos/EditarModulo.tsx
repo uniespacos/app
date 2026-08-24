@@ -25,7 +25,7 @@ export default function EditarModulo() {
         andares: [],
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         let errors = false;
         const validacaoEstrutura = validarEstrutura(data.andares);

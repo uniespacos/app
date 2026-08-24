@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Camera, Trash2 } from 'lucide-react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { SyntheticEvent, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -112,7 +112,7 @@ export default function Profile({
         setData('setor_id', setorId);
     };
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: SyntheticEvent) => {
         e.preventDefault();
 
         post(route('settings.profile.update'), {

@@ -29,7 +29,7 @@ export default function EditarInstituicao() {
         endereco: instituicao.endereco,
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         form.put(route('institucional.instituicoes.update', { instituico: instituicao.id }));
     };

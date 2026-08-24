@@ -129,7 +129,7 @@ export default function AvaliarReserva({
         }
     }, [slotsSelecao]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent) => {
         submitEvaluation(e);
     };
 

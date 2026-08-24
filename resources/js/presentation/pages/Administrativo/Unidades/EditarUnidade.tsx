@@ -29,7 +29,7 @@ export default function EditarUnidade() {
         instituicao_id: unidade.instituicao?.id.toString() || '',
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         put(route('institucional.unidades.update', { unidade: unidade.id }));
     };

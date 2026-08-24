@@ -29,7 +29,7 @@ export default function CadastrarInstituicaoPage() {
         endereco: '',
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         form.post(route('institucional.instituicoes.store'));
     };

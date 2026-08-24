@@ -19,11 +19,6 @@
       "count": 1
     }
   },
-  "resources/js/components/ui/alert-dialog.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/components/ui/carousel.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
@@ -35,11 +30,6 @@
     },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 3
-    }
-  },
-  "resources/js/components/ui/dialog.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
     }
   },
   "resources/js/components/ui/form.tsx": {
@@ -181,11 +171,6 @@
       "count": 2
     }
   },
-  "resources/js/presentation/molecules/DeleteItem.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/molecules/GenericHeader.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
@@ -228,9 +213,6 @@
     }
   },
   "resources/js/presentation/organisms/AgendaDialogReserva.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 2
-    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     },
@@ -266,9 +248,6 @@
     }
   },
   "resources/js/presentation/organisms/EditUserModal.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     }
@@ -332,16 +311,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/organisms/InstituicaoForm.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/organisms/ModuloForm.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/organisms/NotificationDropdown.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 2
@@ -367,15 +336,7 @@
       "count": 2
     }
   },
-  "resources/js/presentation/organisms/UnidadesForm.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/Administrativo/Espacos/CadastroEspaco.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     },
@@ -383,31 +344,17 @@
       "count": 5
     }
   },
-  "resources/js/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/Administrativo/Instituicoes/EditarInstituicao.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }
   },
   "resources/js/presentation/pages/Administrativo/Modulos/CadastrarModulo.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     }
   },
   "resources/js/presentation/pages/Administrativo/Modulos/EditarModulo.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     },
@@ -415,15 +362,7 @@
       "count": 1
     }
   },
-  "resources/js/presentation/pages/Administrativo/Unidades/CadastrarUnidade.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/Administrativo/Unidades/EditarUnidade.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
     },
@@ -452,47 +391,11 @@
     }
   },
   "resources/js/presentation/pages/Reservas/Gestor/AvaliarReservaPage.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
-  "resources/js/presentation/pages/auth/confirm-password.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/pages/auth/forgot-password.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/pages/auth/login.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/pages/auth/reset-password.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/pages/auth/verify-email.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/pages/settings/password.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/settings/profile.tsx": {
-    "@typescript-eslint/no-deprecated": {
-      "count": 1
-    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 2
     }

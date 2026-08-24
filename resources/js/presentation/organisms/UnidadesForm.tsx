@@ -5,13 +5,13 @@ import { FormField } from '@/presentation/molecules/FormField';
 import { CadastrarUnidadeForm } from '@/presentation/pages/Administrativo/Unidades/CadastrarUnidade';
 import { Instituicao } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { useEffect } from 'react';
 import type React from 'react';
+import { useEffect } from 'react';
 
 interface UnidadeFormProps {
     data: CadastrarUnidadeForm;
     setData: ReturnType<typeof useForm<CadastrarUnidadeForm>>['setData'];
-    submit: (e: React.FormEvent<HTMLFormElement>) => void;
+    submit: (e: React.SyntheticEvent) => void;
     errors: Record<string, string>;
     processing: boolean;
     title: string;

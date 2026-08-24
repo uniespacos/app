@@ -4,7 +4,7 @@ import { FormField } from '@/presentation/molecules/FormField';
 import { Modal } from '@/presentation/molecules/Modal';
 import type { User } from '@/types';
 import { router, useForm } from '@inertiajs/react';
-import { useEffect, useState, type FormEventHandler } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 
 interface EditUserModalProps {
     user: User | undefined;
@@ -29,7 +29,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
 
     if (!user) return null;
 
-    const handleSubmit: FormEventHandler = (e) => {
+    const handleSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
 
         put(route('institucional.usuarios.update', { usuario: user.id }), {

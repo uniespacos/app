@@ -1,6 +1,6 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +23,7 @@ export default function Login() {
     });
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit: FormEventHandler = (e) => {
+    const handleSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
         post(route('login'), {
             onFinish: () => {

@@ -6,7 +6,7 @@ import HeadingSmall from '@/presentation/atoms/HeadingSmall';
 import InputError from '@/presentation/atoms/InputError';
 import { Modal } from '@/presentation/molecules/Modal';
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { SyntheticEvent, useRef, useState } from 'react';
 
 interface DeleteItemProps {
     itemName: string;
@@ -46,7 +46,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = fals
         }
     };
 
-    const deleteItem: FormEventHandler = (e) => {
+    const deleteItem = (e: SyntheticEvent) => {
         e.preventDefault();
 
         destroy(route, {
