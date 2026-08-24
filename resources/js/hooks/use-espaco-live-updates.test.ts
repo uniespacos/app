@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { useEspacoLiveUpdates } from './useEspacoLiveUpdates';
+import { useEspacoLiveUpdates } from './use-espaco-live-updates';
 import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 
 describe('useEspacoLiveUpdates', () => {

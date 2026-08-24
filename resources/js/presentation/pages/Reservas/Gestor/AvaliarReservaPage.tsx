@@ -7,7 +7,7 @@ import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
@@ -51,6 +51,7 @@ export default function AvaliarReserva({
     const { form, submitEvaluation } = useAvaliarReservaUseCase({
         reserva,
     });
+    const { setData } = form;
 
     const semanaInicial = useMemo(() => parseISO(semana.referencia), [semana.referencia]);
     const dataInicialReserva = useMemo(() => new Date(reserva.data_inicial), [reserva.data_inicial]);
@@ -84,9 +85,9 @@ export default function AvaliarReserva({
                 .filter(Boolean)
                 .join('\n');
 
-            form.setData('motivo', motivoConflitos);
+            setData('motivo', motivoConflitos);
         }
-    }, [form, reserva.horarios, todosOsConflitos]);
+    }, [setData, reserva.horarios, todosOsConflitos]);
 
     useEffect(() => {
         const horariosParaEnviar = slotsSelecao
@@ -96,12 +97,12 @@ export default function AvaliarReserva({
                 status: slot.status,
             }));
 
-        form.setData((prevData) => ({
+        setData((prevData) => ({
             ...prevData,
             situacao: verificarStatusReserva(slotsSelecao),
             horarios_avaliados: horariosParaEnviar,
         }));
-    }, [form, slotsSelecao]);
+    }, [setData, slotsSelecao]);
 
     const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
 
@@ -175,6 +176,7 @@ export default function AvaliarReserva({
                                     Horários Solicitados
                                 </h4>
                                 <AgendaNavegacao
+                                    variant="compact"
                                     semanaAtual={semanaVisivel}
                                     onAnterior={irParaSemanaAnterior}
                                     onProxima={irParaProximaSemana}

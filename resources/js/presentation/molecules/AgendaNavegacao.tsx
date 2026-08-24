@@ -10,7 +10,9 @@ interface AgendaNavegacaoProps {
     onReset?: () => void;
     desabilitarAnterior?: boolean;
     desabilitarProxima?: boolean;
+    variant?: 'full' | 'compact';
 }
+
 export default function AgendaNavegacao({
     semanaAtual,
     onAnterior,
@@ -18,24 +20,34 @@ export default function AgendaNavegacao({
     onReset,
     desabilitarAnterior = false,
     desabilitarProxima = false,
+    variant = 'full',
 }: AgendaNavegacaoProps) {
-    // --- LÓGICA CORRIGIDA ---
-    // 1. Calcula o início real da semana (Segunda-feira)
     const inicioDaSemana = startOfWeek(semanaAtual, { weekStartsOn: 1 });
-    // 2. Calcula o fim real da semana (Domingo)
     const fimDaSemana = endOfWeek(semanaAtual, { weekStartsOn: 1 });
+    const formatoFim = variant === 'compact' ? 'dd/MM/yyyy' : 'dd/MM';
+    const textoIntervalo = `${format(inicioDaSemana, 'dd/MM', { locale: ptBR })} - ${format(fimDaSemana, formatoFim, { locale: ptBR })}`;
 
-    // 3. Formata o texto usando as datas corretas
-    const textoIntervalo = `${format(inicioDaSemana, 'dd/MM', { locale: ptBR })} - ${format(fimDaSemana, 'dd/MM', { locale: ptBR })}`;
-    // --- FIM DA LÓGICA ---
+    if (variant === 'compact') {
+        return (
+            <div className="flex items-center justify-between">
+                <Button variant="outline" size="sm" onClick={onAnterior} disabled={desabilitarAnterior}>
+                    <ChevronLeft className="mr-1 h-4 w-4" />
+                    <span className="hidden sm:inline">Semana Anterior</span>
+                    <span className="sm:hidden">Anterior</span>
+                </Button>
+
+                <h2 className="text-sm font-medium sm:text-base">{textoIntervalo}</h2>
+
+                <Button variant="outline" size="sm" onClick={onProxima} disabled={desabilitarProxima}>
+                    <span className="hidden sm:inline">Próxima Semana</span>
+                    <span className="sm:hidden">Próxima</span>
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+            </div>
+        );
+    }
 
     return (
-        /*
-            Quatro controles numa linha só não cabem em 390px: o intervalo de datas
-            quebrava em duas linhas espremido entre os botões. No mobile as setas
-            passam a ser ícones flanqueando a data, e "Voltar para semana atual"
-            desce para a própria linha — onde há largura para o rótulo inteiro.
-        */
         <div className="bg-muted/30 flex flex-col gap-2 rounded-lg border px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="flex items-center justify-between gap-2 sm:justify-start">
                 <Button
@@ -74,13 +86,7 @@ export default function AgendaNavegacao({
                     </Button>
                 )}
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onProxima}
-                    disabled={desabilitarProxima}
-                    className="hidden sm:inline-flex"
-                >
+                <Button variant="outline" size="sm" onClick={onProxima} disabled={desabilitarProxima} className="hidden sm:inline-flex">
                     Próxima Semana
                     <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>

@@ -1,6 +1,6 @@
+import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
 import { router } from '@inertiajs/react';
 import { useEffect } from 'react';
-import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
 
 export function useReservationValidation(reservaId: number): void {
     useEffect(() => {
