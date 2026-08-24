@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.56](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.55...v1.3.0-rc.56) (2026-08-24)
+
+
+### Bug Fixes
+
+* autorizacao em roles, try-catch em notificacoes e correcao de estado no seletor de instituicao ([#365](https://github.com/uniespacos/uniespacos/issues/365)) ([171f5f7](https://github.com/uniespacos/uniespacos/commit/171f5f7d7aa4604882d5d8f6e89681301ee6049d))
+
 ## [1.3.0-rc.55](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.54...v1.3.0-rc.55) (2026-08-24)
 
 
