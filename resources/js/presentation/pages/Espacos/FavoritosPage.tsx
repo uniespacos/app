@@ -1,5 +1,6 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
-import EspacoCard from '@/presentation/organisms/EspacoCard'; // Caminho ajustado para o seu EspacoCard
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import EspacoCard from '@/presentation/organisms/EspacoCard';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Espaco, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -13,7 +14,7 @@ const breadcrumbs = [
 
 export default function FavoritosPage() {
     const {
-        favoritos: { data: espacosFavoritos, links }, // Renomeamos 'data' para 'espacosFavoritos' para clareza
+        favoritos: { data: espacosFavoritos, links },
         user,
     } = usePage<{
         favoritos: {
@@ -23,6 +24,7 @@ export default function FavoritosPage() {
         };
         user: User;
     }>().props;
+
     const handleSolicitarReserva = (espacoId: string) => {
         router.get(`/espacos/${espacoId}`);
     };
@@ -31,52 +33,34 @@ export default function FavoritosPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Meus Favoritos" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
-                        <GenericHeader
-                            titulo="Meus Espaços Favoritos"
-                            descricao="Aqui você encontra todos os espaços que você marcou como favoritos."
-                        />
+                <GenericHeader
+                    titulo="Meus Espaços Favoritos"
+                    descricao="Aqui você encontra todos os espaços que você marcou como favoritos."
+                />
 
-                        {espacosFavoritos.length > 0 ? (
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-                                {espacosFavoritos.map((espaco) => (
-                                    <EspacoCard key={espaco.id} espaco={espaco} user={user} handleSolicitarReserva={handleSolicitarReserva} />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-muted-foreground py-10 text-center">
-                                <p>Você ainda não favoritou nenhum espaço. Explore e adicione seus favoritos!</p>
-                                <Link href={route('espacos.index')} className="text-info-accent mt-4 block hover:underline">
-                                    Ver todos os espaços
-                                </Link>
-                            </div>
-                        )}
-
-                        {espacosFavoritos.length > 0 && (
-                            <div className="mt-6 flex justify-center">
-                                <div className="flex gap-1">
-                                    {links.map((link, index) =>
-                                        link.url ? (
-                                            <Link
-                                                key={index}
-                                                href={link.url}
-                                                className={`rounded-md border px-4 py-2 text-sm ${link.active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'}`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
-                                        ) : (
-                                            <span
-                                                key={index}
-                                                className="text-muted-foreground rounded-md border px-4 py-2 text-sm"
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
-                                        ),
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                {espacosFavoritos.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                        {espacosFavoritos.map((espaco) => (
+                            <EspacoCard
+                                key={espaco.id}
+                                espaco={espaco}
+                                user={user}
+                                handleSolicitarReserva={handleSolicitarReserva}
+                            />
+                        ))}
                     </div>
-                </div>
+                ) : (
+                    <div className="text-muted-foreground py-10 text-center">
+                        <p>Você ainda não favoritou nenhum espaço. Explore e adicione seus favoritos!</p>
+                        <Link href={route('espacos.index')} className="text-info-accent mt-4 block hover:underline">
+                            Ver todos os espaços
+                        </Link>
+                    </div>
+                )}
+
+                {espacosFavoritos.length > 0 && links.length > 1 && (
+                    <PaginacaoListas links={links} />
+                )}
             </div>
         </AppLayout>
     );

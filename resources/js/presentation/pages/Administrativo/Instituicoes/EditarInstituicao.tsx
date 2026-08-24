@@ -37,18 +37,16 @@ export default function EditarInstituicao() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Editar ${instituicao.nome}`} />
-            <div className="container mx-auto py-10">
-                <div className="container mx-auto space-y-6 p-6">
-                    <InstituicaoForm
-                        data={form.data}
-                        setData={form.setData}
-                        submit={submit}
-                        errors={form.errors}
-                        processing={form.processing}
-                        title="Editar Instituição"
-                        description="Altere os dados da instituição abaixo."
-                    />
-                </div>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <InstituicaoForm
+                    data={form.data}
+                    setData={form.setData}
+                    submit={submit}
+                    errors={form.errors}
+                    processing={form.processing}
+                    title="Editar Instituição"
+                    description="Altere os dados da instituição abaixo."
+                />
             </div>
         </AppLayout>
     );
