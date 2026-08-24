@@ -14,9 +14,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
         protected Reserva $reserva,
     ) {}
 
-    /**
-     * Stores a new instance of Reserva in the database
-     */
     public function store(array $data): Reserva
     {
         return $this->reserva->create($data);
@@ -40,7 +37,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     }
 
     /**
-     * Returns a paginated list of Reserva for a specific user, filtered by week and optional criteria
+     * Returns a paginated list of Reserva for a specific user, filtered by optional criteria
      *
      * @param  array<string, mixed>  $filters
      */
@@ -48,14 +45,12 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     {
         return $this->reserva->newQuery()
             ->where('user_id', $userId)
-            // o que anulava qualquer filtro por arquivadas logo abaixo.
             ->arquivo($filters['arquivo'] ?? null)
-            ->when($filters['search'] ?? null, fn ($q, $s) => $q->where('titulo', 'like', '%'.$s.'%'))
+            ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q2) => $q2->where('titulo', 'like', '%'.$s.'%')->orWhere('descricao', 'like', '%'.$s.'%')))
             ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s))
             ->with([
-                'horarios' => function ($query) use ($weekStart, $weekEnd) {
-                    $query->whereBetween('data', [$weekStart, $weekEnd])
-                        ->orderBy('data')->orderBy('horario_inicio')
+                'horarios' => function ($query) {
+                    $query->orderBy('data')->orderBy('horario_inicio')
                         ->with(['agenda.espaco.andar.modulo']);
                 },
                 'user:id,name',
@@ -80,7 +75,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     }
 
     /**
-     * Returns a paginated list of Reserva visible to the given gestor agendas, with optional filters
+     * Returns a paginated list of Reserva for a gestor, filtered by optional criteria
      *
      * @param  array<int>  $agendaIds
      * @param  array<string, mixed>  $filters
@@ -88,38 +83,30 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     public function getPaginatedForGestor(array $agendaIds, array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         return $this->reserva->newQuery()
-            ->select(['id', 'titulo', 'descricao', 'situacao', 'user_id', 'data_inicial', 'data_final'])
-            ->withHorariosStats($agendaIds)
             ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendaIds))
-            ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('titulo', 'like', "%{$s}%")->orWhere('descricao', 'like', "%{$s}%")))
-            // situacoes" deixa de significar "todas menos as arquivadas".
+            ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q2) => $q2->where('titulo', 'like', "%{$s}%")->orWhere('descricao', 'like', "%{$s}%")))
             ->arquivo($filters['arquivo'] ?? null)
             ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s))
             ->with([
                 'user:id,name',
                 'horarios' => function ($query) use ($agendaIds) {
-                    $query->whereIn('agenda_id', $agendaIds)->with([
-                        'agenda:id,espaco_id,turno',
-                        // relação aninhada precisa da própria chave estrangeira —
-                        // sem andar_id/modulo_id a cadeia volta null silenciosamente.
-                        'agenda.espaco:id,nome,andar_id',
-                        'agenda.espaco.andar:id,nome,modulo_id',
-                        'agenda.espaco.andar.modulo:id,nome',
-                    ]);
+                    $query->whereIn('agenda_id', $agendaIds)
+                        ->orderBy('data')->orderBy('horario_inicio')
+                        ->with([
+                            'agenda:id,espaco_id,turno',
+                            'agenda.espaco:id,nome,andar_id',
+                            'agenda.espaco.andar:id,nome,modulo_id',
+                            'agenda.espaco.andar.modulo:id,nome,unidade_id',
+                        ]);
                 },
             ])
+            ->withHorariosStats($agendaIds)
             ->ordenar($filters['ordenar'] ?? null)
             ->paginate($perPage);
     }
 
     /**
-     * Returns a Reserva with horarios filtered to the gestor's agendas and the given week
-     *
-     *: o whereHas escopa a própria Reserva às agendas do gestor. Sem
-     * ele, filtrar apenas o relacionamento devolvia titulo/descricao/user de
-     * reservas fora do escopo de gestão. Mesmo critério de getPaginatedForGestor.
-     *
-     * @param  array<int>  $agendaIds
+     * Returns a Reserva for a gestor with its week-filtered horarios for the detail modal
      */
     public function findForGestorModal(int $reservaId, array $agendaIds, string $weekStart, string $weekEnd): ?Reserva
     {
@@ -142,17 +129,11 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             ])->find($reservaId);
     }
 
-    /**
-     * Returns an instance of Reserva from the given id
-     */
     public function get(int|string $id): ?Reserva
     {
         return $this->reserva->find($id);
     }
 
-    /**
-     * Updates the data of an instance of Reserva
-     */
     public function update(array $data, int|string $id): Reserva
     {
         $reserva = $this->reserva->findOrFail($id);
@@ -161,9 +142,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
         return $reserva;
     }
 
-    /**
-     * Removes an instance of Reserva from the database
-     */
     public function destroy(int|string $id): bool
     {
         return (bool) $this->reserva->findOrFail($id)->delete();

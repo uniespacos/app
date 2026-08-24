@@ -482,18 +482,6 @@
     }
   },
   "resources/js/presentation/organisms/ReservasDetalhes.tsx": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-argument": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 1
-    },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }

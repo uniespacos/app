@@ -1,5 +1,6 @@
 import { comSituacaoEfetivaDoGestor } from '@/application/reservas/helpers/reserva-helpers';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { formatDate } from '@/lib/utils';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
@@ -7,12 +8,12 @@ import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/delete-item';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
 import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
-import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
+import { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Edit, FileText, XCircle } from 'lucide-react';
+import { Edit, FileText, MoreHorizontal, XCircle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -23,12 +24,15 @@ interface ReservasListProps {
     isGestor: boolean;
     user?: UserType;
     routeName: string;
+    viewMode?: ViewMode;
 }
 
-export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName }: ReservasListProps) {
+export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName, viewMode: controlledViewMode }: ReservasListProps) {
     const { data: reservas, links } = paginator;
     const isMobile = useIsMobile();
-    const [viewMode, setViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
+    const [internalViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
+    const viewMode = controlledViewMode ?? internalViewMode;
+
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
 
@@ -78,74 +82,93 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
         );
     };
 
-    const renderActions = (reserva: Reserva) => (
-        <div className="flex flex-wrap justify-end gap-2">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                    handleAbrirDetalhes(reserva);
-                }}
-            >
-                <FileText className="mr-1.5 h-4 w-4" />
-                Detalhes
-            </Button>
+    const renderActions = (reserva: Reserva) => {
+        const canEdit = Boolean(!isGestor && reserva.situacao !== 'inativa' && (reserva.can_update ?? false));
+        const canCancel = !isGestor && reserva.situacao !== 'inativa';
+        const isGestorEvaluable = isGestor && reserva.situacao !== 'inativa';
 
-            {reserva.situacao !== 'inativa' ? (
-                isGestor ? (
+        return (
+            <div className="flex items-center justify-end gap-1.5">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1 px-2.5 text-xs font-medium"
+                    onClick={() => {
+                        handleAbrirDetalhes(reserva);
+                    }}
+                >
+                    <FileText className="h-3.5 w-3.5" />
+                    Detalhes
+                </Button>
+
+                {isGestorEvaluable && (
                     <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
+                        className="h-8 gap-1 px-2.5 text-xs font-medium"
                         onClick={() => {
                             handleAvaliarButton(reserva.id);
                         }}
                     >
-                        <Edit className="mr-1.5 h-4 w-4" />
+                        <Edit className="h-3.5 w-3.5" />
                         {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                     </Button>
-                ) : (
-                    <>
-                        {reserva.can_update && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                    router.get(`reservas/${String(reserva.id)}/edit`);
-                                }}
-                            >
-                                <Edit className="mr-1.5 h-4 w-4" />
-                                Editar
+                )}
+
+                {(canEdit || canCancel) && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Mais ações</span>
                             </Button>
-                        )}
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                                setRemoverReserva(reserva);
-                            }}
-                        >
-                            <XCircle className="mr-1.5 h-4 w-4" />
-                            Cancelar
-                        </Button>
-                    </>
-                )
-            ) : null}
-        </div>
-    );
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {canEdit && (
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        router.get(`reservas/${String(reserva.id)}/edit`);
+                                    }}
+                                >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar
+                                </DropdownMenuItem>
+                            )}
+                            {canCancel && (
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setRemoverReserva(reserva);
+                                    }}
+                                    className="text-destructive focus:text-destructive"
+                                >
+                                    <XCircle className="mr-2 h-4 w-4" />
+                                    Cancelar
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+            </div>
+        );
+    };
 
     const columns: ColumnDef<Reserva>[] = [
         {
             header: 'Título',
+            className: 'min-w-[180px]',
             cell: (reserva) => (
-                <div>
-                    <div className="font-medium">
-                        {reserva.titulo.substring(0, 30)}
-                        {reserva.titulo.length > 30 ? '...' : ''}
+                <div className="min-w-0 space-y-0.5">
+                    <div className="text-foreground truncate font-semibold" title={reserva.titulo}>
+                        {reserva.titulo}
                     </div>
                     {reserva.descricao ? (
-                        <p className="text-muted-foreground hidden text-sm sm:block">
-                            {reserva.descricao.substring(0, 30)}
-                            {reserva.descricao.length > 30 ? '...' : ''}
+                        <p className="text-muted-foreground line-clamp-1 truncate text-xs" title={reserva.descricao}>
+                            {reserva.descricao}
+                        </p>
+                    ) : null}
+                    {isGestor && reserva.user ? (
+                        <p className="text-muted-foreground truncate text-xs">
+                            <span className="font-medium">Solicitante:</span> {reserva.user.name}
                         </p>
                     ) : null}
                 </div>
@@ -153,17 +176,25 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
         },
         {
             header: 'Local',
-            className: 'hidden md:table-cell',
+            className: 'min-w-[160px]',
             cell: (reserva) => <LocalReserva espaco={reserva.horarios[0]?.agenda?.espaco} />,
         },
         {
             header: 'Período',
-            className: 'hidden lg:table-cell',
-            cell: (reserva) => `${formatDate(reserva.data_inicial)} à ${formatDate(reserva.data_final)}`,
+            className: 'min-w-[130px] whitespace-nowrap',
+            cell: (reserva) => (
+                <div className="text-sm">
+                    <div className="font-medium">{formatDate(reserva.data_inicial)}</div>
+                    {reserva.data_inicial !== reserva.data_final && (
+                        <div className="text-muted-foreground text-xs">até {formatDate(reserva.data_final)}</div>
+                    )}
+                </div>
+            ),
         },
         {
             header: 'Situação',
-            className: 'hidden md:table-cell',
+            align: 'center',
+            className: 'w-[150px]',
             cell: (reserva) => <SituacaoBadge situacao={reserva.situacao} />,
         },
     ];
@@ -184,10 +215,6 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
-                <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-            </div>
-
             <DataTable
                 data={reservasFiltradas}
                 columns={columns}
