@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import InputError from '@/presentation/atoms/input-error';
+import { FormField } from '@/presentation/molecules/FormField';
 import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import type { Instituicao } from '@/types';
 import { LoaderCircle } from 'lucide-react';
@@ -21,7 +20,7 @@ interface FormRegistroUsuarioProps {
     errors: Record<string, string>;
     processing: boolean;
     instituicaos: Instituicao[];
-    onSubmit: (e: React.FormEvent) => void;
+    onSubmit: (e: React.SyntheticEvent) => void;
 }
 
 export function FormRegistroUsuario({ data, onInputChange, errors, processing, instituicaos, onSubmit }: FormRegistroUsuarioProps) {
@@ -49,8 +48,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         <form onSubmit={onSubmit} className="space-y-6">
             <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Nome completo *</Label>
+                    <FormField label="Nome completo" htmlFor="name" error={errors.name} required>
                         <Input
                             id="name"
                             value={data.name}
@@ -59,13 +57,12 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                             }}
                             placeholder="Digite seu nome completo"
                             required
+                            disabled={processing}
                             className="h-11"
                         />
-                        <InputError message={errors.name} />
-                    </div>
+                    </FormField>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
+                    <FormField label="Email" htmlFor="email" error={errors.email} required>
                         <Input
                             id="email"
                             type="email"
@@ -75,24 +72,23 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                             }}
                             placeholder="seu@email.com"
                             required
+                            disabled={processing}
                             className="h-11"
                         />
-                        <InputError message={errors.email} />
-                    </div>
+                    </FormField>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="phone">Número de celular </Label>
+                <FormField label="Número de celular" htmlFor="phone" error={errors.phone}>
                     <Input
                         id="phone"
                         value={data.phone}
                         onChange={handlePhoneChange}
                         placeholder="Exemplo: (XX) XXXXX-XXXX"
                         maxLength={15}
+                        disabled={processing}
                         className="h-11"
                     />
-                    <InputError message={errors.phone} />
-                </div>
+                </FormField>
             </div>
 
             <div className="space-y-4">
@@ -118,8 +114,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                 <div className="border-t pt-6">
                     <h3 className="text-foreground mb-4 text-lg font-medium">Definir Senha</h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Senha *</Label>
+                        <FormField label="Senha" htmlFor="password" error={errors.password} required>
                             <Input
                                 id="password"
                                 type="password"
@@ -129,13 +124,12 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 }}
                                 placeholder="Mínimo 8 caracteres"
                                 required
+                                disabled={processing}
                                 className="h-11"
                             />
-                            <InputError message={errors.password} />
-                        </div>
+                        </FormField>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="password_confirmation">Confirme sua senha *</Label>
+                        <FormField label="Confirme sua senha" htmlFor="password_confirmation" error={errors.password_confirmation} required>
                             <Input
                                 id="password_confirmation"
                                 type="password"
@@ -145,10 +139,10 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 }}
                                 placeholder="Digite a senha novamente"
                                 required
+                                disabled={processing}
                                 className="h-11"
                             />
-                            <InputError message={errors.password_confirmation} />
-                        </div>
+                        </FormField>
                     </div>
                 </div>
             </div>

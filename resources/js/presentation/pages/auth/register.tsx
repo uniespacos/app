@@ -1,20 +1,16 @@
 import { Button } from '@/components/ui/button';
-import { ModalNovaInstituicao } from '@/presentation/molecules/ModalNovaInstituicao';
+import { ModalNovaInstituicao } from '@/presentation/organisms/ModalNovaInstituicao';
 import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
 import { Instituicao } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import type React from 'react';
 
 export default function Register() {
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;
 
     const [showModal, setShowModal] = useState(false);
-    const [novaInstituicao, setNovaInstituicao] = useState({
-        nome: '',
-        unidade: '',
-        setor: '',
-    });
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -25,31 +21,13 @@ export default function Register() {
         campus: '',
         instituicao_id: '',
         setor_id: '',
-        instituicao_custom: '',
-        unidade_custom: '',
-        setor_custom: '',
     });
+
     const handleInputChange = (field: string, value: string) => {
         setData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleNovaInstituicaoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNovaInstituicao((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const submitNovaInstituicao = () => {
-        setData((prev) => ({
-            ...prev,
-            instituicao_custom: novaInstituicao.nome,
-            unidade_custom: novaInstituicao.unidade,
-            setor_custom: novaInstituicao.setor,
-        }));
-        setShowModal(false);
-        setNovaInstituicao({ nome: '', unidade: '', setor: '' });
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         post(route('register'), {
@@ -105,9 +83,6 @@ export default function Register() {
             <ModalNovaInstituicao
                 open={showModal}
                 onOpenChange={setShowModal}
-                novaInstituicao={novaInstituicao}
-                onChange={handleNovaInstituicaoChange}
-                onSubmit={submitNovaInstituicao}
             />
         </div>
     );

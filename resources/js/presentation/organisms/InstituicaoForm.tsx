@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FormField } from '@/presentation/molecules/FormField';
 import { CadastrarInstituicaoForm } from '@/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao';
 import type React from 'react';
 
@@ -24,8 +24,7 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                     <CardDescription>{description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="nome">Nome da Instituição</Label>
+                    <FormField label="Nome da Instituição" htmlFor="nome" error={errors.nome} required>
                         <Input
                             id="nome"
                             value={data.nome}
@@ -33,23 +32,23 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                                 setData('nome', e.target.value);
                             }}
                             placeholder="Ex: Universidade Federal da Bahia"
+                            disabled={processing}
                         />
-                        {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="sigla">Sigla</Label>
+                    </FormField>
+
+                    <FormField label="Sigla" htmlFor="sigla" error={errors.sigla} required>
                         <Input
                             id="sigla"
                             value={data.sigla}
                             onChange={(e) => {
-                                setData('sigla', e.target.value);
+                                setData('sigla', e.target.value.toUpperCase());
                             }}
                             placeholder="Ex: UFBA"
+                            disabled={processing}
                         />
-                        {errors.sigla && <p className="text-destructive mt-1 text-sm">{errors.sigla}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="endereco">Endereço</Label>
+                    </FormField>
+
+                    <FormField label="Endereço" htmlFor="endereco" error={errors.endereco}>
                         <Input
                             id="endereco"
                             value={data.endereco}
@@ -57,9 +56,9 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                                 setData('endereco', e.target.value);
                             }}
                             placeholder="Ex: Rua Barão de Jeremoabo, s/n"
+                            disabled={processing}
                         />
-                        {errors.endereco && <p className="text-destructive mt-1 text-sm">{errors.endereco}</p>}
-                    </div>
+                    </FormField>
                 </CardContent>
                 <CardFooter>
                     <Button type="submit" disabled={processing}>

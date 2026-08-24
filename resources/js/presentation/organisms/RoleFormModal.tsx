@@ -62,16 +62,17 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
         },
     });
 
-    const selectedPermissions = useMemo(() => watch('permissions') || [], [watch]);
-    const nameValue = useMemo(() => watch('name') || '', [watch]);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+    const permissionsValue = watch('permissions');
+    const selectedPermissions = useMemo(() => permissionsValue ?? [], [permissionsValue]);
+    const nameValue = watch('name');
 
     useEffect(() => {
         if (role) {
             reset({
                 name: role.name,
-                description: role.description || '',
-                permissions: role.permissions || [],
+                description: role.description ?? '',
+                permissions: role.permissions ?? [],
             });
         } else {
             reset({
@@ -80,20 +81,22 @@ export function RoleFormModal({ isOpen, role, permissions, onClose }: RoleFormMo
                 permissions: [],
             });
         }
-    }, [role, isOpen, reset]);
+    }, [role, reset]);
 
     const handleTogglePermission = (permissionName: string) => {
-        const current = selectedPermissions || [];
+        const current = selectedPermissions;
         const updated = current.includes(permissionName) ? current.filter((p) => p !== permissionName) : [...current, permissionName];
         setValue('permissions', updated, { shouldValidate: true });
     };
 
-    const handleToggleGroup = (group: string, perms: Permission[]) => {
-        const groupNames = perms.map((p) => p.name);
-        const allSelected = groupNames.every((n) => selectedPermissions.includes(n));
+    const handleToggleGroup = (group: string, groupPerms: Permission[]) => {
+        const groupPermNames = groupPerms.map((p) => p.name);
+        const allSelected = groupPermNames.every((p) => selectedPermissions.includes(p));
+
         const updated = allSelected
-            ? selectedPermissions.filter((n) => !groupNames.includes(n))
-            : [...new Set([...selectedPermissions, ...groupNames])];
+            ? selectedPermissions.filter((p) => !groupPermNames.includes(p))
+            : Array.from(new Set([...selectedPermissions, ...groupPermNames]));
+
         setValue('permissions', updated, { shouldValidate: true });
     };
 

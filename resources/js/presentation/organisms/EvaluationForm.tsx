@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
+import { FormField } from '@/presentation/molecules/FormField';
 import { SituacaoReserva, SlotCalendario } from '@/types';
 import { router } from '@inertiajs/react';
 import { CheckCircle, Info, XCircle } from 'lucide-react';
@@ -25,7 +26,7 @@ interface EvaluationFormProps {
     slotsSelecao: SlotCalendario[];
     isReavaliacao: boolean;
     onDecisaoChange: (value: SituacaoReserva) => void;
-    onSubmit: (e: React.FormEvent) => void;
+    onSubmit: (e: React.SyntheticEvent) => void;
 }
 
 export default function EvaluationForm({
@@ -113,10 +114,7 @@ export default function EvaluationForm({
                     </div>
 
                     {showMotivoField && (
-                        <div className="space-y-2">
-                            <Label htmlFor="motivo" className="text-destructive font-medium">
-                                Motivo do Indeferimento *
-                            </Label>
+                        <FormField label="Motivo do Indeferimento" htmlFor="motivo" required>
                             <Textarea
                                 id="motivo"
                                 placeholder="Descreva o motivo pelo qual um ou mais horários estão sendo indeferidos..."
@@ -127,13 +125,10 @@ export default function EvaluationForm({
                                 className="border-destructive/25 focus:border-destructive min-h-[100px]"
                             />
                             <p className="text-destructive text-sm">Este campo é obrigatório se algum horário for indeferido.</p>
-                        </div>
+                        </FormField>
                     )}
 
-                    <div className="space-y-2">
-                        <Label htmlFor="observacao" className="text-info-accent font-medium">
-                            Observação (Opcional)
-                        </Label>
+                    <FormField label="Observação (Opcional)" htmlFor="observacao">
                         <Textarea
                             id="observacao"
                             placeholder="Caso haja uma observação adicional para o solicitante, descreva aqui..."
@@ -143,7 +138,7 @@ export default function EvaluationForm({
                             }}
                             className="border-info/25 focus:border-info/25 min-h-[100px]"
                         />
-                    </div>
+                    </FormField>
 
                     <div className="flex gap-3 border-t pt-4">
                         <Button type="submit" disabled={isSubmitting} className="flex-1">

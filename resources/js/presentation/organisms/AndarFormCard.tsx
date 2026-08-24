@@ -4,7 +4,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMensagemBloqueioRemocao, nivelParaLabel, podeRemoverAndar } from '@/lib/utils/andars/AndarHelpers';
+import { FormField } from '@/presentation/molecules/FormField';
 import { AlertTriangle, Lock, Trash2 } from 'lucide-react';
+
 export interface AndarFormData {
     id: string;
     nome: string;
@@ -130,9 +132,12 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                         </div>
                     )}
 
-                    <div className="space-y-3">
-                        <Label className="text-sm font-medium">Tipos de Acesso</Label>
-                        <div className="grid grid-cols-1 gap-3">
+                    <FormField
+                        label="Tipos de Acesso"
+                        htmlFor={`andar-${andar.id}-acesso`}
+                        error={hasErrors ? errors[`andares.${index}.tipo_acesso`] : undefined}
+                    >
+                        <div id={`andar-${andar.id}-acesso`} className="grid grid-cols-1 gap-3">
                             {tiposDeAcesso.map((tipo) => (
                                 <div key={tipo.id} className="flex items-center space-x-3">
                                     <Checkbox
@@ -148,8 +153,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                 </div>
                             ))}
                         </div>
-                        {hasErrors && <p className="text-destructive text-xs">{errors[`andares.${index}.tipo_acesso`]}</p>}
-                    </div>
+                    </FormField>
                 </CardContent>
             </Card>
         </TooltipProvider>
