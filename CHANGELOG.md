@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.60](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.59...v1.3.0-rc.60) (2026-08-24)
+
+
+### Features
+
+* **frontend:** harmonização arquitetural e atomic design (fase 4) ([#374](https://github.com/uniespacos/uniespacos/issues/374)) ([15402fc](https://github.com/uniespacos/uniespacos/commit/15402fcc1cd1332cd7a4b27f83e6aa92ebba70d6))
+
 ## [1.3.0-rc.59](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.58...v1.3.0-rc.59) (2026-08-24)
 
 
