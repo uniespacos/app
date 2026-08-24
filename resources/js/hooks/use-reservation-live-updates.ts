@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { acquirePublicChannel, releasePublicChannel } from '@/lib/echo-channel-registry';
+import { useEffect } from 'react';
 
 interface ReservationEvent {
     action: string;

@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { endOfWeek, format, startOfWeek } from "date-fns";
-import { ptBR } from "date-fns/locale/pt-BR";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { endOfWeek, format, startOfWeek } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AgendaNavegacaoProps {
     semanaAtual: Date;
@@ -10,7 +10,7 @@ interface AgendaNavegacaoProps {
     onReset?: () => void;
     desabilitarAnterior?: boolean;
     desabilitarProxima?: boolean;
-    variant?: "full" | "compact";
+    variant?: 'full' | 'compact';
 }
 
 export default function AgendaNavegacao({
@@ -20,14 +20,14 @@ export default function AgendaNavegacao({
     onReset,
     desabilitarAnterior = false,
     desabilitarProxima = false,
-    variant = "full",
+    variant = 'full',
 }: AgendaNavegacaoProps) {
     const inicioDaSemana = startOfWeek(semanaAtual, { weekStartsOn: 1 });
     const fimDaSemana = endOfWeek(semanaAtual, { weekStartsOn: 1 });
-    const formatoFim = variant === "compact" ? "dd/MM/yyyy" : "dd/MM";
-    const textoIntervalo = `${format(inicioDaSemana, "dd/MM", { locale: ptBR })} - ${format(fimDaSemana, formatoFim, { locale: ptBR })}`;
+    const formatoFim = variant === 'compact' ? 'dd/MM/yyyy' : 'dd/MM';
+    const textoIntervalo = `${format(inicioDaSemana, 'dd/MM', { locale: ptBR })} - ${format(fimDaSemana, formatoFim, { locale: ptBR })}`;
 
-    if (variant === "compact") {
+    if (variant === 'compact') {
         return (
             <div className="flex items-center justify-between">
                 <Button variant="outline" size="sm" onClick={onAnterior} disabled={desabilitarAnterior}>
@@ -86,13 +86,7 @@ export default function AgendaNavegacao({
                     </Button>
                 )}
 
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onProxima}
-                    disabled={desabilitarProxima}
-                    className="hidden sm:inline-flex"
-                >
+                <Button variant="outline" size="sm" onClick={onProxima} disabled={desabilitarProxima} className="hidden sm:inline-flex">
                     Próxima Semana
                     <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>

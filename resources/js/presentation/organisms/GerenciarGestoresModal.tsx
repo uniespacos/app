@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { TURNO_LABEL, TURNOS_ORDENADOS } from "@/constants/turnos";
-import { Modal } from "@/presentation/molecules/Modal";
-import { UserSearchCombobox } from "@/presentation/molecules/UserSearchComboBox";
-import type { Espaco, User } from "@/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { TURNO_LABEL, TURNOS_ORDENADOS } from '@/constants/turnos';
+import { Modal } from '@/presentation/molecules/Modal';
+import { UserSearchCombobox } from '@/presentation/molecules/UserSearchComboBox';
+import type { Espaco, User } from '@/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface GerenciarGestoresModalProps {
     espaco: Espaco | null;
@@ -24,9 +24,9 @@ export function GerenciarGestoresModal({ espaco, usuarios, isOpen, onClose, onSa
     useEffect(() => {
         if (espaco?.agendas) {
             setGestores({
-                manha: espaco.agendas.find((a) => a.turno === "manha")?.user?.id || null,
-                tarde: espaco.agendas.find((a) => a.turno === "tarde")?.user?.id || null,
-                noite: espaco.agendas.find((a) => a.turno === "noite")?.user?.id || null,
+                manha: espaco.agendas.find((a) => a.turno === 'manha')?.user?.id ?? null,
+                tarde: espaco.agendas.find((a) => a.turno === 'tarde')?.user?.id ?? null,
+                noite: espaco.agendas.find((a) => a.turno === 'noite')?.user?.id ?? null,
             });
         } else {
             setGestores({ manha: null, tarde: null, noite: null });
@@ -37,9 +37,9 @@ export function GerenciarGestoresModal({ espaco, usuarios, isOpen, onClose, onSa
         if (!espaco?.agendas) return { manha: null, tarde: null, noite: null };
 
         return {
-            manha: espaco.agendas.find((a) => a.turno === "manha")?.user?.id || null,
-            tarde: espaco.agendas.find((a) => a.turno === "tarde")?.user?.id || null,
-            noite: espaco.agendas.find((a) => a.turno === "noite")?.user?.id || null,
+            manha: espaco.agendas.find((a) => a.turno === 'manha')?.user?.id ?? null,
+            tarde: espaco.agendas.find((a) => a.turno === 'tarde')?.user?.id ?? null,
+            noite: espaco.agendas.find((a) => a.turno === 'noite')?.user?.id ?? null,
         };
     }, [espaco?.agendas]);
 
@@ -58,9 +58,7 @@ export function GerenciarGestoresModal({ espaco, usuarios, isOpen, onClose, onSa
     }, []);
 
     const hasChanges = useMemo(() => {
-        return Object.keys(gestores).some(
-            (turno) => gestores[turno] !== gestoresIniciais[turno as keyof typeof gestoresIniciais],
-        );
+        return Object.keys(gestores).some((turno) => gestores[turno] !== gestoresIniciais[turno as keyof typeof gestoresIniciais]);
     }, [gestores, gestoresIniciais]);
 
     if (!espaco) return null;
@@ -85,7 +83,9 @@ export function GerenciarGestoresModal({ espaco, usuarios, isOpen, onClose, onSa
                             <UserSearchCombobox
                                 usuarios={usuarios}
                                 value={gestores[turno]}
-                                onValueChange={(value) => { handleGestorChange(turno, value); }}
+                                onValueChange={(value) => {
+                                    handleGestorChange(turno, value);
+                                }}
                                 placeholder={`Buscar gestor para o turno da ${TURNO_LABEL[turno].toLowerCase()}...`}
                             />
                         </div>
@@ -97,7 +97,7 @@ export function GerenciarGestoresModal({ espaco, usuarios, isOpen, onClose, onSa
                         Cancelar
                     </Button>
                     <Button onClick={handleSalvar} disabled={!hasChanges} type="button">
-                        {hasChanges ? "Salvar Alterações" : "Nenhuma Alteração"}
+                        {hasChanges ? 'Salvar Alterações' : 'Nenhuma Alteração'}
                     </Button>
                 </div>
             </div>

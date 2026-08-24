@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
+import { useEffect } from 'react';
 
 interface EspacoEvent {
     action: string;
