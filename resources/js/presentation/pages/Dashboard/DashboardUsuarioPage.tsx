@@ -46,7 +46,7 @@ export default function Dashboard() {
                 >
                     <CardContent className="flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
                         <div className="flex items-center gap-4">
-                            <div className="rounded-full bg-white/15 p-3">
+                            <div className="bg-primary-foreground/15 rounded-full p-3">
                                 <CalendarSearch className="h-6 w-6" />
                             </div>
                             <div>

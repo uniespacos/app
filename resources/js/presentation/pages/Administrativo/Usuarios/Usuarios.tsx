@@ -34,11 +34,11 @@ const getRoleBadgeClass = (role: string) => {
     switch (role.toLowerCase()) {
         case 'super-admin':
         case 'administrador':
-            return 'bg-destructive/15 text-destructive';
+            return 'bg-destructive-subtle text-destructive border-destructive/25';
         case 'gestor':
-            return 'bg-info/15 text-info-accent';
+            return 'bg-info-subtle text-info-accent border-info/25';
         default:
-            return 'bg-muted text-muted-foreground';
+            return 'bg-muted text-muted-foreground border-border';
     }
 };
 
@@ -107,12 +107,7 @@ export default function Usuarios() {
         setEditingUser(user);
     };
 
-    const handlePermissionUpdate = (
-        userId: number,
-        roleName: string,
-        agendas?: number[],
-        directPermissions?: string[],
-    ) => {
+    const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[], directPermissions?: string[]) => {
         setProcessing(true);
         const payload: { role_name: string; agendas: number[]; direct_permissions?: string[] } = {
             role_name: roleName,
@@ -175,7 +170,7 @@ export default function Usuarios() {
             {
                 header: 'Usuário',
                 cell: (user) => (
-                    <div className="flex items-center space-x-3 min-w-[200px]">
+                    <div className="flex min-w-[200px] items-center space-x-3">
                         <Avatar className="h-9 w-9 shrink-0">
                             <AvatarFallback>
                                 {user.name
@@ -186,8 +181,8 @@ export default function Usuarios() {
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                            <div className="font-medium truncate">{user.name}</div>
-                            <div className="text-muted-foreground text-sm truncate">{user.email}</div>
+                            <div className="truncate font-medium">{user.name}</div>
+                            <div className="text-muted-foreground truncate text-sm">{user.email}</div>
                             {user.telefone ? <div className="text-muted-foreground text-xs">{user.telefone}</div> : null}
                         </div>
                     </div>
@@ -199,17 +194,13 @@ export default function Usuarios() {
             },
             {
                 header: 'Papel',
-                cell: (user) => (
-                    <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>
-                        {getRoleLabel(user.roles[0] ?? ROLE_COMUM)}
-                    </Badge>
-                ),
+                cell: (user) => <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>,
             },
             {
                 header: 'Status',
                 cell: (user) => (
                     <div className="flex items-center space-x-2">
-                        <div className={cn('h-2 w-2 rounded-full shrink-0', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
+                        <div className={cn('h-2 w-2 shrink-0 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
                             {user.email_verified_at ? 'Verificado' : 'Não verificado'}
                         </span>
@@ -222,7 +213,7 @@ export default function Usuarios() {
 
     const renderUserCard = (user: User) => (
         <Card key={user.id} className="transition-shadow hover:shadow-md">
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="space-y-4 p-4">
                 <div className="flex items-center space-x-3">
                     <Avatar className="h-11 w-11 shrink-0">
                         <AvatarFallback>
@@ -234,21 +225,17 @@ export default function Usuarios() {
                         </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-base truncate">{user.name}</h3>
-                        <p className="text-muted-foreground text-sm truncate">{user.email}</p>
+                        <h3 className="truncate text-base font-semibold">{user.name}</h3>
+                        <p className="text-muted-foreground truncate text-sm">{user.email}</p>
                         {user.telefone ? <p className="text-muted-foreground text-xs">{user.telefone}</p> : null}
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
                     <div className="flex items-center gap-2">
-                        <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>
-                            {getRoleLabel(user.roles[0] ?? ROLE_COMUM)}
-                        </Badge>
+                        <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>
                         <div className="flex items-center space-x-1.5">
                             <div className={cn('h-2 w-2 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
-                            <span className="text-muted-foreground text-xs">
-                                {user.email_verified_at ? 'Verificado' : 'Não verificado'}
-                            </span>
+                            <span className="text-muted-foreground text-xs">{user.email_verified_at ? 'Verificado' : 'Não verificado'}</span>
                         </div>
                     </div>
                     <div>{renderUserActions(user)}</div>
@@ -280,8 +267,8 @@ export default function Usuarios() {
                                 variant="plain"
                             />
                         </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3">
-                            <div className="space-y-2 flex-1 sm:w-[180px]">
+                        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-end">
+                            <div className="flex-1 space-y-2 sm:w-[180px]">
                                 <Label>Setor</Label>
                                 <Select value={selectedSetorId} onValueChange={handleSetorChange}>
                                     <SelectTrigger className="w-full">
@@ -297,7 +284,7 @@ export default function Usuarios() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="self-end sm:self-auto shrink-0">
+                            <div className="shrink-0 self-end sm:self-auto">
                                 <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
                             </div>
                         </div>
