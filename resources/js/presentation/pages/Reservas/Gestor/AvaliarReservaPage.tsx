@@ -34,8 +34,8 @@ export default function AvaliarReserva({
     todosOsConflitos: Record<string, any>;
 }) {
     const isReavaliacao = useMemo(() => {
-        return reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
-    }, [reserva.horarios]);
+        return reserva.situacao !== 'em_analise' || reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
+    }, [reserva.situacao, reserva.horarios]);
 
     const agendas = useMemo(() => {
         return reserva.horarios

@@ -1,4 +1,4 @@
-import { Reserva, SituacaoReserva } from '@/types';
+import { Reserva } from '@/types';
 import { useForm } from '@inertiajs/react';
 import type React from 'react';
 import { toast } from 'sonner';
@@ -9,10 +9,13 @@ interface UseAvaliarReservaUseCaseProps {
 }
 
 export function useAvaliarReservaUseCase({ reserva, onSuccess }: UseAvaliarReservaUseCaseProps) {
-    const existingJustification = (reserva as unknown as { existing_justification?: string }).existing_justification ?? '';
+    const existingJustification =
+        (reserva as unknown as { existing_justification?: string }).existing_justification ??
+        reserva.horarios.find((h) => h.justificativa)?.justificativa ??
+        '';
 
     const form = useForm({
-        situacao: reserva.situacao as SituacaoReserva,
+        situacao: reserva.situacao,
         motivo: existingJustification,
         observacao: reserva.observacao ?? '',
         horarios_avaliados: [] as { id: number; status: string }[],
