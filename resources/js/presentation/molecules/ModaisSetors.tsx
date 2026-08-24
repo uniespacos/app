@@ -14,7 +14,7 @@ interface Props {
     setViewingUsuarios: (setor: Setor | null) => void;
     instituicao: Instituicao;
     unidades: Unidade[];
-    usuarios: User[];
+    usuarios?: User[];
     onCreateSetor: (data: SetorFormData) => void;
     onUpdateSetor: (setorId: number, data: SetorFormData) => void;
 }
@@ -33,7 +33,7 @@ export function ModaisSetor({
     onUpdateSetor,
 }: Props) {
     const getUsuariosDoSetor = (setorId: number) => {
-        return usuarios.filter((user) => user.setor?.id === setorId);
+        return usuarios ? usuarios.filter((user) => user.setor?.id === setorId) : undefined;
     };
 
     return (

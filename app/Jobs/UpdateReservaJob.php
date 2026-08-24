@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Events\ReservaEvent;
 use App\Models\Agenda;
 use App\Models\Horario;
@@ -110,7 +111,7 @@ class UpdateReservaJob implements ShouldQueue
                     // com a reserva parcialmente avaliada, sem passar pelo
                     // bloqueio da ReservaPolicy.
                     $avaliacoes = $this->reserva->horarios()
-                        ->whereIn('situacao', ['deferida', 'indeferida'])
+                        ->whereIn('situacao', [SituacaoReservaEnum::DEFERIDA->value, SituacaoReservaEnum::INDEFERIDA->value])
                         ->get()
                         ->keyBy(fn ($h) => $this->chaveHorario($h->agenda_id, $h->data, $h->horario_inicio));
 
@@ -127,8 +128,8 @@ class UpdateReservaJob implements ShouldQueue
                         // nao quem edita — senao um gestor editando a reserva de
                         // outra pessoa a deferiria sem querer.
                         fn (Agenda $agenda) => $agenda->user_id === $this->reserva->user_id
-                            ? 'deferida'
-                            : 'em_analise',
+                            ? SituacaoReservaEnum::DEFERIDA->value
+                            : SituacaoReservaEnum::EM_ANALISE->value,
                     );
 
                     foreach ($linhas as $indice => $linha) {

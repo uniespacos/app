@@ -66,12 +66,12 @@ class AvaliarReservaJob implements ShouldQueue
                 if ($scope === 'single') {
                     foreach ($horariosDaAvaliacao as $avaliacao) {
                         $horarioId = $avaliacao['id'];
-                        $statusFinal = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
+                        $statusFinal = $avaliacao['status'] === 'solicitado' ? SituacaoReservaEnum::EM_ANALISE->value : $avaliacao['status'];
                         $justificativaFinal = $motivoDoGestor;
 
                         if ($horariosConflitantesIds->contains($horarioId)) {
                             $conflito = $conflitosMap->get($horarioId);
-                            $statusFinal = 'indeferida';
+                            $statusFinal = SituacaoReservaEnum::INDEFERIDA->value;
                             $justificativaFinal = "Conflito com a reserva '{$conflito->conflito_reserva_titulo}' de {$conflito->conflito_user_name}.";
                         }
 
@@ -92,7 +92,7 @@ class AvaliarReservaJob implements ShouldQueue
                                 : 'Conflito com outra reserva.';
 
                             Horario::where('id', $id)->update([
-                                'situacao' => 'indeferida',
+                                'situacao' => SituacaoReservaEnum::INDEFERIDA->value,
                                 'justificativa' => $justificativa,
                                 'user_id' => $this->gestor->id,
                             ]);
@@ -119,8 +119,8 @@ class AvaliarReservaJob implements ShouldQueue
                             continue;
                         }
 
-                        $statusParaReplicar = $avaliacao['status'] === 'solicitado' ? 'em_analise' : $avaliacao['status'];
-                        $justificativaParaReplicar = $statusParaReplicar === 'indeferida' ? $motivoDoGestor : null;
+                        $statusParaReplicar = $avaliacao['status'] === 'solicitado' ? SituacaoReservaEnum::EM_ANALISE->value : $avaliacao['status'];
+                        $justificativaParaReplicar = $statusParaReplicar === SituacaoReservaEnum::INDEFERIDA->value ? $motivoDoGestor : null;
 
                         $this->reserva->horarios()
                             ->whereNotIn('id', $horariosConflitantesIds)
@@ -240,7 +240,7 @@ class AvaliarReservaJob implements ShouldQueue
         $reservasParaRevalidar = Reserva::query()
             ->where('id', '!=', $this->reserva->id)
             ->where('validation_status', 'completed')
-            ->where('situacao', 'em_analise')
+            ->where('situacao', SituacaoReservaEnum::EM_ANALISE->value)
             ->whereHas('horarios', function ($query) use ($slotsOcupados) {
                 $query->where(function ($q) use ($slotsOcupados) {
                     foreach ($slotsOcupados as $slot) {
@@ -281,21 +281,21 @@ class AvaliarReservaJob implements ShouldQueue
         $totalHorarios = $statusCounts->sum();
 
         if ($totalHorarios === 0) {
-            $reserva->situacao = 'indeferida';
+            $reserva->situacao = SituacaoReservaEnum::INDEFERIDA->value;
             $reserva->save();
 
             return;
         }
 
-        $deferidosCount = $statusCounts->get('deferida', 0);
-        $indeferidosCount = $statusCounts->get('indeferida', 0);
-        $emAnaliseCount = $statusCounts->get('em_analise', 0);
+        $deferidosCount = $statusCounts->get(SituacaoReservaEnum::DEFERIDA->value, 0);
+        $indeferidosCount = $statusCounts->get(SituacaoReservaEnum::INDEFERIDA->value, 0);
+        $emAnaliseCount = $statusCounts->get(SituacaoReservaEnum::EM_ANALISE->value, 0);
 
         $novaSituacao = match (true) {
-            $deferidosCount === $totalHorarios => 'deferida',
-            $indeferidosCount === $totalHorarios => 'indeferida',
-            $emAnaliseCount > 0 => 'em_analise',
-            default => 'parcialmente_deferida',
+            $deferidosCount === $totalHorarios => SituacaoReservaEnum::DEFERIDA->value,
+            $indeferidosCount === $totalHorarios => SituacaoReservaEnum::INDEFERIDA->value,
+            $emAnaliseCount > 0 => SituacaoReservaEnum::EM_ANALISE->value,
+            default => SituacaoReservaEnum::PARCIALMENTE_DEFERIDA->value,
         };
 
         $reserva->situacao = $novaSituacao;

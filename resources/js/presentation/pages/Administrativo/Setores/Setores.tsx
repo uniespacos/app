@@ -5,7 +5,7 @@ import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
 import { SetorFormData } from '@/presentation/organisms/SetorForm';
 import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 import AppLayout from '@/presentation/templates/app-layout';
-import { Instituicao, Setor, Unidade, User } from '@/types';
+import { Instituicao, Setor, Unidade } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -18,11 +18,10 @@ const breadcrumbs = [
 ];
 
 export default function SetoresPage() {
-    const { instituicao, unidades, setores, usuarios } = usePage<{
+    const { instituicao, unidades, setores } = usePage<{
         instituicao: Instituicao;
         unidades: Unidade[];
         setores: Setor[];
-        usuarios: User[];
     }>().props;
 
     const { searchTerm, setSearchTerm, selectedUnidade, setSelectedUnidade, filteredUnidades, filteredSetores, clearFilters } = useFiltros(
@@ -92,12 +91,7 @@ export default function SetoresPage() {
                             onClearFilters={clearFilters}
                         />
 
-                        <TabelaSetores
-                            setores={filteredSetores ?? []}
-                            onEdit={setEditingSetor}
-                            onViewUsuarios={setViewingUsuarios}
-                            usuarios={usuarios}
-                        />
+                        <TabelaSetores setores={filteredSetores ?? []} onEdit={setEditingSetor} onViewUsuarios={setViewingUsuarios} />
 
                         <ModaisSetor
                             isCreateModalOpen={isCreateModalOpen}
@@ -108,7 +102,6 @@ export default function SetoresPage() {
                             setViewingUsuarios={setViewingUsuarios}
                             instituicao={instituicao}
                             unidades={unidades}
-                            usuarios={usuarios}
                             onCreateSetor={(data) => {
                                 handleCreateSetor(data);
                             }}

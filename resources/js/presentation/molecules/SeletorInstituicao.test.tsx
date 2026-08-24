@@ -7,11 +7,22 @@ const mockInstituicoes: Instituicao[] = [
         id: 1,
         nome: 'Universidade Teste',
         sigla: 'UT',
+        endereco: 'Rua Principal, 123',
         setors: [
-            { id: 10, nome: 'Setor Alfa', sigla: 'SA', unidade: { id: 1, nome: 'Unidade 1', sigla: 'U1' } as any } as any,
-            { id: 20, nome: 'Setor Beta', sigla: 'SB', unidade: { id: 1, nome: 'Unidade 1', sigla: 'U1' } as any } as any,
+            {
+                id: 10,
+                nome: 'Setor Alfa',
+                sigla: 'SA',
+                unidade: { id: 1, nome: 'Unidade 1', sigla: 'U1' },
+            },
+            {
+                id: 20,
+                nome: 'Setor Beta',
+                sigla: 'SB',
+                unidade: { id: 1, nome: 'Unidade 1', sigla: 'U1' },
+            },
         ],
-    } as Instituicao,
+    },
 ];
 
 describe('SeletorInstituicao', () => {

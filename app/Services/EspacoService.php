@@ -384,6 +384,7 @@ class EspacoService
     public function addFavorite(User $user, Espaco $espaco): void
     {
         $user->favoritos()->attach($espaco->id);
+        Espaco::forgetFavoritosCache($user->id);
     }
 
     /**
@@ -392,5 +393,14 @@ class EspacoService
     public function removeFavorite(User $user, Espaco $espaco): void
     {
         $user->favoritos()->detach($espaco->id);
+        Espaco::forgetFavoritosCache($user->id);
+    }
+
+    /**
+     * Checks if the space has at least one manager assigned.
+     */
+    public function hasManager(Espaco $espaco): bool
+    {
+        return $espaco->agendas()->whereNotNull('user_id')->exists();
     }
 }

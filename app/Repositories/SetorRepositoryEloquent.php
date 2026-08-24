@@ -48,6 +48,7 @@ class SetorRepositoryEloquent implements SetorRepositoryInterface
         return $this->setor
             ->whereHas('unidade', fn ($q) => $q->where('instituicao_id', $instituicaoId))
             ->with(['unidade.instituicao'])
+            ->withCount('users')
             ->get();
     }
 

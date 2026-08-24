@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Models\Espaco;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ListarEspacosRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return (bool) $this->user()?->can('viewAny', Espaco::class);
+        return $this->user() !== null;
     }
 
     /**

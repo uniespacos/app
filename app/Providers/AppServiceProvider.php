@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Espaco;
 use App\Models\Instituicao;
 use App\Models\Modulo;
 use App\Models\Reserva;
 use App\Models\Role;
 use App\Models\Setor;
 use App\Models\Unidade;
+use App\Models\User;
+use App\Policies\EspacoPolicy;
 use App\Policies\InstituicaoPolicy;
 use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SetorPolicy;
 use App\Policies\UnidadePolicy;
+use App\Policies\UserPolicy;
 use App\Repositories\AgendaRepositoryEloquent;
 use App\Repositories\AgendaRepositoryInterface;
 use App\Repositories\AndarRepositoryEloquent;
@@ -84,6 +88,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Modulo::class, ModuloPolicy::class);
         Gate::policy(Setor::class, SetorPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Espaco::class, EspacoPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');

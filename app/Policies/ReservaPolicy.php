@@ -50,12 +50,12 @@ class ReservaPolicy
             return true;
         }
 
-        if ($user->id !== $reserva->user_id || $reserva->situacao !== 'em_analise') {
+        if ($user->id !== $reserva->user_id || $reserva->situacao !== SituacaoReservaEnum::EM_ANALISE->value) {
             return false;
         }
 
         $hasProcessedSlots = $reserva->horarios()
-            ->whereIn('situacao', ['deferida', 'indeferida'])
+            ->whereIn('situacao', [SituacaoReservaEnum::DEFERIDA->value, SituacaoReservaEnum::INDEFERIDA->value])
             ->exists();
 
         return ! $hasProcessedSlots;
