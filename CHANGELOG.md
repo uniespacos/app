@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.59](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.58...v1.3.0-rc.59) (2026-08-24)
+
+
+### Miscellaneous Chores
+
+* executar fase 1 de fundacao configuracao e clean code ([#371](https://github.com/uniespacos/uniespacos/issues/371)) ([a678b2a](https://github.com/uniespacos/uniespacos/commit/a678b2a7246f8b04b5c1701d10e57c59c4b9f9bd))
+
 ## [1.3.0-rc.58](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.57...v1.3.0-rc.58) (2026-08-24)
 
 
