@@ -1,5 +1,4 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
 import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
@@ -75,8 +74,12 @@ export default function GerenciarEspacos() {
                             capacidadeEspacos={capacidadeEspacos}
                         />
 
-                        <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
-                        <PaginacaoListas links={espacos.links} />
+                        <TabelaEspacos
+                            espacos={espacos.data}
+                            onGerenciarGestores={handleGerenciarGestores}
+                            totalFiltrado={espacos.total}
+                            pagination={{ links: espacos.links }}
+                        />
 
                         {espacoParaGerenciar && (
                             <GerenciarGestoresModal

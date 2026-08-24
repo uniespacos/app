@@ -1,10 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/delete-item';
 import GenericHeader from '@/presentation/molecules/generic-header';
-import Paginacao from '@/presentation/molecules/paginacao-listas';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao } from '@/types';
@@ -17,6 +15,12 @@ const breadcrumbs = [
         title: 'Gerenciar Instituições',
         href: '/institucional/instituicoes',
     },
+];
+
+const columns: ColumnDef<Instituicao>[] = [
+    { header: 'Nome', accessorKey: 'nome' },
+    { header: 'Sigla', accessorKey: 'sigla', width: '120px' },
+    { header: 'Endereço', accessorKey: 'endereco' },
 ];
 
 export default function InstituicoesPage() {
@@ -56,46 +60,33 @@ export default function InstituicoesPage() {
                             placeholder="Buscar por nome ou sigla"
                             variant="card"
                         />
-                        <Card>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Nome</TableHead>
-                                            <TableHead>Sigla</TableHead>
-                                            <TableHead>Endereço</TableHead>
-                                            <TableHead className="w-[120px]">Ações</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {instituicoes.data.map((instituicao: Instituicao) => (
-                                            <TableRow key={instituicao.id}>
-                                                <TableCell>{instituicao.nome}</TableCell>
-                                                <TableCell>{instituicao.sigla}</TableCell>
-                                                <TableCell>{instituicao.endereco || 'N/A'}</TableCell>
-                                                <TableCell className="flex items-center gap-2">
-                                                    <Link href={route('institucional.instituicoes.edit', { instituico: instituicao.id })}>
-                                                        <Button variant="outline" size="icon">
-                                                            <FilePenLine className="h-4 w-4" />
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        onClick={() => {
-                                                            setRemoverInstituicao(instituicao);
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                                <Paginacao links={instituicoes.links} />
-                            </CardContent>
-                        </Card>
+                        <DataTable
+                            data={instituicoes.data}
+                            columns={columns}
+                            pagination={{ links: instituicoes.links }}
+                            emptyState={{
+                                title: 'Nenhuma instituição encontrada',
+                                description: 'Tente ajustar sua busca ou cadastre uma nova instituição.',
+                            }}
+                            actions={(instituicao) => (
+                                <div className="flex justify-end gap-2">
+                                    <Link href={route('institucional.instituicoes.edit', { instituico: instituicao.id })}>
+                                        <Button variant="outline" size="icon">
+                                            <FilePenLine className="h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => {
+                                            setRemoverInstituicao(instituicao);
+                                        }}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )}
+                        />
                         {removerInstituicao && (
                             <DeleteItem
                                 isOpen={(open) => {
@@ -103,7 +94,7 @@ export default function InstituicoesPage() {
                                         setRemoverInstituicao(null);
                                     }
                                 }}
-                                itemName={removerInstituicao.nome || 'Instituição'}
+                                itemName={removerInstituicao.nome}
                                 route={route('institucional.instituicoes.destroy', removerInstituicao.id)}
                             />
                         )}
