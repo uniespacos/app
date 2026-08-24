@@ -8,7 +8,7 @@ import type React from 'react';
 interface InstituicaoFormProps {
     data: CadastrarInstituicaoForm;
     setData: (key: keyof CadastrarInstituicaoForm, value: string) => void;
-    submit: (e: React.FormEvent<HTMLFormElement>) => void;
+    submit: (e: React.SyntheticEvent) => void;
     errors: Partial<Record<keyof CadastrarInstituicaoForm, string>>;
     processing: boolean;
     title: string;

@@ -1,5 +1,5 @@
 import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import type React from 'react';
@@ -29,7 +29,7 @@ export default function EditarInstituicao() {
         endereco: instituicao.endereco,
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         form.put(route('institucional.instituicoes.update', { instituico: instituicao.id }));
     };

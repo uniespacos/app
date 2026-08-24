@@ -5,14 +5,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PERMISSION_SECAO_RELATORIOS } from '@/constants/permissions';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 import { hasPermission } from '@/lib/auth';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format, subDays } from 'date-fns';
 import { BarChart3, CalendarSearch, Eye, Star } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
 
-const GraficoReservasPeriodo = lazy(() => import('@/presentation/molecules/GraficoReservasPeriodo'));
+const GraficoReservasPeriodo = lazy(() => import('@/presentation/organisms/GraficoReservasPeriodo'));
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

@@ -1,4 +1,4 @@
-import { derivarSlotsDoTurno, type SlotDerivado } from '@/application/espacos/helpers/derivar-slots-do-turno';
+import { derivarSlotsDoTurno, type SlotDerivado } from '@/lib/utils/derivar-slots-do-turno';
 import { ESTILO_SLOT } from '@/constants/situacao-reserva';
 import { TURNOS_ORDENADOS, TURNO_LABEL, type Turno } from '@/constants/turnos';
 import { cn } from '@/lib/utils';

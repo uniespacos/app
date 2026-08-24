@@ -1,7 +1,7 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
+import PaginacaoListas from '@/presentation/molecules/PaginacaoListas';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Espaco, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 

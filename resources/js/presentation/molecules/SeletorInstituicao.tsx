@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/presentation/atoms/input-error';
+import InputError from '@/presentation/atoms/InputError';
 import type { Instituicao, Setor } from '@/types';
 import { useEffect, useState } from 'react';
 

@@ -1,19 +1,19 @@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import InputError from '@/presentation/atoms/input-error';
-import AuthLayout from '@/presentation/templates/auth-layout';
+import InputError from '@/presentation/atoms/InputError';
+import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<{ password: string }>>({
         password: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: SyntheticEvent) => {
         e.preventDefault();
 
         post(route('password.confirm'), {

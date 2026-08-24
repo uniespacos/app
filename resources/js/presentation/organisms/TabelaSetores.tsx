@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
-import DeleteItem from '@/presentation/molecules/delete-item';
+import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
 import { Setor, User } from '@/types';
 import { Edit, Trash2, Users } from 'lucide-react';

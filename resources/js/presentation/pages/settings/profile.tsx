@@ -1,19 +1,19 @@
 import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Camera, Trash2 } from 'lucide-react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { SyntheticEvent, useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import HeadingSmall from '@/presentation/atoms/heading-small';
-import InputError from '@/presentation/atoms/input-error';
+import HeadingSmall from '@/presentation/atoms/HeadingSmall';
+import InputError from '@/presentation/atoms/InputError';
 import { UserAvatar } from '@/presentation/atoms/UserAvatar';
-import DeleteItem from '@/presentation/molecules/delete-item';
+import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
-import AppLayout from '@/presentation/templates/app-layout';
-import SettingsLayout from '@/presentation/templates/settings/layout';
+import AppLayout from '@/presentation/templates/AppLayout';
+import SettingsLayout from '@/presentation/templates/settings/Layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -112,7 +112,7 @@ export default function Profile({
         setData('setor_id', setorId);
     };
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: SyntheticEvent) => {
         e.preventDefault();
 
         post(route('settings.profile.update'), {

@@ -7,14 +7,11 @@ import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
 import { hasPermission } from '@/lib/auth';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import type { Espaco, User } from '@/types';
+import { router } from '@inertiajs/react';
 import { Building2, ChevronRight, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
 
-import { useFavoritarEspacoUseCase } from '@/application/espacos/use-cases/use-favoritar-espaco-usecase';
-import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
-
-const httpGateway = new InertiaHttpGateway();
-const espacosRepository = new InertiaEspacosRepository(httpGateway);
+declare function route(name: string, params?: unknown): string;
 
 interface CardEspacoProps {
     espaco: Espaco;
@@ -35,14 +32,45 @@ export default function EspacoCard({
     handleExcluirEspaco,
     showFavoritar = true,
 }: CardEspacoProps) {
-    const { isFavorited, processing, toggleFavorito } = useFavoritarEspacoUseCase({
-        repository: espacosRepository,
-        espaco,
-    });
+    const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
+    const [processing, setProcessing] = useState(false);
+
     const modulo = espaco.andar?.modulo?.nome;
-    const handleFavoritarEspaco = () => {
-        toggleFavorito();
+
+    const handleFavoritarEspaco = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        setProcessing(true);
+        if (isFavorited) {
+            router.delete(route('espacos.desfavoritar', espaco.id), {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    setIsFavorited(false);
+                },
+                onFinish: () => {
+                    setProcessing(false);
+                },
+            });
+        } else {
+            router.post(
+                route('espacos.favoritar', espaco.id),
+                {},
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: () => {
+                        setIsFavorited(true);
+                    },
+                    onFinish: () => {
+                        setProcessing(false);
+                    },
+                },
+            );
+        }
     };
+
     const imageSources =
         espaco.imagens && espaco.imagens.length > 0
             ? espaco.imagens.map((img) => `/storage/${img}`)

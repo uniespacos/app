@@ -1,8 +1,8 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
+import PaginacaoListas from '@/presentation/molecules/PaginacaoListas';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 const breadcrumbs = [

@@ -1,14 +1,14 @@
-import InputError from '@/presentation/atoms/input-error';
-import AppLayout from '@/presentation/templates/app-layout';
-import SettingsLayout from '@/presentation/templates/settings/layout';
+import InputError from '@/presentation/atoms/InputError';
+import AppLayout from '@/presentation/templates/AppLayout';
+import SettingsLayout from '@/presentation/templates/settings/Layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { SyntheticEvent, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import HeadingSmall from '@/presentation/atoms/heading-small';
+import HeadingSmall from '@/presentation/atoms/HeadingSmall';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,7 +27,7 @@ export default function Password() {
         password_confirmation: '',
     });
 
-    const updatePassword: FormEventHandler = (e) => {
+    const updatePassword = (e: SyntheticEvent) => {
         e.preventDefault();
 
         put(route('settings.password.update'), {
@@ -120,9 +120,7 @@ export default function Password() {
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Salvar Senha</Button>
 
-                            {recentlySuccessful && (
-                                <p className="text-muted-foreground text-sm">Salvo</p>
-                            )}
+                            {recentlySuccessful && <p className="text-muted-foreground text-sm">Salvo</p>}
                         </div>
                     </form>
                 </div>

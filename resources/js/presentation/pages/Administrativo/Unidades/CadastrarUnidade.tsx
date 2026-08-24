@@ -1,6 +1,6 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import UnidadeForm from '@/presentation/organisms/UnidadesForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 const breadcrumbs = [
@@ -25,7 +25,7 @@ export default function CadastrarUnidadePage() {
     const { instituicao } = usePage<{ instituicao: Instituicao }>().props;
     const { data, setData, post, processing, errors } = useForm<CadastrarUnidadeForm>();
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         setData((prevData) => ({ ...prevData, instituicao_id: instituicao.id.toString() }));
 
         e.preventDefault();

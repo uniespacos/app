@@ -1,14 +1,12 @@
-import { useReservasListUseCase } from '@/application/reservas/use-cases/use-reservas-list-usecase';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
-import GenericHeader from '@/presentation/molecules/generic-header';
+import { useReservasFilters } from '@/hooks/use-reservas-filters';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
 import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
 import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
 import { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import { ReservasList } from '@/presentation/organisms/ReservasList';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
@@ -22,9 +20,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 declare function route(name: string, params?: unknown): string;
-
-const httpGateway = new InertiaHttpGateway();
-const reservasRepository = new InertiaReservasRepository(httpGateway);
 
 export default function MinhasReservas({
     filters,
@@ -52,8 +47,8 @@ export default function MinhasReservas({
         setSelectedOrdenar,
         selectedDate,
         setSelectedDate,
-    } = useReservasListUseCase({
-        repository: reservasRepository,
+    } = useReservasFilters({
+        routeName: 'reservas.index',
         initialFilters: filters,
         initialSemana: semana,
     });

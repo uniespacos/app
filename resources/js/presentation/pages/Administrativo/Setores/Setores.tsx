@@ -1,9 +1,9 @@
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
-import GenericHeader from '@/presentation/molecules/generic-header';
-import { ModaisSetor } from '@/presentation/molecules/ModaisSetor';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
+import { ModaisSetor } from '@/presentation/organisms/ModaisSetor';
 import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
 import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao, Setor, Unidade } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';

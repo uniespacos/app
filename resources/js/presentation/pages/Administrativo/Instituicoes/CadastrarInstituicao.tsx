@@ -1,6 +1,6 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import type React from 'react';
@@ -29,7 +29,7 @@ export default function CadastrarInstituicaoPage() {
         endereco: '',
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         form.post(route('institucional.instituicoes.store'));
     };

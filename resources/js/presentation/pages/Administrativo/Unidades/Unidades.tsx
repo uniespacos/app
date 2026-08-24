@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
-import DeleteItem from '@/presentation/molecules/delete-item';
-import GenericHeader from '@/presentation/molecules/generic-header';
+import DeleteItem from '@/presentation/molecules/DeleteItem';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';

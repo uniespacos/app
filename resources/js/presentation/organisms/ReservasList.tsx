@@ -1,11 +1,11 @@
-import { comSituacaoEfetivaDoGestor } from '@/application/reservas/helpers/reserva-helpers';
+import { comSituacaoEfetivaDoGestor } from '@/lib/utils/reserva-helpers';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { formatDate } from '@/lib/utils';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
-import DeleteItem from '@/presentation/molecules/delete-item';
+import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
 import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
 import { ViewMode } from '@/presentation/molecules/ViewModeToggle';

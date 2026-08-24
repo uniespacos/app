@@ -1,4 +1,4 @@
-import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
+import { mapearStatusBackendParaSlot } from '@/lib/utils/reserva-status.helpers';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { diasDaSemana, formatDate } from '@/lib/utils';

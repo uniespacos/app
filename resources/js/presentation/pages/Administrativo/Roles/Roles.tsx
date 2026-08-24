@@ -5,10 +5,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DeleteRoleConfirmation } from '@/presentation/molecules/DeleteRoleConfirmation';
-import GenericHeader from '@/presentation/molecules/generic-header';
+import { DeleteRoleConfirmation } from '@/presentation/organisms/DeleteRoleConfirmation';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { RoleFormModal } from '@/presentation/organisms/RoleFormModal';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Permission, Role } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Plus, Trash2 } from 'lucide-react';

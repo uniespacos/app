@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
+import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 

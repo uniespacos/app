@@ -1,16 +1,16 @@
-import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
-import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
-import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
 import { Badge } from '@/components/ui/badge';
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
+import { useAvaliarReserva } from '@/hooks/use-avaliar-reserva';
+import { useReservationSlots } from '@/hooks/use-reservation-slots';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
+import { verificarStatusReserva } from '@/lib/utils/reserva-status.helpers';
 import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Head } from '@inertiajs/react';
 import { format, parse, parseISO } from 'date-fns';
@@ -25,16 +25,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function AvaliarReserva({
     reserva,
     semana,
-    todosOsConflitos,
+    todosOsConflitos = {},
 }: {
     reserva: Reserva;
-    auth: { user: UserType };
+    user: UserType;
+    isReavaliacao?: boolean;
     semana: { referencia: string };
-    todosOsConflitos: Record<string, { horario_checado_id: number; conflito_reserva_titulo: string; conflito_user_name: string }>;
+    todosOsConflitos?: Record<
+        string,
+        {
+            horario_checado_id: number;
+            conflito_reserva_id: number;
+            conflito_reserva_titulo: string;
+            conflito_user_name: string;
+            conflito_tipo: string;
+        }
+    >;
 }) {
-    const isReavaliacao = useMemo(() => {
-        return reserva.situacao !== 'em_analise' || reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
-    }, [reserva.situacao, reserva.horarios]);
+    const isReavaliacao = reserva.situacao !== 'em_analise';
 
     const agendas = useMemo(() => {
         return reserva.horarios
@@ -47,7 +55,7 @@ export default function AvaliarReserva({
 
     const { slotsSelecao, avaliarSlot, handleDecisaoGlobalChange } = useReservationSlots(reserva);
 
-    const { form, submitEvaluation } = useAvaliarReservaUseCase({
+    const { form, submitEvaluation } = useAvaliarReserva({
         reserva,
     });
     const { setData } = form;
@@ -121,7 +129,7 @@ export default function AvaliarReserva({
         }
     }, [slotsSelecao]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent) => {
         submitEvaluation(e);
     };
 

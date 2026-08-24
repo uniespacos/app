@@ -1,6 +1,6 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import UnidadeForm from '@/presentation/organisms/UnidadesForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
@@ -29,7 +29,7 @@ export default function EditarUnidade() {
         instituicao_id: unidade.instituicao?.id.toString() || '',
     });
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         put(route('institucional.unidades.update', { unidade: unidade.id }));
     };

@@ -9,7 +9,7 @@ import React from 'react';
 
 jest.mock('@inertiajs/react');
 
-jest.mock('@/presentation/templates/app-layout', () => {
+jest.mock('@/presentation/templates/AppLayout', () => {
     return function DummyLayout({ children }: { children: React.ReactNode }) {
         return <div>{children}</div>;
     };
