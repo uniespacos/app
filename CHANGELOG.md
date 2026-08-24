@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.55](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.54...v1.3.0-rc.55) (2026-08-24)
+
+
+### Miscellaneous Chores
+
+* remover comentarios do codigo ([#363](https://github.com/uniespacos/uniespacos/issues/363)) ([c81951f](https://github.com/uniespacos/uniespacos/commit/c81951fdef77135d40bbc9631f0766d1a2f2eb9b))
+
 ## [1.3.0-rc.54](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.53...v1.3.0-rc.54) (2026-08-24)
 
 
