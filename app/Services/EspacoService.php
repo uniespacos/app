@@ -19,6 +19,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class EspacoService
@@ -273,11 +274,20 @@ class EspacoService
 
             foreach ($espaco->agendas as $agenda) {
                 if ($agenda->user) {
-                    $agenda->user->notify(new UserAssignedAsManagerNotification(
-                        $agenda->user,
-                        $espaco->nome,
-                        $agenda->turno
-                    ));
+                    try {
+                        $agenda->user->notify(new UserAssignedAsManagerNotification(
+                            $agenda->user,
+                            $espaco->nome,
+                            $agenda->turno
+                        ));
+                    } catch (\Exception $e) {
+                        Log::warning('Falha ao notificar gestor sobre atualizacao do espaco', [
+                            'user_id' => $agenda->user->id,
+                            'espaco_id' => $espaco->id,
+                            'turno' => $agenda->turno,
+                            'exception' => $e,
+                        ]);
+                    }
                 }
             }
 
@@ -315,7 +325,16 @@ class EspacoService
                     $newUser = $this->repoUser->get($userId);
                     if ($newUser && ! $newUser->hasPermissionTo('reservas.avaliar')) {
                         $newUser->assignRole('gestor');
-                        $newUser->notify(new UserAssignedAsManagerNotification($newUser, $espaco->nome, $turno));
+                        try {
+                            $newUser->notify(new UserAssignedAsManagerNotification($newUser, $espaco->nome, $turno));
+                        } catch (\Exception $e) {
+                            Log::warning('Falha ao notificar novo gestor do espaco', [
+                                'user_id' => $newUser->id,
+                                'espaco_id' => $espaco->id,
+                                'turno' => $turno,
+                                'exception' => $e,
+                            ]);
+                        }
                     }
                 }
 
@@ -323,7 +342,16 @@ class EspacoService
                     $oldUser = $this->repoUser->get($oldUserId);
                     if ($oldUser && ! Agenda::where('user_id', $oldUserId)->exists()) {
                         $oldUser->removeRole('gestor');
-                        $oldUser->notify(new UserRemovedAsManagerNotification($oldUser, $espaco->nome, $turno));
+                        try {
+                            $oldUser->notify(new UserRemovedAsManagerNotification($oldUser, $espaco->nome, $turno));
+                        } catch (\Exception $e) {
+                            Log::warning('Falha ao notificar remocao de gestor do espaco', [
+                                'user_id' => $oldUser->id,
+                                'espaco_id' => $espaco->id,
+                                'turno' => $turno,
+                                'exception' => $e,
+                            ]);
+                        }
                     }
                 }
             }

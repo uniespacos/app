@@ -26,10 +26,8 @@ export function SeletorInstituicao({
     const [setorId, setSetorId] = useState<string>(initialSetorId || '');
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Efeito para inicializar com o setor atual do usuário
     useEffect(() => {
         if (initialSetorId && instituicaos.length > 0 && !isInitialized) {
-            // Encontra qual instituição e setor correspondem ao ID inicial
             for (const inst of instituicaos) {
                 const foundSetor = inst.setors?.find((s) => s.id.toString() === initialSetorId);
                 if (foundSetor) {
@@ -44,12 +42,6 @@ export function SeletorInstituicao({
             }
         }
     }, [initialSetorId, instituicaos, isInitialized, onInstituicaoChange]);
-
-    useEffect(() => {
-        if (initialSetorId && setorId !== initialSetorId) {
-            setSetorId(initialSetorId);
-        }
-    }, [initialSetorId, setorId]);
 
     const handleInstituicaoChange = (value: string) => {
         setInstituicaoId(value);
