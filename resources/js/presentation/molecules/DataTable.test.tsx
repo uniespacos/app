@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { ColumnDef, DataTable } from './DataTable';
 
-interface TestItem extends Record<string, unknown> {
+interface TestItem {
     id: number;
     nome: string;
     sigla: string;
@@ -33,6 +33,13 @@ describe('DataTable', () => {
         expect(screen.getByText('Ações')).toBeInTheDocument();
         expect(screen.getByText('Editar IA')).toBeInTheDocument();
         expect(screen.getByText('Editar IB')).toBeInTheDocument();
+    });
+
+    it('renders grid cards when viewMode is grid and renderCard is passed', () => {
+        render(<DataTable data={mockData} columns={mockColumns} viewMode="grid" renderCard={(item) => <div>Card Customizado: {item.nome}</div>} />);
+
+        expect(screen.getByText('Card Customizado: Item Alfa')).toBeInTheDocument();
+        expect(screen.getByText('Card Customizado: Item Beta')).toBeInTheDocument();
     });
 
     it('renders empty state when data array is empty', () => {

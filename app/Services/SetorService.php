@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Setor;
 use App\Notifications\SectorUpdatedNotification;
 use App\Repositories\SetorRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -22,6 +23,14 @@ class SetorService
     public function getAllByInstituicao(int $instituicaoId): Collection
     {
         return $this->repoSetor->getAllByInstituicao($instituicaoId);
+    }
+
+    /**
+     * @return LengthAwarePaginator<int, Setor>
+     */
+    public function paginate(int $instituicaoId, int $perPage = 10, ?string $search = null, ?int $unidadeId = null): LengthAwarePaginator
+    {
+        return $this->repoSetor->getPaginatedByInstituicao($instituicaoId, $perPage, $search, $unidadeId);
     }
 
     /**

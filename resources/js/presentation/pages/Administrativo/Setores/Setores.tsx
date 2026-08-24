@@ -1,4 +1,4 @@
-import { useFiltros } from '@/hooks/use-filtros';
+import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import GenericHeader from '@/presentation/molecules/generic-header';
 import { ModaisSetor } from '@/presentation/molecules/ModaisSetor';
 import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
@@ -18,20 +18,57 @@ const breadcrumbs = [
 ];
 
 export default function SetoresPage() {
-    const { instituicao, unidades, setores } = usePage<{
+    const { instituicao, unidades, setores, filters } = usePage<{
         instituicao: Instituicao;
         unidades: Unidade[];
-        setores: Setor[];
+        setores: {
+            data: Setor[];
+            links: { url: string | null; label: string; active: boolean }[];
+            total: number;
+        };
+        filters?: { search: string | null; unidade_id: number | null };
     }>().props;
 
-    const { searchTerm, setSearchTerm, selectedUnidade, setSelectedUnidade, filteredUnidades, filteredSetores, clearFilters } = useFiltros(
-        instituicao,
-        unidades,
-        setores,
-    );
+    const [selectedUnidade, setSelectedUnidade] = useState<string>(filters?.unidade_id ? String(filters.unidade_id) : 'all');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingSetor, setEditingSetor] = useState<Setor | null>(null);
     const [viewingUsuarios, setViewingUsuarios] = useState<Setor | null>(null);
+
+    const { searchTerm, setSearchTerm } = useDebouncedSearch({
+        routeName: 'institucional.setors.index',
+        initialSearch: filters?.search ?? '',
+        extraParams: {
+            unidade_id: selectedUnidade !== 'all' ? selectedUnidade : '',
+        },
+    });
+
+    const handleUnidadeChange = (unidadeId: string) => {
+        setSelectedUnidade(unidadeId);
+        router.get(
+            route('institucional.setors.index'),
+            {
+                search: searchTerm || undefined,
+                unidade_id: unidadeId !== 'all' ? unidadeId : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setSelectedUnidade('all');
+        router.get(
+            route('institucional.setors.index'),
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
     function handleCreateSetor(data: SetorFormData): void {
         router.post(
@@ -67,9 +104,9 @@ export default function SetoresPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setores" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
+                <div className="container mx-auto space-y-6 py-4 sm:py-6">
+                    <div className="space-y-6 p-2 sm:p-6">
                         <GenericHeader
                             titulo={'Gerenciar Setores'}
                             descricao={'Gerencie os setores das unidades organizacionais'}
@@ -85,13 +122,18 @@ export default function SetoresPage() {
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             selectedUnidade={selectedUnidade}
-                            setSelectedUnidade={setSelectedUnidade}
+                            setSelectedUnidade={handleUnidadeChange}
                             unidades={unidades}
-                            filteredUnidades={filteredUnidades}
-                            onClearFilters={clearFilters}
+                            filteredUnidades={unidades}
+                            onClearFilters={handleClearFilters}
                         />
 
-                        <TabelaSetores setores={filteredSetores ?? []} onEdit={setEditingSetor} onViewUsuarios={setViewingUsuarios} />
+                        <TabelaSetores
+                            setores={setores.data}
+                            pagination={{ links: setores.links }}
+                            onEdit={setEditingSetor}
+                            onViewUsuarios={setViewingUsuarios}
+                        />
 
                         <ModaisSetor
                             isCreateModalOpen={isCreateModalOpen}

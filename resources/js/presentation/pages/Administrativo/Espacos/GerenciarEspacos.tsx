@@ -7,12 +7,14 @@ import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
+
 const breadcrumbs = [
     {
         title: 'Gerenciar Espaços',
         href: '/institucional/espacos',
     },
 ];
+
 export default function GerenciarEspacos() {
     const { unidades, modulos, andares, espacos, users, filters, capacidadeEspacos } = usePage<{
         espacos: {
@@ -50,19 +52,16 @@ export default function GerenciarEspacos() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
-            <div className="flex">
-                {/* `w-[100vh]` aqui usava a ALTURA da viewport como largura: num
-                    celular de 390px o container ficava com 844px e a página
-                    inteira rolava lateralmente. */}
-                <div className="container mx-auto w-full flex-1 space-y-6 py-6">
-                    <div className="space-y-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
+                <div className="container mx-auto space-y-6 py-4 sm:py-6">
+                    <div className="space-y-6 p-2 sm:p-6">
                         <GenericHeader
                             titulo={'Gerenciar Espaços'}
                             descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
                             buttonText="Cadastrar Espaço"
                             ButtonIcon={PlusCircle}
                             buttonOnClick={handleCadastrarEspaco}
-                            canSeeButton // Exibe o botão apenas para
+                            canSeeButton
                         />
 
                         <EspacoFiltroBusca

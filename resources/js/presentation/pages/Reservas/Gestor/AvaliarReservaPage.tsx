@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
 import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
 import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
@@ -31,7 +30,7 @@ export default function AvaliarReserva({
     reserva: Reserva;
     auth: { user: UserType };
     semana: { referencia: string };
-    todosOsConflitos: Record<string, any>;
+    todosOsConflitos: Record<string, { horario_checado_id: number; conflito_reserva_titulo: string; conflito_user_name: string }>;
 }) {
     const isReavaliacao = useMemo(() => {
         return reserva.situacao !== 'em_analise' || reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');

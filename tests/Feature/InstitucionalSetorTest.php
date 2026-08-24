@@ -53,6 +53,21 @@ class InstitucionalSetorTest extends TestCase
         );
     }
 
+    public function test_index_paginates_setores_and_filters_by_search(): void
+    {
+        Setor::factory()->create(['unidade_id' => $this->unidade->id, 'nome' => 'Almoxarifado Geral', 'sigla' => 'ALMOX']);
+        Setor::factory()->create(['unidade_id' => $this->unidade->id, 'nome' => 'Recursos Humanos', 'sigla' => 'RH']);
+
+        $response = $this->actingAs($this->admin)->get(route('institucional.setors.index', ['search' => 'Almoxarifado']));
+
+        $response->assertOk();
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->has('setores.data', 1)
+            ->where('setores.data.0.sigla', 'ALMOX')
+            ->where('filters.search', 'Almoxarifado')
+        );
+    }
+
     public function test_usuarios_endpoint_returns_json_users_for_sector(): void
     {
         $user1 = User::factory()->create(['setor_id' => $this->setor->id, 'name' => 'Usuario Alfa']);
