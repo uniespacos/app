@@ -17,15 +17,14 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/password',
         icon: null,
     },
-    /*  {
+    {
         title: 'Aparência',
         href: '/settings/appearance',
         icon: null,
-    }, */
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    // Durante a renderização no servidor, renderizamos o layout apenas no cliente...
     if (typeof window === 'undefined') {
         return null;
     }
