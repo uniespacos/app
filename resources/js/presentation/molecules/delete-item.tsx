@@ -1,27 +1,50 @@
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef, useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import InputError from '@/presentation/atoms/input-error';
-
 import HeadingSmall from '@/presentation/atoms/heading-small';
-
+import InputError from '@/presentation/atoms/input-error';
 import { Modal } from '@/presentation/molecules/Modal';
+import { useForm } from '@inertiajs/react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 interface DeleteItemProps {
     itemName: string;
-    isOpen?: (open: boolean) => void;
     route: string;
+    isOpen?: (open: boolean) => void;
     showHeading?: boolean;
+    variant?: 'modal' | 'card';
 }
 
-export default function DeleteItem({ isOpen, route, itemName, showHeading = true }: DeleteItemProps) {
-    const [open, setOpen] = useState(false);
+export default function DeleteItem({ isOpen, route, itemName, showHeading = false, variant = 'modal' }: DeleteItemProps) {
+    const [open, setOpen] = useState(variant === 'modal');
     const passwordInput = useRef<HTMLInputElement>(null);
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
+    const {
+        data,
+        setData,
+        delete: destroy,
+        processing,
+        reset,
+        errors,
+        clearErrors,
+    } = useForm({
+        password: '',
+    });
+
+    const closeModal = () => {
+        setOpen(false);
+        isOpen?.(false);
+        clearErrors();
+        reset();
+    };
+
+    const handleOpenChange = (newOpen: boolean) => {
+        if (!newOpen) {
+            closeModal();
+        } else {
+            setOpen(true);
+        }
+    };
 
     const deleteItem: FormEventHandler = (e) => {
         e.preventDefault();
@@ -31,80 +54,80 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
             onSuccess: () => {
                 closeModal();
             },
-            onError: () => passwordInput.current?.focus(),
-            onFinish: () => {
-                closeModal();
-                reset();
+            onError: () => {
+                passwordInput.current?.focus();
             },
         });
     };
 
-    const closeModal = () => {
-        setOpen(false);
-        isOpen?.(false);
-        clearErrors();
-        reset();
-    };
+    const modalContent = (
+        <Modal
+            open={open}
+            onOpenChange={handleOpenChange}
+            title={`Tem certeza que deseja excluir o(a) ${itemName}?`}
+            description={`Uma vez que o(a) ${itemName} for excluído, todos os dados serão permanentemente removidos. Por favor, digite sua senha para confirmar que deseja excluir permanentemente o(a) ${itemName}.`}
+        >
+            <form className="space-y-6" onSubmit={deleteItem}>
+                <div className="grid gap-2">
+                    <Label htmlFor="delete-item-password" className="sr-only">
+                        Senha
+                    </Label>
 
-    return (
-        <div className="space-y-6">
-            {showHeading && <HeadingSmall title={itemName} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
+                    <Input
+                        id="delete-item-password"
+                        type="password"
+                        name="password"
+                        ref={passwordInput}
+                        value={data.password}
+                        onChange={(e) => {
+                            setData('password', e.target.value);
+                        }}
+                        placeholder="Digite sua senha para confirmar"
+                        autoComplete="current-password"
+                        autoFocus
+                    />
 
-            <div className="border-destructive/25 bg-destructive-subtle space-y-4 rounded-lg border p-4">
-                <div className="text-destructive-accent relative space-y-0.5">
-                    <p className="font-medium">Aviso</p>
-                    <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
+                    <InputError message={errors.password} />
                 </div>
 
-                <Button
-                    variant="destructive"
-                    onClick={() => {
-                        setOpen(true);
-                    }}
-                >
-                    Excluir {itemName}
-                </Button>
+                <DialogFooter className="gap-2">
+                    <Button type="button" variant="outline" onClick={closeModal} disabled={processing}>
+                        Cancelar
+                    </Button>
 
-                <Modal
-                    open={open}
-                    onOpenChange={setOpen}
-                    title={`Tem certeza que deseja excluir o(a) ${itemName}?`}
-                    description={`Uma vez que o(a) ${itemName} for excluído, todos os dados serão permanentemente removidos. Por favor, digite sua senha para confirmar que deseja excluir permanentemente o(a) ${itemName}`}
-                >
-                    <form className="space-y-6" onSubmit={deleteItem}>
-                        <div className="grid gap-2">
-                            <Label htmlFor="password" className="sr-only">
-                                Senha
-                            </Label>
-
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                ref={passwordInput}
-                                value={data.password}
-                                onChange={(e) => {
-                                    setData('password', e.target.value);
-                                }}
-                                placeholder="Senha"
-                                autoComplete="current-password"
-                            />
-
-                            <InputError message={errors.password} />
-                        </div>
-
-                        <DialogFooter className="gap-2">
-                            <Button type="button" variant="outline" onClick={closeModal}>
-                                Cancelar
-                            </Button>
-
-                            <Button variant="destructive" disabled={processing} asChild>
-                                <button type="submit">Excluir {itemName}</button>
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Modal>
-            </div>
-        </div>
+                    <Button variant="destructive" type="submit" disabled={processing}>
+                        {processing ? 'Excluindo...' : `Excluir ${itemName}`}
+                    </Button>
+                </DialogFooter>
+            </form>
+        </Modal>
     );
+
+    if (variant === 'card') {
+        return (
+            <div className="space-y-6">
+                {showHeading && <HeadingSmall title={itemName} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
+
+                <div className="border-destructive/25 bg-destructive-subtle space-y-4 rounded-lg border p-4">
+                    <div className="text-destructive-accent relative space-y-0.5">
+                        <p className="font-medium">Aviso</p>
+                        <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
+                    </div>
+
+                    <Button
+                        variant="destructive"
+                        onClick={() => {
+                            setOpen(true);
+                        }}
+                    >
+                        Excluir {itemName}
+                    </Button>
+
+                    {modalContent}
+                </div>
+            </div>
+        );
+    }
+
+    return modalContent;
 }

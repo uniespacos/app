@@ -1,10 +1,7 @@
-import { useAgnosticForm } from '@/hooks/use-agnostic-form';
 import { Reserva } from '@/types';
-import React from 'react';
+import { useForm } from '@inertiajs/react';
+import type React from 'react';
 import { toast } from 'sonner';
-import { FormAvaliacaoPayload } from '../ports/reservas-repository.interface';
-
-declare function route(name: string, params?: unknown): string;
 
 interface UseAvaliarReservaUseCaseProps {
     reserva: Reserva;
@@ -12,14 +9,17 @@ interface UseAvaliarReservaUseCaseProps {
 }
 
 export function useAvaliarReservaUseCase({ reserva, onSuccess }: UseAvaliarReservaUseCaseProps) {
-    const existingJustification = (reserva as unknown as { existing_justification?: string }).existing_justification || '';
+    const existingJustification =
+        (reserva as unknown as { existing_justification?: string }).existing_justification ??
+        reserva.horarios.find((h) => h.justificativa)?.justificativa ??
+        '';
 
-    const form = useAgnosticForm<FormAvaliacaoPayload>({
+    const form = useForm({
         situacao: reserva.situacao,
         motivo: existingJustification,
-        observacao: reserva.observacao || '',
-        horarios_avaliados: [],
-        evaluation_scope: 'recurring',
+        observacao: reserva.observacao ?? '',
+        horarios_avaliados: [] as { id: number; status: string }[],
+        evaluation_scope: 'recurring' as 'single' | 'recurring',
     });
 
     const submitEvaluation = (e: React.FormEvent) => {
@@ -29,7 +29,7 @@ export function useAvaliarReservaUseCase({ reserva, onSuccess }: UseAvaliarReser
             return;
         }
 
-        form.submit('patch', route('gestor.reservas.update', reserva.id), {
+        form.patch(route('gestor.reservas.update', reserva.id), {
             onSuccess: () => {
                 toast.success('Reserva avaliada com sucesso!');
                 if (onSuccess) onSuccess();

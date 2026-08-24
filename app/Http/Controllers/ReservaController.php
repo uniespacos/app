@@ -81,7 +81,7 @@ class ReservaController extends Controller
             $this->service->update($reserva, $request->validated(), Auth::user());
 
             return redirect()->route('reservas.index')
-                ->with('success', 'Sua reserva foi enviada para atualização. O processo será concluído em segundo plano.');
+                ->with('success', 'Sua solicitação de alteração foi enviada para processamento.');
         } catch (\Exception $e) {
             Log::error('Erro ao despachar UpdateReservaJob', [
                 'reserva_id' => $reserva->id,

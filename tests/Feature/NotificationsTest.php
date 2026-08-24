@@ -117,7 +117,7 @@ class NotificationsTest extends TestCase
 
         // Test Mail
         $mailMessage = $notification->toMail($this->user);
-        $this->assertStringContainsString('Sua reserva foi criada!: '.$this->reserva->titulo, $mailMessage->subject);
+        $this->assertStringContainsString('Solicitação de Reserva Enviada: '.$this->reserva->titulo, $mailMessage->subject);
 
         $mailData = (string) $mailMessage->render();
         $this->assertStringContainsString('criada com sucesso e está aguardando avaliação.', $mailData);

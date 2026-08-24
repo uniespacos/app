@@ -1,5 +1,4 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
 import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
@@ -8,12 +7,14 @@ import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
+
 const breadcrumbs = [
     {
         title: 'Gerenciar Espaços',
         href: '/institucional/espacos',
     },
 ];
+
 export default function GerenciarEspacos() {
     const { unidades, modulos, andares, espacos, users, filters, capacidadeEspacos } = usePage<{
         espacos: {
@@ -51,50 +52,44 @@ export default function GerenciarEspacos() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
-            <div className="flex">
-                {/* `w-[100vh]` aqui usava a ALTURA da viewport como largura: num
-                    celular de 390px o container ficava com 844px e a página
-                    inteira rolava lateralmente. */}
-                <div className="container mx-auto w-full flex-1 space-y-6 py-6">
-                    <div className="space-y-6 p-6">
-                        {/* Cabeçalho */}
-                        <GenericHeader
-                            titulo={'Gerenciar Espaços'}
-                            descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
-                            buttonText="Cadastrar Espaço"
-                            ButtonIcon={PlusCircle}
-                            buttonOnClick={handleCadastrarEspaco}
-                            canSeeButton // Exibe o botão apenas para
-                        />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo={'Gerenciar Espaços'}
+                    descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
+                    buttonText="Cadastrar Espaço"
+                    ButtonIcon={PlusCircle}
+                    buttonOnClick={handleCadastrarEspaco}
+                    canSeeButton
+                />
 
-                        {/* Filtros */}
-                        <EspacoFiltroBusca
-                            route={route('institucional.espacos.index')}
-                            unidades={unidades}
-                            modulos={modulos}
-                            andares={andares}
-                            filters={filters}
-                            capacidadeEspacos={capacidadeEspacos}
-                        />
+                <EspacoFiltroBusca
+                    route={route('institucional.espacos.index')}
+                    unidades={unidades}
+                    modulos={modulos}
+                    andares={andares}
+                    filters={filters}
+                    capacidadeEspacos={capacidadeEspacos}
+                />
 
-                        {/* Tabela de Espaços */}
-                        <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
-                        <PaginacaoListas links={espacos.links} />
+                <TabelaEspacos
+                    espacos={espacos.data}
+                    onGerenciarGestores={handleGerenciarGestores}
+                    totalFiltrado={espacos.total}
+                    pagination={{ links: espacos.links }}
+                />
 
-                        {espacoParaGerenciar && (
-                            <GerenciarGestoresModal
-                                key={espacoParaGerenciar.id}
-                                espaco={espacoParaGerenciar}
-                                usuarios={users}
-                                isOpen={!!espacoParaGerenciar}
-                                onClose={() => {
-                                    setEspacoParaGerenciar(null);
-                                }}
-                                onSave={handleSalvarGestores}
-                            />
-                        )}
-                    </div>
-                </div>
+                {espacoParaGerenciar && (
+                    <GerenciarGestoresModal
+                        key={espacoParaGerenciar.id}
+                        espaco={espacoParaGerenciar}
+                        usuarios={users}
+                        isOpen={!!espacoParaGerenciar}
+                        onClose={() => {
+                            setEspacoParaGerenciar(null);
+                        }}
+                        onSave={handleSalvarGestores}
+                    />
+                )}
             </div>
         </AppLayout>
     );

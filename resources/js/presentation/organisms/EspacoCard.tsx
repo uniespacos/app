@@ -113,7 +113,7 @@ export default function EspacoCard({
                     <button
                         onClick={handleFavoritarEspaco}
                         disabled={processing}
-                        className={`absolute top-2 right-2 rounded-full p-2.5 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive hover:bg-destructive text-white' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
+                        className={`absolute top-2 right-2 rounded-full p-2.5 shadow-md transition-all duration-200 ${isFavorited ? 'bg-destructive hover:bg-destructive text-destructive-foreground' : 'bg-background text-foreground hover:bg-muted'} ${processing ? 'cursor-not-allowed opacity-70' : ''}`}
                         title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
                     >
                         <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />

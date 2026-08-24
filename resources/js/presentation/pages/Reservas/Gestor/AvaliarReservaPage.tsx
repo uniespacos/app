@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
 import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
 import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
@@ -31,11 +30,11 @@ export default function AvaliarReserva({
     reserva: Reserva;
     auth: { user: UserType };
     semana: { referencia: string };
-    todosOsConflitos: Record<string, any>;
+    todosOsConflitos: Record<string, { horario_checado_id: number; conflito_reserva_titulo: string; conflito_user_name: string }>;
 }) {
     const isReavaliacao = useMemo(() => {
-        return reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
-    }, [reserva.horarios]);
+        return reserva.situacao !== 'em_analise' || reserva.horarios.some((h) => h.situacao === 'deferida' || h.situacao === 'indeferida');
+    }, [reserva.situacao, reserva.horarios]);
 
     const agendas = useMemo(() => {
         return reserva.horarios
@@ -150,68 +149,64 @@ export default function AvaliarReserva({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Avaliar reserva" />
-            <div className="bg-muted/50 min-h-screen p-6">
-                <div className="mx-auto max-w-4xl space-y-6">
-                    <div className="container mx-auto space-y-6 p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-foreground text-3xl font-bold">Avaliar Reserva</h1>
-                                <p className="text-muted-foreground mt-1">
-                                    Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} /{' '}
-                                    {reserva.horarios[0]?.agenda?.espaco?.andar?.nome
-                                        ? getAndarLabelByValue(reserva.horarios[0].agenda.espaco.andar.nome)
-                                        : null}
-                                </p>
-                            </div>
-                            <Badge className={`${getStatusReservaColor(situacaoHeader)} flex items-center gap-1`}>
-                                <SituacaoIcon situacao={situacaoHeader} />
-                                {getStatusReservaText(situacaoHeader)}
-                            </Badge>
-                        </div>
-
-                        <ReservaInfoCard reserva={reserva}>
-                            <div>
-                                <h4 className="text-foreground mb-3 flex items-center gap-2 font-medium">
-                                    <Clock className="h-4 w-4" />
-                                    Horários Solicitados
-                                </h4>
-                                <AgendaNavegacao
-                                    variant="compact"
-                                    semanaAtual={semanaVisivel}
-                                    onAnterior={irParaSemanaAnterior}
-                                    onProxima={irParaProximaSemana}
-                                    desabilitarAnterior={!podeVoltar || isLoading}
-                                    desabilitarProxima={!podeAvancar || isLoading}
-                                />
-                                <div className="relative mt-2">
-                                    <CalendarReservationDetails
-                                        agendas={agendas}
-                                        diasSemana={diasDaSemana(semanaVisivel, hoje)}
-                                        slotsSolicitados={slotsSelecao}
-                                        alternarSelecaoSlot={avaliarSlot}
-                                    />
-                                    {isLoading && (
-                                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-white/70 backdrop-blur-sm">
-                                            <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </ReservaInfoCard>
-
-                        <EvaluationForm
-                            isReavaliacao={isReavaliacao}
-                            data={form.data}
-                            setData={form.setData}
-                            decisao={decisao}
-                            isSubmitting={form.processing}
-                            isRadioGroupDisabled={isRadioGroupDisabled}
-                            slotsSelecao={slotsSelecao}
-                            onDecisaoChange={handleDecisaoChange}
-                            onSubmit={handleSubmit}
-                        />
+            <div className="mx-auto flex h-full w-full max-w-4xl flex-1 flex-col gap-6 rounded-xl p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-foreground text-3xl font-bold">Avaliar Reserva</h1>
+                        <p className="text-muted-foreground mt-1">
+                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} /{' '}
+                            {reserva.horarios[0]?.agenda?.espaco?.andar?.nome
+                                ? getAndarLabelByValue(reserva.horarios[0].agenda.espaco.andar.nome)
+                                : null}
+                        </p>
                     </div>
+                    <Badge className={`${getStatusReservaColor(situacaoHeader)} flex items-center gap-1`}>
+                        <SituacaoIcon situacao={situacaoHeader} />
+                        {getStatusReservaText(situacaoHeader)}
+                    </Badge>
                 </div>
+
+                <ReservaInfoCard reserva={reserva}>
+                    <div>
+                        <h4 className="text-foreground mb-3 flex items-center gap-2 font-medium">
+                            <Clock className="h-4 w-4" />
+                            Horários Solicitados
+                        </h4>
+                        <AgendaNavegacao
+                            variant="compact"
+                            semanaAtual={semanaVisivel}
+                            onAnterior={irParaSemanaAnterior}
+                            onProxima={irParaProximaSemana}
+                            desabilitarAnterior={!podeVoltar || isLoading}
+                            desabilitarProxima={!podeAvancar || isLoading}
+                        />
+                        <div className="relative mt-2">
+                            <CalendarReservationDetails
+                                agendas={agendas}
+                                diasSemana={diasDaSemana(semanaVisivel, hoje)}
+                                slotsSolicitados={slotsSelecao}
+                                alternarSelecaoSlot={avaliarSlot}
+                            />
+                            {isLoading && (
+                                <div className="bg-background/70 absolute inset-0 z-10 flex items-center justify-center rounded-md backdrop-blur-sm">
+                                    <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </ReservaInfoCard>
+
+                <EvaluationForm
+                    isReavaliacao={isReavaliacao}
+                    data={form.data}
+                    setData={form.setData}
+                    decisao={decisao}
+                    isSubmitting={form.processing}
+                    isRadioGroupDisabled={isRadioGroupDisabled}
+                    slotsSelecao={slotsSelecao}
+                    onDecisaoChange={handleDecisaoChange}
+                    onSubmit={handleSubmit}
+                />
             </div>
         </AppLayout>
     );

@@ -39,7 +39,7 @@ export default function RelatoriosInstitucionalPage({ tipos_disponiveis, opcoes_
     return (
         <AppLayout breadcrumbs={[{ title: 'Relatórios', href: '/institucional/relatorios' }]}>
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
+                <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Relatórios — Gestão Institucional</h1>

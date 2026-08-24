@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarSetoresRequest;
 use App\Http\Requests\StoreSetorRequest;
 use App\Http\Requests\UpdateSetorRequest;
 use App\Models\Setor;
@@ -27,18 +28,28 @@ class InstitucionalSetorController extends Controller
         protected UnidadeService $unidadeService,
     ) {}
 
-    public function index(): Response
+    public function index(ListarSetoresRequest $request): Response
     {
         $this->authorize('viewAny', Setor::class);
 
         $user = Auth::user();
         $instituicao = $user->setor->unidade->instituicao->load(['unidades']);
         $instituicaoId = $instituicao->id;
+        $validated = $request->validated();
+        $search = $validated['search'] ?? null;
+        $unidadeId = isset($validated['unidade_id']) ? (int) $validated['unidade_id'] : null;
+
+        $setores = $this->service->paginate($instituicaoId, 10, $search, $unidadeId);
+        $setores->withQueryString();
 
         return Inertia::render('Administrativo/Setores/Setores', [
             'instituicao' => $instituicao,
             'unidades' => $this->unidadeService->getAllByInstituicao($instituicaoId)->load(['setors']),
-            'setores' => $this->service->getAllByInstituicao($instituicaoId),
+            'setores' => $setores,
+            'filters' => [
+                'search' => $search,
+                'unidade_id' => $unidadeId,
+            ],
         ]);
     }
 

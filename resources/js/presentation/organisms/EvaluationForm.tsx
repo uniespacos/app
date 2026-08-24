@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +6,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { SituacaoReserva, SlotCalendario } from '@/types';
 import { router } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Info, XCircle } from 'lucide-react';
+import type React from 'react';
 
-// Define o tipo para o objeto 'data' que vem do useForm
 interface FormData {
     situacao: SituacaoReserva;
     motivo: string;
@@ -17,16 +16,14 @@ interface FormData {
     evaluation_scope: 'single' | 'recurring';
 }
 
-// Define as props que o componente espera receber
 interface EvaluationFormProps {
     data: FormData;
-    setData: (field: keyof FormData, value: any) => void; // Função para alterar os dados do formulário
-
+    setData: (field: keyof FormData, value: unknown) => void;
     decisao: SituacaoReserva;
     isSubmitting: boolean;
     isRadioGroupDisabled: boolean;
     slotsSelecao: SlotCalendario[];
-    isReavaliacao: boolean; // <-- RECEBA A NOVA PROP
+    isReavaliacao: boolean;
     onDecisaoChange: (value: SituacaoReserva) => void;
     onSubmit: (e: React.FormEvent) => void;
 }
@@ -42,26 +39,32 @@ export default function EvaluationForm({
     onSubmit,
     isReavaliacao,
 }: EvaluationFormProps) {
-    const showMotivoField = decisao === 'indeferida' || slotsSelecao.some((slot) => slot.status === 'indeferida');
+    const showMotivoField =
+        decisao === 'indeferida' || slotsSelecao.some((slot) => slot.status === 'indeferida') || (isReavaliacao && Boolean(data.motivo));
 
     return (
         <form onSubmit={onSubmit}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Avaliação da Reserva</CardTitle>
-                    <CardDescription>Defina se a reserva será deferida ou indeferida e adicione suas observações.</CardDescription>
+                    <CardTitle>{isReavaliacao ? 'Reavaliação da Reserva' : 'Avaliação da Reserva'}</CardTitle>
+                    <CardDescription>
+                        {isReavaliacao
+                            ? 'Revise e altere as decisões dos horários e atualize as observações da reserva.'
+                            : 'Defina se a reserva será deferida ou indeferida e adicione suas observações.'}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {isReavaliacao && (
-                        <Alert variant="destructive">
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Atenção: Reavaliação de Reserva</AlertTitle>
-                            <AlertDescription>
-                                Esta reserva já possui horários avaliados. Suas novas decisões podem sobrescrever avaliações anteriores. Se aplicar
-                                para "Toda a recorrência", a avaliação será replicada para todos os horários correspondentes no período.
+                        <Alert className="border-info/30 bg-info-subtle text-info-accent">
+                            <Info className="text-info-accent h-4 w-4" />
+                            <AlertTitle className="text-info-accent font-semibold">Reavaliação de Reserva</AlertTitle>
+                            <AlertDescription className="text-info-accent/90 text-sm">
+                                Esta reserva já foi avaliada anteriormente. Você está realizando uma reavaliação. Os dados e justificativas anteriores
+                                foram pré-carregados nos campos abaixo. Suas novas decisões atualizarão os horários e o status geral da solicitação.
                             </AlertDescription>
                         </Alert>
                     )}
+
                     <div className="space-y-2">
                         <Label className="font-medium">Aplicar esta avaliação para:</Label>
                         <RadioGroup
@@ -144,7 +147,13 @@ export default function EvaluationForm({
 
                     <div className="flex gap-3 border-t pt-4">
                         <Button type="submit" disabled={isSubmitting} className="flex-1">
-                            {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
+                            {isSubmitting
+                                ? isReavaliacao
+                                    ? 'Reavaliando...'
+                                    : 'Processando...'
+                                : isReavaliacao
+                                  ? 'Reavaliar Reserva'
+                                  : 'Confirmar Avaliação'}
                         </Button>
                         <Button
                             type="button"

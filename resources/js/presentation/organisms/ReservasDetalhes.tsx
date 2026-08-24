@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -24,11 +23,11 @@ interface ReservaDetalhesProps {
 }
 
 export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, routeName }: ReservaDetalhesProps) {
-    const { semana } = usePage().props as any;
+    const { semana } = usePage<{ semana?: { referencia: string } }>().props;
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const [semanaVisivel, setSemanaVisivel] = useState(parseISO(semana.referencia));
+    const [semanaVisivel, setSemanaVisivel] = useState(semana?.referencia ? parseISO(semana.referencia) : new Date());
 
     const slotsSelecao = useMemo<SlotCalendario[]>(() => {
         return selectedReserva.horarios.map((horario) => ({
@@ -38,7 +37,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             horario_inicio: horario.horario_inicio,
             horario_fim: horario.horario_fim,
             agenda_id: horario.agenda?.id,
-            dadosReserva: { horarioDB: horario, autor: selectedReserva.user!.name, reserva_titulo: selectedReserva.titulo },
+            dadosReserva: { horarioDB: horario, autor: selectedReserva.user?.name ?? '', reserva_titulo: selectedReserva.titulo },
             isShowReservation: true,
         }));
     }, [selectedReserva.horarios, selectedReserva.user, selectedReserva.titulo]);

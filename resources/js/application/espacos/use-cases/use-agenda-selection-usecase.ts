@@ -120,7 +120,7 @@ export function useAgendaSelectionUseCase({ reserva, isEditMode, semanaVisivel }
                 limparSelecao();
                 setDialogAberto(false);
                 reset();
-                toast.success(isEditMode ? 'Sua reserva foi enviada para atualização!' : 'Solicitação enviada para processamento!');
+                toast.success(isEditMode ? 'Sua solicitação de alteração foi enviada!' : 'Solicitação de reserva enviada com sucesso!');
             },
             onError: (formErrors: Record<string, string>) => {
                 toast.error(Object.values(formErrors)[0] || 'Ocorreu um erro de validação.');

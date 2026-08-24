@@ -109,13 +109,23 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * O banco guarda só o caminho relativo no disco público (ex.: "avatars/xxx.jpg");
-     * aqui vira a URL completa para todo lugar que renderiza <UserAvatar> no frontend.
+     * O banco guarda o caminho relativo no disco público (ex.: "avatars/xxx.jpg")
+     * ou uma URL externa completa (ex.: "https://placehold.co/...").
      */
     protected function profilePic(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? Storage::disk('public')->url($value) : null,
+            get: function (?string $value): ?string {
+                if (empty($value)) {
+                    return null;
+                }
+
+                if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, 'data:')) {
+                    return $value;
+                }
+
+                return Storage::disk('public')->url($value);
+            },
         );
     }
 }

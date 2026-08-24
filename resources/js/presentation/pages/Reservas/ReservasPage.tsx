@@ -1,17 +1,18 @@
+import { useReservasListUseCase } from '@/application/reservas/use-cases/use-reservas-list-usecase';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 import GenericHeader from '@/presentation/molecules/generic-header';
 import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
 import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
 import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
+import { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import { ReservasList } from '@/presentation/organisms/ReservasList';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
-import { Suspense } from 'react';
-
-import { useReservasListUseCase } from '@/application/reservas/use-cases/use-reservas-list-usecase';
-import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
+import { Suspense, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,6 +38,9 @@ export default function MinhasReservas({
     reservaToShow?: Reserva;
     semana: { referencia: string };
 }) {
+    const isMobile = useIsMobile();
+    const [viewMode, setViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
+
     const {
         searchTerm,
         setSearchTerm,
@@ -77,6 +81,8 @@ export default function MinhasReservas({
                     onOrdenarChange={setSelectedOrdenar}
                     selectedDate={selectedDate}
                     onDateChange={setSelectedDate}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
                 />
                 <Suspense fallback={<ReservasLoading />}>
                     <ReservasList
@@ -85,6 +91,7 @@ export default function MinhasReservas({
                         isGestor={false}
                         reservaToShow={reservaToShow}
                         routeName={'reservas.index'}
+                        viewMode={viewMode}
                     />
                 </Suspense>
             </div>

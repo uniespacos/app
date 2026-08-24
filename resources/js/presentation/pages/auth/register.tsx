@@ -70,7 +70,6 @@ export default function Register() {
             <div className="container mx-auto px-4 py-8">
                 <div className="mx-auto max-w-6xl">
                     <div className="grid items-center gap-8 lg:grid-cols-2">
-                        {/* Logo Section */}
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-center">
                                 <img src="/_img/uniespacos_logo.png" alt="Logo UniEspaços" className="h-100 w-auto" />
@@ -78,7 +77,6 @@ export default function Register() {
                             </div>
                         </div>
 
-                        {/* Form Section */}
                         <div className="bg-card rounded-2xl p-8 shadow-xl">
                             <div className="mb-8">
                                 <h2 className="text-foreground mb-2 text-2xl font-semibold">Criar conta</h2>

@@ -61,7 +61,7 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                             <AlertDialogAction
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="bg-destructive hover:bg-destructive/90 text-white"
+                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                             >
                                 {isDeleting ? 'Deletando...' : 'Deletar'}
                             </AlertDialogAction>

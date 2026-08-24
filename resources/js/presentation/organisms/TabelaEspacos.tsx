@@ -1,151 +1,171 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
+import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/delete-item';
 import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
+import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Trash2, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface TabelaEspacosProps {
-    espacos: Espaco[]; // Agora recebe os espaços já filtrados e paginados
-    totalFiltrado: number; // Recebe o total de itens após a filtragem
+    espacos: Espaco[];
+    totalFiltrado: number;
+    pagination?: {
+        links: { url?: string | null; label: string; active?: boolean }[];
+        meta?: object;
+    };
     onGerenciarGestores: (espaco: Espaco) => void;
 }
 
-export function TabelaEspacos({ espacos, totalFiltrado, onGerenciarGestores }: TabelaEspacosProps) {
+export function TabelaEspacos({ espacos, totalFiltrado, pagination, onGerenciarGestores }: TabelaEspacosProps) {
+    const [viewMode, setViewMode] = useState<ViewMode>('table');
     const [removerEspaco, setRemoverEspaco] = useState<Espaco | undefined>(undefined);
 
-    if (totalFiltrado === 0) {
-        return (
-            <Card>
-                <CardContent>
-                    <div className="border-border flex min-h-[400px] flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center">
-                        <h2 className="text-xl font-semibold">Nenhum espaço encontrado</h2>
-                        <p className="text-muted-foreground mt-2">Tente ajustar os filtros ou cadastre um novo espaço para que ele apareça aqui.</p>
+    const renderEspacoActions = (espaco: Espaco) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                    onClick={() => {
+                        router.get(route('institucional.espacos.edit', { espaco: espaco.id }));
+                    }}
+                >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => {
+                        onGerenciarGestores(espaco);
+                    }}
+                >
+                    <Users className="mr-2 h-4 w-4" />
+                    Gerenciar Gestores
+                </DropdownMenuItem>
+                <Separator />
+                <DropdownMenuItem
+                    onClick={() => {
+                        setRemoverEspaco(espaco);
+                    }}
+                    className="text-destructive"
+                >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
+    const columns = useMemo<ColumnDef<Espaco>[]>(
+        () => [
+            {
+                header: 'Espaço',
+                cell: (espaco) => (
+                    <div>
+                        <div className="font-medium">{espaco.nome}</div>
+                        <div className="text-muted-foreground max-w-[200px] truncate text-sm">{espaco.descricao}</div>
+                    </div>
+                ),
+            },
+            {
+                header: 'Localização',
+                cell: (espaco) => (
+                    <div className="text-sm">
+                        <div className="font-medium">{espaco.andar?.modulo?.unidade?.instituicao?.sigla}</div>
+                        <div>{espaco.andar?.modulo?.unidade?.nome}</div>
+                        <div className="text-muted-foreground">
+                            {espaco.andar?.modulo?.nome} - {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null}
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                header: 'Capacidade',
+                cell: (espaco) => <Badge variant="secondary">{espaco.capacidade_pessoas} pessoas</Badge>,
+            },
+            {
+                header: 'Gestores por Turno',
+                cell: (espaco) => <GestoresEspaco agendas={espaco.agendas} />,
+            },
+        ],
+        [],
+    );
+
+    const renderCard = (espaco: Espaco) => (
+        <Card key={espaco.id} className="transition-shadow hover:shadow-md">
+            <CardContent className="space-y-3 p-4">
+                <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-base font-semibold">{espaco.nome}</h4>
+                        <p className="text-muted-foreground line-clamp-2 text-sm">{espaco.descricao}</p>
+                    </div>
+                    <Badge variant="secondary" className="shrink-0">
+                        {espaco.capacidade_pessoas} pessoas
+                    </Badge>
+                </div>
+                <div className="text-muted-foreground space-y-0.5 text-sm">
+                    <p className="truncate">
+                        {espaco.andar?.modulo?.unidade?.instituicao?.sigla} - {espaco.andar?.modulo?.unidade?.nome}
+                    </p>
+                    <p className="truncate">
+                        {espaco.andar?.modulo?.nome} - {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null}
+                    </p>
+                </div>
+                <div className="border-t pt-2">
+                    <GestoresEspaco agendas={espaco.agendas} />
+                </div>
+                <div className="flex justify-end border-t pt-2">{renderEspacoActions(espaco)}</div>
+            </CardContent>
+        </Card>
+    );
+
+    return (
+        <>
+            <DataTable
+                data={espacos}
+                columns={columns}
+                viewMode={viewMode}
+                renderCard={renderCard}
+                gridClassName="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                cardTitle={`Espaços Cadastrados (${String(totalFiltrado)})`}
+                cardHeaderAction={<ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />}
+                pagination={pagination}
+                emptyState={{
+                    title: 'Nenhum espaço encontrado',
+                    description: 'Tente ajustar os filtros ou cadastre um novo espaço para que ele apareça aqui.',
+                    action: (
                         <Button
                             onClick={() => {
                                 router.get(route('institucional.espacos.create'));
                             }}
-                            className="mt-4"
                         >
                             Cadastrar Primeiro Espaço
                         </Button>
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Espaços Cadastrados ({totalFiltrado})</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Espaço</TableHead>
-                                <TableHead>Localização</TableHead>
-                                <TableHead>Capacidade</TableHead>
-                                <TableHead>Gestores por Turno</TableHead>
-                                <TableHead className="text-right">Ações</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {espacos.map((espaco) => (
-                                <>
-                                    <TableRow key={espaco.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div>
-                                                    <div className="font-medium">{espaco.nome}</div>
-                                                    <div className="text-muted-foreground max-w-[200px] truncate text-sm">{espaco.descricao}</div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="text-sm">
-                                                <div className="font-medium">{espaco.andar?.modulo?.unidade?.instituicao?.sigla}</div>
-                                                <div>{espaco.andar?.modulo?.unidade?.nome}</div>
-                                                <div className="text-muted-foreground">
-                                                    {espaco.andar?.modulo?.nome} -{' '}
-                                                    {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary">{espaco.capacidade_pessoas} pessoas</Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <GestoresEspaco agendas={espaco.agendas} />
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            router.get(route('institucional.espacos.edit', { espaco: espaco.id }));
-                                                        }}
-                                                    >
-                                                        <Edit className="mr-2 h-4 w-4" />
-                                                        Editar
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            onGerenciarGestores(espaco);
-                                                        }}
-                                                    >
-                                                        <Users className="mr-2 h-4 w-4" />
-                                                        Gerenciar Gestores
-                                                    </DropdownMenuItem>
-                                                    <Separator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            setRemoverEspaco(espaco);
-                                                        }}
-                                                        className="text-destructive"
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Excluir
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    {removerEspaco && removerEspaco.id === espaco.id && (
-                                        <TableRow key={`delete-${espaco.id}`}>
-                                            <TableCell style={{ alignItems: 'flex-end' }}>
-                                                <DeleteItem
-                                                    showHeading={false}
-                                                    itemName={removerEspaco.nome}
-                                                    route={route('institucional.espacos.destroy', { espaco: removerEspaco.id })}
-                                                    isOpen={(open) => {
-                                                        if (!open) {
-                                                            setRemoverEspaco(undefined);
-                                                        }
-                                                    }}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-            </CardContent>
-        </Card>
+                    ),
+                }}
+                actions={renderEspacoActions}
+            />
+            {removerEspaco && (
+                <DeleteItem
+                    showHeading={false}
+                    itemName={removerEspaco.nome}
+                    route={route('institucional.espacos.destroy', { espaco: removerEspaco.id })}
+                    isOpen={(open) => {
+                        if (!open) {
+                            setRemoverEspaco(undefined);
+                        }
+                    }}
+                />
+            )}
+        </>
     );
 }

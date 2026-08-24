@@ -38,20 +38,18 @@ export default function EditarUnidade() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Editar ${unidade.nome}`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="container mx-auto space-y-6 py-6">
-                    <div className="container mx-auto space-y-6 p-6">
-                        <GenericHeader titulo={`Editar Unidade:  ${unidade.nome}`} descricao="Aqui você consegue editar a unidade selecionada" />
-                        <UnidadeForm
-                            data={data}
-                            setData={setData}
-                            submit={submit}
-                            errors={errors}
-                            processing={processing}
-                            title="Editar Modulo"
-                            description="Altere os dados do modulo abaixo."
-                            instituicao={instituicao}
-                        />
-                    </div>
+                <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                    <GenericHeader titulo={`Editar Unidade:  ${unidade.nome}`} descricao="Aqui você consegue editar a unidade selecionada" />
+                    <UnidadeForm
+                        data={data}
+                        setData={setData}
+                        submit={submit}
+                        errors={errors}
+                        processing={processing}
+                        title="Editar Modulo"
+                        description="Altere os dados do modulo abaixo."
+                        instituicao={instituicao}
+                    />
                 </div>
             </div>
         </AppLayout>

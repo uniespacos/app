@@ -1,15 +1,15 @@
-import { IFormHandler } from '@/application/ports/form-handler.interface';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CadastrarInstituicaoForm } from '@/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao';
+import type React from 'react';
 
 interface InstituicaoFormProps {
     data: CadastrarInstituicaoForm;
-    setData: IFormHandler<CadastrarInstituicaoForm>['setData'];
+    setData: (key: keyof CadastrarInstituicaoForm, value: string) => void;
     submit: (e: React.FormEvent<HTMLFormElement>) => void;
-    errors: Record<string, string>;
+    errors: Partial<Record<keyof CadastrarInstituicaoForm, string>>;
     processing: boolean;
     title: string;
     description: string;

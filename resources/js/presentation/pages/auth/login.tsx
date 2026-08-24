@@ -40,7 +40,7 @@ export default function Login() {
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-center text-2xl font-bold">
                             <div className="mb-2 flex justify-center">
-                                <AppLogoIcon className="size-34 text-white dark:text-black" />
+                                <AppLogoIcon className="text-foreground size-34" />
                             </div>
                             Bem-vindo ao UniEspaços
                         </CardTitle>
