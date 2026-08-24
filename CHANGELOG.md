@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.58](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.57...v1.3.0-rc.58) (2026-08-24)
+
+
+### Bug Fixes
+
+* padronizacao no frontend, atomic design, tokens semanticos e busca debounced ([#369](https://github.com/uniespacos/uniespacos/issues/369)) ([9d19d8e](https://github.com/uniespacos/uniespacos/commit/9d19d8ecf13258736896d4ae6a0eb2b1157f19b4))
+
 ## [1.3.0-rc.57](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.56...v1.3.0-rc.57) (2026-08-24)
 
 
