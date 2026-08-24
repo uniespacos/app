@@ -83,7 +83,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     };
 
     const renderActions = (reserva: Reserva) => {
-        const canEdit = Boolean(!isGestor && reserva.situacao !== 'inativa' && (reserva.can_update ?? false));
+        const canEdit = !isGestor && reserva.situacao !== 'inativa' && (reserva.can_update ?? false);
         const canCancel = !isGestor && reserva.situacao !== 'inativa';
         const isGestorEvaluable = isGestor && reserva.situacao !== 'inativa';
 

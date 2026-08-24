@@ -1,4 +1,3 @@
-import type { RequestPayload } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -47,7 +46,7 @@ export function useDebouncedSearch({ routeName, initialSearch = '', extraParams 
                     ? routeNameRef.current
                     : route(routeNameRef.current);
 
-            router.get(targetUrl, cleanParams as RequestPayload, { preserveState: true, preserveScroll: true, replace: true });
+            router.get(targetUrl, cleanParams, { preserveState: true, preserveScroll: true, replace: true });
         }, delay);
 
         return () => {

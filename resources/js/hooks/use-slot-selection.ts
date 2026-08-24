@@ -1,6 +1,6 @@
 import { SlotCalendario } from '@/types';
 import { addWeeks, format } from 'date-fns';
-import { ptBR } from 'date-fns/locale/pt-BR';
+import { ptBR } from 'date-fns/locale';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,7 +19,7 @@ export function useSlotSelection({ hoje, slotsIniciais = [] }: UseSlotSelectionP
             slotsIniciais.length !== lastInitialSlotsRef.current.length ||
             slotsIniciais.some((slot, idx) => {
                 const prev = lastInitialSlotsRef.current[idx];
-                return !prev || slot.id !== prev.id || slot.status !== prev.status;
+                return slot.id !== prev.id || slot.status !== prev.status;
             });
 
         if (hasChanged) {

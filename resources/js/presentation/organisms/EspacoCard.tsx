@@ -160,11 +160,7 @@ export default function EspacoCard({
 
             {isModoGerenciamento ? (
                 <CardFooter className="flex flex-wrap gap-2 py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={irParaAgenda}
-                    >
+                    <Button variant="outline" size="sm" onClick={irParaAgenda}>
                         Ver Detalhes
                     </Button>
                     <Button variant="default" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>

@@ -48,13 +48,7 @@ describe('SetorForm', () => {
     });
 
     it('renders fields correctly in create mode', () => {
-        render(
-            <SetorForm
-                instituicao={mockInstituicao}
-                unidades={mockUnidades}
-                onCancel={jest.fn()}
-            />,
-        );
+        render(<SetorForm instituicao={mockInstituicao} unidades={mockUnidades} onCancel={jest.fn()} />);
 
         expect(screen.getByLabelText(/Instituição/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/Unidade/i)).toBeInTheDocument();
@@ -64,28 +58,14 @@ describe('SetorForm', () => {
     });
 
     it('renders button with update label when editing an existing sector', () => {
-        render(
-            <SetorForm
-                setor={mockSetor}
-                instituicao={mockInstituicao}
-                unidades={mockUnidades}
-                onCancel={jest.fn()}
-            />,
-        );
+        render(<SetorForm setor={mockSetor} instituicao={mockInstituicao} unidades={mockUnidades} onCancel={jest.fn()} />);
 
         expect(screen.getByRole('button', { name: /Atualizar/i })).toBeInTheDocument();
     });
 
     it('calls post when submitting new sector', () => {
         const onSuccess = jest.fn();
-        render(
-            <SetorForm
-                instituicao={mockInstituicao}
-                unidades={mockUnidades}
-                onSuccess={onSuccess}
-                onCancel={jest.fn()}
-            />,
-        );
+        render(<SetorForm instituicao={mockInstituicao} unidades={mockUnidades} onSuccess={onSuccess} onCancel={jest.fn()} />);
 
         const submitBtn = screen.getByRole('button', { name: /Criar Setor/i });
         const form = submitBtn.closest('form');
@@ -97,15 +77,7 @@ describe('SetorForm', () => {
 
     it('calls put when submitting existing sector update', () => {
         const onSuccess = jest.fn();
-        render(
-            <SetorForm
-                setor={mockSetor}
-                instituicao={mockInstituicao}
-                unidades={mockUnidades}
-                onSuccess={onSuccess}
-                onCancel={jest.fn()}
-            />,
-        );
+        render(<SetorForm setor={mockSetor} instituicao={mockInstituicao} unidades={mockUnidades} onSuccess={onSuccess} onCancel={jest.fn()} />);
 
         const submitBtn = screen.getByRole('button', { name: /Atualizar/i });
         const form = submitBtn.closest('form');
@@ -117,13 +89,7 @@ describe('SetorForm', () => {
 
     it('calls onCancel when clicking cancel button', () => {
         const onCancel = jest.fn();
-        render(
-            <SetorForm
-                instituicao={mockInstituicao}
-                unidades={mockUnidades}
-                onCancel={onCancel}
-            />,
-        );
+        render(<SetorForm instituicao={mockInstituicao} unidades={mockUnidades} onCancel={onCancel} />);
 
         fireEvent.click(screen.getByRole('button', { name: /Cancelar/i }));
         expect(onCancel).toHaveBeenCalledTimes(1);

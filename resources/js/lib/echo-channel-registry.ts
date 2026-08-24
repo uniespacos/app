@@ -24,7 +24,7 @@ const privateChannels = new Map<string, ChannelRef<EchoPrivateChannel>>();
 // Helpers para acessar Echo de forma type-safe
 // Cast é necessário apenas para cobrir runtime onde Echo pode estar ausente antes de app.tsx rodar
 function getEchoInstance(): EchoInstance | undefined {
-    return window.Echo as EchoInstance | undefined;
+    return window.Echo;
 }
 
 /**

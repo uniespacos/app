@@ -1,55 +1,4 @@
 {
-  "resources/js/app.tsx": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-argument": {
-      "count": 2
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 5
-    },
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 2
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
-  "resources/js/components/ui/carousel.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/components/ui/chart.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 15
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 3
-    }
-  },
-  "resources/js/components/ui/form.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/components/ui/sidebar.tsx": {
-    "@typescript-eslint/no-unused-expressions": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 3
-    }
-  },
-  "resources/js/components/ui/toggle-group.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 4
-    }
-  },
   "resources/js/hooks/use-agenda-navigation.test.ts": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
@@ -87,11 +36,6 @@
   },
   "resources/js/hooks/use-mobile.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
-  "resources/js/hooks/use-slot-selection.ts": {
-    "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     }
   },
@@ -403,22 +347,6 @@
   "resources/js/presentation/templates/settings/Layout.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
-    }
-  },
-  "resources/js/ssr.tsx": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
-  "resources/js/types/index.d.ts": {
-    "@typescript-eslint/no-redundant-type-constituents": {
-      "count": 3
     }
   }
 }
