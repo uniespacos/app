@@ -52,48 +52,44 @@ export default function GerenciarEspacos() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Espaços" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
-                <div className="container mx-auto space-y-6 py-4 sm:py-6">
-                    <div className="space-y-6 p-2 sm:p-6">
-                        <GenericHeader
-                            titulo={'Gerenciar Espaços'}
-                            descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
-                            buttonText="Cadastrar Espaço"
-                            ButtonIcon={PlusCircle}
-                            buttonOnClick={handleCadastrarEspaco}
-                            canSeeButton
-                        />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo={'Gerenciar Espaços'}
+                    descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
+                    buttonText="Cadastrar Espaço"
+                    ButtonIcon={PlusCircle}
+                    buttonOnClick={handleCadastrarEspaco}
+                    canSeeButton
+                />
 
-                        <EspacoFiltroBusca
-                            route={route('institucional.espacos.index')}
-                            unidades={unidades}
-                            modulos={modulos}
-                            andares={andares}
-                            filters={filters}
-                            capacidadeEspacos={capacidadeEspacos}
-                        />
+                <EspacoFiltroBusca
+                    route={route('institucional.espacos.index')}
+                    unidades={unidades}
+                    modulos={modulos}
+                    andares={andares}
+                    filters={filters}
+                    capacidadeEspacos={capacidadeEspacos}
+                />
 
-                        <TabelaEspacos
-                            espacos={espacos.data}
-                            onGerenciarGestores={handleGerenciarGestores}
-                            totalFiltrado={espacos.total}
-                            pagination={{ links: espacos.links }}
-                        />
+                <TabelaEspacos
+                    espacos={espacos.data}
+                    onGerenciarGestores={handleGerenciarGestores}
+                    totalFiltrado={espacos.total}
+                    pagination={{ links: espacos.links }}
+                />
 
-                        {espacoParaGerenciar && (
-                            <GerenciarGestoresModal
-                                key={espacoParaGerenciar.id}
-                                espaco={espacoParaGerenciar}
-                                usuarios={users}
-                                isOpen={!!espacoParaGerenciar}
-                                onClose={() => {
-                                    setEspacoParaGerenciar(null);
-                                }}
-                                onSave={handleSalvarGestores}
-                            />
-                        )}
-                    </div>
-                </div>
+                {espacoParaGerenciar && (
+                    <GerenciarGestoresModal
+                        key={espacoParaGerenciar.id}
+                        espaco={espacoParaGerenciar}
+                        usuarios={users}
+                        isOpen={!!espacoParaGerenciar}
+                        onClose={() => {
+                            setEspacoParaGerenciar(null);
+                        }}
+                        onSave={handleSalvarGestores}
+                    />
+                )}
             </div>
         </AppLayout>
     );

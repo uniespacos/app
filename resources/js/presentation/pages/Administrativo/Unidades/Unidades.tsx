@@ -44,63 +44,59 @@ export default function UnidadesPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Unidades" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
-                <div className="container mx-auto space-y-6 py-4 sm:py-6">
-                    <div className="space-y-6 p-2 sm:p-6">
-                        <GenericHeader
-                            titulo="Gerenciar Unidades"
-                            descricao="Aqui você consegue gerenciar as unidades cadastradas"
-                            buttonText="Criar nova"
-                            buttonLink={route('institucional.unidades.create')}
-                            ButtonIcon={PlusCircle}
-                            canSeeButton={true}
-                        />
-                        <SearchFilter
-                            searchTerm={searchTerm}
-                            onSearchTermChange={setSearchTerm}
-                            placeholder="Buscar por nome ou sigla"
-                            variant="card"
-                        />
-                        <DataTable
-                            data={unidades.data}
-                            columns={columns}
-                            pagination={{ links: unidades.links }}
-                            emptyState={{
-                                title: 'Nenhuma unidade encontrada',
-                                description: 'Tente ajustar sua busca ou cadastre uma nova unidade.',
-                            }}
-                            actions={(unidade) => (
-                                <div className="flex justify-end gap-2">
-                                    <Link href={route('institucional.unidades.edit', { unidade: unidade.id })}>
-                                        <Button variant="outline" size="icon">
-                                            <FilePenLine className="h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                    <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        onClick={() => {
-                                            setRemoverUnidade(unidade);
-                                        }}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            )}
-                        />
-                        {removerUnidade && (
-                            <DeleteItem
-                                isOpen={(open) => {
-                                    if (!open) {
-                                        setRemoverUnidade(null);
-                                    }
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo="Gerenciar Unidades"
+                    descricao="Aqui você consegue gerenciar as unidades cadastradas"
+                    buttonText="Criar nova"
+                    buttonLink={route('institucional.unidades.create')}
+                    ButtonIcon={PlusCircle}
+                    canSeeButton={true}
+                />
+                <SearchFilter
+                    searchTerm={searchTerm}
+                    onSearchTermChange={setSearchTerm}
+                    placeholder="Buscar por nome ou sigla"
+                    variant="card"
+                />
+                <DataTable
+                    data={unidades.data}
+                    columns={columns}
+                    pagination={{ links: unidades.links }}
+                    emptyState={{
+                        title: 'Nenhuma unidade encontrada',
+                        description: 'Tente ajustar sua busca ou cadastre uma nova unidade.',
+                    }}
+                    actions={(unidade) => (
+                        <div className="flex justify-end gap-2">
+                            <Link href={route('institucional.unidades.edit', { unidade: unidade.id })}>
+                                <Button variant="outline" size="icon">
+                                    <FilePenLine className="h-4 w-4" />
+                                </Button>
+                            </Link>
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => {
+                                    setRemoverUnidade(unidade);
                                 }}
-                                itemName={removerUnidade.nome}
-                                route={route('institucional.unidades.destroy', removerUnidade.id)}
-                            />
-                        )}
-                    </div>
-                </div>
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    )}
+                />
+                {removerUnidade && (
+                    <DeleteItem
+                        isOpen={(open) => {
+                            if (!open) {
+                                setRemoverUnidade(null);
+                            }
+                        }}
+                        itemName={removerUnidade.nome}
+                        route={route('institucional.unidades.destroy', removerUnidade.id)}
+                    />
+                )}
             </div>
         </AppLayout>
     );

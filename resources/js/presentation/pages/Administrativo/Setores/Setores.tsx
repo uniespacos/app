@@ -104,55 +104,51 @@ export default function SetoresPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setores" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
-                <div className="container mx-auto space-y-6 py-4 sm:py-6">
-                    <div className="space-y-6 p-2 sm:p-6">
-                        <GenericHeader
-                            titulo={'Gerenciar Setores'}
-                            descricao={'Gerencie os setores das unidades organizacionais'}
-                            canSeeButton
-                            buttonText="Cadastrar setor"
-                            ButtonIcon={PlusCircle}
-                            buttonOnClick={() => {
-                                setIsCreateModalOpen(true);
-                            }}
-                        />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo={'Gerenciar Setores'}
+                    descricao={'Gerencie os setores das unidades organizacionais'}
+                    canSeeButton
+                    buttonText="Cadastrar setor"
+                    ButtonIcon={PlusCircle}
+                    buttonOnClick={() => {
+                        setIsCreateModalOpen(true);
+                    }}
+                />
 
-                        <FiltrosSetor
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            selectedUnidade={selectedUnidade}
-                            setSelectedUnidade={handleUnidadeChange}
-                            unidades={unidades}
-                            filteredUnidades={unidades}
-                            onClearFilters={handleClearFilters}
-                        />
+                <FiltrosSetor
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    selectedUnidade={selectedUnidade}
+                    setSelectedUnidade={handleUnidadeChange}
+                    unidades={unidades}
+                    filteredUnidades={unidades}
+                    onClearFilters={handleClearFilters}
+                />
 
-                        <TabelaSetores
-                            setores={setores.data}
-                            pagination={{ links: setores.links }}
-                            onEdit={setEditingSetor}
-                            onViewUsuarios={setViewingUsuarios}
-                        />
+                <TabelaSetores
+                    setores={setores.data}
+                    pagination={{ links: setores.links }}
+                    onEdit={setEditingSetor}
+                    onViewUsuarios={setViewingUsuarios}
+                />
 
-                        <ModaisSetor
-                            isCreateModalOpen={isCreateModalOpen}
-                            setIsCreateModalOpen={setIsCreateModalOpen}
-                            editingSetor={editingSetor}
-                            setEditingSetor={setEditingSetor}
-                            viewingUsuarios={viewingUsuarios}
-                            setViewingUsuarios={setViewingUsuarios}
-                            instituicao={instituicao}
-                            unidades={unidades}
-                            onCreateSetor={(data) => {
-                                handleCreateSetor(data);
-                            }}
-                            onUpdateSetor={(setorId, data) => {
-                                handleUpdateSetor(setorId, data);
-                            }}
-                        />
-                    </div>
-                </div>
+                <ModaisSetor
+                    isCreateModalOpen={isCreateModalOpen}
+                    setIsCreateModalOpen={setIsCreateModalOpen}
+                    editingSetor={editingSetor}
+                    setEditingSetor={setEditingSetor}
+                    viewingUsuarios={viewingUsuarios}
+                    setViewingUsuarios={setViewingUsuarios}
+                    instituicao={instituicao}
+                    unidades={unidades}
+                    onCreateSetor={(data) => {
+                        handleCreateSetor(data);
+                    }}
+                    onUpdateSetor={(setorId, data) => {
+                        handleUpdateSetor(setorId, data);
+                    }}
+                />
             </div>
         </AppLayout>
     );

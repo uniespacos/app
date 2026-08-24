@@ -107,7 +107,12 @@ export default function Usuarios() {
         setEditingUser(user);
     };
 
-    const handlePermissionUpdate = (userId: number, roleName: string, agendas?: number[], directPermissions?: string[]) => {
+    const handlePermissionUpdate = (
+        userId: number,
+        roleName: string,
+        agendas?: number[],
+        directPermissions?: string[],
+    ) => {
         setProcessing(true);
         const payload: { role_name: string; agendas: number[]; direct_permissions?: string[] } = {
             role_name: roleName,
@@ -170,7 +175,7 @@ export default function Usuarios() {
             {
                 header: 'Usuário',
                 cell: (user) => (
-                    <div className="flex min-w-[200px] items-center space-x-3">
+                    <div className="flex items-center space-x-3 min-w-[200px]">
                         <Avatar className="h-9 w-9 shrink-0">
                             <AvatarFallback>
                                 {user.name
@@ -181,8 +186,8 @@ export default function Usuarios() {
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                            <div className="truncate font-medium">{user.name}</div>
-                            <div className="text-muted-foreground truncate text-sm">{user.email}</div>
+                            <div className="font-medium truncate">{user.name}</div>
+                            <div className="text-muted-foreground text-sm truncate">{user.email}</div>
                             {user.telefone ? <div className="text-muted-foreground text-xs">{user.telefone}</div> : null}
                         </div>
                     </div>
@@ -194,13 +199,17 @@ export default function Usuarios() {
             },
             {
                 header: 'Papel',
-                cell: (user) => <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>,
+                cell: (user) => (
+                    <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>
+                        {getRoleLabel(user.roles[0] ?? ROLE_COMUM)}
+                    </Badge>
+                ),
             },
             {
                 header: 'Status',
                 cell: (user) => (
                     <div className="flex items-center space-x-2">
-                        <div className={cn('h-2 w-2 shrink-0 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
+                        <div className={cn('h-2 w-2 rounded-full shrink-0', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
                             {user.email_verified_at ? 'Verificado' : 'Não verificado'}
                         </span>
@@ -213,7 +222,7 @@ export default function Usuarios() {
 
     const renderUserCard = (user: User) => (
         <Card key={user.id} className="transition-shadow hover:shadow-md">
-            <CardContent className="space-y-4 p-4">
+            <CardContent className="p-4 space-y-4">
                 <div className="flex items-center space-x-3">
                     <Avatar className="h-11 w-11 shrink-0">
                         <AvatarFallback>
@@ -225,17 +234,21 @@ export default function Usuarios() {
                         </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-base font-semibold">{user.name}</h3>
-                        <p className="text-muted-foreground truncate text-sm">{user.email}</p>
+                        <h3 className="font-semibold text-base truncate">{user.name}</h3>
+                        <p className="text-muted-foreground text-sm truncate">{user.email}</p>
                         {user.telefone ? <p className="text-muted-foreground text-xs">{user.telefone}</p> : null}
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
                     <div className="flex items-center gap-2">
-                        <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>
+                        <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>
+                            {getRoleLabel(user.roles[0] ?? ROLE_COMUM)}
+                        </Badge>
                         <div className="flex items-center space-x-1.5">
                             <div className={cn('h-2 w-2 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
-                            <span className="text-muted-foreground text-xs">{user.email_verified_at ? 'Verificado' : 'Não verificado'}</span>
+                            <span className="text-muted-foreground text-xs">
+                                {user.email_verified_at ? 'Verificado' : 'Não verificado'}
+                            </span>
                         </div>
                     </div>
                     <div>{renderUserActions(user)}</div>
@@ -248,100 +261,96 @@ export default function Usuarios() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciar Usuários" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-2 sm:p-4">
-                <div className="container mx-auto space-y-6 py-4 sm:py-6">
-                    <div className="space-y-6 p-2 sm:p-6">
-                        <GenericHeader
-                            titulo="Gerenciar Usuários"
-                            descricao="Visualize e gerencie os usuários cadastrados no sistema"
-                            buttonText="Novo Usuário"
-                            ButtonIcon={UserPlus}
-                            canSeeButton={false}
-                        />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <GenericHeader
+                    titulo="Gerenciar Usuários"
+                    descricao="Visualize e gerencie os usuários cadastrados no sistema"
+                    buttonText="Novo Usuário"
+                    ButtonIcon={UserPlus}
+                    canSeeButton={false}
+                />
 
-                        <Card>
-                            <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-end">
-                                <div className="w-full flex-1">
-                                    <SearchFilter
-                                        searchTerm={searchTerm}
-                                        onSearchTermChange={setSearchTerm}
-                                        placeholder="Buscar por nome, email ou telefone..."
-                                        variant="plain"
-                                    />
-                                </div>
-                                <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-end">
-                                    <div className="flex-1 space-y-2 sm:w-[180px]">
-                                        <Label>Setor</Label>
-                                        <Select value={selectedSetorId} onValueChange={handleSetorChange}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Setor" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">Todos os setores</SelectItem>
-                                                {setores.map((setor) => (
-                                                    <SelectItem key={setor.id} value={setor.id.toString()}>
-                                                        {setor.sigla}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="shrink-0 self-end sm:self-auto">
-                                        <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <DataTable
-                            data={users.data}
-                            columns={columns}
-                            viewMode={viewMode}
-                            renderCard={renderUserCard}
-                            gridClassName="grid gap-4 grid-cols-1"
-                            pagination={{ links: users.links }}
-                            emptyState={{
-                                title: 'Nenhum usuário encontrado',
-                                description: 'Tente ajustar sua busca ou filtros selecionados.',
-                            }}
-                            actions={renderUserActions}
-                        />
-
-                        {removerUsuario && (
-                            <DeleteItem
-                                itemName={removerUsuario.name}
-                                isOpen={(open) => {
-                                    if (!open) {
-                                        setRemoverUsuario(undefined);
-                                    }
-                                }}
-                                route={route('institucional.usuarios.destroy', { usuario: removerUsuario.id })}
+                <Card>
+                    <CardContent className="flex flex-col gap-4 p-4 md:flex-row md:items-end">
+                        <div className="w-full flex-1">
+                            <SearchFilter
+                                searchTerm={searchTerm}
+                                onSearchTermChange={setSearchTerm}
+                                placeholder="Buscar por nome, email ou telefone..."
+                                variant="plain"
                             />
-                        )}
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3">
+                            <div className="space-y-2 flex-1 sm:w-[180px]">
+                                <Label>Setor</Label>
+                                <Select value={selectedSetorId} onValueChange={handleSetorChange}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Setor" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Todos os setores</SelectItem>
+                                        {setores.map((setor) => (
+                                            <SelectItem key={setor.id} value={setor.id.toString()}>
+                                                {setor.sigla}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="self-end sm:self-auto shrink-0">
+                                <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                        <EditUserModal
-                            user={editingUser}
-                            isOpen={!!editingUser}
-                            onClose={() => {
-                                setEditingUser(undefined);
-                            }}
-                        />
+                <DataTable
+                    data={users.data}
+                    columns={columns}
+                    viewMode={viewMode}
+                    renderCard={renderUserCard}
+                    gridClassName="grid gap-4 grid-cols-1"
+                    pagination={{ links: users.links }}
+                    emptyState={{
+                        title: 'Nenhum usuário encontrado',
+                        description: 'Tente ajustar sua busca ou filtros selecionados.',
+                    }}
+                    actions={renderUserActions}
+                />
 
-                        {isModalOpen && selectedUser && (
-                            <PermissionModal
-                                key={selectedUser.id}
-                                user={selectedUser}
-                                isOpen={isModalOpen}
-                                onClose={() => {
-                                    setIsModalOpen(false);
-                                    setSelectedUser(undefined);
-                                }}
-                                onUpdate={handlePermissionUpdate}
-                                processing={processing}
-                            />
-                        )}
-                    </div>
-                </div>
+                {removerUsuario && (
+                    <DeleteItem
+                        itemName={removerUsuario.name}
+                        isOpen={(open) => {
+                            if (!open) {
+                                setRemoverUsuario(undefined);
+                            }
+                        }}
+                        route={route('institucional.usuarios.destroy', { usuario: removerUsuario.id })}
+                    />
+                )}
+
+                <EditUserModal
+                    user={editingUser}
+                    isOpen={!!editingUser}
+                    onClose={() => {
+                        setEditingUser(undefined);
+                    }}
+                />
+
+                {isModalOpen && selectedUser && (
+                    <PermissionModal
+                        key={selectedUser.id}
+                        user={selectedUser}
+                        isOpen={isModalOpen}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            setSelectedUser(undefined);
+                        }}
+                        onUpdate={handlePermissionUpdate}
+                        processing={processing}
+                    />
+                )}
             </div>
         </AppLayout>
     );

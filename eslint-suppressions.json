@@ -537,11 +537,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/pages/Administrativo/Modulos/Modulos.tsx": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/Administrativo/Unidades/EditarUnidade.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
