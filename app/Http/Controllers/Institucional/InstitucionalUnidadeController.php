@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarUnidadesRequest;
 use App\Http\Requests\StoreUnidadeRequest;
 use App\Http\Requests\UpdateUnidadeRequest;
 use App\Models\Unidade;
@@ -27,14 +28,20 @@ class InstitucionalUnidadeController extends Controller
     /**
      * Display a paginated listing of units scoped to the authenticated user's institution.
      */
-    public function index(): Response
+    public function index(ListarUnidadesRequest $request): Response
     {
         $this->authorize('viewAny', Unidade::class);
 
         $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
+        $validated = $request->validated();
+        $search = $validated['search'] ?? null;
+
+        $unidades = $this->service->paginate($instituicaoId, 10, $search);
+        $unidades->withQueryString();
 
         return Inertia::render('Administrativo/Unidades/Unidades', [
-            'unidades' => $this->service->paginate($instituicaoId, 10),
+            'unidades' => $unidades,
+            'filters' => ['search' => $search],
         ]);
     }
 
@@ -94,8 +101,7 @@ class InstitucionalUnidadeController extends Controller
             return redirect()->route('institucional.unidades.index')
                 ->with('success', 'Unidade atualizada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')
-                ->with('error', 'Erro ao atualizar a unidade: '.$th->getMessage());
+            return back()->withInput()->with('error', 'Erro ao atualizar a unidade: '.$th->getMessage());
         }
     }
 
@@ -116,8 +122,7 @@ class InstitucionalUnidadeController extends Controller
 
             return back()->with('success', 'Unidade excluída com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.unidades.index')
-                ->with('error', 'Erro ao deletar a unidade: '.$th->getMessage());
+            return back()->with('error', 'Erro ao deletar a unidade: '.$th->getMessage());
         }
     }
 }

@@ -174,6 +174,29 @@ class UserService
     }
 
     /**
+     * Creates and persists a new user.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function create(array $data): User
+    {
+        return $this->repoUser->store($data);
+    }
+
+    /**
+     * Updates an existing user with the given data.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function update(User $user, array $data): User
+    {
+        $data['telefone'] = $data['phone'] ?? $user->telefone;
+        unset($data['phone']);
+
+        return $this->repoUser->update($data, $user->id);
+    }
+
+    /**
      * Deletes the given user from the database.
      */
     public function delete(User $user): bool

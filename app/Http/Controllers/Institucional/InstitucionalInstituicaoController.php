@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarInstituicoesRequest;
 use App\Http\Requests\StoreInstituicaoRequest;
 use App\Http\Requests\UpdateInstituicaoRequest;
 use App\Models\Instituicao;
@@ -26,12 +27,18 @@ class InstitucionalInstituicaoController extends Controller
     /**
      * Display a paginated listing of institutions.
      */
-    public function index(): Response
+    public function index(ListarInstituicoesRequest $request): Response
     {
         $this->authorize('viewAny', Instituicao::class);
 
+        $validated = $request->validated();
+        $search = $validated['search'] ?? null;
+        $instituicoes = $this->service->paginate(10, $search);
+        $instituicoes->withQueryString();
+
         return Inertia::render('Administrativo/Instituicoes/Instituicoes', [
-            'instituicoes' => $this->service->paginate(10),
+            'instituicoes' => $instituicoes,
+            'filters' => ['search' => $search],
         ]);
     }
 
@@ -79,8 +86,7 @@ class InstitucionalInstituicaoController extends Controller
             return redirect()->route('institucional.instituicoes.index')
                 ->with('success', 'Instituição atualizada com sucesso.');
         } catch (\Throwable $th) {
-            return redirect()->route('institucional.instituicoes.index')
-                ->with('error', 'Erro ao atualizar a instituição: '.$th->getMessage());
+            return back()->withInput()->with('error', 'Erro ao atualizar a instituição: '.$th->getMessage());
         }
     }
 

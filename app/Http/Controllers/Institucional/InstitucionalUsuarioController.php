@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarUsuariosRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdatePermissionsRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -14,7 +15,6 @@ use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -31,14 +31,15 @@ class InstitucionalUsuarioController extends Controller
     /**
      * Display the users listing with permission types, institutions, and sectors.
      */
-    public function index(Request $request): Response
+    public function index(ListarUsuariosRequest $request): Response
     {
         $this->authorize('viewAny', User::class);
 
+        $validated = $request->validated();
         $data = $this->service->getIndexData(
             Auth::user(),
-            $request->string('search')->trim()->value() ?: null,
-            $request->integer('setor_id') ?: null,
+            $validated['search'] ?? null,
+            isset($validated['setor_id']) ? (int) $validated['setor_id'] : null,
         );
 
         return Inertia::render('Administrativo/Usuarios/Usuarios', $data);
@@ -51,7 +52,7 @@ class InstitucionalUsuarioController extends Controller
     {
         $this->authorize('create', User::class);
 
-        User::create($request->validated());
+        $this->service->create($request->validated());
 
         return redirect()->route('institucional.usuarios.index')
             ->with('success', 'Usuário criado com sucesso.');
@@ -64,14 +65,8 @@ class InstitucionalUsuarioController extends Controller
     {
         $this->authorize('update', $usuario);
 
-        $validated = $request->validated();
-        $validated['telefone'] = $validated['phone'] ?? $usuario->telefone;
-        unset($validated['phone']);
+        $this->service->update($usuario, $request->validated());
 
-        $usuario->update($validated);
-
-        // back() em vez de route(index): preserva a busca/página em que o
-        // admin estava, que o redirect fixo descartava.
         return back()->with('success', 'Usuário atualizado com sucesso.');
     }
 

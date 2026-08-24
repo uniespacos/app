@@ -92,8 +92,7 @@ class InstitucionalSetorController extends Controller
         try {
             $this->service->update($setor, $request->validated());
 
-            return redirect()->route('institucional.setors.index')
-                ->with('success', 'Setor atualizado com sucesso!');
+            return back()->with('success', 'Setor atualizado com sucesso!');
         } catch (\Exception $e) {
             return back()->with(['error' => 'Erro ao atualizar setor: '.$e->getMessage()])->withInput();
         }
@@ -114,8 +113,7 @@ class InstitucionalSetorController extends Controller
         try {
             $this->service->delete($setor);
 
-            return redirect()->route('institucional.setors.index')
-                ->with('success', 'Setor removido com sucesso!');
+            return back()->with('success', 'Setor removido com sucesso!');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Erro ao remover setor: '.$e->getMessage()]);
         }

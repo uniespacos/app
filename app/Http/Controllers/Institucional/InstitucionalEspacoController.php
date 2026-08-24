@@ -7,13 +7,13 @@ namespace App\Http\Controllers\Institucional;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AlterarGestoresEspacoRequest;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarEspacosRequest;
 use App\Http\Requests\StoreEspacoRequest;
 use App\Http\Requests\UpdateEspacoRequest;
 use App\Models\Espaco;
 use App\Services\EspacoService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -30,13 +30,13 @@ class InstitucionalEspacoController extends Controller
     /**
      * Display the admin listing of spaces with managers and structural data.
      */
-    public function index(Request $request): Response
+    public function index(ListarEspacosRequest $request): Response
     {
         $this->authorize('viewAny', Espaco::class);
 
         $user = Auth::user();
         $instituicaoId = $user->setor->unidade->instituicao_id;
-        $filters = $request->only(['search', 'unidade', 'modulo', 'andar', 'capacidade']);
+        $filters = $request->validated();
         $filterOptions = $this->service->getFilterOptions($instituicaoId);
 
         return Inertia::render('Administrativo/Espacos/GerenciarEspacos', [
