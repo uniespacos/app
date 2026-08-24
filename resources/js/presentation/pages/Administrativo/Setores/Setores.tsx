@@ -1,14 +1,14 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { useFiltros } from '@/hooks/use-filtros';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import { ModaisSetor } from '@/presentation/molecules/ModaisSetors';
+import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
+import { SetorFormData } from '@/presentation/organisms/SetorForm';
+import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Setor, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
-import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
-import { ModaisSetor } from '@/presentation/molecules/ModaisSetors';
-import { SetorFormData } from '@/presentation/organisms/SetorForm';
-import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 
 const breadcrumbs = [
     {
@@ -30,7 +30,6 @@ export default function SetoresPage() {
         unidades,
         setores,
     );
-    // Estados dos modais
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingSetor, setEditingSetor] = useState<Setor | null>(null);
     const [viewingUsuarios, setViewingUsuarios] = useState<Setor | null>(null);
@@ -78,7 +77,9 @@ export default function SetoresPage() {
                             canSeeButton
                             buttonText="Cadastrar setor"
                             ButtonIcon={PlusCircle}
-                            buttonOnClick={() => { setIsCreateModalOpen(true); }}
+                            buttonOnClick={() => {
+                                setIsCreateModalOpen(true);
+                            }}
                         />
 
                         <FiltrosSetor
@@ -108,8 +109,12 @@ export default function SetoresPage() {
                             instituicao={instituicao}
                             unidades={unidades}
                             usuarios={usuarios}
-                            onCreateSetor={(data) => { handleCreateSetor(data); }}
-                            onUpdateSetor={(setorId, data) => { handleUpdateSetor(setorId, data); }}
+                            onCreateSetor={(data) => {
+                                handleCreateSetor(data);
+                            }}
+                            onUpdateSetor={(setorId, data) => {
+                                handleUpdateSetor(setorId, data);
+                            }}
                         />
                     </div>
                 </div>

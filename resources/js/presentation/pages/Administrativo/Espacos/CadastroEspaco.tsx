@@ -1,16 +1,16 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
+import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
+import { LocationSelector } from '@/presentation/molecules/LocationSelector';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
-import { LocationSelector } from '@/presentation/molecules/LocationSelector';
-import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
-import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 
 const breadcrumbs = [
     { title: 'Espaço', href: '/institucional/espacos' },
@@ -43,7 +43,6 @@ export default function CadastroEspacoPage() {
 
     const [imagesWithPreviews, setImagesWithPreviews] = useState<ImageWithPreview[]>(() => {
         if (!isEditMode || !espaco.imagens) return [];
-        // No modo de edição, inicializa com as imagens existentes
         return espaco.imagens.map((imgPath) => ({
             file: new File([], imgPath, { type: 'image/*' }), // Create a dummy File object for existing images
             preview: `/storage/${imgPath}`,
@@ -66,8 +65,9 @@ export default function CadastroEspacoPage() {
     const handleSetMainImage = (index: number) => {
         setData((prevData) => ({ ...prevData, main_image_index: index }));
     };
-    const handleImagesToDelete = (path: string) =>
-        { setData((prevData) => ({ ...prevData, images_to_delete: [...(data.images_to_delete ?? []), path] })); };
+    const handleImagesToDelete = (path: string) => {
+        setData((prevData) => ({ ...prevData, images_to_delete: [...(data.images_to_delete ?? []), path] }));
+    };
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -121,17 +121,17 @@ export default function CadastroEspacoPage() {
                                             modulos={modulos}
                                             andares={andares}
                                             unidadeSelecionada={data.unidade_id}
-                                            setUnidadeSelecionada={(unidadeSelecionada) =>
-                                                { setData((prevData) => ({ ...prevData, unidade_id: unidadeSelecionada })); }
-                                            }
+                                            setUnidadeSelecionada={(unidadeSelecionada) => {
+                                                setData((prevData) => ({ ...prevData, unidade_id: unidadeSelecionada }));
+                                            }}
                                             moduloSelecionado={data.modulo_id}
-                                            handleModuloChange={(moduloSelecionado) =>
-                                                { setData((prevData) => ({ ...prevData, modulo_id: moduloSelecionado })); }
-                                            }
+                                            handleModuloChange={(moduloSelecionado) => {
+                                                setData((prevData) => ({ ...prevData, modulo_id: moduloSelecionado }));
+                                            }}
                                             andarSelecionado={data.andar_id}
-                                            handleAndarChange={(andarSelecionado) =>
-                                                { setData((prevData) => ({ ...prevData, andar_id: parseInt(andarSelecionado!, 10) })); }
-                                            }
+                                            handleAndarChange={(andarSelecionado) => {
+                                                setData((prevData) => ({ ...prevData, andar_id: parseInt(andarSelecionado!, 10) }));
+                                            }}
                                             processing={processing}
                                             errors={errors}
                                         />
@@ -156,7 +156,11 @@ export default function CadastroEspacoPage() {
                                 </CardContent>
                             </Card>
                             {data.modulo_id && (
-                                <AddAndarDialog open={isAddAndarDialogOpen} moduloSelecionado={data.modulo_id} setIsDialogOpen={setIsAddAndarDialogOpen} />
+                                <AddAndarDialog
+                                    open={isAddAndarDialogOpen}
+                                    moduloSelecionado={data.modulo_id}
+                                    setIsDialogOpen={setIsAddAndarDialogOpen}
+                                />
                             )}
                         </>
                     </div>

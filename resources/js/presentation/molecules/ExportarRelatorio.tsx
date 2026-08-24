@@ -27,11 +27,7 @@ export function ExportarRelatorio({ onExport, estaGerando, disabled }: Props) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" disabled={disabled || estaGerando} className="gap-2">
-                    {estaGerando ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                        <Download className="h-4 w-4" />
-                    )}
+                    {estaGerando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                     {estaGerando ? 'Gerando...' : 'Exportar'}
                     <ChevronDown className="text-muted-foreground h-4 w-4" />
                 </Button>
@@ -40,7 +36,12 @@ export function ExportarRelatorio({ onExport, estaGerando, disabled }: Props) {
                 <DropdownMenuLabel>Formato</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {FORMATOS.map((formato) => (
-                    <DropdownMenuItem key={formato.value} onSelect={() => { onExport(formato.value); }}>
+                    <DropdownMenuItem
+                        key={formato.value}
+                        onSelect={() => {
+                            onExport(formato.value);
+                        }}
+                    >
                         {formato.label}
                     </DropdownMenuItem>
                 ))}

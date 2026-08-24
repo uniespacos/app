@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Acrescenta `error_code` e `details` às respostas de erro JSON (issue #112).
+ * Acrescenta `error_code` e `details` às respostas de erro JSON.
  *
  * O envelope é ADITIVO por necessidade, não por preferência. Dois consumidores
  * dependem do formato atual do Laravel:

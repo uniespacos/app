@@ -1,6 +1,6 @@
+import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 import { renderHook } from '@testing-library/react';
 import { useReservationLiveUpdates } from './use-reservation-live-updates';
-import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 
 describe('useReservationLiveUpdates', () => {
     let mockListen: jest.Mock;
@@ -66,21 +66,15 @@ describe('useReservationLiveUpdates', () => {
             useReservationLiveUpdates();
         });
 
-        const callArgs = mockListen.mock.calls.at(0) as (
-            | string
-            | ((event: { action: string; reservaId: number }) => void)
-        )[];
-        const callback = callArgs.at(1) as (event: {
-            action: string;
-            reservaId: number;
-        }) => void;
+        const callArgs = mockListen.mock.calls.at(0) as (string | ((event: { action: string; reservaId: number }) => void))[];
+        const callback = callArgs.at(1) as (event: { action: string; reservaId: number }) => void;
 
         callback({ action: 'created', reservaId: 1 });
 
         expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'reserva:updated',
-            })
+            }),
         );
     });
 
@@ -89,21 +83,15 @@ describe('useReservationLiveUpdates', () => {
             useReservationLiveUpdates();
         });
 
-        const callArgs = mockListen.mock.calls.at(0) as (
-            | string
-            | ((event: { action: string; reservaId: number }) => void)
-        )[];
-        const callback = callArgs.at(1) as (event: {
-            action: string;
-            reservaId: number;
-        }) => void;
+        const callArgs = mockListen.mock.calls.at(0) as (string | ((event: { action: string; reservaId: number }) => void))[];
+        const callback = callArgs.at(1) as (event: { action: string; reservaId: number }) => void;
 
         callback({ action: 'validated', reservaId: 2 });
 
         expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'reserva:updated',
-            })
+            }),
         );
     });
 
@@ -112,21 +100,15 @@ describe('useReservationLiveUpdates', () => {
             useReservationLiveUpdates();
         });
 
-        const callArgs = mockListen.mock.calls.at(0) as (
-            | string
-            | ((event: { action: string; reservaId: number }) => void)
-        )[];
-        const callback = callArgs.at(1) as (event: {
-            action: string;
-            reservaId: number;
-        }) => void;
+        const callArgs = mockListen.mock.calls.at(0) as (string | ((event: { action: string; reservaId: number }) => void))[];
+        const callback = callArgs.at(1) as (event: { action: string; reservaId: number }) => void;
 
         callback({ action: 'evaluated', reservaId: 3 });
 
         expect(dispatchEventSpy).toHaveBeenCalledWith(
             expect.objectContaining({
                 type: 'reserva:updated',
-            })
+            }),
         );
     });
 
@@ -135,14 +117,8 @@ describe('useReservationLiveUpdates', () => {
             useReservationLiveUpdates();
         });
 
-        const callArgs = mockListen.mock.calls.at(0) as (
-            | string
-            | ((event: { action: string; reservaId: number }) => void)
-        )[];
-        const callback = callArgs.at(1) as (event: {
-            action: string;
-            reservaId: number;
-        }) => void;
+        const callArgs = mockListen.mock.calls.at(0) as (string | ((event: { action: string; reservaId: number }) => void))[];
+        const callback = callArgs.at(1) as (event: { action: string; reservaId: number }) => void;
 
         jest.clearAllMocks();
 

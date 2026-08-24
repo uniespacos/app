@@ -1,6 +1,6 @@
-import { InertiaReservasRepository } from './inertia-reservas-repository';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
 import { FormAvaliacaoPayload } from '../../application/reservas/ports/reservas-repository.interface';
+import { InertiaReservasRepository } from './inertia-reservas-repository';
 
 describe('InertiaReservasRepository', () => {
     let repository: InertiaReservasRepository;
@@ -12,7 +12,7 @@ describe('InertiaReservasRepository', () => {
             post: jest.fn(),
             put: jest.fn(),
             patch: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
         } as unknown as jest.Mocked<IHttpGateway>;
 
         (globalThis as unknown as { route: jest.Mock }).route = jest.fn((name) => name);
@@ -45,7 +45,7 @@ describe('InertiaReservasRepository', () => {
             motivo: 'motivo',
             observacao: 'obs',
             horarios_avaliados: [],
-            evaluation_scope: 'single'
+            evaluation_scope: 'single',
         };
         await repository.avaliarReserva(456, payload);
         expect(mockGateway.patch).toHaveBeenCalledWith('gestor.reservas.update', payload);

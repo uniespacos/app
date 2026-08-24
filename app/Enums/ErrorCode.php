@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enums;
 
 /**
- * Códigos de erro estáveis expostos nas respostas JSON (issue #112).
+ * Códigos de erro estáveis expostos nas respostas JSON.
  *
  * A ideia é o cliente ramificar por um identificador que não muda, em vez de
  * comparar o texto da mensagem — que é traduzível e reescrito à vontade.

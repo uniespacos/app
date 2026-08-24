@@ -8,16 +8,14 @@ interface UserAvatarProps {
     fallbackClassName?: string;
 }
 
-export function UserAvatar({ user, className = "h-8 w-8", fallbackClassName }: UserAvatarProps) {
+export function UserAvatar({ user, className = 'h-8 w-8', fallbackClassName }: UserAvatarProps) {
     const getInitials = useInitials();
     const profilePic = user.profile_pic || ('avatar' in user ? String(user.avatar) : undefined);
 
     return (
         <Avatar className={`overflow-hidden rounded-full ${className}`}>
             <AvatarImage src={profilePic || '/placeholder.svg'} alt={user.name} />
-            <AvatarFallback className={`rounded-lg bg-muted text-foreground ${fallbackClassName}`}>
-                {getInitials(user.name)}
-            </AvatarFallback>
+            <AvatarFallback className={`bg-muted text-foreground rounded-lg ${fallbackClassName}`}>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
     );
 }

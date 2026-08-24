@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
@@ -8,6 +7,7 @@ import { FiltrosRelatorio } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     filtros: Partial<FiltrosRelatorio>;
@@ -15,12 +15,8 @@ interface Props {
 }
 
 export function FiltrosOcupacaoEspacos({ filtros, onChange }: Props) {
-    const [dataInicio, setDataInicio] = useState<Date | undefined>(
-        filtros.data_inicio ? new Date(filtros.data_inicio) : undefined
-    );
-    const [dataFim, setDataFim] = useState<Date | undefined>(
-        filtros.data_fim ? new Date(filtros.data_fim) : undefined
-    );
+    const [dataInicio, setDataInicio] = useState<Date | undefined>(filtros.data_inicio ? new Date(filtros.data_inicio) : undefined);
+    const [dataFim, setDataFim] = useState<Date | undefined>(filtros.data_fim ? new Date(filtros.data_fim) : undefined);
 
     const turnos = [
         { value: 'manha', label: 'Manhã' },
@@ -83,12 +79,12 @@ export function FiltrosOcupacaoEspacos({ filtros, onChange }: Props) {
                     label="Turnos"
                     opcoes={turnos}
                     selecionados={filtros.turnos ?? []}
-                    onChange={(valores) =>
-                        { onChange({
+                    onChange={(valores) => {
+                        onChange({
                             ...filtros,
                             turnos: valores as ('manha' | 'tarde' | 'noite')[],
-                        }); }
-                    }
+                        });
+                    }}
                 />
             </div>
         </div>

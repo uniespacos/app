@@ -13,7 +13,6 @@ interface AgendaCalendarioProps {
     agendas: Agenda[];
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
-    // Adiciona a prop para passar os slots da reserva atual
     slotsDaReserva?: SlotCalendario[];
     isEditMode?: boolean;
 }
@@ -75,7 +74,6 @@ export default function AgendaCalendario({
                             isSlotSelecionado={isSlotSelecionado}
                             alternarSelecaoSlot={alternarSelecaoSlot}
                             agenda={agenda}
-                            // Passa os slots da reserva para a seção correta
                             slotsSolicitados={slotsDaReserva}
                         />
                     ))}

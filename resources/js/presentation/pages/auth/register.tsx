@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { ModalNovaInstituicao } from '@/presentation/molecules/ModalNovaInstituicao';
+import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
 import { Instituicao } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
-import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
-import { ModalNovaInstituicao } from '@/presentation/molecules/ModalNovaInstituicao';
 
 export default function Register() {
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;
@@ -53,7 +53,9 @@ export default function Register() {
         e.preventDefault();
 
         post(route('register'), {
-            onFinish: () => { reset('password', 'password_confirmation'); },
+            onFinish: () => {
+                reset('password', 'password_confirmation');
+            },
         });
     };
 
@@ -63,7 +65,7 @@ export default function Register() {
 
     return (
         // Sem gradiente semântico equivalente no tema; usa fundo neutro que respeita dark mode.
-        <div className="flex min-h-screen items-center justify-center bg-muted">
+        <div className="bg-muted flex min-h-screen items-center justify-center">
             <Head title="Criar conta" />
             <div className="container mx-auto px-4 py-8">
                 <div className="mx-auto max-w-6xl">
@@ -72,14 +74,14 @@ export default function Register() {
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-center">
                                 <img src="/_img/uniespacos_logo.png" alt="Logo UniEspaços" className="h-100 w-auto" />
-                                <p className="text-lg text-muted-foreground">Crie sua conta para começar a usar nossa plataforma</p>
+                                <p className="text-muted-foreground text-lg">Crie sua conta para começar a usar nossa plataforma</p>
                             </div>
                         </div>
 
                         {/* Form Section */}
-                        <div className="rounded-2xl bg-card p-8 shadow-xl">
+                        <div className="bg-card rounded-2xl p-8 shadow-xl">
                             <div className="mb-8">
-                                <h2 className="mb-2 text-2xl font-semibold text-foreground">Criar conta</h2>
+                                <h2 className="text-foreground mb-2 text-2xl font-semibold">Criar conta</h2>
                                 <p className="text-muted-foreground">Preencha os dados abaixo para se cadastrar</p>
                             </div>
 
@@ -92,7 +94,7 @@ export default function Register() {
                                 onSubmit={handleSubmit}
                             />
 
-                            <div className="mt-6 border-t border-border pt-6">
+                            <div className="border-border mt-6 border-t pt-6">
                                 <Button variant="outline" className="w-full bg-transparent" onClick={handleBackToLogin}>
                                     <ArrowLeft className="mr-2 h-4 w-4" />
                                     Voltar para o login

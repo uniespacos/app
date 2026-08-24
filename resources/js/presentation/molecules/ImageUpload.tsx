@@ -3,11 +3,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { FormCadastroValues } from '@/presentation/pages/Administrativo/Espacos/CadastroEspaco';
 import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
-import { FormCadastroValues } from '@/presentation/pages/Administrativo/Espacos/CadastroEspaco';
 export interface ImageWithPreview {
     file: File;
     preview: string;
@@ -87,7 +87,7 @@ export function ImageUpload({
             <div className="space-y-2">
                 <Label htmlFor="images">Imagens do Espaço</Label>
                 <Input id="images" type="file" accept="image/*" multiple onChange={handleImagesUpload} disabled={processing} />
-                {errors.imagens && <p className="mt-1 text-sm text-destructive">{errors.imagens}</p>}
+                {errors.imagens && <p className="text-destructive mt-1 text-sm">{errors.imagens}</p>}
             </div>
 
             {imagesWithPreviews.length > 0 ? (
@@ -111,8 +111,10 @@ export function ImageUpload({
                                         type="button"
                                         variant="outline"
                                         size="icon"
-                                        className="h-6 w-6 rounded-full bg-background shadow-md"
-                                        onClick={() => { setMainImageIndex(index); }}
+                                        className="bg-background h-6 w-6 rounded-full shadow-md"
+                                        onClick={() => {
+                                            setMainImageIndex(index);
+                                        }}
                                         disabled={processing || mainImageIndex === index}
                                         title="Definir como imagem principal"
                                     >
@@ -126,7 +128,7 @@ export function ImageUpload({
                                             strokeWidth="2"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
-                                            className="h-3 w-3 text-warning-accent"
+                                            className="text-warning-accent h-3 w-3"
                                         >
                                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                         </svg>
@@ -136,7 +138,9 @@ export function ImageUpload({
                                         variant="destructive"
                                         size="icon"
                                         className="h-6 w-6 rounded-full opacity-90 shadow-md"
-                                        onClick={() => { handleRemoveImage(index); }}
+                                        onClick={() => {
+                                            handleRemoveImage(index);
+                                        }}
                                         disabled={processing}
                                     >
                                         <X className="h-3 w-3" />

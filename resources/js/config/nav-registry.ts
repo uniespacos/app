@@ -1,18 +1,18 @@
 import {
-    PERMISSION_SECAO_GESTAO_RESERVAS,
     PERMISSION_SECAO_GESTAO_ESPACOS,
-    PERMISSION_SECAO_GESTAO_USUARIOS,
     PERMISSION_SECAO_GESTAO_INSTITUICOES,
-    PERMISSION_SECAO_GESTAO_UNIDADES,
     PERMISSION_SECAO_GESTAO_MODULOS,
-    PERMISSION_SECAO_GESTAO_SETORES,
+    PERMISSION_SECAO_GESTAO_RESERVAS,
     PERMISSION_SECAO_GESTAO_ROLES,
+    PERMISSION_SECAO_GESTAO_SETORES,
+    PERMISSION_SECAO_GESTAO_UNIDADES,
+    PERMISSION_SECAO_GESTAO_USUARIOS,
     PERMISSION_SECAO_RELATORIOS,
     ROLE_INSTITUCIONAL,
 } from '@/constants/permissions';
-import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import type { User } from '@/types';
+import type { LucideIcon } from 'lucide-react';
+import { BookOpen, Briefcase, Building, Calendar, Eye, FileBarChart2, Grid3X3, LayoutGrid, MapPin, School, ShieldCheck, Users } from 'lucide-react';
 
 /**
  * Fonte única de verdade para as seções navegáveis da aplicação.

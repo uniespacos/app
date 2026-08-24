@@ -28,9 +28,6 @@ class InstitucionalSetorController extends Controller
         protected UserService $userService,
     ) {}
 
-    /**
-     * Display a listing of sectors with related institution, units and users.
-     */
     public function index(): Response
     {
         $this->authorize('viewAny', Setor::class);
@@ -47,18 +44,12 @@ class InstitucionalSetorController extends Controller
         ]);
     }
 
-    /**
-     * Redirect to the sector panel — sectors are managed inline, not via a separate create page.
-     */
     public function create(): RedirectResponse
     {
         return redirect()->route('institucional.setors.index')
             ->with('error', 'A criação de setores é a partir do painel administrativo de setores.');
     }
 
-    /**
-     * Store a newly created sector in storage.
-     */
     public function store(StoreSetorRequest $request): RedirectResponse
     {
         $this->authorize('create', Setor::class);
@@ -73,18 +64,12 @@ class InstitucionalSetorController extends Controller
         }
     }
 
-    /**
-     * Redirect to the sector panel — sectors are edited inline.
-     */
     public function edit(Setor $setor): RedirectResponse
     {
         return redirect()->route('institucional.setors.index')
             ->with('error', 'A edição de setores é a partir do painel administrativo de setores.');
     }
 
-    /**
-     * Update the specified sector in storage and notify its users.
-     */
     public function update(UpdateSetorRequest $request, Setor $setor): RedirectResponse
     {
         $this->authorize('update', $setor);
@@ -98,10 +83,6 @@ class InstitucionalSetorController extends Controller
         }
     }
 
-    /**
-     * Remove the specified sector from storage.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Setor $setor): RedirectResponse
     {
         $this->authorize('delete', $setor);

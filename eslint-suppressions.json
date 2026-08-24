@@ -494,11 +494,6 @@
       "count": 8
     }
   },
-  "resources/js/presentation/organisms/GerenciarGestoresDialog.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 6
-    }
-  },
   "resources/js/presentation/organisms/PermissionModal.tsx": {
     "@typescript-eslint/no-confusing-void-expression": {
       "count": 1
@@ -577,9 +572,6 @@
   },
   "resources/js/presentation/pages/Administrativo/Modulos/Modulos.tsx": {
     "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
     }
   },

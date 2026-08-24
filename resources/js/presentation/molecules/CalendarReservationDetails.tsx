@@ -1,7 +1,7 @@
-import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import { Card } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
@@ -51,7 +51,7 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                         {diasSemana.map((dia) => (
                             <div
                                 key={dia.valor}
-                                className={cn('border-l bg-muted/50 p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
+                                className={cn('bg-muted/50 border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
                             >
                                 <div className="capitalize">{dia.abreviado}</div>
                                 <div className="font-normal">{dia.diaMes.split('/')[0]}</div>

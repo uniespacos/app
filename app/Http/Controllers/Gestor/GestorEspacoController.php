@@ -17,9 +17,6 @@ class GestorEspacoController extends Controller
         protected EspacoService $service,
     ) {}
 
-    /**
-     * Display the gestor listing of spaces.
-     */
     public function index(): Response
     {
         return Inertia::render('Espacos/EspacosPage', [
@@ -27,9 +24,6 @@ class GestorEspacoController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified space with its agenda managers and reserved slots.
-     */
     public function show(Espaco $espaco): Response|RedirectResponse
     {
         try {

@@ -66,7 +66,9 @@ export default function EvaluationForm({
                         <Label className="font-medium">Aplicar esta avaliação para:</Label>
                         <RadioGroup
                             value={data.evaluation_scope}
-                            onValueChange={(value: 'single' | 'recurring') => { setData('evaluation_scope', value); }}
+                            onValueChange={(value: 'single' | 'recurring') => {
+                                setData('evaluation_scope', value);
+                            }}
                             className="space-y-2"
                         >
                             <div className="flex items-center space-x-2">
@@ -87,17 +89,17 @@ export default function EvaluationForm({
                     <div className="space-y-2">
                         <Label className="font-medium">Decisão Global</Label>
                         <RadioGroup value={decisao} onValueChange={onDecisaoChange} disabled={isRadioGroupDisabled}>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-success/25 has-[:checked]:bg-success-subtle">
+                            <div className="has-[:checked]:border-success/25 has-[:checked]:bg-success-subtle flex items-center space-x-2 rounded-lg border p-3">
                                 <RadioGroupItem value="deferida" id="deferida" />
                                 <Label htmlFor="deferida" className="flex w-full cursor-pointer items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-success-accent" />
+                                    <CheckCircle className="text-success-accent h-4 w-4" />
                                     Deferir todos os horários visíveis
                                 </Label>
                             </div>
-                            <div className="flex items-center space-x-2 rounded-lg border p-3 has-[:checked]:border-destructive/25 has-[:checked]:bg-destructive-subtle">
+                            <div className="has-[:checked]:border-destructive/25 has-[:checked]:bg-destructive-subtle flex items-center space-x-2 rounded-lg border p-3">
                                 <RadioGroupItem value="indeferida" id="indeferida" />
                                 <Label htmlFor="indeferida" className="flex w-full cursor-pointer items-center gap-2">
-                                    <XCircle className="h-4 w-4 text-destructive" />
+                                    <XCircle className="text-destructive h-4 w-4" />
                                     Indeferir todos os horários visíveis
                                 </Label>
                             </div>
@@ -109,30 +111,34 @@ export default function EvaluationForm({
 
                     {showMotivoField && (
                         <div className="space-y-2">
-                            <Label htmlFor="motivo" className="font-medium text-destructive">
+                            <Label htmlFor="motivo" className="text-destructive font-medium">
                                 Motivo do Indeferimento *
                             </Label>
                             <Textarea
                                 id="motivo"
                                 placeholder="Descreva o motivo pelo qual um ou mais horários estão sendo indeferidos..."
                                 value={data.motivo}
-                                onChange={(e) => { setData('motivo', e.target.value); }}
-                                className="min-h-[100px] border-destructive/25 focus:border-destructive"
+                                onChange={(e) => {
+                                    setData('motivo', e.target.value);
+                                }}
+                                className="border-destructive/25 focus:border-destructive min-h-[100px]"
                             />
-                            <p className="text-sm text-destructive">Este campo é obrigatório se algum horário for indeferido.</p>
+                            <p className="text-destructive text-sm">Este campo é obrigatório se algum horário for indeferido.</p>
                         </div>
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="observacao" className="font-medium text-info-accent">
+                        <Label htmlFor="observacao" className="text-info-accent font-medium">
                             Observação (Opcional)
                         </Label>
                         <Textarea
                             id="observacao"
                             placeholder="Caso haja uma observação adicional para o solicitante, descreva aqui..."
                             value={data.observacao}
-                            onChange={(e) => { setData('observacao', e.target.value); }}
-                            className="min-h-[100px] border-info/25 focus:border-info/25"
+                            onChange={(e) => {
+                                setData('observacao', e.target.value);
+                            }}
+                            className="border-info/25 focus:border-info/25 min-h-[100px]"
                         />
                     </div>
 
@@ -140,7 +146,14 @@ export default function EvaluationForm({
                         <Button type="submit" disabled={isSubmitting} className="flex-1">
                             {isSubmitting ? 'Processando...' : 'Confirmar Avaliação'}
                         </Button>
-                        <Button type="button" variant="outline" className="px-8" onClick={() => { router.get(route('gestor.reservas.index')); }}>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="px-8"
+                            onClick={() => {
+                                router.get(route('gestor.reservas.index'));
+                            }}
+                        >
                             Cancelar
                         </Button>
                     </div>

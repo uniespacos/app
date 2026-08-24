@@ -28,9 +28,7 @@ export default function Dashboard() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Olá, {user.name}!</h1>
-                    <p className="text-muted-foreground">
-                        {user.setor ? `${user.setor.nome} (${user.setor.sigla})` : 'Bem-vindo ao UniEspaços!'}
-                    </p>
+                    <p className="text-muted-foreground">{user.setor ? `${user.setor.nome} (${user.setor.sigla})` : 'Bem-vindo ao UniEspaços!'}</p>
                 </div>
 
                 {/* CTA principal: primeira coisa que o usuário deve fazer ao
@@ -40,7 +38,9 @@ export default function Dashboard() {
                 <Card
                     role="button"
                     tabIndex={0}
-                    onClick={() => { router.get(route('espacos.index')); }}
+                    onClick={() => {
+                        router.get(route('espacos.index'));
+                    }}
                     onKeyDown={(e) => e.key === 'Enter' && router.get(route('espacos.index'))}
                     className="bg-primary text-primary-foreground cursor-pointer border-none transition-opacity hover:opacity-90"
                 >
@@ -67,7 +67,9 @@ export default function Dashboard() {
                             key={label}
                             role="button"
                             tabIndex={0}
-                            onClick={() => { router.get(href); }}
+                            onClick={() => {
+                                router.get(href);
+                            }}
                             onKeyDown={(e) => e.key === 'Enter' && router.get(href)}
                             className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
                         >

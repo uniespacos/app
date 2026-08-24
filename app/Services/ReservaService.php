@@ -56,14 +56,10 @@ class ReservaService
 
         $reservaToShow = null;
         $reservaIdFiltro = $filters['reserva'] ?? null;
-
-        // Valida o formato antes de tocar o banco: sem isso, ?reserva=abc vira
-        // (int) 0 e dispara um find(0) desnecessário.
         if (! empty($reservaIdFiltro) && filter_var($reservaIdFiltro, FILTER_VALIDATE_INT) !== false) {
             $reservaToShow = $this->repoReserva->findWithWeekSlots((int) $reservaIdFiltro, $weekStart, $weekEnd);
 
             if ($reservaToShow) {
-                // Issue #119: a reserva vem da query string, não de route-model
                 // binding, então a autorização precisa acontecer aqui — onde o
                 // objeto é resolvido — e não na borda HTTP.
                 Gate::forUser($user)->authorize('view', $reservaToShow);
@@ -161,7 +157,7 @@ class ReservaService
     }
 
     /**
-     * Normaliza os filtros de listagem antes de chegarem ao repositorio (issue #108).
+     * Normaliza os filtros de listagem antes de chegarem ao repositorio.
      *
      * Faz duas coisas:
      *
@@ -204,7 +200,6 @@ class ReservaService
      */
     public function cancel(Reserva $reserva, User $user): void
     {
-        // Issue #108: cancelar o que ja esta cancelado nao muda estado nenhum,
         // mas disparava outra rodada de notificacoes para todos os gestores.
         // Enquanto as arquivadas eram invisiveis na listagem esse caminho era
         // inalcancavel pela UI; com o filtro novo, deixa de ser.

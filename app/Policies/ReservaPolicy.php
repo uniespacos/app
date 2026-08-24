@@ -21,7 +21,7 @@ class ReservaPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * ATENÇÃO (issue #119): este método é a única barreira contra IDOR nas rotas
+     * ATENÇÃO: este método é a única barreira contra IDOR nas rotas
      * reservas.index (?reserva=), reservas.show e reservas.edit. A permission
      * 'reservas.visualizar' é intencional: o papel 'institucional' depende dela
      * para visualizar reservas de terceiros. Não reduzir para apenas user_id.

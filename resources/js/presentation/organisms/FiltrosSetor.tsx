@@ -28,7 +28,9 @@ export function FiltrosSetor({ searchTerm, setSearchTerm, selectedUnidade, setSe
                             <Input
                                 placeholder="Nome ou sigla do setor..."
                                 value={searchTerm}
-                                onChange={(e) => { setSearchTerm(e.target.value); }}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                }}
                                 className="pl-10"
                             />
                         </div>

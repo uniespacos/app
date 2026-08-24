@@ -25,9 +25,6 @@ class ReservaController extends Controller
         protected ReservaService $service,
     ) {}
 
-    /**
-     * Display the user's reservations listing with week navigation and detail modal support.
-     */
     public function index(Request $request): Response
     {
         $data = $this->service->getListingForUser(
@@ -39,14 +36,8 @@ class ReservaController extends Controller
         return Inertia::render('Reservas/ReservasPage', $data);
     }
 
-    /**
-     * Show the form for creating a new reservation.
-     */
     public function create(): void {}
 
-    /**
-     * Dispatch the async job to create a new reservation.
-     */
     public function store(StoreReservaRequest $request)
     {
         try {
@@ -63,26 +54,16 @@ class ReservaController extends Controller
         }
     }
 
-    /**
-     * Redirect to the reservation index with the reservation modal open.
-     */
     public function show(Reserva $reserva): RedirectResponse
     {
         $this->authorize('view', $reserva);
 
-        // Issue #222: as notificações apontam para esta rota e a URL fica gravada
-        // na tabela notifications, então propagar a semana aqui conserta também
-        // os links já enviados. Sem isto, index cai no default 'today' e o modal
-        // abre numa semana sem horários.
         return redirect()->route('reservas.index', [
             'reserva' => $reserva->id,
             'semana' => $this->service->resolveDataAncora($reserva),
         ]);
     }
 
-    /**
-     * Display the reservation edit page with week-filtered schedule.
-     */
     public function edit(Request $request, Reserva $reserva): Response
     {
         $this->authorize('update', $reserva);
@@ -92,9 +73,6 @@ class ReservaController extends Controller
         return Inertia::render('Espacos/VisualizarEspacoPage', $data);
     }
 
-    /**
-     * Dispatch the async job to update a reservation.
-     */
     public function update(UpdateReservaRequest $request, Reserva $reserva): RedirectResponse
     {
         $this->authorize('update', $reserva);
@@ -115,10 +93,6 @@ class ReservaController extends Controller
         }
     }
 
-    /**
-     * Cancel the specified reservation.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Reserva $reserva): RedirectResponse
     {
         $this->authorize('delete', $reserva);

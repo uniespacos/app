@@ -1,11 +1,11 @@
-import { NavMain } from '@/presentation/molecules/nav-main';
-import { NavUser } from '@/presentation/molecules/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Link, usePage } from '@inertiajs/react';
+import { NAV_REGISTRY } from '@/config/nav-registry';
 import { canAccessNavEntry } from '@/lib/auth';
 import AppLogo from '@/presentation/atoms/app-logo';
+import { NavMain } from '@/presentation/molecules/nav-main';
+import { NavUser } from '@/presentation/molecules/nav-user';
 import type { User } from '@/types';
-import { NAV_REGISTRY } from '@/config/nav-registry';
+import { Link, usePage } from '@inertiajs/react';
 
 /* --------------------------- Componente -------------------------------- */
 export function AppSidebar() {

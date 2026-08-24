@@ -11,8 +11,6 @@ export function GestoresEspaco({ agendas }: GestoresEspacoProps) {
     if (!agendas || agendas.length === 0) {
         return <span className="text-muted-foreground text-sm">Nenhum gestor</span>;
     }
-
-    // Issue #101: percorre os turnos na ordem canônica em vez das agendas na
     // ordem que o banco devolveu — mesma abordagem do GerenciarGestoresDialog,
     // para que a leitura e a edição mostrem sempre os mesmos três turnos.
     return (

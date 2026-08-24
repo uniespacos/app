@@ -1,6 +1,6 @@
+import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 import { renderHook } from '@testing-library/react';
 import { useEspacoLiveUpdates } from './use-espaco-live-updates';
-import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 
 describe('useEspacoLiveUpdates', () => {
     let mockListen: jest.Mock;
@@ -58,19 +58,9 @@ describe('useEspacoLiveUpdates', () => {
 
         const callArgs = mockListen.mock.calls[0] as (
             | string
-            | ((event: {
-                action: string;
-                reservaId: number;
-                espacoId: number;
-                horariosCount: number;
-            }) => void)
+            | ((event: { action: string; reservaId: number; espacoId: number; horariosCount: number }) => void)
         )[];
-        const callback = callArgs[1] as (event: {
-            action: string;
-            reservaId: number;
-            espacoId: number;
-            horariosCount: number;
-        }) => void;
+        const callback = callArgs[1] as (event: { action: string; reservaId: number; espacoId: number; horariosCount: number }) => void;
 
         callback({
             action: 'created',
@@ -126,19 +116,9 @@ describe('useEspacoLiveUpdates', () => {
 
         const callArgs = mockListen.mock.calls[0] as (
             | string
-            | ((event: {
-                action: string;
-                reservaId: number;
-                espacoId: number;
-                horariosCount: number;
-            }) => void)
+            | ((event: { action: string; reservaId: number; espacoId: number; horariosCount: number }) => void)
         )[];
-        const callback = callArgs[1] as (event: {
-            action: string;
-            reservaId: number;
-            espacoId: number;
-            horariosCount: number;
-        }) => void;
+        const callback = callArgs[1] as (event: { action: string; reservaId: number; espacoId: number; horariosCount: number }) => void;
 
         callback({
             action: 'validated',
@@ -176,11 +156,14 @@ describe('useEspacoLiveUpdates', () => {
     });
 
     it('should resubscribe when espacoId changes', () => {
-        const { rerender } = renderHook((id: number) => {
-            useEspacoLiveUpdates(id);
-        }, {
-            initialProps: 42,
-        });
+        const { rerender } = renderHook(
+            (id: number) => {
+                useEspacoLiveUpdates(id);
+            },
+            {
+                initialProps: 42,
+            },
+        );
 
         expect(mockPrivateChannel).toHaveBeenCalledWith('App.Models.Espaco.42');
         expect(mockListen).toHaveBeenCalledTimes(1);

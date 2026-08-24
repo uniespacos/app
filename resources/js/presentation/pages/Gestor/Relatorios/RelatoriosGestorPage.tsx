@@ -45,7 +45,12 @@ export default function RelatoriosGestorPage({ tipos_disponiveis, opcoes_inventa
                     <ExportarRelatorio onExport={handleExport} estaGerando={estaGerando} disabled={!tipoSelecionado} />
                 </div>
 
-                <Tabs value={tipoSelecionado} onValueChange={(value) => { setTipoSelecionado(value as TipoRelatorio); }}>
+                <Tabs
+                    value={tipoSelecionado}
+                    onValueChange={(value) => {
+                        setTipoSelecionado(value as TipoRelatorio);
+                    }}
+                >
                     <TabsList className="flex h-auto flex-wrap justify-start gap-1">
                         {tipos_disponiveis.map((tipo) => (
                             <TabsTrigger key={tipo.value} value={tipo.value}>

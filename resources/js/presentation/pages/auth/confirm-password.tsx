@@ -1,12 +1,11 @@
-// Components
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
 import AuthLayout from '@/presentation/templates/auth-layout';
 
 export default function ConfirmPassword() {
@@ -18,7 +17,9 @@ export default function ConfirmPassword() {
         e.preventDefault();
 
         post(route('password.confirm'), {
-            onFinish: () => { reset('password'); },
+            onFinish: () => {
+                reset('password');
+            },
         });
     };
 
@@ -41,7 +42,9 @@ export default function ConfirmPassword() {
                             autoComplete="current-password"
                             value={data.password}
                             autoFocus
-                            onChange={(e) => { setData('password', e.target.value); }}
+                            onChange={(e) => {
+                                setData('password', e.target.value);
+                            }}
                         />
 
                         <InputError message={errors.password} />

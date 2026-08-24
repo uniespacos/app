@@ -1,5 +1,5 @@
-import { AxiosHttpGateway } from './axios-http-gateway';
 import axios from 'axios';
+import { AxiosHttpGateway } from './axios-http-gateway';
 
 jest.mock('axios', () => {
     const mockAxiosInstance = {
@@ -7,10 +7,10 @@ jest.mock('axios', () => {
         post: jest.fn().mockResolvedValue({ data: 'post_data' }),
         put: jest.fn().mockResolvedValue({ data: 'put_data' }),
         patch: jest.fn().mockResolvedValue({ data: 'patch_data' }),
-        delete: jest.fn().mockResolvedValue({ data: 'delete_data' })
+        delete: jest.fn().mockResolvedValue({ data: 'delete_data' }),
     };
     return {
-        create: jest.fn(() => mockAxiosInstance)
+        create: jest.fn(() => mockAxiosInstance),
     };
 });
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { renderHook, act } from '@testing-library/react';
-import { useReservationSlots } from './use-reservation-slots';
 import { Reserva } from '@/types';
+import { act, renderHook } from '@testing-library/react';
+import { useReservationSlots } from './use-reservation-slots';
 
 describe('useReservationSlots', () => {
     const mockReserva = (horarios: any[]): Reserva => ({

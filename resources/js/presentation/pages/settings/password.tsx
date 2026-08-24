@@ -6,10 +6,10 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-import HeadingSmall from '@/presentation/atoms/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import HeadingSmall from '@/presentation/atoms/heading-small';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,7 +33,9 @@ export default function Password() {
 
         put(route('settings.password.update'), {
             preserveScroll: true,
-            onSuccess: () => { reset(); },
+            onSuccess: () => {
+                reset();
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');
@@ -67,7 +69,9 @@ export default function Password() {
                                 id="current_password"
                                 ref={currentPasswordInput}
                                 value={data.current_password}
-                                onChange={(e) => { setData('current_password', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('current_password', e.target.value);
+                                }}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
@@ -84,7 +88,9 @@ export default function Password() {
                                 id="password"
                                 ref={passwordInput}
                                 value={data.password}
-                                onChange={(e) => { setData('password', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('password', e.target.value);
+                                }}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
@@ -100,7 +106,9 @@ export default function Password() {
                             <Input
                                 id="password_confirmation"
                                 value={data.password_confirmation}
-                                onChange={(e) => { setData('password_confirmation', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('password_confirmation', e.target.value);
+                                }}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"

@@ -193,17 +193,14 @@ export default function AgendaDialogReserva({
 
     const slotsAgrupadosPorDia = useMemo(
         () =>
-            slotsSelecao.reduce<Record<string, { data: Date; slots: SlotCalendario[] }>>(
-                (acc, horario) => {
-                    const diaKey = format(horario.data, 'yyyy-MM-dd');
-                    if (!acc[diaKey]) {
-                        acc[diaKey] = { data: horario.data, slots: [] };
-                    }
-                    acc[diaKey].slots.push(horario);
-                    return acc;
-                },
-                {},
-            ),
+            slotsSelecao.reduce<Record<string, { data: Date; slots: SlotCalendario[] }>>((acc, horario) => {
+                const diaKey = format(horario.data, 'yyyy-MM-dd');
+                if (!acc[diaKey]) {
+                    acc[diaKey] = { data: horario.data, slots: [] };
+                }
+                acc[diaKey].slots.push(horario);
+                return acc;
+            }, {}),
         [slotsSelecao],
     );
 
@@ -254,7 +251,9 @@ export default function AgendaDialogReserva({
                             id="titulo"
                             placeholder="Ex: Aula, Reunião"
                             value={formData.titulo}
-                            onChange={(e) => { handleSetFormData('titulo', e.target.value); }}
+                            onChange={(e) => {
+                                handleSetFormData('titulo', e.target.value);
+                            }}
                             required
                         />
                     </div>
@@ -270,7 +269,9 @@ export default function AgendaDialogReserva({
                             id="descricao"
                             placeholder="Descreva o propósito da reserva..."
                             value={formData.descricao}
-                            onChange={(e) => { handleSetFormData('descricao', e.target.value); }}
+                            onChange={(e) => {
+                                handleSetFormData('descricao', e.target.value);
+                            }}
                             className="min-h-[80px] resize-none"
                         />
                     </div>
@@ -278,7 +279,13 @@ export default function AgendaDialogReserva({
                     {isEditMode && (
                         <div className="space-y-2 border-t pt-4">
                             <h3 className="text-sm font-medium">Aplicar Alterações Para</h3>
-                            <RadioGroup value={formData.edit_scope} onValueChange={(v) => { handleSetFormData('edit_scope', v); }} className="space-y-2">
+                            <RadioGroup
+                                value={formData.edit_scope}
+                                onValueChange={(v) => {
+                                    handleSetFormData('edit_scope', v);
+                                }}
+                                className="space-y-2"
+                            >
                                 <OpcaoRadioCard
                                     value="recurring"
                                     id="edit-scope-recurring"
@@ -301,7 +308,13 @@ export default function AgendaDialogReserva({
                             <Repeat className="text-muted-foreground h-4 w-4" />
                             Período de Recorrência
                         </h3>
-                        <RadioGroup value={formData.recorrencia} onValueChange={(v) => { handleSetFormData('recorrencia', v); }} className="space-y-2">
+                        <RadioGroup
+                            value={formData.recorrencia}
+                            onValueChange={(v) => {
+                                handleSetFormData('recorrencia', v);
+                            }}
+                            className="space-y-2"
+                        >
                             {opcoesRecorrencia.map((opcao) => (
                                 <OpcaoRadioCard
                                     key={opcao.valor}
@@ -327,7 +340,9 @@ export default function AgendaDialogReserva({
                             </Label>
                             <DatePicker
                                 value={formData.data_inicial ? new Date(formData.data_inicial) : undefined}
-                                onSelect={(date) => { handleSetFormData('data_inicial', date); }}
+                                onSelect={(date) => {
+                                    handleSetFormData('data_inicial', date);
+                                }}
                                 disabled={(date) => date < hoje}
                                 placeholder="Selecione"
                             />
@@ -339,7 +354,9 @@ export default function AgendaDialogReserva({
                             <DatePicker
                                 modal
                                 value={formData.data_final ? new Date(formData.data_final) : undefined}
-                                onSelect={(date) => { handleSetFormData('data_final', date); }}
+                                onSelect={(date) => {
+                                    handleSetFormData('data_final', date);
+                                }}
                                 buttonDisabled={formData.recorrencia !== 'personalizado'}
                                 disabled={(date) => (formData.data_inicial ? date < new Date(formData.data_inicial) : date < hoje)}
                                 placeholder="Selecione"
@@ -404,7 +421,13 @@ export default function AgendaDialogReserva({
                     </div>
                 )}
                 <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => { onOpenChange(false); }}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                            onOpenChange(false);
+                        }}
+                    >
                         Cancelar
                     </Button>
                     <Button type="submit" disabled={!formData.titulo.trim() || !formData.descricao.trim() || isSubmitting}>

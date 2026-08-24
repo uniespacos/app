@@ -1,10 +1,10 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import EspacoCard from '@/presentation/organisms/EspacoCard';
+import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import EspacoCard from '@/presentation/organisms/EspacoCard';
-import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 const breadcrumbs = [
     {
         title: 'Consultar Espaços',
@@ -31,7 +31,6 @@ export default function EspacosPage() {
         modulos: Modulo[];
         andares: Andar[];
         filters: {
-            // Recebe os filtros atuais do controller
             search?: string;
             unidade?: string;
             modulo?: string;
@@ -41,7 +40,6 @@ export default function EspacosPage() {
         user: User;
         capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
     }>().props;
-    // Função para solicitar reserva
     const handleSolicitarReserva = (espacoId: string) => {
         router.get(`/espacos/${espacoId}`);
     };

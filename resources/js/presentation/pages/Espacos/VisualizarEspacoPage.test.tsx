@@ -1,11 +1,11 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import VisualizarEspaço from '@/presentation/pages/Espacos/VisualizarEspacoPage';
-import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
-import * as InertiaReact from '@inertiajs/react';
-import * as UseReservationLiveUpdatesModule from '@/hooks/use-reservation-live-updates';
 import * as UseEspacoLiveUpdatesModule from '@/hooks/use-espaco-live-updates';
+import * as UseReservationLiveUpdatesModule from '@/hooks/use-reservation-live-updates';
+import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
+import VisualizarEspaço from '@/presentation/pages/Espacos/VisualizarEspacoPage';
 import type { Espaco, Reserva } from '@/types';
+import * as InertiaReact from '@inertiajs/react';
+import { render } from '@testing-library/react';
+import React from 'react';
 
 jest.mock('@inertiajs/react');
 
@@ -55,9 +55,7 @@ describe('VisualizarEspacoPage', () => {
     });
 
     it('should render the page with espaco and semana props', () => {
-        const { getByTestId } = render(
-            <VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />,
-        );
+        const { getByTestId } = render(<VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />);
 
         expect(getByTestId('agenda-espaco')).toBeInTheDocument();
     });
@@ -65,29 +63,21 @@ describe('VisualizarEspacoPage', () => {
     it('should call useReservationLiveUpdates hook', () => {
         render(<VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />);
 
-        const mockUseReservationLiveUpdates = jest.mocked(
-            UseReservationLiveUpdatesModule.useReservationLiveUpdates,
-        );
+        const mockUseReservationLiveUpdates = jest.mocked(UseReservationLiveUpdatesModule.useReservationLiveUpdates);
         expect(mockUseReservationLiveUpdates).toHaveBeenCalled();
     });
 
     it('should call useEspacoLiveUpdates hook with espaco.id', () => {
         render(<VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />);
 
-        const mockUseEspacoLiveUpdates = jest.mocked(
-            UseEspacoLiveUpdatesModule.useEspacoLiveUpdates,
-        );
+        const mockUseEspacoLiveUpdates = jest.mocked(UseEspacoLiveUpdatesModule.useEspacoLiveUpdates);
         expect(mockUseEspacoLiveUpdates).toHaveBeenCalledWith(1);
     });
 
     it('should call useEspacoLiveUpdates with updated espaco.id when espaco changes', () => {
-        const { rerender } = render(
-            <VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />,
-        );
+        const { rerender } = render(<VisualizarEspaço espaco={mockEspaco} semana={mockSemana} />);
 
-        const mockUseEspacoLiveUpdates = jest.mocked(
-            UseEspacoLiveUpdatesModule.useEspacoLiveUpdates,
-        );
+        const mockUseEspacoLiveUpdates = jest.mocked(UseEspacoLiveUpdatesModule.useEspacoLiveUpdates);
         expect(mockUseEspacoLiveUpdates).toHaveBeenCalledWith(1);
 
         const updatedEspaco: Espaco = { ...mockEspaco, id: 2 };
@@ -154,14 +144,7 @@ describe('VisualizarEspacoPage', () => {
             horarios: [],
         };
 
-        const { getByTestId } = render(
-            <VisualizarEspaço
-                espaco={mockEspaco}
-                semana={mockSemana}
-                reserva={mockReserva}
-                isEditMode={true}
-            />,
-        );
+        const { getByTestId } = render(<VisualizarEspaço espaco={mockEspaco} semana={mockSemana} reserva={mockReserva} isEditMode={true} />);
 
         expect(getByTestId('agenda-espaco')).toBeInTheDocument();
     });

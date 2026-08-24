@@ -1,8 +1,8 @@
-import React from 'react';
 import { useAgnosticForm } from '@/hooks/use-agnostic-form';
-import { FormAvaliacaoPayload } from '../ports/reservas-repository.interface';
 import { Reserva } from '@/types';
+import React from 'react';
 import { toast } from 'sonner';
+import { FormAvaliacaoPayload } from '../ports/reservas-repository.interface';
 
 declare function route(name: string, params?: unknown): string;
 
@@ -11,12 +11,9 @@ interface UseAvaliarReservaUseCaseProps {
     onSuccess?: () => void;
 }
 
-export function useAvaliarReservaUseCase({
-    reserva,
-    onSuccess,
-}: UseAvaliarReservaUseCaseProps) {
+export function useAvaliarReservaUseCase({ reserva, onSuccess }: UseAvaliarReservaUseCaseProps) {
     const existingJustification = (reserva as unknown as { existing_justification?: string }).existing_justification || '';
-    
+
     const form = useAgnosticForm<FormAvaliacaoPayload>({
         situacao: reserva.situacao,
         motivo: existingJustification,
@@ -39,7 +36,7 @@ export function useAvaliarReservaUseCase({
             },
             onError: (errors: Record<string, string>) => {
                 toast.error(Object.values(errors)[0] || 'Ocorreu um erro.');
-            }
+            },
         });
     };
 

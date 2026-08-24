@@ -1,8 +1,8 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import UnidadeForm from '@/presentation/organisms/UnidadesForm';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import UnidadeForm from '@/presentation/organisms/UnidadesForm';
 const breadcrumbs = [
     {
         title: 'Gerenciar Unidades',

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 import { diasDaSemana, formatDate } from '@/lib/utils';
 import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
@@ -65,14 +65,22 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             preserveState: true,
             preserveScroll: true,
             replace: true,
-            onStart: () => { setIsLoading(true); },
-            onFinish: () => { setIsLoading(false); },
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
             only: ['reservaToShow', 'semana'],
         });
     };
 
-    const handleSemanaAnterior = () => { navegarParaSemana(subDays(semanaVisivel, 7)); };
-    const handleProximaSemana = () => { navegarParaSemana(addDays(semanaVisivel, 7)); };
+    const handleSemanaAnterior = () => {
+        navegarParaSemana(subDays(semanaVisivel, 7));
+    };
+    const handleProximaSemana = () => {
+        navegarParaSemana(addDays(semanaVisivel, 7));
+    };
 
     const dataInicialReserva = useMemo(() => new Date(selectedReserva.data_inicial), [selectedReserva.data_inicial]);
     const dataFinalReserva = useMemo(() => new Date(selectedReserva.data_final), [selectedReserva.data_final]);
@@ -108,7 +116,9 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                                 variant="link"
                                 size="sm"
                                 className="h-auto p-0 text-xs"
-                                onClick={() => { router.get(route('espacos.show', espaco.id)); }}
+                                onClick={() => {
+                                    router.get(route('espacos.show', espaco.id));
+                                }}
                             >
                                 Ver agenda do espaço <ExternalLink className="ml-1 h-3 w-3" />
                             </Button>
@@ -121,17 +131,32 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             }
             footer={
                 isGestor ? (
-                    <Button variant="outline" onClick={() => { router.get(`/gestor/reservas/${selectedReserva.id}`); }}>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            router.get(`/gestor/reservas/${selectedReserva.id}`);
+                        }}
+                    >
                         <Edit className="mr-1 h-4 w-4" /> Avaliar
                     </Button>
                 ) : (
                     <div className="flex gap-2">
                         {selectedReserva.can_update && (
-                            <Button variant="outline" onClick={() => { router.get(route('reservas.edit', selectedReserva.id)); }}>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    router.get(route('reservas.edit', selectedReserva.id));
+                                }}
+                            >
                                 <Edit className="mr-1 h-4 w-4" /> Editar
                             </Button>
                         )}
-                        <Button variant="destructive" onClick={() => { setRemoverReserva(selectedReserva); }}>
+                        <Button
+                            variant="destructive"
+                            onClick={() => {
+                                setRemoverReserva(selectedReserva);
+                            }}
+                        >
                             <XCircle className="mr-1 h-4 w-4" /> Cancelar
                         </Button>
                     </div>

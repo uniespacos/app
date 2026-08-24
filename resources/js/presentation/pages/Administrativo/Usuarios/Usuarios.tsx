@@ -64,7 +64,9 @@ export default function UsuariosPage() {
             );
         }, 400);
 
-        return () => { clearTimeout(timeout); };
+        return () => {
+            clearTimeout(timeout);
+        };
     }, [searchTerm, selectedSetorId]);
 
     const handleUserClick = (user: User) => {
@@ -113,7 +115,9 @@ export default function UsuariosPage() {
                                     <Input
                                         placeholder="Buscar por nome ou email..."
                                         value={searchTerm}
-                                        onChange={(e) => { setSearchTerm(e.target.value); }}
+                                        onChange={(e) => {
+                                            setSearchTerm(e.target.value);
+                                        }}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -177,15 +181,28 @@ export default function UsuariosPage() {
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => { handleEditUser(user); }}>
+                                                            <DropdownMenuItem
+                                                                onClick={() => {
+                                                                    handleEditUser(user);
+                                                                }}
+                                                            >
                                                                 <Edit className="mr-2 h-4 w-4" />
                                                                 Editar
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => { handleUserClick(user); }}>
+                                                            <DropdownMenuItem
+                                                                onClick={() => {
+                                                                    handleUserClick(user);
+                                                                }}
+                                                            >
                                                                 <Shield className="mr-2 h-4 w-4" />
                                                                 Permissões
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => { setRemoverUsuario(user); }} className="text-destructive">
+                                                            <DropdownMenuItem
+                                                                onClick={() => {
+                                                                    setRemoverUsuario(user);
+                                                                }}
+                                                                className="text-destructive"
+                                                            >
                                                                 <Trash className="mr-2 h-4 w-4" />
                                                                 Excluir
                                                             </DropdownMenuItem>
@@ -215,7 +232,13 @@ export default function UsuariosPage() {
 
                         <PaginacaoListas links={users.links} />
 
-                        <EditUserModal user={editingUser} isOpen={!!editingUser} onClose={() => { setEditingUser(undefined); }} />
+                        <EditUserModal
+                            user={editingUser}
+                            isOpen={!!editingUser}
+                            onClose={() => {
+                                setEditingUser(undefined);
+                            }}
+                        />
 
                         {isModalOpen && selectedUser && (
                             <PermissionModal

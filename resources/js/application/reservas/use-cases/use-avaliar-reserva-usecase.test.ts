@@ -1,10 +1,10 @@
-import { renderHook, act } from '@testing-library/react';
-import { useAvaliarReservaUseCase } from './use-avaliar-reserva-usecase';
 import { Reserva } from '@/types';
 import { useForm } from '@inertiajs/react';
+import { act, renderHook } from '@testing-library/react';
+import { useAvaliarReservaUseCase } from './use-avaliar-reserva-usecase';
 
 jest.mock('@inertiajs/react', () => ({
-    useForm: jest.fn()
+    useForm: jest.fn(),
 }));
 
 interface MockFormShape {
@@ -34,7 +34,7 @@ describe('useAvaliarReservaUseCase', () => {
             observacao: 'obs',
             created_at: '',
             updated_at: '',
-            horarios: []
+            horarios: [],
         };
 
         mockForm = {
@@ -43,7 +43,7 @@ describe('useAvaliarReservaUseCase', () => {
                 motivo: '',
                 observacao: 'obs',
                 horarios_avaliados: [],
-                evaluation_scope: 'recurring'
+                evaluation_scope: 'recurring',
             },
             setData: jest.fn(),
             errors: {},
@@ -51,7 +51,7 @@ describe('useAvaliarReservaUseCase', () => {
             patch: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
         };
 
         (useForm as jest.Mock).mockReturnValue(mockForm);

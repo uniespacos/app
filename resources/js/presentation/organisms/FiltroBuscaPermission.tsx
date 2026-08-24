@@ -132,7 +132,9 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                             <Label>Instituição</Label>
                             <Select
                                 value={localFilters.selectedInstituicao.toString()}
-                                onValueChange={(value) => { handleFilterChange('selectedInstituicao', value); }}
+                                onValueChange={(value) => {
+                                    handleFilterChange('selectedInstituicao', value);
+                                }}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Selecione a instituição" />
@@ -151,7 +153,9 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                             <Label>Unidade</Label>
                             <Select
                                 value={localFilters.selectedUnidade}
-                                onValueChange={(value) => { handleFilterChange('selectedUnidade', value); }}
+                                onValueChange={(value) => {
+                                    handleFilterChange('selectedUnidade', value);
+                                }}
                                 disabled={!localFilters.selectedInstituicao}
                             >
                                 <SelectTrigger>
@@ -171,7 +175,9 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                             <Label>Módulo</Label>
                             <Select
                                 value={localFilters.selectedModulo}
-                                onValueChange={(value) => { handleFilterChange('selectedModulo', value); }}
+                                onValueChange={(value) => {
+                                    handleFilterChange('selectedModulo', value);
+                                }}
                                 disabled={!localFilters.selectedUnidade}
                             >
                                 <SelectTrigger>
@@ -191,7 +197,9 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                             <Label>Andar</Label>
                             <Select
                                 value={localFilters.selectedAndar}
-                                onValueChange={(value) => { handleFilterChange('selectedAndar', value); }}
+                                onValueChange={(value) => {
+                                    handleFilterChange('selectedAndar', value);
+                                }}
                                 disabled={!localFilters.selectedModulo}
                             >
                                 <SelectTrigger>
@@ -211,7 +219,9 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                             <Label>Espaço</Label>
                             <Select
                                 value={localFilters.selectedEspaco}
-                                onValueChange={(value) => { handleFilterChange('selectedEspaco', value); }}
+                                onValueChange={(value) => {
+                                    handleFilterChange('selectedEspaco', value);
+                                }}
                                 disabled={!localFilters.selectedAndar}
                             >
                                 <SelectTrigger>
@@ -280,7 +290,13 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
                                         </div>
                                         <Badge variant="outline">Capacidade: {selectedAgenda.espaco.capacidade_pessoas} pessoas</Badge>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => { handleRemoveAgenda(selectedAgenda.agenda.id); }}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            handleRemoveAgenda(selectedAgenda.agenda.id);
+                                        }}
+                                    >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>

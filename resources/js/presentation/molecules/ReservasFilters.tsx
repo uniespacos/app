@@ -14,7 +14,7 @@ interface ReservasFiltersProps {
     onSearchTermChange: (value: string) => void;
     selectedSituacao: string;
     onSituacaoChange: (value: string) => void;
-    /** Eixo de arquivamento (issue #108): 'ativas' | 'arquivadas' | 'todas'. */
+    /** Eixo de arquivamento: 'ativas' | 'arquivadas' | 'todas'. */
     selectedArquivo: string;
     onArquivoChange: (value: string) => void;
     /** Critério de ordenação: 'data_solicitacao' | 'situacao'. */
@@ -49,13 +49,14 @@ export function ReservasFilters({
                             placeholder="Buscar por título ou descrição..."
                             className="w-full pl-8"
                             value={searchTerm}
-                            onChange={(e) => { onSearchTermChange(e.target.value); }}
+                            onChange={(e) => {
+                                onSearchTermChange(e.target.value);
+                            }}
                         />
                     </div>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
-                    {/*
-                        Issue #108: este select cobre apenas o resultado da avaliação.
+                    {/*: este select cobre apenas o resultado da avaliação.
                         'inativa' saiu daqui — é estado de arquivamento, e enquanto
                         dividia este campo com os demais o filtro por arquivadas
                         entrava em contradição com o padrão do backend.
@@ -70,7 +71,9 @@ export function ReservasFilters({
                             // texto normal no mesmo tipo de estado padrão. Mesmo padrão
                             // aqui: valor padrão mapeado para um item real.
                             value={selectedSituacao || 'todas'}
-                            onValueChange={(value) => { onSituacaoChange(value === 'todas' ? '' : value); }} // 6. A mudança notifica o pai
+                            onValueChange={(value) => {
+                                onSituacaoChange(value === 'todas' ? '' : value);
+                            }} // 6. A mudança notifica o pai
                         >
                             <SelectTrigger id="reservas-situacao" className="w-full sm:w-[180px]" aria-label="Situação">
                                 <SelectValue placeholder="Situação" />

@@ -1,24 +1,10 @@
-import { Cell, Pie, PieChart } from 'recharts';
-import { CalendarCheck, CircleCheck, CircleX, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TabelaDetalhamento } from '@/presentation/molecules/TabelaDetalhamento';
 import { DadosRelatorio } from '@/types';
+import { CalendarCheck, CircleCheck, CircleX, Clock } from 'lucide-react';
+import { Cell, Pie, PieChart } from 'recharts';
 
 interface Props {
     dados: DadosRelatorio;
@@ -38,9 +24,7 @@ function GraficoReservasPeriodo({ dados }: Props) {
                     <CardTitle>{dados.titulo}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">
-                        Nenhuma reserva para os filtros selecionados.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Nenhuma reserva para os filtros selecionados.</p>
                 </CardContent>
             </Card>
         );
@@ -61,9 +45,7 @@ function GraficoReservasPeriodo({ dados }: Props) {
                         <CalendarCheck className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {numero(dados.sumario['Total de Reservas'])}
-                        </div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Reservas'])}</div>
                         <p className="text-muted-foreground text-xs">No período</p>
                     </CardContent>
                 </Card>
@@ -114,10 +96,7 @@ function GraficoReservasPeriodo({ dados }: Props) {
                                 return acc;
                             }, {});
                             return (
-                                <ChartContainer
-                                    config={chartConfig}
-                                    className="aspect-auto h-[240px] w-full"
-                                >
+                                <ChartContainer config={chartConfig} className="aspect-auto h-[240px] w-full">
                                     <PieChart accessibilityLayer>
                                         <ChartTooltip content={<ChartTooltipContent nameKey="situacao" />} />
                                         <Pie data={distribuicao} dataKey="total" nameKey="situacao" innerRadius={60}>

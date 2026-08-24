@@ -72,8 +72,8 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                             {nivelParaLabel(andar.nivel)}
                             {isTerreo && (
                                 <div className="flex items-center gap-1">
-                                    <Lock className="h-3 w-3 text-info-accent" />
-                                    <span className="rounded bg-info-subtle px-2 py-1 text-xs font-medium text-info-accent">Obrigatório</span>
+                                    <Lock className="text-info-accent h-3 w-3" />
+                                    <span className="bg-info-subtle text-info-accent rounded px-2 py-1 text-xs font-medium">Obrigatório</span>
                                 </div>
                             )}
                         </CardTitle>
@@ -120,7 +120,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                 <CardContent className="space-y-3">
                     {/* Aviso para térreo */}
                     {isTerreo && (
-                        <div className="rounded border border-info/25 bg-info-subtle p-2 text-xs text-info-accent">
+                        <div className="border-info/25 bg-info-subtle text-info-accent rounded border p-2 text-xs">
                             <p className="font-medium">ℹ️ Andar obrigatório</p>
                             <p>Todo módulo deve ter térreo. Configure os tipos de acesso necessários.</p>
                         </div>
@@ -128,7 +128,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
 
                     {/* Aviso para andares bloqueados */}
                     {!podeRemover && !isTerreo && (
-                        <div className="rounded border border-warning/25 bg-warning-subtle p-2 text-xs text-warning-accent">
+                        <div className="border-warning/25 bg-warning-subtle text-warning-accent rounded border p-2 text-xs">
                             <p className="flex items-center gap-1 font-medium">
                                 <AlertTriangle className="h-3 w-3" />
                                 Remoção bloqueada
@@ -146,7 +146,9 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                     <Checkbox
                                         id={`${andar.id}-${tipo.id}`}
                                         checked={andar.tipo_acesso.includes(tipo.id)}
-                                        onCheckedChange={(checked) => { handleTipoAcessoChange(tipo.id, checked as boolean); }}
+                                        onCheckedChange={(checked) => {
+                                            handleTipoAcessoChange(tipo.id, checked as boolean);
+                                        }}
                                     />
                                     <Label htmlFor={`${andar.id}-${tipo.id}`} className="flex-1 cursor-pointer text-sm font-normal">
                                         {tipo.label}
@@ -154,7 +156,7 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                 </div>
                             ))}
                         </div>
-                        {hasErrors && <p className="text-xs text-destructive">{errors[`andares.${index}.tipo_acesso`]}</p>}
+                        {hasErrors && <p className="text-destructive text-xs">{errors[`andares.${index}.tipo_acesso`]}</p>}
                     </div>
                 </CardContent>
             </Card>

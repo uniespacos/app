@@ -82,7 +82,6 @@ class UserRepositoryEloquent implements UserRepositoryInterface
                 fn ($q2) => $q2->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")
             ))
             ->when($setorId, fn ($q) => $q->where('setor_id', $setorId))
-            // Sem isto, getRoleNames() dispararia uma query do Spatie por usuário.
             ->with('roles:id,name')
             ->orderBy('name')
             ->paginate($perPage);

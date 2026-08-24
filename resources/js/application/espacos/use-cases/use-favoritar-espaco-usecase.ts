@@ -1,17 +1,14 @@
-import { useState } from 'react';
-import { IEspacosRepository } from '../ports/espacos-repository.interface';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
+import { useState } from 'react';
+import { IEspacosRepository } from '../ports/espacos-repository.interface';
 
 interface UseFavoritarEspacoUseCaseProps {
     repository: IEspacosRepository;
     espaco: Espaco;
 }
 
-export function useFavoritarEspacoUseCase({
-    repository,
-    espaco,
-}: UseFavoritarEspacoUseCaseProps) {
+export function useFavoritarEspacoUseCase({ repository, espaco }: UseFavoritarEspacoUseCaseProps) {
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
     const [processing, setProcessing] = useState(false);
 

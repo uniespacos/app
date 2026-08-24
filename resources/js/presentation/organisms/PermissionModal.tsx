@@ -198,7 +198,9 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, processing = 
                                         <Collapsible
                                             key={group}
                                             open={isOpen}
-                                            onOpenChange={(o) => { setOpenGroups((prev) => ({ ...prev, [group]: o })); }}
+                                            onOpenChange={(o) => {
+                                                setOpenGroups((prev) => ({ ...prev, [group]: o }));
+                                            }}
                                             className="rounded-md border"
                                         >
                                             <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center gap-2 p-3 text-left">

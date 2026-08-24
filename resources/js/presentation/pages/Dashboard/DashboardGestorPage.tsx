@@ -1,8 +1,9 @@
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PERMISSION_SECAO_RELATORIOS } from '@/constants/permissions';
+import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 import { hasPermission } from '@/lib/auth';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
@@ -10,7 +11,6 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { format, subDays } from 'date-fns';
 import { BarChart3, CalendarSearch, Eye, Star } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
-import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 
 const GraficoReservasPeriodo = lazy(() => import('@/presentation/molecules/GraficoReservasPeriodo'));
 
@@ -50,11 +50,7 @@ export default function Dashboard({
     // o AppSidebar usa para decidir se mostra o item "Relatórios" no menu).
     const authUser = usePage<{ auth: { user: User } }>().props.auth.user;
     const podeVerRelatorios = hasPermission(authUser, PERMISSION_SECAO_RELATORIOS);
-    const { dados, status } = useDadosRelatorio(
-        route('gestor.relatorios.dados'),
-        podeVerRelatorios ? 'reservas_periodo' : undefined,
-        filtrosPeriodo,
-    );
+    const { dados, status } = useDadosRelatorio(route('gestor.relatorios.dados'), podeVerRelatorios ? 'reservas_periodo' : undefined, filtrosPeriodo);
 
     const atalhos = [
         { label: 'Gerir Reservas', descricao: 'Avalie as solicitações pendentes', Icone: Eye, href: route('gestor.reservas.index') },
@@ -77,7 +73,9 @@ export default function Dashboard({
                             key={label}
                             role="button"
                             tabIndex={0}
-                            onClick={() => { router.get(href); }}
+                            onClick={() => {
+                                router.get(href);
+                            }}
                             onKeyDown={(e) => e.key === 'Enter' && router.get(href)}
                             className="hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm"
                         >
@@ -101,7 +99,13 @@ export default function Dashboard({
                                 <CardTitle>Visão Geral das Reservas</CardTitle>
                                 <CardDescription>Últimos 30 dias</CardDescription>
                             </div>
-                            <Button variant="outline" size="sm" onClick={() => { router.get(route('gestor.relatorios.index')); }}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    router.get(route('gestor.relatorios.index'));
+                                }}
+                            >
                                 <BarChart3 className="mr-2 h-4 w-4" />
                                 Relatório completo
                             </Button>

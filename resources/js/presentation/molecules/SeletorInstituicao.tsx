@@ -1,6 +1,6 @@
-import InputError from '@/presentation/atoms/input-error';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import InputError from '@/presentation/atoms/input-error';
 import type { Instituicao, Setor } from '@/types';
 import { useEffect, useState } from 'react';
 
@@ -13,13 +13,13 @@ interface SeletorInstituicaoProps {
     initialSetorId?: string;
 }
 
-export function SeletorInstituicao({ 
-    instituicaos, 
-    processing, 
+export function SeletorInstituicao({
+    instituicaos,
+    processing,
     onInstituicaoChange,
-    onSetorChange, 
-    errors, 
-    initialSetorId 
+    onSetorChange,
+    errors,
+    initialSetorId,
 }: SeletorInstituicaoProps) {
     const [instituicaoId, setInstituicaoId] = useState<string>('');
     const [setores, setSetores] = useState<Setor[]>([]);
@@ -44,13 +44,12 @@ export function SeletorInstituicao({
             }
         }
     }, [initialSetorId, instituicaos, isInitialized, onInstituicaoChange]);
-    
+
     useEffect(() => {
         if (initialSetorId && setorId !== initialSetorId) {
             setSetorId(initialSetorId);
         }
     }, [initialSetorId, setorId]);
-
 
     const handleInstituicaoChange = (value: string) => {
         setInstituicaoId(value);
@@ -87,13 +86,9 @@ export function SeletorInstituicao({
 
             <div className="space-y-2">
                 <Label>Setor *</Label>
-                <Select 
-                    value={setorId} 
-                    onValueChange={handleSetorChange} 
-                    disabled={processing || !instituicaoId}
-                >
+                <Select value={setorId} onValueChange={handleSetorChange} disabled={processing || !instituicaoId}>
                     <SelectTrigger className="h-11">
-                        <SelectValue placeholder={!instituicaoId ? "Selecione primeiro a instituição" : "Selecione um setor"} />
+                        <SelectValue placeholder={!instituicaoId ? 'Selecione primeiro a instituição' : 'Selecione um setor'} />
                     </SelectTrigger>
                     <SelectContent>
                         {setores.map((setor) => (

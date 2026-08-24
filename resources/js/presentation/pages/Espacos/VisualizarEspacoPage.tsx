@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import AppLayout from '@/presentation/templates/app-layout';
+import { useEspacoLiveUpdates } from '@/hooks/use-espaco-live-updates';
+import { useReservationLiveUpdates } from '@/hooks/use-reservation-live-updates';
 import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
+import AppLayout from '@/presentation/templates/app-layout';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { useReservationLiveUpdates } from '@/hooks/use-reservation-live-updates';
-import { useEspacoLiveUpdates } from '@/hooks/use-espaco-live-updates';
+import { useEffect } from 'react';
 
 export default function VisualizarEspaço({
     espaco,

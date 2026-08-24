@@ -8,7 +8,7 @@ interface LocalReservaProps {
 /**
  * Localização de uma reserva: o espaço e, abaixo, módulo e andar.
  *
- * Issue #105. Depende da cadeia `espaco.andar.modulo` vir carregada — quando o
+ *. Depende da cadeia `espaco.andar.modulo` vir carregada — quando o
  * eager loading do repositório não a traz, a linha secundária apenas some, sem
  * erro. Por isso a listagem tem teste sobre o payload, e não só sobre o markup.
  */

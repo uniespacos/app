@@ -1,5 +1,5 @@
-import { AppContent } from '@/presentation/templates/app-content';
 import { AppHeader } from '@/presentation/organisms/app-header';
+import { AppContent } from '@/presentation/templates/app-content';
 import { AppShell } from '@/presentation/templates/app-shell';
 import { type BreadcrumbItem } from '@/types';
 import type { PropsWithChildren } from 'react';

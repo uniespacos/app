@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/presentation/molecules/DatePicker';
 import { FiltroChips } from '@/presentation/molecules/FiltroChips';
 import { FiltrosRelatorio, SituacaoReserva } from '@/types';
 import { format } from 'date-fns';
+import { useState } from 'react';
 
 interface Props {
     filtros: Partial<FiltrosRelatorio>;
@@ -11,12 +11,8 @@ interface Props {
 }
 
 export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
-    const [dataInicio, setDataInicio] = useState<Date | undefined>(
-        filtros.data_inicio ? new Date(filtros.data_inicio) : undefined
-    );
-    const [dataFim, setDataFim] = useState<Date | undefined>(
-        filtros.data_fim ? new Date(filtros.data_fim) : undefined
-    );
+    const [dataInicio, setDataInicio] = useState<Date | undefined>(filtros.data_inicio ? new Date(filtros.data_inicio) : undefined);
+    const [dataFim, setDataFim] = useState<Date | undefined>(filtros.data_fim ? new Date(filtros.data_fim) : undefined);
 
     const situacoes: { value: SituacaoReserva; label: string }[] = [
         { value: 'em_analise', label: 'Em Análise' },
@@ -61,26 +57,26 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
                 </div>
             </div>
 
-            <div className="pt-2 space-y-2">
+            <div className="space-y-2 pt-2">
                 <FiltroChips
                     label="Situações"
                     opcoes={situacoes}
                     selecionados={filtros.situacoes ?? []}
-                    onChange={(valores) =>
-                        { onChange({ ...filtros, situacoes: valores as SituacaoReserva[] }); }
-                    }
+                    onChange={(valores) => {
+                        onChange({ ...filtros, situacoes: valores as SituacaoReserva[] });
+                    }}
                 />
 
                 <FiltroChips
                     label="Turnos"
                     opcoes={turnos}
                     selecionados={filtros.turnos ?? []}
-                    onChange={(valores) =>
-                        { onChange({
+                    onChange={(valores) => {
+                        onChange({
                             ...filtros,
                             turnos: valores as ('manha' | 'tarde' | 'noite')[],
-                        }); }
-                    }
+                        });
+                    }}
                 />
             </div>
         </div>

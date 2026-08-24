@@ -57,26 +57,54 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                 </div>
 
                 <div className="flex gap-2 border-t pt-3">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { onDetalhes(reserva); }}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                            onDetalhes(reserva);
+                        }}
+                    >
                         <FileText className="mr-1.5 h-4 w-4" />
                         Detalhes
                     </Button>
 
                     {reserva.situacao !== 'inativa' &&
                         (isGestor ? (
-                            <Button variant="outline" size="sm" className="flex-1" onClick={() => { onAvaliar(reserva.id); }}>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => {
+                                    onAvaliar(reserva.id);
+                                }}
+                            >
                                 <Edit className="mr-1.5 h-4 w-4" />
                                 {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
                             </Button>
                         ) : (
                             <>
                                 {reserva.can_update && (
-                                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { onEditar(reserva.id); }}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex-1"
+                                        onClick={() => {
+                                            onEditar(reserva.id);
+                                        }}
+                                    >
                                         <Edit className="mr-1.5 h-4 w-4" />
                                         Editar
                                     </Button>
                                 )}
-                                <Button variant="destructive" size="sm" className="flex-1" onClick={() => { onCancelar(reserva); }}>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        onCancelar(reserva);
+                                    }}
+                                >
                                     <XCircle className="mr-1.5 h-4 w-4" />
                                     Cancelar
                                 </Button>

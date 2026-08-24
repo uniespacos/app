@@ -27,9 +27,6 @@ class InstitucionalEspacoController extends Controller
         protected EspacoService $service,
     ) {}
 
-    /**
-     * Display the admin listing of spaces with managers and structural data.
-     */
     public function index(ListarEspacosRequest $request): Response
     {
         $this->authorize('viewAny', Espaco::class);
@@ -50,9 +47,6 @@ class InstitucionalEspacoController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new space.
-     */
     public function create(): Response
     {
         $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
@@ -61,9 +55,6 @@ class InstitucionalEspacoController extends Controller
         return Inertia::render('Administrativo/Espacos/CadastroEspaco', $formData);
     }
 
-    /**
-     * Store a newly created space with images and shift agendas in storage.
-     */
     public function store(StoreEspacoRequest $request): RedirectResponse
     {
         $this->authorize('create', Espaco::class);
@@ -85,9 +76,6 @@ class InstitucionalEspacoController extends Controller
         }
     }
 
-    /**
-     * Display the specified space with its agenda managers and reserved slots.
-     */
     public function show(Espaco $espaco): Response|RedirectResponse
     {
         try {
@@ -100,9 +88,6 @@ class InstitucionalEspacoController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified space.
-     */
     public function edit(Espaco $espaco): Response
     {
         $espaco->load('andar.modulo.unidade');
@@ -115,9 +100,6 @@ class InstitucionalEspacoController extends Controller
         ));
     }
 
-    /**
-     * Update the specified space in storage, managing image changes.
-     */
     public function update(UpdateEspacoRequest $request, Espaco $espaco): RedirectResponse
     {
         $this->authorize('update', $espaco);
@@ -144,10 +126,6 @@ class InstitucionalEspacoController extends Controller
         }
     }
 
-    /**
-     * Remove the specified space from storage.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Espaco $espaco): RedirectResponse
     {
         $this->authorize('delete', $espaco);
@@ -166,9 +144,6 @@ class InstitucionalEspacoController extends Controller
         }
     }
 
-    /**
-     * Update the shift managers for the specified space.
-     */
     public function alterarGestores(AlterarGestoresEspacoRequest $request, Espaco $espaco): RedirectResponse
     {
         $this->authorize('updateGestores', $espaco);
