@@ -1,13 +1,4 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+import { ConfirmDeleteDialog } from '@/presentation/molecules/ConfirmDeleteDialog';
 import type { Role } from '@/types';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -34,46 +25,33 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
     };
 
     return (
-        <AlertDialog open={isOpen} onOpenChange={onClose}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Deletar Papel</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {role?.is_system ? (
-                            'Você não pode deletar um papel de sistema.'
-                        ) : (
-                            <>
-                                Tem certeza que deseja deletar o papel <strong>{role?.name}</strong>?
-                                {(role?.users_count || 0) > 0 && (
-                                    <div className="border-warning/25 bg-warning-subtle mt-2 rounded border p-2 text-sm">
-                                        <strong>{role?.users_count}</strong> usuário(s) será(ão) movido(s) para o papel 'comum'.
-                                    </div>
-                                )}{' '}
-                                Esta ação não pode ser desfeita.
-                            </>
-                        )}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="flex justify-end gap-2">
-                    {!role?.is_system && (
-                        <>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={handleDelete}
-                                disabled={isDeleting}
-                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                            >
-                                {isDeleting ? 'Deletando...' : 'Deletar'}
-                            </AlertDialogAction>
-                        </>
-                    )}
-                    {role?.is_system && (
-                        <Button variant="outline" onClick={onClose}>
-                            Fechar
-                        </Button>
-                    )}
-                </div>
-            </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDeleteDialog
+            open={isOpen}
+            onOpenChange={(open) => {
+                if (!open) onClose();
+            }}
+            title="Deletar Papel"
+            description={
+                role?.is_system ? (
+                    'Você não pode deletar um papel de sistema.'
+                ) : (
+                    <>
+                        Tem certeza que deseja deletar o papel <strong>{role?.name}</strong>?
+                        {(role?.users_count || 0) > 0 && (
+                            <div className="border-warning/25 bg-warning-subtle mt-2 rounded border p-2 text-sm">
+                                <strong>{role?.users_count}</strong> usuário(s) será(ão) movido(s) para o papel 'comum'.
+                            </div>
+                        )}{' '}
+                        Esta ação não pode ser desfeita.
+                    </>
+                )
+            }
+            onConfirm={handleDelete}
+            isDeleting={isDeleting}
+            confirmText="Deletar"
+            disabled={role?.is_system}
+            showCancel={!role?.is_system}
+            closeText={role?.is_system ? 'Fechar' : undefined}
+        />
     );
 }

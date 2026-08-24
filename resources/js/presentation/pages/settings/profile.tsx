@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import HeadingSmall from '@/presentation/atoms/heading-small';
 import InputError from '@/presentation/atoms/input-error';
 import { UserAvatar } from '@/presentation/atoms/UserAvatar';
-import DeleteUser from '@/presentation/molecules/delete-user';
+import DeleteItem from '@/presentation/molecules/delete-item';
 import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import AppLayout from '@/presentation/templates/app-layout';
 import SettingsLayout from '@/presentation/templates/settings/layout';
@@ -258,14 +258,12 @@ export default function Profile({
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Salvar</Button>
 
-                            {recentlySuccessful && (
-                                <p className="text-muted-foreground text-sm">Salvo</p>
-                            )}
+                            {recentlySuccessful && <p className="text-muted-foreground text-sm">Salvo</p>}
                         </div>
                     </form>
                 </div>
 
-                <DeleteUser />
+                <DeleteItem itemName="conta" route={route('settings.profile.destroy')} showHeading={true} variant="card" />
             </SettingsLayout>
         </AppLayout>
     );

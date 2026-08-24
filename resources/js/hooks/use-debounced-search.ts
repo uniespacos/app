@@ -42,7 +42,12 @@ export function useDebouncedSearch({ routeName, initialSearch = '', extraParams 
                 cleanParams.search = searchTerm;
             }
 
-            router.get(route(routeNameRef.current), cleanParams as RequestPayload, { preserveState: true, preserveScroll: true, replace: true });
+            const targetUrl =
+                routeNameRef.current.startsWith('http://') || routeNameRef.current.startsWith('https://') || routeNameRef.current.startsWith('/')
+                    ? routeNameRef.current
+                    : route(routeNameRef.current);
+
+            router.get(targetUrl, cleanParams as RequestPayload, { preserveState: true, preserveScroll: true, replace: true });
         }, delay);
 
         return () => {

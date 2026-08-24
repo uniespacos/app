@@ -1,4 +1,5 @@
 import { Label } from '@/components/ui/label';
+import { TURNOS_ORDENADOS, TURNO_LABEL, Turno } from '@/constants/turnos';
 import { DatePicker } from '@/presentation/molecules/DatePicker';
 import { FiltroChips } from '@/presentation/molecules/FiltroChips';
 import { FiltrosRelatorio, SituacaoReserva } from '@/types';
@@ -21,11 +22,10 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
         { value: 'parcialmente_deferida', label: 'Parcialmente Deferida' },
     ];
 
-    const turnos = [
-        { value: 'manha', label: 'Manhã' },
-        { value: 'tarde', label: 'Tarde' },
-        { value: 'noite', label: 'Noite' },
-    ];
+    const turnos = TURNOS_ORDENADOS.map((turno) => ({
+        value: turno,
+        label: TURNO_LABEL[turno],
+    }));
 
     const handleDataInicioChange = (date: Date | undefined) => {
         setDataInicio(date);
@@ -48,12 +48,12 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <Label className="mb-2 block">Data Início</Label>
-                    <DatePicker value={dataInicio} onSelect={handleDataInicioChange} />
+                    <DatePicker value={dataInicio} onSelect={handleDataInicioChange} placeholder="Selecione..." />
                 </div>
 
                 <div>
                     <Label className="mb-2 block">Data Fim</Label>
-                    <DatePicker value={dataFim} onSelect={handleDataFimChange} />
+                    <DatePicker value={dataFim} onSelect={handleDataFimChange} placeholder="Selecione..." />
                 </div>
             </div>
 
@@ -74,7 +74,7 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
                     onChange={(valores) => {
                         onChange({
                             ...filtros,
-                            turnos: valores as ('manha' | 'tarde' | 'noite')[],
+                            turnos: valores as Turno[],
                         });
                     }}
                 />
