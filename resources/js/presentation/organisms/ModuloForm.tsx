@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { criarTerreoInicial, garantirTerreo, nivelParaNome } from '@/lib/utils/andars/AndarHelpers';
 import { isEditMode, transformModuloToFormData } from '@/lib/utils/andars/ModuloDataFormTransformer';
-import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
+import AndarStickFormActions from '@/presentation/organisms/AndarStickFormActions';
 import { FormField } from '@/presentation/molecules/FormField';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import AndaresManager from '@/presentation/organisms/AndarManager';

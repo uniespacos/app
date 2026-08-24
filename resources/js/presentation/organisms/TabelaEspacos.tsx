@@ -5,8 +5,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Separator } from '@/components/ui/separator';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
-import DeleteItem from '@/presentation/molecules/delete-item';
-import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
+import DeleteItem from '@/presentation/molecules/DeleteItem';
+import { GestoresEspaco } from '@/presentation/organisms/GestoresEspaco';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';

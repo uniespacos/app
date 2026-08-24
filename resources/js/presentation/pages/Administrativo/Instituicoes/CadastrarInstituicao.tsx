@@ -1,6 +1,6 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import type React from 'react';

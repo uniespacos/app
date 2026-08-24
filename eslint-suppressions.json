@@ -19,95 +19,8 @@
       "count": 1
     }
   },
-  "resources/js/application/espacos/helpers/derivar-slots-do-turno.ts": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/application/espacos/use-cases/use-agenda-selection-usecase.test.ts": {
-    "@typescript-eslint/no-unsafe-argument": {
-      "count": 3
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 8
-    },
-    "@typescript-eslint/no-unsafe-call": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 4
-    },
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 3
-    }
-  },
-  "resources/js/application/espacos/use-cases/use-agenda-selection-usecase.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    }
-  },
-  "resources/js/application/espacos/use-cases/use-favoritar-espaco-usecase.test.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 4
-    }
-  },
-  "resources/js/application/reservas/helpers/reserva-helpers.test.ts": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
-  "resources/js/application/reservas/helpers/reserva-helpers.ts": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-avaliar-reserva-usecase.test.ts": {
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    },
-    "@typescript-eslint/unbound-method": {
-      "count": 1
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-reservas-gestor-usecase.test.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 2
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-reservas-gestor-usecase.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 4
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-reservas-list-usecase.test.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 2
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-reservas-list-usecase.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 4
-    }
-  },
-  "resources/js/application/reservas/use-reservation-slots.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 2
-    }
-  },
-  "resources/js/application/reservas/use-reservation-slots.ts": {
-    "@typescript-eslint/no-non-null-assertion": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unnecessary-condition": {
+  "resources/js/components/ui/alert-dialog.tsx": {
+    "@typescript-eslint/no-deprecated": {
       "count": 1
     }
   },
@@ -122,6 +35,11 @@
     },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 3
+    }
+  },
+  "resources/js/components/ui/dialog.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
     }
   },
   "resources/js/components/ui/form.tsx": {
@@ -187,60 +105,6 @@
       "count": 1
     }
   },
-  "resources/js/infrastructure/espacos/api-espacos-repository.test.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 2
-    }
-  },
-  "resources/js/infrastructure/espacos/api-espacos-repository.ts": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 2
-    }
-  },
-  "resources/js/infrastructure/espacos/inertia-espacos-repository.test.ts": {
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    },
-    "@typescript-eslint/unbound-method": {
-      "count": 2
-    }
-  },
-  "resources/js/infrastructure/reservas/api-reservas-repository.test.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 4
-    }
-  },
-  "resources/js/infrastructure/reservas/api-reservas-repository.ts": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 2
-    }
-  },
-  "resources/js/infrastructure/reservas/inertia-reservas-repository.test.ts": {
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    },
-    "@typescript-eslint/unbound-method": {
-      "count": 4
-    }
-  },
-  "resources/js/infrastructure/shared/axios-http-gateway.test.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    }
-  },
-  "resources/js/infrastructure/shared/inertia-gateways.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
-    },
-    "@typescript-eslint/unbound-method": {
-      "count": 7
-    }
-  },
-  "resources/js/infrastructure/shared/inertia-http-gateway.ts": {
-    "@typescript-eslint/prefer-promise-reject-errors": {
-      "count": 5
-    }
-  },
   "resources/js/lib/utils.ts": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 2
@@ -285,14 +149,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/AddAndarDialog.tsx": {
-    "@typescript-eslint/no-confusing-void-expression": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/molecules/AvaliacaoGestoresResumo.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
@@ -317,46 +173,21 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/DeleteRoleConfirmation.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
+  "resources/js/presentation/molecules/CalendarShiftSection.tsx": {
+    "@typescript-eslint/no-empty-function": {
       "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/EditUserModal.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/EspacoFormFields.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/ExportarRelatorio.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/GraficoIndicadoresConsolidados.tsx": {
-    "@typescript-eslint/no-base-to-string": {
-      "count": 2
     },
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 2
+    }
+  },
+  "resources/js/presentation/molecules/DeleteItem.tsx": {
     "@typescript-eslint/no-deprecated": {
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/GraficoInventarioEspacos.tsx": {
-    "@typescript-eslint/no-base-to-string": {
-      "count": 5
-    }
-  },
-  "resources/js/presentation/molecules/GraficoOcupacaoEspacos.tsx": {
-    "@typescript-eslint/no-base-to-string": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/GraficoReservasPeriodo.tsx": {
-    "@typescript-eslint/no-deprecated": {
+  "resources/js/presentation/molecules/GenericHeader.tsx": {
+    "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
     }
   },
@@ -383,30 +214,23 @@
       "count": 4
     }
   },
-  "resources/js/presentation/molecules/TabelaDetalhamento.tsx": {
-    "@typescript-eslint/no-base-to-string": {
-      "count": 2
+  "resources/js/presentation/molecules/TabsItemEspacosFavoritos.tsx": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
     }
   },
-  "resources/js/presentation/molecules/calendar-shift-section.tsx": {
-    "@typescript-eslint/no-empty-function": {
+  "resources/js/presentation/organisms/AddAndarDialog.tsx": {
+    "@typescript-eslint/no-confusing-void-expression": {
       "count": 1
     },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 2
-    }
-  },
-  "resources/js/presentation/molecules/generic-header.tsx": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/molecules/tabs-item-espacos-favoritos.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }
   },
   "resources/js/presentation/organisms/AgendaDialogReserva.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 2
+    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     },
@@ -431,6 +255,24 @@
       "count": 2
     }
   },
+  "resources/js/presentation/organisms/AppSidebar.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/DeleteRoleConfirmation.tsx": {
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/EditUserModal.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/organisms/EspacoAgenda.tsx": {
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
@@ -440,9 +282,6 @@
     }
   },
   "resources/js/presentation/organisms/EspacoCard.tsx": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     },
@@ -455,9 +294,57 @@
       "count": 5
     }
   },
+  "resources/js/presentation/organisms/EspacoFormFields.tsx": {
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/ExportarRelatorio.tsx": {
+    "@typescript-eslint/prefer-nullish-coalescing": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/organisms/FiltroBuscaPermission.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 8
+    }
+  },
+  "resources/js/presentation/organisms/GraficoIndicadoresConsolidados.tsx": {
+    "@typescript-eslint/no-base-to-string": {
+      "count": 2
+    },
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/GraficoInventarioEspacos.tsx": {
+    "@typescript-eslint/no-base-to-string": {
+      "count": 5
+    }
+  },
+  "resources/js/presentation/organisms/GraficoOcupacaoEspacos.tsx": {
+    "@typescript-eslint/no-base-to-string": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/GraficoReservasPeriodo.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/InstituicaoForm.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/ModuloForm.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/organisms/NotificationDropdown.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
     }
   },
   "resources/js/presentation/organisms/PermissionModal.tsx": {
@@ -475,17 +362,20 @@
       "count": 1
     }
   },
-  "resources/js/presentation/organisms/app-sidebar.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/organisms/notification-dropdown.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
+  "resources/js/presentation/organisms/TabelaDetalhamento.tsx": {
+    "@typescript-eslint/no-base-to-string": {
       "count": 2
     }
   },
+  "resources/js/presentation/organisms/UnidadesForm.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/pages/Administrativo/Espacos/CadastroEspaco.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     },
@@ -493,17 +383,31 @@
       "count": 5
     }
   },
+  "resources/js/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/pages/Administrativo/Instituicoes/EditarInstituicao.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }
   },
   "resources/js/presentation/pages/Administrativo/Modulos/CadastrarModulo.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     }
   },
   "resources/js/presentation/pages/Administrativo/Modulos/EditarModulo.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     },
@@ -511,7 +415,15 @@
       "count": 1
     }
   },
+  "resources/js/presentation/pages/Administrativo/Unidades/CadastrarUnidade.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/pages/Administrativo/Unidades/EditarUnidade.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
     },
@@ -540,16 +452,52 @@
     }
   },
   "resources/js/presentation/pages/Reservas/Gestor/AvaliarReservaPage.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/no-non-null-assertion": {
       "count": 1
     }
   },
+  "resources/js/presentation/pages/auth/confirm-password.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/pages/auth/forgot-password.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/pages/auth/login.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/pages/auth/reset-password.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/pages/auth/verify-email.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
+  "resources/js/presentation/pages/settings/password.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/pages/settings/profile.tsx": {
+    "@typescript-eslint/no-deprecated": {
+      "count": 1
+    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 2
     }
   },
-  "resources/js/presentation/templates/settings/layout.tsx": {
+  "resources/js/presentation/templates/settings/Layout.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }

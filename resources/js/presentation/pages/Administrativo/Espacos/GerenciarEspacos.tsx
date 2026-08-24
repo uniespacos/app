@@ -1,8 +1,8 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
 import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';

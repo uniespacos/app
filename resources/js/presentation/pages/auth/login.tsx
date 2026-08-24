@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
+import AppLogoIcon from '@/presentation/atoms/AppLogoIcon';
 
 interface LoginForm {
     email: string;

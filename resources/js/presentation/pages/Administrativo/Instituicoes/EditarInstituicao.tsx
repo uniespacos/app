@@ -1,5 +1,5 @@
 import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import type React from 'react';

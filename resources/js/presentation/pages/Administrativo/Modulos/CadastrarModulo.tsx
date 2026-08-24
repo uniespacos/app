@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import ModuloForm from '@/presentation/organisms/ModuloForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';

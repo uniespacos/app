@@ -1,7 +1,7 @@
-import HeadingSmall from '@/presentation/atoms/heading-small';
-import AppearanceTabs from '@/presentation/molecules/appearance-tabs';
-import AppLayout from '@/presentation/templates/app-layout';
-import SettingsLayout from '@/presentation/templates/settings/layout';
+import HeadingSmall from '@/presentation/atoms/HeadingSmall';
+import AppearanceTabs from '@/presentation/molecules/AppearanceTabs';
+import AppLayout from '@/presentation/templates/AppLayout';
+import SettingsLayout from '@/presentation/templates/settings/Layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 

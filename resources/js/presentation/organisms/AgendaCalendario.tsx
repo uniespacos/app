@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AgendaLegenda from '@/presentation/molecules/AgendaLegenda';
-import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
+import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection'; // Importa o componente que corrigimos
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo } from 'react';

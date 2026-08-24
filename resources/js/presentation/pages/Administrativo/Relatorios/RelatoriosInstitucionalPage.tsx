@@ -4,20 +4,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 import { useGerarRelatorio } from '@/hooks/use-gerar-relatorio';
-import { ExportarRelatorio } from '@/presentation/molecules/ExportarRelatorio';
-import { FiltrosIndicadoresConsolidados } from '@/presentation/molecules/FiltrosIndicadoresConsolidados';
-import { FiltrosInventarioEspacos } from '@/presentation/molecules/FiltrosInventarioEspacos';
-import { FiltrosOcupacaoEspacos } from '@/presentation/molecules/FiltrosOcupacaoEspacos';
-import { FiltrosReservasPeriodo } from '@/presentation/molecules/FiltrosReservasPeriodo';
-import AppLayout from '@/presentation/templates/app-layout';
+import { ExportarRelatorio } from '@/presentation/organisms/ExportarRelatorio';
+import { FiltrosIndicadoresConsolidados } from '@/presentation/organisms/FiltrosIndicadoresConsolidados';
+import { FiltrosInventarioEspacos } from '@/presentation/organisms/FiltrosInventarioEspacos';
+import { FiltrosOcupacaoEspacos } from '@/presentation/organisms/FiltrosOcupacaoEspacos';
+import { FiltrosReservasPeriodo } from '@/presentation/organisms/FiltrosReservasPeriodo';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { FiltrosRelatorio, FormatoRelatorio, OpcoesInventario, TipoRelatorio, TipoRelatorioOption } from '@/types';
 import { BarChart3 } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 
-const GraficoReservasPeriodo = lazy(() => import('@/presentation/molecules/GraficoReservasPeriodo'));
-const GraficoOcupacaoEspacos = lazy(() => import('@/presentation/molecules/GraficoOcupacaoEspacos'));
-const GraficoInventarioEspacos = lazy(() => import('@/presentation/molecules/GraficoInventarioEspacos'));
-const GraficoIndicadoresConsolidados = lazy(() => import('@/presentation/molecules/GraficoIndicadoresConsolidados'));
+const GraficoReservasPeriodo = lazy(() => import('@/presentation/organisms/GraficoReservasPeriodo'));
+const GraficoOcupacaoEspacos = lazy(() => import('@/presentation/organisms/GraficoOcupacaoEspacos'));
+const GraficoInventarioEspacos = lazy(() => import('@/presentation/organisms/GraficoInventarioEspacos'));
+const GraficoIndicadoresConsolidados = lazy(() => import('@/presentation/organisms/GraficoIndicadoresConsolidados'));
 
 interface Props {
     tipos_disponiveis: TipoRelatorioOption[];

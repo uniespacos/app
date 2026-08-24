@@ -5,9 +5,9 @@ import { FormEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import InputError from '@/presentation/atoms/input-error';
-import TextLink from '@/presentation/atoms/text-link';
-import AuthLayout from '@/presentation/templates/auth-layout';
+import InputError from '@/presentation/atoms/InputError';
+import TextLink from '@/presentation/atoms/TextLink';
+import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { data, setData, post, processing, errors } = useForm<Required<{ email: string }>>({

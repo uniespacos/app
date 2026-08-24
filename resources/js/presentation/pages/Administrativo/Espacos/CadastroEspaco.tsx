@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
-import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
-import GenericHeader from '@/presentation/molecules/generic-header';
+import { AddAndarDialog } from '@/presentation/organisms/AddAndarDialog';
+import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 import { LocationSelector } from '@/presentation/molecules/LocationSelector';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';

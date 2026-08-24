@@ -1,6 +1,6 @@
-import { useAgendaSelectionUseCase } from '@/application/espacos/use-cases/use-agenda-selection-usecase';
 import { Button } from '@/components/ui/button';
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
+import { useAgendaSelection } from '@/hooks/use-agenda-selection';
 import { cn, diasDaSemana } from '@/lib/utils';
 import AgendaEditModeAlert from '@/presentation/molecules/AgendaEditModeAlert';
 import AgendaHeader from '@/presentation/molecules/AgendaHeader';
@@ -45,7 +45,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
         setFormData,
         processing,
         handleFormSubmit,
-    } = useAgendaSelectionUseCase({
+    } = useAgendaSelection({
         espaco,
         reserva,
         isEditMode,

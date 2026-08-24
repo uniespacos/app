@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import PaginacaoListas from '@/presentation/molecules/PaginacaoListas';
 import type { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import type { ReactNode } from 'react';
 

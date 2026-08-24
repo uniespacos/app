@@ -1,6 +1,6 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
+import GenericHeader from '@/presentation/molecules/GenericHeader';
 import UnidadeForm from '@/presentation/organisms/UnidadesForm';
-import AppLayout from '@/presentation/templates/app-layout';
+import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 const breadcrumbs = [
