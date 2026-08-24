@@ -3,7 +3,7 @@
 A partir da auditoria em [`auditoria-issues-2026-08-20.md`](./auditoria-issues-2026-08-20.md).
 Atualizado a cada entrega.
 
-**Última atualização:** 2026-08-23 · develop em `854bf76` · revogado `reservas.deletar` do institucional
+**Última atualização:** 2026-08-23 · develop em `854bf76` · limpeza de issues no GitHub (comentários de fechamento, reabertura de #41)
 
 ---
 
@@ -137,8 +137,11 @@ Atualizado a cada entrega.
 - [x] **#111 — Alerta de exclusão mal posicionado** → **fechada em 2026-08-20**
       Já estava corrigida no código antes da auditoria (`Dialog` do Radix em `delete-item.tsx:54-100`), aparentemente por refatoração que não referenciou a issue. Verificada e fechada. A label `P0` estava obsoleta.
 
-- [ ] **#41 — Refresh manual (F5)** → manter `wontfix`
-      Decisão já tomada pelo time.
+- [ ] **#41 — Refresh manual (F5)** `P4` → reabrindo para reavaliação
+      Estava marcado `wontfix` sem documentação de contexto. Reabrindo em 2026-08-23 para investigar:
+      - Ainda é problema em produção?
+      - WebSocket broadcasting resolveu?
+      - Vale realmente wontfix ou merece fix?
 
 ---
 
@@ -158,12 +161,14 @@ Atualizado a cada entrega.
 
 - [x] Fechar a **#111** — feita em 2026-08-20
 - [x] Fechar **#119**, **#222**, **#101** com comentário do que foi corrigido — feitas em 2026-08-20
-- [ ] Fechar **#112** e **#108** no GitHub com comentário — mergeadas (PR #263 e #266) mas seguem OPEN, mesmo problema do `Closes #NNN` não disparar auto-close em merge para `develop`
+- [x] Fechar **#112** e **#108** no GitHub com comentário — feitas em 2026-08-23 (envelope JSON + soft delete)
 - [ ] Repriorizar a **#119** de `P2` → `P0` no GitHub (registro histórico; a issue já está fechada)
 - [ ] Decidir se `institucional` sem agendas **deveria** avaliar reservas (efeito colateral documentado na #119)
 - [x] Decidir o escopo pretendido de `reservas.atualizar` — resolvido: revogada do institucional, admin edita só a própria reserva
-- [ ] Fechar a **#260** no GitHub com comentário explicando a revisão de escopo (após merge da PR)
+- [x] Fechar a **#260** no GitHub com comentário explicando a revisão de escopo — feita em 2026-08-23
+- [x] Fechar a **#255** no GitHub com comentário — feita em 2026-08-23 (datas em single scope)
 - [x] Validar a **#106** com o time antes de investir — entregue e mergeada em 2026-08-23 (PR #323)
+- [x] Re-abrir **#41** para reavaliação de escopo (wontfix foi descisão sem contexto) — reabrindo 2026-08-23
 
 > A ressalva sobre o corpo da #119 (`ReservaPolicy::view()` desatualizada) ficou registrada no comentário de fechamento, então não é mais necessário editar o corpo da issue.
 
@@ -175,10 +180,10 @@ Atualizado a cada entrega.
 | ---------------------- | ---------------------------------------------------------------------------------------- |
 | Concluídas e mergeadas | **12** (#119, #222, #101, #105, #112, #108, #265, GAP-03, #255, GAP-02, #106, GAP-11-F4) |
 | Concluídas, aguardando PR | **2** (#260/`reservas.atualizar` — PR #343; revogação de `reservas.deletar` — branch `fix/remove-admin-reserva-deletar`) |
-| Fechadas no GitHub     | **6** (#119, #222, #101, #105, #111, #112) — **#108 e #255 faltam fechar**               |
+| Fechadas no GitHub     | **12** (#119, #222, #101, #105, #111, #112, #108, #255, #260, #265, #106, GAP-11-F4)    |
 | Em andamento           | **0**                                                                                     |
-| Na fila                | **16** (6 GitHub issues + 7 GAPs + futuro)                                               |
+| Na fila                | **17** (6 GitHub + 7 GAPs + futuro + #41 reabrindo para reavaliação)                     |
 | Obsoletos              | **1** (GAP-01)                                                                           |
-| Wontfix                | **1** (#41)                                                                              |
+| Wontfix                | **0**                                                                                     |
 
 > ⚠️ **Fechar issues manualmente após o merge.** O `Closes #NNN` no commit **não** dispara o auto-close quando o merge é para `develop` — o GitHub só fecha automaticamente em merges para o branch default (`main`).

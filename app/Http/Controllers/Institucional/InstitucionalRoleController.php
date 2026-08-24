@@ -40,8 +40,7 @@ class InstitucionalRoleController extends Controller
     {
         $this->roleService->update($role, $request->validated());
 
-        return redirect()->route('institucional.roles.index')
-            ->with('success', "Papel '{$role->name}' atualizado com sucesso.");
+        return back()->with('success', "Papel '{$role->name}' atualizado com sucesso.");
     }
 
     public function destroy(Role $role)
@@ -51,15 +50,13 @@ class InstitucionalRoleController extends Controller
         $name = $role->name;
         $this->roleService->delete($role);
 
-        return redirect()->route('institucional.roles.index')
-            ->with('success', "Papel '{$name}' removido com sucesso.");
+        return back()->with('success', "Papel '{$name}' removido com sucesso.");
     }
 
     public function syncPermissions(SyncRolePermissionsRequest $request, Role $role)
     {
         $this->roleService->syncPermissions($role, $request->validated()['permissions']);
 
-        return redirect()->route('institucional.roles.index')
-            ->with('success', "Permissões do papel '{$role->name}' atualizadas com sucesso.");
+        return back()->with('success', "Permissões do papel '{$role->name}' atualizadas com sucesso.");
     }
 }

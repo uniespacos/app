@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Institucional;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmPasswordRequest;
+use App\Http\Requests\ListarModulosRequest;
 use App\Http\Requests\StoreModuloRequest;
 use App\Http\Requests\UpdateModuloRequest;
 use App\Models\Modulo;
@@ -29,14 +30,27 @@ class InstitucionalModuloController extends Controller
     /**
      * Display a paginated listing of modules scoped to the authenticated user's institution.
      */
-    public function index(): Response
+    public function index(ListarModulosRequest $request): Response
     {
         $this->authorize('viewAny', Modulo::class);
 
         $instituicaoId = Auth::user()->setor->unidade->instituicao_id;
+        $validated = $request->validated();
+        $search = $validated['search'] ?? null;
+        $unidade = $validated['unidade'] ?? null;
+
+        $modulos = $this->service->paginate($instituicaoId, 10, $search, $unidade);
+        $modulos->withQueryString();
+
+        $unidades = $this->unidadeService->getAllByInstituicao($instituicaoId);
 
         return Inertia::render('Administrativo/Modulos/Modulos', [
-            'modulos' => $this->service->paginate($instituicaoId, 10),
+            'modulos' => $modulos,
+            'unidades' => $unidades,
+            'filters' => [
+                'search' => $search,
+                'unidade' => $unidade,
+            ],
         ]);
     }
 
@@ -120,8 +134,7 @@ class InstitucionalModuloController extends Controller
         try {
             $this->service->delete($modulo);
 
-            return redirect()->route('institucional.modulos.index')
-                ->with('success', 'Módulo removido com sucesso!');
+            return back()->with('success', 'Módulo removido com sucesso!');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Erro ao remover módulo: '.$e->getMessage()]);
         }
