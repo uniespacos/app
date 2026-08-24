@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function UsuariosSetor({ setor, usuarios: initialUsuarios }: Props) {
-    const [usuarios, setUsuarios] = useState<User[]>(initialUsuarios || []);
+    const [usuarios, setUsuarios] = useState<User[]>(initialUsuarios ?? []);
     const [loading, setLoading] = useState<boolean>(!initialUsuarios);
 
     useEffect(() => {
@@ -28,7 +28,7 @@ export function UsuariosSetor({ setor, usuarios: initialUsuarios }: Props) {
         fetch(route('institucional.setors.usuarios', setor.id), {
             headers: { Accept: 'application/json' },
         })
-            .then((res) => res.json())
+            .then((res) => res.json() as Promise<User[]>)
             .then((data) => {
                 if (isMounted) {
                     setUsuarios(data);
