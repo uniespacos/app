@@ -11,8 +11,8 @@ use App\Http\Requests\UpdateSetorRequest;
 use App\Models\Setor;
 use App\Services\SetorService;
 use App\Services\UnidadeService;
-use App\Services\UserService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -25,7 +25,6 @@ class InstitucionalSetorController extends Controller
     public function __construct(
         protected SetorService $service,
         protected UnidadeService $unidadeService,
-        protected UserService $userService,
     ) {}
 
     public function index(): Response
@@ -40,8 +39,18 @@ class InstitucionalSetorController extends Controller
             'instituicao' => $instituicao,
             'unidades' => $this->unidadeService->getAllByInstituicao($instituicaoId)->load(['setors']),
             'setores' => $this->service->getAllByInstituicao($instituicaoId),
-            'usuarios' => $this->userService->getAllByInstituicao($instituicaoId),
         ]);
+    }
+
+    public function usuarios(Setor $setor): JsonResponse
+    {
+        $this->authorize('view', $setor);
+
+        $usuarios = $setor->users()
+            ->select(['id', 'name', 'email', 'telefone', 'profile_pic', 'email_verified_at', 'setor_id'])
+            ->get();
+
+        return response()->json($usuarios);
     }
 
     public function create(): RedirectResponse

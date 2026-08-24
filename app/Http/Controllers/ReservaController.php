@@ -38,7 +38,7 @@ class ReservaController extends Controller
 
     public function create(): void {}
 
-    public function store(StoreReservaRequest $request)
+    public function store(StoreReservaRequest $request): RedirectResponse
     {
         try {
             $this->service->create($request->validated(), Auth::user());

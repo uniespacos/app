@@ -9,15 +9,18 @@ import { useState } from 'react';
 
 interface Props {
     setores: Setor[];
-    usuarios: User[];
+    usuarios?: User[];
     onEdit: (setor: Setor) => void;
     onViewUsuarios: (setor: Setor) => void;
 }
 
 export function TabelaSetores({ setores, usuarios, onEdit, onViewUsuarios }: Props) {
     const [removerSetor, setRemoverSetor] = useState<Setor | undefined>();
-    const getUsuariosDoSetor = (setorId: number) => {
-        return usuarios.filter((user) => user.setor?.id === setorId).length;
+    const getUsuariosDoSetor = (setor: Setor) => {
+        if (typeof setor.users_count === 'number') {
+            return setor.users_count;
+        }
+        return usuarios?.filter((user) => user.setor?.id === setor.id).length ?? 0;
     };
 
     return (
@@ -77,7 +80,7 @@ export function TabelaSetores({ setores, usuarios, onEdit, onViewUsuarios }: Pro
                                                     className="flex items-center gap-1"
                                                 >
                                                     <Users className="h-4 w-4" />
-                                                    <Badge variant="secondary">{getUsuariosDoSetor(setor.id)}</Badge>
+                                                    <Badge variant="secondary">{getUsuariosDoSetor(setor)}</Badge>
                                                 </Button>
                                             </TableCell>
                                             <TableCell className="text-right">

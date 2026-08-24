@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\SituacaoReserva\ModoArquivoEnum;
 use App\Enums\SituacaoReserva\OrdenacaoReservaEnum;
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use Carbon\Carbon;
 use Database\Factories\ReservaFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -101,15 +102,7 @@ class Reserva extends Model
      */
     public function getSituacaoFormatadaAttribute(): string
     {
-        return match ($this->situacao) {
-            'em_analise' => 'Em Análise',
-            'deferida' => 'Deferida',
-            'indeferida' => 'Indeferida',
-            'parcialmente_deferida' => 'Parcialmente Deferida',
-            /** @phpstan-ignore match.alwaysTrue */
-            'inativa' => 'Inativa',
-            default => ucfirst(str_replace('_', ' ', $this->situacao)),
-        };
+        return SituacaoReservaEnum::labelDe($this->situacao);
     }
 
     /**

@@ -107,6 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestão de Setores
     Route::middleware(['permission:secao.gestao-setores'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::get('setors/{setor}/usuarios', [InstitucionalSetorController::class, 'usuarios'])->name('setors.usuarios');
         Route::resource('setors', InstitucionalSetorController::class);
     });
 

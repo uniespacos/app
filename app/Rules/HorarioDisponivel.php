@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -42,7 +43,7 @@ class HorarioDisponivel implements DataAwareRule, ValidationRule
             ->where('data', $horario['data'])
             ->where('horario_inicio', $horario['horario_inicio'])
             ->where('agenda_id', $horario['agenda_id'])
-            ->where('situacao', 'deferida')
+            ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
             ->exists();
 
         if ($conflict) {

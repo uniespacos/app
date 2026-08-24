@@ -152,6 +152,7 @@ export interface Setor {
     sigla: string;
     unidade?: Unidade; // Relação aninhada
     users?: User[]; // Relação aninhada, array de usuários
+    users_count?: number;
 }
 
 export interface Modulo {

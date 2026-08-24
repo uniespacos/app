@@ -112,8 +112,7 @@ class InstitucionalEspacoController extends Controller
                 $request->validated('images_to_delete', [])
             );
 
-            return redirect()->route('institucional.espacos.index')
-                ->with('success', 'Espaço atualizado com sucesso!');
+            return back()->with('success', 'Espaço atualizado com sucesso!');
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar espaço', [
                 'espaco_id' => $espaco->id,
@@ -137,8 +136,7 @@ class InstitucionalEspacoController extends Controller
         try {
             $this->service->delete($espaco);
 
-            return redirect()->route('institucional.espacos.index')
-                ->with('success', 'Espaço excluído com sucesso!');
+            return back()->with('success', 'Espaço excluído com sucesso!');
         } catch (\Exception $error) {
             return redirect()->back()->with('error', 'Erro ao excluir, favor tentar novamente.');
         }
@@ -151,8 +149,7 @@ class InstitucionalEspacoController extends Controller
         try {
             $this->service->updateGestores($espaco, $request->validated());
 
-            return redirect()->route('institucional.espacos.index')
-                ->with('success', 'Gestores atualizados com sucesso!');
+            return back()->with('success', 'Gestores atualizados com sucesso!');
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar gestores do espaço', [
                 'espaco_id' => $espaco->id,

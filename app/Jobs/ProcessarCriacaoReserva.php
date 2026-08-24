@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\SituacaoReserva\SituacaoReservaEnum;
 use App\Events\ReservaEvent;
 use App\Models\Agenda;
 use App\Models\Horario;
@@ -79,7 +80,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     'data_final' => $this->dadosRequisicao['data_final'],
                     'recorrencia' => $this->dadosRequisicao['recorrencia'],
                     'user_id' => $this->solicitante->id,
-                    'situacao' => 'em_analise',
+                    'situacao' => SituacaoReservaEnum::EM_ANALISE->value,
                 ]);
 
                 [$linhas, $agendasUsadas] = $expansao->montar(
@@ -89,8 +90,8 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     Carbon::parse($reserva->data_final),
                     (int) $reserva->id,
                     fn (Agenda $agenda) => $agenda->user && $agenda->user->id === $this->solicitante->id
-                        ? 'deferida'
-                        : 'em_analise',
+                        ? SituacaoReservaEnum::DEFERIDA->value
+                        : SituacaoReservaEnum::EM_ANALISE->value,
                 );
 
                 if ($linhas !== []) {
@@ -102,9 +103,9 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 $gestoresUnicos = $agendasUsadas->map(fn (Agenda $a) => $a->user)->filter()->unique('id')->values();
 
                 if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
-                    $reserva->update(['situacao' => 'deferida']);
+                    $reserva->update(['situacao' => SituacaoReservaEnum::DEFERIDA->value]);
                 } elseif ($gestoresUnicos->contains(fn ($g) => $g->id === $this->solicitante->id)) {
-                    $reserva->update(['situacao' => 'parcialmente_deferida']);
+                    $reserva->update(['situacao' => SituacaoReservaEnum::PARCIALMENTE_DEFERIDA->value]);
                 }
 
                 Log::info('Reservation created', [

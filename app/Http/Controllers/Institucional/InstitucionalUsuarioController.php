@@ -107,8 +107,7 @@ class InstitucionalUsuarioController extends Controller
                 'exception' => $e,
             ]);
 
-            return redirect()->route('institucional.usuarios.index')
-                ->with('error', 'Erro ao atualizar permissões: '.$e->getMessage());
+            return back()->with('error', 'Erro ao atualizar permissões: '.$e->getMessage());
         }
     }
 
@@ -130,8 +129,7 @@ class InstitucionalUsuarioController extends Controller
                 'exception' => $e,
             ]);
 
-            return redirect()->route('institucional.usuarios.index')
-                ->with('error', 'Erro ao excluir usuário.');
+            return back()->with('error', 'Erro ao excluir usuário.');
         }
     }
 }
