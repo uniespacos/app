@@ -52,12 +52,7 @@ export default function InstituicoesPage() {
                     ButtonIcon={PlusCircle}
                     canSeeButton={true}
                 />
-                <SearchFilter
-                    searchTerm={searchTerm}
-                    onSearchTermChange={setSearchTerm}
-                    placeholder="Buscar por nome ou sigla"
-                    variant="card"
-                />
+                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder="Buscar por nome ou sigla" variant="card" />
                 <DataTable
                     data={instituicoes.data}
                     columns={columns}

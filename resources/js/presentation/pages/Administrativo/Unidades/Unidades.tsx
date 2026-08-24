@@ -53,12 +53,7 @@ export default function UnidadesPage() {
                     ButtonIcon={PlusCircle}
                     canSeeButton={true}
                 />
-                <SearchFilter
-                    searchTerm={searchTerm}
-                    onSearchTermChange={setSearchTerm}
-                    placeholder="Buscar por nome ou sigla"
-                    variant="card"
-                />
+                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder="Buscar por nome ou sigla" variant="card" />
                 <DataTable
                     data={unidades.data}
                     columns={columns}

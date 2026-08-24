@@ -1,5 +1,5 @@
-import { router } from '@inertiajs/react';
 import type { RequestPayload } from '@inertiajs/core';
+import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 interface UseDebouncedSearchOptions {
@@ -42,11 +42,7 @@ export function useDebouncedSearch({ routeName, initialSearch = '', extraParams 
                 cleanParams.search = searchTerm;
             }
 
-            router.get(
-                route(routeNameRef.current),
-                cleanParams as RequestPayload,
-                { preserveState: true, preserveScroll: true, replace: true },
-            );
+            router.get(route(routeNameRef.current), cleanParams as RequestPayload, { preserveState: true, preserveScroll: true, replace: true });
         }, delay);
 
         return () => {

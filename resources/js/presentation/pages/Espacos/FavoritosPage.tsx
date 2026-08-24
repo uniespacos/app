@@ -33,20 +33,12 @@ export default function FavoritosPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Meus Favoritos" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <GenericHeader
-                    titulo="Meus Espaços Favoritos"
-                    descricao="Aqui você encontra todos os espaços que você marcou como favoritos."
-                />
+                <GenericHeader titulo="Meus Espaços Favoritos" descricao="Aqui você encontra todos os espaços que você marcou como favoritos." />
 
                 {espacosFavoritos.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                         {espacosFavoritos.map((espaco) => (
-                            <EspacoCard
-                                key={espaco.id}
-                                espaco={espaco}
-                                user={user}
-                                handleSolicitarReserva={handleSolicitarReserva}
-                            />
+                            <EspacoCard key={espaco.id} espaco={espaco} user={user} handleSolicitarReserva={handleSolicitarReserva} />
                         ))}
                     </div>
                 ) : (
@@ -58,9 +50,7 @@ export default function FavoritosPage() {
                     </div>
                 )}
 
-                {espacosFavoritos.length > 0 && links.length > 1 && (
-                    <PaginacaoListas links={links} />
-                )}
+                {espacosFavoritos.length > 0 && links.length > 1 && <PaginacaoListas links={links} />}
             </div>
         </AppLayout>
     );

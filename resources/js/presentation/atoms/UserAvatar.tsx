@@ -17,7 +17,7 @@ export function UserAvatar({ user, className = 'h-8 w-8', fallbackClassName }: U
         typeof user.profile_pic === 'string'
             ? user.profile_pic
             : 'avatar' in user && typeof (user as { avatar: unknown }).avatar === 'string'
-              ? ((user as { avatar: string }).avatar)
+              ? (user as { avatar: string }).avatar
               : undefined;
     const profilePic = rawProfilePic && rawProfilePic.trim() !== '' ? rawProfilePic : undefined;
 
@@ -32,9 +32,7 @@ export function UserAvatar({ user, className = 'h-8 w-8', fallbackClassName }: U
                     }}
                 />
             ) : null}
-            <AvatarFallback className={`bg-muted text-foreground rounded-lg ${fallbackClassName}`}>
-                {getInitials(user.name)}
-            </AvatarFallback>
+            <AvatarFallback className={`bg-muted text-foreground rounded-lg ${fallbackClassName}`}>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
     );
 }
