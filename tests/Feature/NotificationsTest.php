@@ -301,7 +301,7 @@ class NotificationsTest extends TestCase
         $this->assertStringContainsString('foi atualizado em nosso sistema.', $mailData);
         $this->assertStringContainsString($this->setor->nome, $mailData);
         $this->assertStringContainsString(e($this->user->name), $mailData);
-        $this->assertStringContainsString(route('institucional.setors.show', $this->setor->id), $mailData);
+        $this->assertStringContainsString(route('institucional.setors.index'), $mailData);
 
         // Test Broadcast
         $broadcastData = $notification->toBroadcast($this->user)->data;
