@@ -31,11 +31,6 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
     const [andares, setAndares] = useState<Andar[]>(modulos.find((m) => m.id.toString() === localFilters.selectedModulo)?.andars || []);
     const [espacos, setEspacos] = useState<Espaco[]>(andares.find((a) => a.id.toString() === localFilters.selectedAndar)?.espacos || []);
 
-    // Estes filtros são só navegação local na árvore instituição → unidade →
-    // módulo → andar → espaço, que já vem inteira nas props. Antes cada mudança
-    // disparava um router.get em institucional.usuarios.index levando os filtros
-    // na query string — mas o controller nunca leu esses parâmetros, então era
-    // um request de página inteira sem efeito nenhum a cada clique.
 
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
         setLocalFilters((prevFilters) => {

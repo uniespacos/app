@@ -11,9 +11,6 @@ interface FormFieldProps {
     children: ReactNode;
 }
 
-// Generaliza o padrão Label + campo + erro repetido manualmente em cada
-// formulário (ver EspacoFormFields.tsx). O campo em si (Input, Textarea,
-// Select, DatePicker...) entra como children.
 export function FormField({ label, htmlFor, error, required, className, children }: FormFieldProps) {
     return (
         <div className={cn('space-y-2', className)}>

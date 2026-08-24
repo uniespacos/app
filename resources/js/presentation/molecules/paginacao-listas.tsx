@@ -9,17 +9,6 @@ interface PaginacaoListasProps {
     }[];
 }
 
-/**
- * O array `links` vem pronto do LengthAwarePaginator do Laravel: Anterior,
- * depois a janela de páginas (que pode chegar a 10 números seguidos quando há
- * muitas páginas — é o comportamento padrão do `UrlWindow`), depois Próximo.
- * Em telas largas isso cabe numa linha só. No celular, a mesma lista quebra em
- * 2-3 fileiras de quadradinhos — pouco legível e nada compacto.
- *
- * No mobile trocamos a lista numerada por Anterior / "Página X de Y" /
- * Próximo, usando os mesmos dois links de borda (preservam preserveState e
- * preserveScroll) e derivando o total da última página numerada da janela.
- */
 export default function PaginacaoListas({ links }: PaginacaoListasProps) {
     const isMobile = useIsMobile();
 

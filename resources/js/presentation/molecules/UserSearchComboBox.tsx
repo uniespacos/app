@@ -1,5 +1,3 @@
-'use client';
-
 import type React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -25,7 +23,6 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
     const [searchValue, setSearchValue] = useState('');
     const selectedUser = usuarios.find((user) => user.id === value);
 
-    // Filtrar usuários baseado na busca
     const filteredUsers = useMemo(() => {
         if (!searchValue.trim()) return usuarios;
 
@@ -98,7 +95,6 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                         }}
                         className="h-auto border-0 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                         onKeyDown={(e) => {
-                            // Prevenir que o popover feche com Escape
                             if (e.key === 'Escape') {
                                 e.stopPropagation();
                                 setSearchValue('');

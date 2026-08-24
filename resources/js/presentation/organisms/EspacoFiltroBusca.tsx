@@ -34,9 +34,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         unidade: filters.unidade || 'all',
         modulo: filters.modulo || 'all',
         andar: filters.andar || 'all',
-        // '' não batia com nenhum SelectItem (o padrão é 'qualquer'), então o
-        // trigger caía no placeholder cinza — parecia "nada selecionado" ao
-        // lado dos outros três selects, que sempre mostram um valor concreto.
         capacidade: filters.capacidade || 'qualquer',
     });
     const isInitialMount = useRef(true);
@@ -102,11 +99,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         });
     };
 
-    // No mobile, busca + 4 selects empilhados ocupavam a tela inteira antes
-    // do primeiro card de espaço aparecer. A busca continua sempre visível;
-    // os filtros avançados ficam recolhidos por padrão nesse breakpoint (o
-    // `sm:block` no conteúdo força a exibição sempre aberta a partir do
-    // tablet, onde cabem lado a lado sem esse problema).
     const [filtrosAbertos, setFiltrosAbertos] = useState(false);
     const quantidadeFiltrosAtivos = [
         localFilters.unidade !== 'all',
@@ -119,7 +111,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         <Card className="mb-6">
             <CardContent className="space-y-4">
                 <div className="flex gap-2">
-                    {/* Busca */}
                     <div className="relative flex-1">
                         <Label htmlFor="espacos-busca" className="sr-only">
                             Buscar
@@ -153,7 +144,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                 </div>
 
                 <div className={cn('grid grid-cols-2 gap-4 lg:grid-cols-4', !filtrosAbertos && 'hidden sm:grid')}>
-                    {/* Filtro de Unidade */}
                     <div className="col-span-2 space-y-2 sm:col-span-1">
                         <Label htmlFor="espacos-unidade">Unidade</Label>
                         <Select
@@ -176,7 +166,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                         </Select>
                     </div>
 
-                    {/* Filtro de Módulo */}
                     <div className="space-y-2">
                         <Label htmlFor="espacos-modulo">Módulo</Label>
                         <Select
@@ -200,7 +189,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                         </Select>
                     </div>
 
-                    {/* Filtro de Andar */}
                     <div className="space-y-2">
                         <Label htmlFor="espacos-andar">Andar</Label>
                         <Select
@@ -224,7 +212,6 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                         </Select>
                     </div>
 
-                    {/* Filtro de Capacidade */}
                     <div className="space-y-2">
                         <Label htmlFor="espacos-capacidade">Capacidade</Label>
                         <Select

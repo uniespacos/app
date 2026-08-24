@@ -2,7 +2,6 @@ import InputError from '@/presentation/atoms/input-error';
 import AppLayout from '@/presentation/templates/app-layout';
 import SettingsLayout from '@/presentation/templates/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
@@ -121,15 +120,9 @@ export default function Password() {
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Salvar Senha</Button>
 
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
+                            {recentlySuccessful && (
                                 <p className="text-muted-foreground text-sm">Salvo</p>
-                            </Transition>
+                            )}
                         </div>
                     </form>
                 </div>

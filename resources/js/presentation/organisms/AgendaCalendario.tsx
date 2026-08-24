@@ -22,13 +22,11 @@ export default function AgendaCalendario({
     agendas,
     isSlotSelecionado,
     alternarSelecaoSlot,
-    slotsDaReserva, // Recebe a nova prop
+    slotsDaReserva,
     isEditMode,
 }: AgendaCalendarioProps) {
     const isMobile = useIsMobile();
 
-    // Agrupa agendas por turno e pega a primeira de cada um (que tem gestor)
-    // Evita renderizar múltiplas seções para o mesmo turno
     const agendasPorTurno = useMemo(() => {
         const mapa = new Map<string, Agenda>();
         [...agendas]
@@ -41,9 +39,6 @@ export default function AgendaCalendario({
         return Array.from(mapa.values());
     }, [agendas]);
 
-    // Só uma das visões é montada, em vez de renderizar as duas e esconder uma
-    // com CSS: são ~120 células por semana, e construí-las para depois ocultar
-    // desperdiçaria trabalho justamente no aparelho que queremos aliviar.
     if (isMobile) {
         return (
             <Card className="gap-0 p-0">
@@ -64,8 +59,6 @@ export default function AgendaCalendario({
             <AgendaLegenda isEditMode={isEditMode} />
             <div className="w-full overflow-auto">
                 <div className="min-w-[800px] rounded-xl">
-                    {/* Renderiza uma seção para cada turno (Manhã, Tarde, Noite)
-                        Cada seção tem seu próprio header com dias da semana (#106) */}
                     {agendasPorTurno.map((agenda) => (
                         <CalendarShiftSection
                             key={agenda.id}

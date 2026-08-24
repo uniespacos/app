@@ -12,7 +12,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     if (totalPages <= 1) {
-        return null; // Não renderiza a paginação se houver apenas uma página ou menos
+        return null;
     }
 
     const handlePageChange = (page: number) => {
@@ -23,15 +23,13 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        const maxPagesToShow = 5; // Máximo de números de página a serem exibidos
+        const maxPagesToShow = 5;
         let startPage: number, endPage: number;
 
         if (totalPages <= maxPagesToShow) {
-            // Mostra todos os números de página se o total for menor ou igual ao máximo
             startPage = 1;
             endPage = totalPages;
         } else {
-            // Lógica para exibir um subconjunto de números de página
             const maxPagesBeforeCurrent = Math.floor(maxPagesToShow / 2);
             const maxPagesAfterCurrent = Math.ceil(maxPagesToShow / 2) - 1;
 

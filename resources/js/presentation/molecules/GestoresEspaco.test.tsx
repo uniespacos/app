@@ -2,13 +2,6 @@ import type { Agenda } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { GestoresEspaco } from './GestoresEspaco';
 
-/**
- * Regression guard for issue #101 (admin "Gestores por Turno" out of order).
- *
- * The component used to map over `agendas` in whatever order the API returned
- * them. Neither Espaco::agendas() nor EspacoRepositoryEloquent::getAllByInstituicao
- * applies an ORDER BY, so the sequence was left to the database.
- */
 
 const agenda = (id: number, turno: Agenda['turno'], nomeGestor?: string): Agenda => ({
     id,
@@ -16,7 +9,6 @@ const agenda = (id: number, turno: Agenda['turno'], nomeGestor?: string): Agenda
     ...(nomeGestor ? { user: { id, name: nomeGestor, email: `${nomeGestor}@uesb.edu.br` } as Agenda['user'] } : {}),
 });
 
-/** Reads the shift labels in the order they appear in the DOM. */
 const turnosRenderizados = (): string[] => screen.getAllByTestId('turno-label').map((el) => el.textContent ?? '');
 
 describe('GestoresEspaco', () => {
@@ -32,11 +24,6 @@ describe('GestoresEspaco', () => {
         expect(turnosRenderizados()).toEqual(['Manhã', 'Tarde', 'Noite']);
     });
 
-    /**
-     * The issue asks for the three shifts "regardless of whether a manager is
-     * assigned to that shift or if the shift is empty". This mirrors what the
-     * assignment dialog (GerenciarGestoresDialog) already does.
-     */
     it('renders all three shifts even when an agenda is missing', () => {
         render(<GestoresEspaco agendas={[agenda(1, 'manha', 'Ana')]} />);
 

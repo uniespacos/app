@@ -25,7 +25,7 @@ export default function EspacosPage() {
         espacos: {
             data: Espaco[];
             links: { url: string | null; label: string; active: boolean }[];
-            meta: object; // Contém 'from', 'to', 'total', etc.
+            meta: object;
         };
         unidades: Unidade[];
         modulos: Modulo[];
@@ -38,7 +38,7 @@ export default function EspacosPage() {
             capacidade?: string;
         };
         user: User;
-        capacidadeEspacos: number[]; // Mapeia capacidade para total de espaços
+        capacidadeEspacos: number[];
     }>().props;
     const handleSolicitarReserva = (espacoId: string) => {
         router.get(`/espacos/${espacoId}`);
@@ -48,9 +48,6 @@ export default function EspacosPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Espacos" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                {/* A descrição falava de cadastrar/excluir/editar espaços —
-                    texto da tela administrativa de gerenciamento, copiado
-                    para a tela de consulta onde o usuário só vê e reserva. */}
                 <GenericHeader titulo="Consultar espaços" descricao="Veja os espaços disponíveis e solicite sua reserva" />
 
                 <EspacoFiltroBusca
@@ -67,11 +64,6 @@ export default function EspacosPage() {
                     ))}
                 </div>
 
-                {/* Paginação reimplementada na mão aqui, sem `flex-wrap`
-                    (uma lista longa de páginas vazava/rolava na horizontal
-                    no celular) e sem preserveState/preserveScroll no Link
-                    (cada clique perdia a posição de rolagem e o estado da
-                    página). PaginacaoListas já resolve os dois. */}
                 <PaginacaoListas links={links} />
             </div>
         </AppLayout>

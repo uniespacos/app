@@ -11,30 +11,9 @@ interface CalendarDiaMobileProps {
     isSlotSelecionado: (slot: SlotCalendario) => boolean;
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     slotsDaReserva?: SlotCalendario[];
-    /**
-     * Na tela de agendar, turno sem gestor não pode ser reservado — faz
-     * sentido esconder. No modal de detalhes de uma reserva já feita, a
-     * agenda pode não trazer o gestor carregado, e o turno precisa aparecer
-     * do mesmo jeito: é a própria reserva, não uma oferta de horário livre.
-     */
     exigirGestor?: boolean;
 }
 
-/**
- * Visão do calendário para telas estreitas.
- *
- * A grade semanal tem `min-w-[800px]` por construção — sete colunas de dia mais
- * a coluna de horas não cabem em celular nenhum, e forçá-las produz rolagem
- * lateral dentro de rolagem vertical, que é onde os usuários se perdiam.
- *
- * Aqui a semana vira um dia por vez. Mostrar os sete dias empilhados daria por
- * volta de 120 linhas de rolagem (3 turnos x ~6 faixas x 7 dias), o que não é
- * navegável.
- *
- * Os slots vêm de `derivarSlotsDoTurno`, a mesma função que alimenta a grade do
- * desktop. Isso é deliberado: derivação duplicada faria as visões divergirem, e
- * um slot livre no celular que está reservado no desktop vira reserva sobreposta.
- */
 export default function CalendarDiaMobile({
     diasSemana,
     agendas,
@@ -57,8 +36,6 @@ export default function CalendarDiaMobile({
         [agendas, exigirGestor],
     );
 
-    // Agrupa por turno e pega a primeira de cada um, igual ao AgendaCalendario
-    // Evita renderizar múltiplas seções para o mesmo turno
     const agendasPorTurno = useMemo(() => {
         const mapa = new Map<string, Agenda>();
         agendasOrdenadas.forEach((agenda) => {
@@ -87,7 +64,6 @@ export default function CalendarDiaMobile({
 
     return (
         <div className="overflow-hidden rounded-xl border">
-            {/* Seletor de dia — alvos de toque de 44px, o mínimo confortável para o dedo */}
             <div className="flex border-b" role="tablist" aria-label="Dia da semana">
                 {diasSemana.map((dia, indice) => {
                     const ativo = indice === indiceDia;
@@ -119,7 +95,6 @@ export default function CalendarDiaMobile({
                                 {dia.diaMes.split('/')[0]}
                             </span>
 
-                            {/* Indicador de hoje quando o dia não é o selecionado */}
                             {dia.ehHoje && !ativo && <span className="bg-primary absolute bottom-1 h-1 w-1 rounded-full" />}
                         </button>
                     );
@@ -136,10 +111,6 @@ export default function CalendarDiaMobile({
 
                     {slots.map(({ horaLabel, slot }) => {
                         const selecionado = isSlotSelecionado(slot);
-                        // Passado nunca é clicável: clicar nele acionava a lógica de
-                        // "mover para a semana seguinte" do hook de seleção, que
-                        // troca silenciosamente o horário marcado por outro em
-                        // outro dia — confuso, sem relação visível com o toque.
                         const clicavel = slot.status !== 'reservado' && !slot.isLocked && !slot.isPast;
                         const status = selecionado ? 'selecionado' : slot.status;
 
@@ -158,37 +129,19 @@ export default function CalendarDiaMobile({
                                 className={cn(
                                     'flex min-h-[52px] w-full items-center gap-3 border-b px-3 py-2 text-left transition-colors last:border-b-0',
                                     'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
-                                    // Mesma paleta e regra da grade desktop: fundo
-                                    // colorido por status (livre fica neutro), cor
-                                    // reservada para o que precisa ser notado rápido.
-                                    status !== 'livre' && ESTILO_SLOT[status].fundo,
-                                    !clicavel && 'cursor-not-allowed',
-                                    // Livre clicável só ganha destaque no hover, como
-                                    // convite a interagir; os demais status clicáveis
-                                    // (solicitado/deferida/indeferida em modo de edição)
-                                    // usam o hover neutro padrão.
                                     clicavel && (status === 'livre' ? 'hover:bg-success-subtle' : 'hover:bg-muted/50'),
                                     slot.isPast && !selecionado && 'bg-muted/60 opacity-90 grayscale',
                                 )}
                             >
-                                {/* Faixa de cor à esquerda: o status fica legível sem
-                                    depender de tingir a linha inteira, que empastelava
-                                    o texto. */}
                                 <span className={cn('h-8 w-1 shrink-0 rounded-full', ESTILO_SLOT[status].solido)} aria-hidden />
 
                                 <span className="text-sm font-medium tabular-nums">{horaLabel}</span>
 
-                                {/* Ao contrário da célula da grade, aqui há largura
-                                    para o título inteiro da reserva. */}
                                 <span className="text-muted-foreground ml-auto truncate text-right text-xs">
                                     {(() => {
                                         if (slot.status === 'reservado' && !selecionado) {
                                             return slot.dadosReserva?.reserva_titulo;
                                         }
-                                        // Livre + passado ainda diz "Livre" no texto padrão,
-                                        // e o cinza sozinho é sutil demais no mobile para
-                                        // avisar que o dia já passou — troca o texto para
-                                        // não deixar dúvida (mesma linguagem da legenda).
                                         if (slot.status === 'livre' && slot.isPast && !selecionado) {
                                             return 'Horário encerrado';
                                         }

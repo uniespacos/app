@@ -10,7 +10,6 @@ interface Props {
 }
 
 export function FiltrosInventarioEspacos({ filtros, opcoes, onChange }: Props) {
-    // Cada nivel so lista o que pertence ao nivel anterior selecionado.
     const modulos = useMemo(
         () => (filtros.unidade_id ? opcoes.modulos.filter((modulo) => modulo.unidade_id === filtros.unidade_id) : opcoes.modulos),
         [opcoes.modulos, filtros.unidade_id],
@@ -32,7 +31,6 @@ export function FiltrosInventarioEspacos({ filtros, opcoes, onChange }: Props) {
             : opcoes.espacos.filter((espaco) => idsAndares.has(espaco.andar_id));
     }, [opcoes.espacos, andares, filtros.andar_id]);
 
-    // Trocar um nivel invalida os niveis abaixo dele.
     const handleUnidade = (unidade_id?: number) => {
         onChange({
             ...filtros,

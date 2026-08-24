@@ -1,5 +1,4 @@
 import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Camera, Trash2 } from 'lucide-react';
 import { FormEventHandler, useRef, useState } from 'react';
@@ -116,9 +115,6 @@ export default function Profile({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        // POST com _method=patch (não PATCH puro): o PHP só popula $_POST/$_FILES em
-        // corpos multipart/form-data quando o verbo HTTP é POST. Um PATCH puro com o
-        // arquivo da foto chega ao Laravel como se todos os campos estivessem vazios.
         post(route('settings.profile.update'), {
             forceFormData: true,
             preserveScroll: true,
@@ -262,15 +258,9 @@ export default function Profile({
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Salvar</Button>
 
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
+                            {recentlySuccessful && (
                                 <p className="text-muted-foreground text-sm">Salvo</p>
-                            </Transition>
+                            )}
                         </div>
                     </form>
                 </div>

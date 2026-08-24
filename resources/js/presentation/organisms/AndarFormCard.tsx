@@ -8,7 +8,7 @@ import { AlertTriangle, Lock, Trash2 } from 'lucide-react';
 export interface AndarFormData {
     id: string;
     nome: string;
-    nivel: number; // -2, -1, 0, 1, 2, etc. (0 = térreo)
+    nivel: number;
     tipo_acesso: string[];
 }
 
@@ -40,7 +40,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
     const isTerreo = andar.nivel === 0;
     const hasErrors = errors?.[`andares.${index}.tipo_acesso`];
 
-    // Função para lidar com tentativa de remoção
     const handleRemoveClick = () => {
         if (!podeRemover) {
             console.warn(`Tentativa de remoção bloqueada: ${mensagemBloqueio}`);
@@ -49,14 +48,12 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
         onRemove(andar.id);
     };
 
-    // Determinar ícone do botão
     const getIconeBotao = () => {
         if (isTerreo) return <Lock className="h-4 w-4" />;
         if (!podeRemover) return <AlertTriangle className="h-4 w-4" />;
         return <Trash2 className="h-4 w-4" />;
     };
 
-    // Determinar cor do botão
     const getCorBotao = () => {
         if (podeRemover) return 'text-destructive hover:text-destructive';
         if (isTerreo) return 'text-info-accent cursor-not-allowed border-info/25';
@@ -79,7 +76,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                         </CardTitle>
 
                         <div className="flex items-center gap-2">
-                            {/* Badges dos tipos de acesso */}
                             {andar.tipo_acesso.length > 0 && (
                                 <div className="flex gap-1">
                                     {andar.tipo_acesso.slice(0, 2).map((tipo) => (
@@ -93,7 +89,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                                 </div>
                             )}
 
-                            {/* Botão de remover */}
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <div>
@@ -118,7 +113,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                 </CardHeader>
 
                 <CardContent className="space-y-3">
-                    {/* Aviso para térreo */}
                     {isTerreo && (
                         <div className="border-info/25 bg-info-subtle text-info-accent rounded border p-2 text-xs">
                             <p className="font-medium">ℹ️ Andar obrigatório</p>
@@ -126,7 +120,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                         </div>
                     )}
 
-                    {/* Aviso para andares bloqueados */}
                     {!podeRemover && !isTerreo && (
                         <div className="border-warning/25 bg-warning-subtle text-warning-accent rounded border p-2 text-xs">
                             <p className="flex items-center gap-1 font-medium">
@@ -137,7 +130,6 @@ export default function AndarCard({ andar, index, onUpdate, onRemove, todosAndar
                         </div>
                     )}
 
-                    {/* Tipos de Acesso */}
                     <div className="space-y-3">
                         <Label className="text-sm font-medium">Tipos de Acesso</Label>
                         <div className="grid grid-cols-1 gap-3">

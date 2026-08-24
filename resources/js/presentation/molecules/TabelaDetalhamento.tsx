@@ -26,11 +26,6 @@ interface Props {
 
 const DATA_BR = /^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?$/;
 
-/**
- * Converte o valor exibido em algo comparavel. As linhas ja chegam
- * formatadas do backend (datas em d/m/Y, taxas com "%"), entao a ordenacao
- * precisa reinterpretar o texto antes de comparar.
- */
 function valorOrdenavel(valor: unknown): number | string {
     if (valor === null || valor === undefined) {
         return '';
@@ -65,7 +60,6 @@ export function TabelaDetalhamento({ titulo = 'Detalhamento', colunas, linhas, i
     const [porPagina, setPorPagina] = useState(itemsPerPage);
     const [ordenacao, setOrdenacao] = useState<Ordenacao | undefined>();
 
-    // Filtros novos podem encurtar a lista; volta para a primeira pagina.
     useEffect(() => {
         setPagina(1);
     }, [linhas, porPagina, ordenacao]);
@@ -98,7 +92,6 @@ export function TabelaDetalhamento({ titulo = 'Detalhamento', colunas, linhas, i
                 return { chave, direcao: 'asc' };
             }
 
-            // Terceiro clique remove a ordenacao e volta a ordem original.
             return atual.direcao === 'asc' ? { chave, direcao: 'desc' } : undefined;
         });
     };

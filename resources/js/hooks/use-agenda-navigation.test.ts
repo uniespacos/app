@@ -12,7 +12,7 @@ jest.mock('@inertiajs/react', () => ({
 describe('useAgendaNavigation', () => {
     const routeName = 'espacos.show';
     const routeParams = { espaco: 1 };
-    const semanaInicial = parseISO('2026-06-01'); // A Monday
+    const semanaInicial = parseISO('2026-06-01');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -90,7 +90,6 @@ describe('useAgendaNavigation', () => {
     });
 
     it('should not navigate to the previous week if podeVoltar is false', () => {
-        // dataInicial is set to a Monday of the current week, so we can't go back
         const dataInicial = parseISO('2026-06-01');
         const { result } = renderHook(() =>
             useAgendaNavigation({
@@ -111,7 +110,6 @@ describe('useAgendaNavigation', () => {
     });
 
     it('should not navigate to the next week if podeAvancar is false', () => {
-        // dataFinal is set to a Friday of the current week, so we can't go to the next week
         const dataFinal = parseISO('2026-06-05');
         const { result } = renderHook(() =>
             useAgendaNavigation({

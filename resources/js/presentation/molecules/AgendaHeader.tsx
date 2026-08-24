@@ -43,18 +43,6 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                 <div className="border-t pt-4">
                     <h3 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">Gestores por turno</h3>
 
-                    {/*
-                        Antes: grid-cols-1 com `justify-center` e rótulo "MANHA:" colado
-                        ao nome. Nomes longos ("Comissão de Residência Multiprofissional
-                        de Saúde - COREMU") quebravam em duas linhas centralizadas e o
-                        rótulo ficava boiando fora de eixo. Rótulo em largura fixa e
-                        texto alinhado à esquerda mantêm a coluna reta qualquer que seja
-                        o tamanho do nome.
-
-                        A ordem vem de TURNOS_ORDENADOS em vez de um array
-                        literal, e o rótulo de TURNO_LABEL — "MANHA" sem til era
-                        `turno.toUpperCase()` cru.
-                    */}
                     <dl className="bg-muted/30 grid grid-cols-1 gap-x-4 gap-y-3 rounded-lg p-3 sm:grid-cols-3">
                         {TURNOS_ORDENADOS.map((turno) => {
                             const gestor = gestoresPorTurno.get(turno);
@@ -67,9 +55,7 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                                         {gestor ? (
                                             <div className="min-w-0">
                                                 <p className="text-sm leading-snug break-words">{gestor.nome}</p>
-                                                {/* Tooltip é inalcançável no toque, então
-                                                    e-mail e setor ficam visíveis. */}
-                                                {gestor.email && <p className="text-muted-foreground text-xs break-all">{gestor.email}</p>}
+                                                                            {gestor.email && <p className="text-muted-foreground text-xs break-all">{gestor.email}</p>}
                                             </div>
                                         ) : (
                                             <span className="text-muted-foreground text-sm">Sem gestor</span>

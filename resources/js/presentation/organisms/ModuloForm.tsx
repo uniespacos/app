@@ -41,22 +41,18 @@ export default function ModuloForm({
     const topRef = useRef<HTMLDivElement>(null);
     const andaresRef = useRef<HTMLDivElement>(null);
 
-    // Criar um Card com forwardRef para a seção de andares
     const AndaresCard = forwardRef<HTMLDivElement, { children: React.ReactNode }>(({ children }, ref) => <Card ref={ref}>{children}</Card>);
     AndaresCard.displayName = 'AndaresCard';
 
-    // Inicializar dados do formulário
     useEffect(() => {
         if (modulo && isEditMode(modulo)) {
             const formData = transformModuloToFormData(modulo);
-            // Garantir que tem térreo mesmo nos dados vindos do backend
             const andaresComTerreo = garantirTerreo(formData.andares);
             setData({
                 ...formData,
                 andares: andaresComTerreo.map((andar) => ({ ...andar, nome: nivelParaNome(andar.nivel) })),
             });
         } else if (data.andares.length === 0) {
-            // Se não é edição e não tem andares, criar térreo inicial
             setData((prev: CadastrarModuloForm) => ({
                 ...prev,
                 andares: [criarTerreoInicial()],
@@ -71,14 +67,12 @@ export default function ModuloForm({
     const handleAddAndar = (novoAndar: AndarFormData) => {
         setData((prev: CadastrarModuloForm) => {
             const novosAndares = [...prev.andares, novoAndar];
-            // Sempre garantir que tem térreo
             return {
                 ...prev,
                 andares: garantirTerreo(novosAndares),
             };
         });
 
-        // Scroll suave para a seção de andares
         setTimeout(() => {
             andaresRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
@@ -93,18 +87,15 @@ export default function ModuloForm({
 
     const handleRemoveAndar = (andarId: string) => {
         setData((prev: CadastrarModuloForm) => {
-            // Encontrar o andar que está sendo removido
             const andarParaRemover = prev.andares.find((a: AndarFormData) => a.id === andarId);
 
-            // PROTEÇÃO EXTRA: Nunca permitir remover térreo
             if (andarParaRemover && andarParaRemover.nivel === 0) {
                 console.warn('Tentativa de remover térreo bloqueada no handleRemoveAndar');
-                return prev; // Não fazer nada
+                return prev;
             }
 
             const novosAndares = prev.andares.filter((a: AndarFormData) => a.id !== andarId);
 
-            // Sempre garantir que tem térreo após remoção
             return {
                 ...prev,
                 andares: garantirTerreo(novosAndares),
@@ -121,7 +112,6 @@ export default function ModuloForm({
     return (
         <div ref={topRef}>
             <form onSubmit={submit} className="space-y-6 pb-20">
-                {/* Informações Básicas do Módulo */}
                 <Card>
                     <CardHeader>
                         <CardTitle>{title}</CardTitle>
@@ -129,13 +119,11 @@ export default function ModuloForm({
                         {editMode && <div className="text-muted-foreground text-sm">ID do Módulo: {modulo?.id}</div>}
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {/* Select de Instituição */}
                         <div className="space-y-2">
                             <Label htmlFor="instituicao">Instituição</Label>
                             <Input id="instituicao" value={instituicao.nome} disabled />
                         </div>
 
-                        {/* Select de Unidade */}
                         <div className="space-y-2">
                             <Label htmlFor="unidade_id">Unidade</Label>
                             <SelectUI
@@ -159,7 +147,6 @@ export default function ModuloForm({
                             {errors.unidade_id && <p className="text-destructive mt-1 text-sm">{errors.unidade_id}</p>}
                         </div>
 
-                        {/* Input Nome do Módulo */}
                         <div className="space-y-2">
                             <Label htmlFor="nome">Nome do módulo</Label>
                             <Input
@@ -175,7 +162,6 @@ export default function ModuloForm({
                     </CardContent>
                 </Card>
 
-                {/* Seção de Andares */}
                 <AndaresCard ref={andaresRef}>
                     <CardHeader>
                         <CardTitle>Andares do Módulo</CardTitle>
@@ -195,7 +181,6 @@ export default function ModuloForm({
                     </CardContent>
                 </AndaresCard>
 
-                {/* Botões de Ação Fixos */}
                 <Card>
                     <CardFooter className="flex justify-end space-x-2">
                         <Button type="submit" disabled={processing}>
@@ -205,7 +190,6 @@ export default function ModuloForm({
                 </Card>
             </form>
 
-            {/* Ações Sticky */}
             <AndarStickFormActions processing={processing} isEditMode={editMode} onScrollToTop={scrollToTop} andaresCount={data.andares.length} />
         </div>
     );

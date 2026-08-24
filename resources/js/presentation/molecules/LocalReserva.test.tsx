@@ -2,11 +2,6 @@ import type { Espaco } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { LocalReserva } from './LocalReserva';
 
-/**
- * Issue #105. Covers the degraded shapes explicitly: when the andar.modulo chain
- * is missing the component must still show the space name instead of breaking,
- * because that is exactly what happens if an eager load is dropped later.
- */
 
 const espaco = (overrides: Partial<Espaco> = {}): Espaco =>
     ({

@@ -64,7 +64,6 @@ export default function Register() {
     };
 
     return (
-        // Sem gradiente semântico equivalente no tema; usa fundo neutro que respeita dark mode.
         <div className="bg-muted flex min-h-screen items-center justify-center">
             <Head title="Criar conta" />
             <div className="container mx-auto px-4 py-8">

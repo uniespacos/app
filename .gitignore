@@ -47,3 +47,10 @@ docker/development/mailpit/*
 
 # Environment variables
 .env
+
+# Documentação de auditorias internas
+/docs/auditoria/
+/docs/auditoria-2/
+/docs/auditoria-design/
+/docs/auditoria-issues-*.md
+/docs/plano-execucao-design/

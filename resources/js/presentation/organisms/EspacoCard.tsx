@@ -23,7 +23,7 @@ interface CardEspacoProps {
     handleSolicitarReserva?: (espacoId: string) => void;
     handleEditarEspaco?: (espacoId: string) => void;
     handleExcluirEspaco?: (espacoId: string) => void;
-    showFavoritar?: boolean; // Se deve mostrar o botão de favoritar
+    showFavoritar?: boolean;
 }
 
 export default function EspacoCard({
@@ -45,21 +45,14 @@ export default function EspacoCard({
     };
     const imageSources =
         espaco.imagens && espaco.imagens.length > 0
-            ? espaco.imagens.map((img) => `/storage/${img}`) // Assumindo que '/storage/' é o caminho correto
+            ? espaco.imagens.map((img) => `/storage/${img}`)
             : [espaco.main_image_index ? `/storage/${espaco.main_image_index}` : espacoImage];
 
     const isModoGerenciamento = Boolean(isGerenciarEspacos) && hasPermission(user, PERMISSION_ESPACOS_ATUALIZAR);
-    // Fora do modo de gerenciamento, o card inteiro é o link para a agenda do
-    // espaço — não faz sentido repetir a mesma ação num botão "Ver agenda" no
-    // rodapé quando clicar em qualquer parte do card já leva para lá.
     const isClicavel = !isModoGerenciamento;
     const irParaAgenda = () => handleSolicitarReserva?.(String(espaco.id));
 
     return (
-        // Card sem o py-6/gap-6 padrão do shadcn: aquele padding é o que deixava
-        // uma tarja da cor do card acima e abaixo da imagem (ela nunca alcançava
-        // as bordas arredondadas). Com py-0 a imagem é o primeiro filho colado no
-        // topo, e o overflow-hidden faz o efeito de máscara nos cantos do Card.
         <Card
             role={isClicavel ? 'button' : undefined}
             tabIndex={isClicavel ? 0 : undefined}
@@ -67,10 +60,6 @@ export default function EspacoCard({
             onKeyDown={isClicavel ? (e) => e.key === 'Enter' && irParaAgenda() : undefined}
             className={`flex flex-col gap-0 overflow-hidden py-0 ${isClicavel ? 'hover:border-primary/40 cursor-pointer transition-colors hover:shadow-sm' : ''}`}
         >
-            {/* --- Seção da Imagem/Carrossel --- */}
-            {/* stopPropagation: cliques nas setas do carrossel e no botão de
-                favoritar não podem "vazar" para o onClick do card e disparar
-                a navegação para a agenda. */}
             <div
                 className="relative"
                 onClick={(e) => {
@@ -81,10 +70,6 @@ export default function EspacoCard({
                     <CarouselContent>
                         {imageSources.map((src, index) => (
                             <CarouselItem key={index}>
-                                {/* bg-muted por trás: sem isso, uma imagem quebrada ou
-                                    ainda carregando deixava o card com um retângulo
-                                    preto sólido — chamativo ao lado dos outros cards
-                                    com o placeholder visível. */}
                                 <div className="bg-muted aspect-video">
                                     <img
                                         src={src}
@@ -92,13 +77,12 @@ export default function EspacoCard({
                                         className="h-full w-full object-cover"
                                         onError={(e) => {
                                             e.currentTarget.src = espacoImage;
-                                        }} // Fallback para imagem quebrada
+                                        }}
                                     />
                                 </div>
                             </CarouselItem>
                         ))}
                     </CarouselContent>
-                    {/* Mostra os botões de navegação apenas se houver mais de uma imagem */}
                     {imageSources.length > 1 && (
                         <>
                             <CarouselPrevious className="absolute top-1/2 left-3 -translate-y-1/2" />
@@ -107,8 +91,6 @@ export default function EspacoCard({
                     )}
                 </Carousel>
 
-                {/* Botão de Favoritar posicionado sobre a imagem. Padding um pouco
-                    maior que o alvo de toque mínimo (44px) para não ficar apertado no mobile. */}
                 {showFavoritar && (
                     <button
                         onClick={handleFavoritarEspaco}
@@ -127,7 +109,6 @@ export default function EspacoCard({
                 </CardTitle>
             </CardHeader>
 
-            {/* flex-grow para que esta área ocupe o espaço disponível, empurrando o rodapé para baixo */}
             <CardContent className="flex-grow pt-4">
                 <div className="grid grid-cols-2 gap-2">
                     <Badge variant="outline" className="w-full min-w-0 justify-start gap-1.5 overflow-hidden">
@@ -149,15 +130,12 @@ export default function EspacoCard({
                 </div>
             </CardContent>
 
-            {/* O rodapé se alinha na parte inferior do card */}
             {isModoGerenciamento ? (
                 <CardFooter className="flex flex-wrap gap-2 py-4">
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                            /* Lógica para ver detalhes */
-                        }}
+                        onClick={irParaAgenda}
                     >
                         Ver Detalhes
                     </Button>
@@ -171,8 +149,6 @@ export default function EspacoCard({
                     </Button>
                 </CardFooter>
             ) : (
-                // Dica de que o card é clicável, não um botão — a ação já é
-                // acionada pelo card inteiro (ver `isClicavel` acima).
                 <CardFooter className="text-primary flex items-center justify-end gap-1 py-4 text-sm font-medium">
                     Ver disponibilidade
                     <ChevronRight className="h-4 w-4" />
