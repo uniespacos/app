@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.53](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.52...v1.3.0-rc.53) (2026-08-24)
+
+
+### Bug Fixes
+
+* auditoria no codigo e padroes arquiteturais ([#359](https://github.com/uniespacos/uniespacos/issues/359)) ([7ecd6f7](https://github.com/uniespacos/uniespacos/commit/7ecd6f72f077ab8d263e94ad35e1f1b6da5ba214))
+
 ## [1.3.0-rc.52](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.51...v1.3.0-rc.52) (2026-08-23)
 
 
