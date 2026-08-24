@@ -15,17 +15,6 @@ interface ReservaCardMobileProps {
     onCancelar: (reserva: Reserva) => void;
 }
 
-/**
- * A tabela de reservas tem 5 colunas; no celular só Título sobra visível
- * (Local/Período/Situação já são `hidden md:table-cell`), e a coluna Ações
- * com 2-3 botões de texto completo empurra a linha para rolagem lateral
- * dentro da tabela. Um card por reserva resolve porque cada informação ganha
- * sua própria linha em vez de disputar largura de coluna.
- *
- * A faixa colorida no topo repete o token `solido` de ESTILO_SITUACAO (o
- * mesmo já usado no badge) — dá pra reconhecer a situação num relance, antes
- * mesmo de ler o texto do badge.
- */
 export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;

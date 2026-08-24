@@ -7,7 +7,6 @@ import { NavUser } from '@/presentation/molecules/nav-user';
 import type { User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
-/* --------------------------- Componente -------------------------------- */
 export function AppSidebar() {
     const { props } = usePage<{ auth: { user: User } }>();
     const user = props.auth.user;
@@ -24,10 +23,6 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" variant="inset">
-            {/* Cabeçalho ------------------------------------------------------- */}
-            {/* border-b separa a marca do restante do menu — sem ela o Sheet
-                mobile ficava com a logo flutuando solta no topo de uma lista
-                de itens, sem nenhuma divisão visual entre as duas áreas. */}
             <SidebarHeader className="border-sidebar-border/50 border-b">
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -40,16 +35,12 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            {/* Conteúdo -------------------------------------------------------- */}
             <SidebarContent>
-                {/* Itens comuns */}
                 {<NavMain label="Painel" items={commonNav} />}
 
-                {/* Seção do cargo */}
                 {extraItems.length > 0 && <NavMain label="Gerir" items={extraItems} />}
             </SidebarContent>
 
-            {/* Rodapé ---------------------------------------------------------- */}
             <SidebarFooter className="border-sidebar-border/50 border-t">
                 <NavUser />
             </SidebarFooter>

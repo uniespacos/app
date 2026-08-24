@@ -18,11 +18,6 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
     const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
     const isMobile = useIsMobile();
 
-    // Mesma visão de dia-a-dia da agenda de reserva: a grade de 800px nunca
-    // coube no celular, e aqui ela ficava dentro de um modal ainda mais
-    // apertado — era rolagem lateral dentro de rolagem vertical dentro de
-    // dialog. `isSlotSelecionado` sempre falso porque este uso é read-only
-    // (não há seleção de horário no modal de detalhes).
     if (isMobile) {
         return (
             <Card className="p-0">
@@ -40,10 +35,6 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
 
     return (
         <Card className="p-0">
-            {/* O scroll precisa ficar no PAI: antes, `overflow-auto` estava no
-                mesmo elemento que carrega o `min-w-[800px]`, e um elemento não
-                rola a si próprio — a grade vazava para fora do modal no celular.
-                Mesmo padrão de AgendaCalendario. */}
             <div className="w-full overflow-auto">
                 <div className="min-w-[800px] rounded-xl">
                     <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
@@ -60,7 +51,7 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                     </div>
                     {agendas.map((agenda) => {
                         if (!agenda) {
-                            return null; // Skip empty agendas
+                            return null;
                         }
                         return (
                             <CalendarShiftSection

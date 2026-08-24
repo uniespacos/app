@@ -25,9 +25,6 @@ interface ModalProps {
     children?: ReactNode;
 }
 
-// Modal padrão da aplicação: toda tela que precisar de um modal customizado
-// deve montar seu organismo por cima deste componente em vez de reimplementar
-// Dialog/DialogContent diretamente.
 export function Modal({
     open,
     onOpenChange,

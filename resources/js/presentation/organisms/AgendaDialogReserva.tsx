@@ -16,7 +16,6 @@ import { ptBR } from 'date-fns/locale';
 import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-// Tipagem das props foi atualizada
 interface AgendaDialogReservaProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -31,13 +30,6 @@ interface AgendaDialogReservaProps {
     setSlotsSelecao?: (slots: SlotCalendario[]) => void;
 }
 
-/**
- * Opção de escopo/recorrência como um card clicável, em vez de um botão de
- * rádio solto ao lado do texto. O card inteiro é o alvo de clique (via
- * `<Label>` envolvendo tudo), e o estado selecionado usa os mesmos tokens de
- * `primary` que o resto do app usa para "isto está ativo" — mesma linguagem
- * visual do item ativo da sidebar.
- */
 function OpcaoRadioCard({
     value,
     id,
@@ -218,11 +210,6 @@ export default function AgendaDialogReserva({
             }
             description={isEditMode ? 'Ajuste os detalhes e o escopo da sua alteração.' : 'Preencha os detalhes da sua reserva.'}
             trigger={
-                // O Button base tem `whitespace-nowrap` fixo, e este texto é
-                // dinâmico ("Reservar 12 horários em 5 dias") — sem
-                // `whitespace-normal` aqui, ele estoura a largura do painel que
-                // o envolve. Sem sombra própria: o painel em EspacoAgenda já
-                // carrega o `shadow-lg`, e repeti-la aqui duplicava a borda.
                 <Button className="w-full whitespace-normal sm:w-auto">
                     {isEditMode ? 'Atualizar' : 'Reservar'} {slotsSelecao.length} horário{slotsSelecao.length > 1 ? 's' : ''} em{' '}
                     {Object.keys(slotsAgrupadosPorDia).length} dia
@@ -236,13 +223,6 @@ export default function AgendaDialogReserva({
                         <Label htmlFor="titulo" className="flex items-center gap-1.5 font-medium">
                             <Type className="text-muted-foreground h-4 w-4" />
                             Título da Reserva
-                            {/*
-                                    Era um <p> (elemento de bloco) dentro de
-                                    <Label>, que renderiza <label> (inline) — HTML
-                                    semanticamente inválido, e era o que empurrava
-                                    "* Obrigatório" para fora de eixo. Um <span>
-                                    com estilo de badge resolve os dois problemas.
-                                */}
                             <span className="text-destructive-accent bg-destructive-subtle rounded-full px-2 py-0.5 text-xs font-normal">
                                 Obrigatório
                             </span>
@@ -328,11 +308,6 @@ export default function AgendaDialogReserva({
                         </RadioGroup>
                     </div>
 
-                    {/*
-                            grid-cols-2 fixo espremia rótulo + ícone + data
-                            ("dd/MM/yyyy (calculado)") numa coluna de menos de
-                            150px em telas de 360px. Empilha abaixo de sm.
-                        */}
                     <div className="bg-muted/30 grid grid-cols-1 gap-4 rounded-lg border p-3 sm:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="data-inicial" className="text-xs">

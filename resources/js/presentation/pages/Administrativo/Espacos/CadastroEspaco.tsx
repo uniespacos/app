@@ -44,9 +44,9 @@ export default function CadastroEspacoPage() {
     const [imagesWithPreviews, setImagesWithPreviews] = useState<ImageWithPreview[]>(() => {
         if (!isEditMode || !espaco.imagens) return [];
         return espaco.imagens.map((imgPath) => ({
-            file: new File([], imgPath, { type: 'image/*' }), // Create a dummy File object for existing images
+            file: new File([], imgPath, { type: 'image/*' }),
             preview: `/storage/${imgPath}`,
-            path: imgPath, // Armazena o path relativo para enviar na exclusão
+            path: imgPath,
         }));
     });
     const [isAddAndarDialogOpen, setIsAddAndarDialogOpen] = useState(false);
@@ -87,7 +87,7 @@ export default function CadastroEspacoPage() {
             });
         } else {
             post(route('institucional.espacos.store'), {
-                forceFormData: true, // Garante que a requisição seja multipart/form-data
+                forceFormData: true,
                 onSuccess: () => {
                     toast.success(`Espaço ${isEditMode ? 'atualizado' : 'cadastrado'} com sucesso!`);
                     if (!isEditMode) {

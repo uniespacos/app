@@ -36,8 +36,6 @@ export default function Dashboard({
     espacosFavoritos: Espaco[];
     reservas: Reserva[];
 }) {
-    // Últimos 30 dias, fixo — esta é a prévia do painel, não o relatório
-    // completo. Quem quiser outro período ou exportar vai para /gestor/relatorios.
     const filtrosPeriodo = useMemo(
         () => ({
             data_inicio: format(subDays(new Date(), 30), 'yyyy-MM-dd'),
@@ -45,9 +43,6 @@ export default function Dashboard({
         }),
         [],
     );
-    // `user` (prop da página) vem direto do Eloquent, sem `.permissions` —
-    // quem carrega esse array é o `auth.user` compartilhado (mesma fonte que
-    // o AppSidebar usa para decidir se mostra o item "Relatórios" no menu).
     const authUser = usePage<{ auth: { user: User } }>().props.auth.user;
     const podeVerRelatorios = hasPermission(authUser, PERMISSION_SECAO_RELATORIOS);
     const { dados, status } = useDadosRelatorio(route('gestor.relatorios.dados'), podeVerRelatorios ? 'reservas_periodo' : undefined, filtrosPeriodo);

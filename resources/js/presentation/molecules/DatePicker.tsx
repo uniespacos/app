@@ -19,8 +19,6 @@ interface DatePickerProps {
     className?: string;
 }
 
-// Combo Popover + Calendar + Button padrão para seleção de data, antes
-// duplicado à mão em cada tela que precisava de um campo de data.
 export function DatePicker({ value, onSelect, disabled, buttonDisabled, modal, placeholder = 'Selecione...', className }: DatePickerProps) {
     return (
         <Popover modal={modal}>

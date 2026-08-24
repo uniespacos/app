@@ -1,5 +1,3 @@
-'use client';
-
 import { Modal } from '@/presentation/molecules/Modal';
 import { SetorForm, SetorFormData } from '@/presentation/organisms/SetorForm';
 import { UsuariosSetor } from '@/presentation/organisms/UsuariosSetor';

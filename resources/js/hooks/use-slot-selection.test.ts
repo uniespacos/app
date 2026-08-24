@@ -11,7 +11,7 @@ jest.mock('sonner', () => ({
 }));
 
 describe('useSlotSelection', () => {
-    const hoje = parseISO('2026-06-02'); // A Tuesday
+    const hoje = parseISO('2026-06-02');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -51,7 +51,6 @@ describe('useSlotSelection', () => {
         expect(result.current.slotsSelecao[0].id).toBe(slot.id);
         expect(result.current.isSlotSelecionado(slot)).toBe(true);
 
-        // Toggle again to remove
         act(() => {
             result.current.alternarSelecaoSlot(slot);
         });
@@ -62,7 +61,6 @@ describe('useSlotSelection', () => {
 
     it('should shift a past slot to next week and notify with toast', () => {
         const { result } = renderHook(() => useSlotSelection({ hoje }));
-        // 2026-06-01 is a Monday (in the past compared to Tuesday June 2)
         const pastSlot = createSlot('2026-06-01|08:20:00', '2026-06-01');
 
         act(() => {

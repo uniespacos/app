@@ -40,7 +40,6 @@ export function LocationSelector({
     return (
         <>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Seleção de Unidade */}
                 <div className="space-y-2">
                     <Label htmlFor="unidade_id">Unidade</Label>
                     <SelectUI
@@ -64,7 +63,6 @@ export function LocationSelector({
                     {errors.unidade_id && <p className="text-destructive mt-1 text-sm">{errors.unidade_id}</p>}
                 </div>
 
-                {/* Seleção de Módulo */}
                 <div className="space-y-2">
                     <Label htmlFor="module_id">Módulo</Label>
                     <SelectUI
@@ -92,7 +90,6 @@ export function LocationSelector({
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Seleção de Andar */}
                 <div className="space-y-2">
                     <Label htmlFor="andar_id">Andar</Label>
                     <div className="flex gap-2">
@@ -114,7 +111,6 @@ export function LocationSelector({
                     {errors.andar_id && <p className="text-destructive mt-1 text-sm">{errors.andar_id}</p>}
                 </div>
 
-                {/* Tipos de Acesso do Andar */}
                 <div className="space-y-2">
                     <Label>Tipos de Acesso do Andar</Label>
                     <div className="border-input bg-muted/50 flex min-h-[40px] flex-wrap items-center gap-2 rounded-md border px-3 py-2">

@@ -18,7 +18,7 @@ export interface CadastrarUnidadeForm {
     nome: string;
     sigla: string;
     instituicao_id: string;
-    [key: string]: string; // Permite campos adicionais
+    [key: string]: string;
 }
 
 export default function CadastrarUnidadePage() {

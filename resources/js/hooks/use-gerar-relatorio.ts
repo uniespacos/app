@@ -29,8 +29,6 @@ export function useGerarRelatorio(endpoint: string) {
                 Accept: 'application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             };
 
-            // Prioriza o cookie XSRF-TOKEN (renovado pelo Laravel a cada resposta) sobre a
-            // meta tag, que fica desatualizada apos o login numa SPA Inertia (sem reload).
             if (xsrfCookie) {
                 headers['X-XSRF-TOKEN'] = xsrfCookie;
             } else if (metaToken) {
@@ -65,12 +63,9 @@ export function useGerarRelatorio(endpoint: string) {
             const blob = await response.blob();
 
             const contentDisposition = response.headers.get('content-disposition');
-            // Fallback com a extensao do formato solicitado: o header pode faltar ou
-            // vir sem aspas, e nunca devemos salvar CSV/XLSX com extensao .pdf.
             let filename = `relatorio.${payload.formato}`;
 
             if (contentDisposition) {
-                // Aceita filename com ou sem aspas (o backend envia sem aspas).
                 const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(contentDisposition);
                 if (match && match[1]) {
                     filename = decodeURIComponent(match[1].trim());

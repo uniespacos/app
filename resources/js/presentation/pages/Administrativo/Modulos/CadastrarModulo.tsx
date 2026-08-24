@@ -21,7 +21,7 @@ export interface CadastrarModuloForm {
     nome: string;
     unidade_id: string;
     andares: AndarFormData[];
-    [key: string]: any; // Para permitir outros campos dinâmicos
+    [key: string]: any;
 }
 
 export default function CadastrarModuloPage() {

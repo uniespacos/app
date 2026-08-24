@@ -2,12 +2,6 @@ import { Agenda, AgendaDiasSemanaType, Horario } from '@/types';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import CalendarDiaMobile from './CalendarDiaMobile';
 
-/**
- * A visão mobile substitui a grade de 800px, que não cabe em celular nenhum.
- * O que estes testes travam é a paridade com o desktop: os dois consomem
- * `derivarSlotsDoTurno`, e um slot reservado não pode virar clicável só porque
- * o layout mudou.
- */
 describe('CalendarDiaMobile', () => {
     const diasSemana: AgendaDiasSemanaType[] = [
         { data: new Date('2026-09-07T12:00:00'), nome: 'Segunda-feira', abreviado: 'seg.', diaMes: '07/09', valor: 'seg', ehHoje: true },
@@ -43,7 +37,6 @@ describe('CalendarDiaMobile', () => {
 
     beforeEach(() => jest.clearAllMocks());
 
-    /** Mesma ordem canônica da issue #101 — turno não sai na ordem do banco. */
     it('renderiza os turnos na ordem canonica, nao na ordem recebida', () => {
         render(<CalendarDiaMobile {...props} />);
 
@@ -58,7 +51,6 @@ describe('CalendarDiaMobile', () => {
         expect(screen.getByRole('tab', { name: /segunda-feira/i })).toHaveAttribute('aria-selected', 'true');
     });
 
-    /** O rótulo visível é abreviado; o leitor de tela recebe o dia por extenso. */
     it('expoe o dia por extenso no nome acessivel da aba', () => {
         render(<CalendarDiaMobile {...props} />);
 
@@ -85,7 +77,6 @@ describe('CalendarDiaMobile', () => {
         expect(props.alternarSelecaoSlot).toHaveBeenCalledTimes(1);
     });
 
-    /** Paridade com o desktop: reservado é intocável nas duas visões. */
     it('slot reservado fica desabilitado e nao notifica', () => {
         const comReserva = [agenda('manha', [horarioDeferido('2026-09-07', '07:30:00')])];
 
@@ -108,7 +99,6 @@ describe('CalendarDiaMobile', () => {
         expect(within(linha).getByText('Selecionado')).toBeInTheDocument();
     });
 
-    /** Turno sem gestor atribuído não aparece — mesma regra do desktop. */
     it('ignora agendas sem gestor', () => {
         const semGestor = [{ id: 9, turno: 'noite', horarios: [] } as Agenda];
 
@@ -123,7 +113,6 @@ describe('CalendarDiaMobile', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    /** Abaixo de ~44px o alvo fica desconfortável para o dedo; usamos 52px. */
     it('usa alvos de toque confortaveis', () => {
         render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
 
@@ -134,7 +123,6 @@ describe('CalendarDiaMobile', () => {
     it('exibe as faixas de horario do turno selecionado', () => {
         render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
 
-        // manha tem 6 faixas
         expect(screen.getAllByRole('button').filter((b) => /\d{2}:\d{2} - \d{2}:\d{2}/.test(b.textContent ?? ''))).toHaveLength(6);
     });
 });

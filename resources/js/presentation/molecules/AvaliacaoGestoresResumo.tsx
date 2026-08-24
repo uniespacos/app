@@ -17,12 +17,6 @@ interface ResumoTurno {
     avaliadoPor: string[];
 }
 
-/**
- * Quem está aguardando uma reserva precisa saber quem avalia — não só que
- * está "em análise". Agrupa os horários por agenda (turno) porque cada turno
- * tem seu próprio gestor: uma reserva pode atravessar manhã e tarde e ter
- * pessoas diferentes avaliando cada pedaço.
- */
 export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresResumoProps) {
     const resumos = useMemo(() => {
         const porAgenda = new Map<number, ResumoTurno>();
@@ -63,10 +57,6 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
     return (
         <div className="space-y-2">
             <h4 className="text-foreground font-medium">Avaliação dos gestores</h4>
-            {/* Em telas largas cada card ocupava a largura inteira do modal por
-                pouca informação — uma linha de texto virava uma faixa de 80vw.
-                A partir de sm, os cards passam a lado a lado e encolhem para o
-                conteúdo, que é o que este componente realmente precisa mostrar. */}
             <ul className="flex flex-col flex-wrap gap-2 sm:flex-row">
                 {resumos.map((resumo) => {
                     const completo = resumo.avaliados === resumo.total;

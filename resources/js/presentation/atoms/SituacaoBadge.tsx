@@ -18,15 +18,6 @@ const ICONE: Record<SituacaoReserva, ComponentType<{ className?: string }>> = {
     inativa: XSquare,
 };
 
-/**
- * As cores vêm de ESTILO_SITUACAO, não de classes soltas do Tailwind. Antes
- * cada situação repetia aqui o próprio trio de border/bg/text, divergindo dos
- * outros três lugares que também pintam situação.
- *
- * O caso `inativa` carregava `border-black-200 text-black-700` — classes que
- * não existem no Tailwind. Nenhuma cor era aplicada e ninguém percebia, porque
- * o texto simplesmente herdava a cor do pai.
- */
 export function SituacaoBadge({ situacao, className }: SituacaoBadgeProps) {
     const estilo = ESTILO_SITUACAO[situacao];
 

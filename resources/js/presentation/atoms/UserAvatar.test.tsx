@@ -34,7 +34,6 @@ describe('UserAvatar', () => {
     it('renders AvatarImage when valid profile_pic is provided', () => {
         render(<UserAvatar user={{ ...mockUser, profile_pic: 'https://example.com/avatar.jpg' }} />);
 
-        // Radix Avatar renders AvatarFallback when image has not loaded yet in jsdom
         expect(screen.getByText('PL')).toBeInTheDocument();
     });
 });

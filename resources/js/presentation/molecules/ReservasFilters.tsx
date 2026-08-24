@@ -44,7 +44,6 @@ export function ReservasFilters({
     return (
         <Card className="w-full">
             <CardContent className="flex flex-col gap-4 p-4">
-                {/* Linha superior: Busca e ViewModeToggle */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="relative flex-1">
                         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
@@ -66,7 +65,6 @@ export function ReservasFilters({
                     )}
                 </div>
 
-                {/* Linha inferior: Filtros em Grid responsivo e harmonioso */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-1.5">
                         <Label htmlFor="reservas-situacao" className="text-muted-foreground text-xs font-medium">

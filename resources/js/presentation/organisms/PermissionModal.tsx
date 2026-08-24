@@ -1,5 +1,3 @@
-'use client';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,7 +30,6 @@ interface PermissionModalProps {
     onUpdate: (userId: number, roleName: string, agendas?: number[], directPermissions?: string[]) => void;
 }
 
-/** Payload de institucional.usuarios.permission-context. */
 interface PermissionContext {
     user: User;
     instituicoes: Instituicao[];
@@ -44,9 +41,6 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, processing = 
     const currentUser = props.auth.user;
     const canManageDirectPermissions = hasPermission(currentUser, PERMISSION_USUARIOS_GERENCIAR_PERMISSOES_DIRETAS);
 
-    // A listagem carrega apenas os campos que o card desenha. Agendas, catálogo
-    // de permissões e a árvore de instituições são pesados e só interessam aqui,
-    // então chegam sob demanda quando o modal abre.
     const [context, setContext] = useState<PermissionContext | null>(null);
     const [loading, setLoading] = useState(false);
 

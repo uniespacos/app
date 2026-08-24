@@ -16,7 +16,6 @@ export default function VisualizarEspaço({
     reserva?: Reserva;
     isEditMode?: boolean;
     semana: {
-        // A página agora espera receber a prop 'semana'
         inicio: string;
         fim: string;
         referencia: string;

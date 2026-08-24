@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowUp } from 'lucide-react';
@@ -17,7 +15,6 @@ export default function AndarStickFormActions({ onScrollToTop, andaresCount }: A
 
     useEffect(() => {
         const toggleVisibility = () => {
-            // Mostrar quando rolar mais de 300px
             if (window.pageYOffset > 300) {
                 setIsVisible(true);
             } else {

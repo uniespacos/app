@@ -14,9 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
     const { user } = usePage<{ user: User }>().props;
 
-    // Ações do usuário comum, em ordem de prioridade: reservar é o motivo de
-    // ele estar aqui, então ganha destaque visual próprio (hero); as outras
-    // duas são consultas de apoio e ficam como atalhos secundários.
     const atalhosSecundarios = [
         { label: 'Minhas Reservas', descricao: 'Acompanhe todas as suas reservas', Icone: ListChecks, href: route('reservas.index') },
         { label: 'Espaços Favoritos', descricao: 'Acesso rápido aos que você marcou', Icone: Star, href: route('espacos.favoritos') },
@@ -31,10 +28,6 @@ export default function Dashboard() {
                     <p className="text-muted-foreground">{user.setor ? `${user.setor.nome} (${user.setor.sigla})` : 'Bem-vindo ao UniEspaços!'}</p>
                 </div>
 
-                {/* CTA principal: primeira coisa que o usuário deve fazer ao
-                    entrar é reservar um espaço, então ela precisa de peso
-                    visual próprio, não competir em pé de igualdade com os
-                    atalhos de consulta abaixo. */}
                 <Card
                     role="button"
                     tabIndex={0}

@@ -8,15 +8,6 @@ interface AgendaLegendaProps {
 const ITEM_LIVRE = { label: 'Disponível para reservar', swatch: 'border border-border bg-background' };
 const ITEM_PASSADO = { label: 'Horário encerrado', swatch: 'bg-muted-foreground/40' };
 
-/**
- * Compartilhada entre a grade desktop e a lista mobile — as duas usam a mesma
- * paleta (fundo por status via `ESTILO_SLOT[status].fundo`), então a legenda
- * vale para as duas. A lista mobile também escreve o rótulo por linha, mas a
- * legenda ainda ajuda: explica o "porquê" da cor sem precisar tocar em cada
- * linha. Em modo de agendamento normal um slot só pode ser livre, passado,
- * reservado ou selecionado; "em análise" e "indeferida" só existem enquanto
- * se edita uma reserva específica, então só aparecem nesse modo.
- */
 export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps) {
     const itens = [
         ITEM_LIVRE,
@@ -32,10 +23,6 @@ export default function AgendaLegenda({ isEditMode = false }: AgendaLegendaProps
     ];
 
     return (
-        // `grid grid-cols-2` no mobile: os itens têm larguras diferentes, e
-        // `flex flex-wrap` deixava a segunda linha de bolinhas desalinhada
-        // com a primeira. Grade força as duas colunas a alinhar. No desktop
-        // cabe tudo numa linha só, então volta a ser `flex`.
         <div className="bg-muted/30 grid grid-cols-2 items-center gap-x-4 gap-y-1.5 border-b px-3 py-2 text-xs md:flex md:flex-wrap">
             {itens.map((item) => (
                 <div key={item.label} className="flex items-center gap-1.5">

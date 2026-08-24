@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SidebarProvider, useSidebar } from './sidebar';
+import { SidebarProvider, useSidebar } from '../sidebar';
 
 // Mock the useIsMobile hook to always return false (desktop view) for simplicity
 jest.mock('@/hooks/use-mobile', () => ({
@@ -8,7 +8,7 @@ jest.mock('@/hooks/use-mobile', () => ({
 }));
 
 // Import storedCookies from jest.setup.js
-import { storedCookies } from '../../../../jest.setup';
+import { storedCookies } from '../../../../../jest.setup';
 
 const cookies = storedCookies as Record<string, string>;
 

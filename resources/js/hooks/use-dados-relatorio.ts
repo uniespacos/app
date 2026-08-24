@@ -13,7 +13,6 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
     const filtrosSerializados = JSON.stringify(filtros ?? {});
 
     useEffect(() => {
-        // Pula o disparo enquanto nao houver um tipo selecionado (mount sem filtros minimos).
         if (!tipo) {
             setStatus('idle');
             setDados(null);
@@ -41,8 +40,6 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
                 Accept: 'application/json',
             };
 
-            // Prioriza o cookie XSRF-TOKEN (renovado pelo Laravel a cada resposta) sobre a
-            // meta tag, que fica desatualizada apos o login numa SPA Inertia (sem reload).
             if (xsrfCookie) {
                 headers['X-XSRF-TOKEN'] = xsrfCookie;
             } else if (metaToken) {
@@ -69,7 +66,6 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
                 setDados(json);
                 setStatus(json.linhas.length === 0 ? 'empty' : 'success');
             } catch {
-                // Ignora respostas obsoletas de requisicoes canceladas pelo cleanup.
                 if (signal.aborted) {
                     return;
                 }

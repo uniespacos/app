@@ -47,7 +47,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
 
     return (
         <form onSubmit={onSubmit} className="space-y-6">
-            {/* Personal Information */}
             <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
@@ -96,7 +95,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                 </div>
             </div>
 
-            {/* Institution Selection */}
             <div className="space-y-4">
                 <div className="border-t pt-6">
                     <div className="mb-4 flex items-center justify-between">
@@ -116,7 +114,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                 </div>
             </div>
 
-            {/* Password */}
             <div className="space-y-4">
                 <div className="border-t pt-6">
                     <h3 className="text-foreground mb-4 text-lg font-medium">Definir Senha</h3>
@@ -156,7 +153,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                 </div>
             </div>
 
-            {/* Submit Button */}
             <div className="pt-6">
                 <Button type="submit" className="h-12 w-full text-base font-medium" disabled={processing}>
                     {processing ? (

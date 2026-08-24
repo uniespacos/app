@@ -20,13 +20,11 @@ export function useAgendaNavigation({ semanaInicial, routeName, routeParams = {}
 
     const podeVoltar = useMemo(() => {
         if (!dataInicial) return true;
-        // startsOn: 1 is Monday
         return isAfter(startOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataInicial);
     }, [semanaVisivel, dataInicial]);
 
     const podeAvancar = useMemo(() => {
         if (!dataFinal) return true;
-        // startsOn: 1 is Monday
         return isBefore(endOfWeek(semanaVisivel, { weekStartsOn: 1 }), dataFinal);
     }, [semanaVisivel, dataFinal]);
 

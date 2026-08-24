@@ -30,9 +30,6 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                     </p>
                                     <p className="text-muted-foreground text-xs">{new Date(reserva.data_inicial).toLocaleDateString('pt-BR')}</p>
                                 </div>
-                                {/* Coluna de status/ação: mesmo padrão outline+FileText da
-                                    listagem de reservas (ReservasList) — o botão azul sólido
-                                    com ícone de check parecia uma ação de aprovar, não de ver. */}
                                 <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start">
                                     <SituacaoBadge situacao={reserva.situacao} />
                                     <Button

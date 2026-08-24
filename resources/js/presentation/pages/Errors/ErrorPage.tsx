@@ -16,8 +16,6 @@ interface ErrorContent {
 const CONTEUDO_POR_STATUS: Record<number, ErrorContent> = {
     403: {
         titulo: 'Acesso não autorizado',
-        // Cobre os dois casos que geram 403 na prática após a:
-        // reserva de outro usuário e reserva que já saiu do estado editável.
         descricao:
             'Você não tem permissão para acessar este conteúdo. Se você tentava editar uma reserva, é possível que ela já tenha sido avaliada e não possa mais ser alterada.',
         Icone: Lock,
