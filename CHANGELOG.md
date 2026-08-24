@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.54](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.53...v1.3.0-rc.54) (2026-08-24)
+
+
+### Bug Fixes
+
+* fase 2 da auditoria de codigo ([#361](https://github.com/uniespacos/uniespacos/issues/361)) ([5d4e08f](https://github.com/uniespacos/uniespacos/commit/5d4e08f09bb9c828a11264f295c620f51de8b956))
+
 ## [1.3.0-rc.53](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.52...v1.3.0-rc.53) (2026-08-24)
 
 
