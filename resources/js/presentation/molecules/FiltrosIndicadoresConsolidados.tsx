@@ -1,11 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { DatePicker } from '@/presentation/molecules/DatePicker';
 import { FiltrosRelatorio } from '@/types';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -38,32 +34,12 @@ export function FiltrosIndicadoresConsolidados({ filtros, onChange }: Props) {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label className="mb-2 block">Data Início</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dataInicio ? format(dataInicio, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecione...'}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={dataInicio} onSelect={handleDataInicioChange} />
-                        </PopoverContent>
-                    </Popover>
+                    <DatePicker value={dataInicio} onSelect={handleDataInicioChange} placeholder="Selecione..." />
                 </div>
 
                 <div>
                     <Label className="mb-2 block">Data Fim</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dataFim ? format(dataFim, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecione...'}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={dataFim} onSelect={handleDataFimChange} />
-                        </PopoverContent>
-                    </Popover>
+                    <DatePicker value={dataFim} onSelect={handleDataFimChange} placeholder="Selecione..." />
                 </div>
             </div>
         </div>
