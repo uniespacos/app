@@ -378,17 +378,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/RoleFormModal.tsx": {
-    "@typescript-eslint/no-misused-promises": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 3
-    }
-  },
   "resources/js/presentation/molecules/SeletorInstituicao.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 4
@@ -481,6 +470,11 @@
       "count": 1
     }
   },
+  "resources/js/presentation/organisms/RoleFormModal.tsx": {
+    "@typescript-eslint/no-misused-promises": {
+      "count": 1
+    }
+  },
   "resources/js/presentation/organisms/app-sidebar.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
@@ -531,9 +525,6 @@
     }
   },
   "resources/js/presentation/pages/Dashboard/DashboardInstitucionalPage.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 2
-    },
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 2
     }

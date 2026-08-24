@@ -3,9 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormField } from '@/presentation/molecules/FormField';
 import { Instituicao, Setor, Unidade } from '@/types';
+import { useForm } from '@inertiajs/react';
 import { MapPin } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
 
 export interface SetorFormData {
     nome: string;
@@ -17,34 +17,33 @@ interface Props {
     setor?: Setor;
     instituicao: Instituicao;
     unidades: Unidade[];
-    onSubmit: (data: SetorFormData) => void;
+    onSuccess?: () => void;
     onCancel: () => void;
 }
 
-export function SetorForm({ setor, instituicao, unidades, onSubmit, onCancel }: Props) {
-    const [nome, setNome] = useState<string>(setor?.nome ?? '');
-    const [sigla, setSigla] = useState<string>(setor?.sigla ?? '');
-    const [unidadeId, setUnidadeId] = useState<string>(setor?.unidade?.id.toString() ?? '');
-    const [errors, setErrors] = useState<Record<string, string>>({});
+export function SetorForm({ setor, instituicao, unidades, onSuccess, onCancel }: Props) {
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        nome: setor?.nome ?? '',
+        sigla: setor?.sigla ?? '',
+        unidade_id: setor?.unidade?.id ? String(setor.unidade.id) : '',
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
-
-        const newErrors: Record<string, string> = {};
-        if (!nome.trim()) newErrors.nome = 'Nome é obrigatório';
-        if (!sigla.trim()) newErrors.sigla = 'Sigla é obrigatória';
-        if (!unidadeId) newErrors.unidade_id = 'Unidade é obrigatória';
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
+        if (setor) {
+            put(route('institucional.setors.update', { setor: setor.id }), {
+                onSuccess: () => {
+                    onSuccess?.();
+                },
+            });
+        } else {
+            post(route('institucional.setors.store'), {
+                onSuccess: () => {
+                    reset();
+                    onSuccess?.();
+                },
+            });
         }
-
-        onSubmit({
-            nome: nome.trim(),
-            sigla: sigla.trim().toUpperCase(),
-            unidade_id: unidadeId,
-        });
     };
 
     return (
@@ -54,7 +53,13 @@ export function SetorForm({ setor, instituicao, unidades, onSubmit, onCancel }: 
             </FormField>
 
             <FormField label="Unidade" htmlFor="unidade" error={errors.unidade_id} required>
-                <Select value={unidadeId} onValueChange={setUnidadeId}>
+                <Select
+                    value={data.unidade_id}
+                    onValueChange={(val) => {
+                        setData('unidade_id', val);
+                    }}
+                    disabled={processing}
+                >
                     <SelectTrigger id="unidade">
                         <SelectValue placeholder="Selecione uma unidade" />
                     </SelectTrigger>
@@ -74,31 +79,35 @@ export function SetorForm({ setor, instituicao, unidades, onSubmit, onCancel }: 
             <FormField label="Nome do Setor" htmlFor="nome" error={errors.nome} required>
                 <Input
                     id="nome"
-                    value={nome}
+                    value={data.nome}
                     onChange={(e) => {
-                        setNome(e.target.value);
+                        setData('nome', e.target.value);
                     }}
                     placeholder="Ex: Recursos Humanos"
+                    disabled={processing}
                 />
             </FormField>
 
             <FormField label="Sigla" htmlFor="sigla" error={errors.sigla} required>
                 <Input
                     id="sigla"
-                    value={sigla}
+                    value={data.sigla}
                     onChange={(e) => {
-                        setSigla(e.target.value.toUpperCase());
+                        setData('sigla', e.target.value.toUpperCase());
                     }}
                     placeholder="Ex: RH"
                     maxLength={10}
+                    disabled={processing}
                 />
             </FormField>
 
             <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onCancel}>
+                <Button type="button" variant="outline" onClick={onCancel} disabled={processing}>
                     Cancelar
                 </Button>
-                <Button type="submit">{setor ? 'Atualizar' : 'Criar Setor'}</Button>
+                <Button type="submit" disabled={processing}>
+                    {processing ? (setor ? 'Atualizando...' : 'Criando...') : setor ? 'Atualizar' : 'Criar Setor'}
+                </Button>
             </div>
         </form>
     );

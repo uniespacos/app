@@ -2,17 +2,18 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { criarTerreoInicial, garantirTerreo, nivelParaNome } from '@/lib/utils/andars/AndarHelpers';
 import { isEditMode, transformModuloToFormData } from '@/lib/utils/andars/ModuloDataFormTransformer';
 import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
+import { FormField } from '@/presentation/molecules/FormField';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
 import AndaresManager from '@/presentation/organisms/AndarManager';
 import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
 import { Instituicao, Modulo, Unidade } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
+import type React from 'react';
 
 export interface ModuloFormProps {
     data: CadastrarModuloForm;
@@ -26,6 +27,7 @@ export interface ModuloFormProps {
     unidades: Unidade[];
     modulo?: Modulo;
 }
+
 export default function ModuloForm({
     data,
     setData,
@@ -119,13 +121,11 @@ export default function ModuloForm({
                         {editMode && <div className="text-muted-foreground text-sm">ID do Módulo: {modulo?.id}</div>}
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="instituicao">Instituição</Label>
+                        <FormField label="Instituição" htmlFor="instituicao">
                             <Input id="instituicao" value={instituicao.nome} disabled />
-                        </div>
+                        </FormField>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="unidade_id">Unidade</Label>
+                        <FormField label="Unidade" htmlFor="unidade_id" error={errors.unidade_id} required>
                             <SelectUI
                                 value={data.unidade_id}
                                 onValueChange={(value) => {
@@ -133,7 +133,7 @@ export default function ModuloForm({
                                 }}
                                 disabled={processing}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger id="unidade_id">
                                     <SelectValue placeholder="Selecione uma unidade" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -144,11 +144,9 @@ export default function ModuloForm({
                                     ))}
                                 </SelectContent>
                             </SelectUI>
-                            {errors.unidade_id && <p className="text-destructive mt-1 text-sm">{errors.unidade_id}</p>}
-                        </div>
+                        </FormField>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="nome">Nome do módulo</Label>
+                        <FormField label="Nome do módulo" htmlFor="nome" error={errors.nome} required>
                             <Input
                                 id="nome"
                                 value={data.nome}
@@ -156,9 +154,9 @@ export default function ModuloForm({
                                     setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value }));
                                 }}
                                 placeholder="Ex: Bloco Administrativo"
+                                disabled={processing}
                             />
-                            {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
-                        </div>
+                        </FormField>
                     </CardContent>
                 </Card>
 

@@ -2,7 +2,6 @@ import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import GenericHeader from '@/presentation/molecules/generic-header';
 import { ModaisSetor } from '@/presentation/molecules/ModaisSetor';
 import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
-import { SetorFormData } from '@/presentation/organisms/SetorForm';
 import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Setor, Unidade } from '@/types';
@@ -70,37 +69,6 @@ export default function SetoresPage() {
         );
     };
 
-    function handleCreateSetor(data: SetorFormData): void {
-        router.post(
-            route('institucional.setors.store'),
-            {
-                ...data,
-                unidade_id: data.unidade_id,
-            },
-            {
-                onSuccess: () => {
-                    setIsCreateModalOpen(false);
-                    setEditingSetor(null);
-                },
-            },
-        );
-    }
-
-    function handleUpdateSetor(setorId: number, data: SetorFormData): void {
-        router.put(
-            route('institucional.setors.update', { setor: setorId }),
-            {
-                ...data,
-            },
-            {
-                onSuccess: () => {
-                    setIsCreateModalOpen(false);
-                    setEditingSetor(null);
-                },
-            },
-        );
-    }
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setores" />
@@ -142,12 +110,6 @@ export default function SetoresPage() {
                     setViewingUsuarios={setViewingUsuarios}
                     instituicao={instituicao}
                     unidades={unidades}
-                    onCreateSetor={(data) => {
-                        handleCreateSetor(data);
-                    }}
-                    onUpdateSetor={(setorId, data) => {
-                        handleUpdateSetor(setorId, data);
-                    }}
                 />
             </div>
         </AppLayout>

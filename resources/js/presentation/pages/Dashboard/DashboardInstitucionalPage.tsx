@@ -3,14 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getTurnoText } from '@/lib/utils';
-import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
 import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Espaco, Reserva, Unidade, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { BarChart3, Building, Calendar, Plus, Settings, UserCheck, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',
@@ -40,25 +40,17 @@ export default function Dashboard({
     espacosFavoritos: Espaco[];
     reservas: Reserva[];
 }) {
-    const [filteredEspacosFavoritos, setFilteredEspacosFavoritos] = useState<Espaco[]>(espacosFavoritos);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    useEffect(() => {
-        if (!searchTerm) {
-            setFilteredEspacosFavoritos(espacosFavoritos);
-            return;
-        }
 
+    const filteredEspacosFavoritos = useMemo(() => {
+        if (!searchTerm.trim()) return espacosFavoritos;
         const lowerSearchTerm = searchTerm.toLowerCase();
-        const filtered = espacosFavoritos.filter(
+        return espacosFavoritos.filter(
             (espaco) =>
                 espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
                 espaco.andar?.nome.toLowerCase().includes(lowerSearchTerm) ||
-                '' ||
-                espaco.andar?.modulo?.nome.toLowerCase().includes(lowerSearchTerm) ||
-                '',
+                espaco.andar?.modulo?.nome.toLowerCase().includes(lowerSearchTerm),
         );
-
-        setFilteredEspacosFavoritos(filtered);
     }, [espacosFavoritos, searchTerm]);
 
     return (
@@ -76,11 +68,11 @@ export default function Dashboard({
                         }}
                     >
                         <Plus className="mr-2 h-4 w-4" />
-                        Novo Espaço
+                        Cadastrar Espaço
                     </Button>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total de Espaços</CardTitle>
@@ -99,74 +91,81 @@ export default function Dashboard({
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{estatisticasPainel.total_gestores}</div>
-                            <p className="text-muted-foreground text-xs">Gestores delegados</p>
+                            <p className="text-muted-foreground text-xs">Com delegações ativas</p>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Reservas do Mês</CardTitle>
-                            <BarChart3 className="text-muted-foreground h-4 w-4" />
+                            <Calendar className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{estatisticasPainel.reservas_mes}</div>
-                            <p className="text-muted-foreground text-xs">Total de reservas</p>
+                            <p className="text-muted-foreground text-xs">Agendamentos realizados</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Taxa de Ocupação</CardTitle>
+                            <BarChart3 className="text-muted-foreground h-4 w-4" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">78%</div>
+                            <p className="text-muted-foreground text-xs">Média geral</p>
                         </CardContent>
                     </Card>
                 </div>
 
-                <Tabs defaultValue="reservas" className="space-y-4">
+                <Tabs defaultValue="overview" className="space-y-4">
                     <TabsList>
-                        <TabsTrigger value="reservas"> Ultimas 5 reservas solicitadas </TabsTrigger>
-                        <TabsTrigger value="favoritos">Espaços Favoritos </TabsTrigger>
-                        <TabsTrigger value="espacos">Gerenciar Espaços</TabsTrigger>
-                        <TabsTrigger value="gestores">Delegar Gestores</TabsTrigger>
+                        <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                        <TabsTrigger value="espacos">Espaços</TabsTrigger>
+                        <TabsTrigger value="gestores">Gestores</TabsTrigger>
                         <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="reservas" className="space-y-4">
-                        <TabsItemReserva reservas={reservas} />
-                    </TabsContent>
-
-                    <TabsContent value="favoritos" className="space-y-4">
+                    <TabsContent value="overview" className="space-y-4">
                         <TabsItemEspacosFavoritos
-                            espacosFiltrados={filteredEspacosFavoritos}
                             user={user}
+                            espacosFiltrados={filteredEspacosFavoritos}
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                         />
+                        <TabsItemReserva reservas={reservas} />
                     </TabsContent>
 
                     <TabsContent value="espacos" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Ultimos 5 espaços cadastrados</CardTitle>
+                                <CardTitle>Gerenciamento de Espaços</CardTitle>
+                                <CardDescription>Visualize e gerencie todos os espaços da instituição</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="space-y-4">
+                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                     {espacos.map((espaco) => (
-                                        <div key={espaco.id} className="rounded-lg border p-4">
-                                            <div className="mb-4 flex items-start justify-between">
-                                                <div className="space-y-1">
-                                                    <h4 className="font-medium">{espaco.nome}</h4>
-                                                    <p className="text-muted-foreground text-sm">Capacidade: {espaco.capacidade_pessoas} pessoas</p>
-                                                    <p className="text-muted-foreground text-xs">
-                                                        {espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null} -{' '}
-                                                        {espaco.andar?.modulo?.nome}, {espaco.andar?.modulo?.unidade?.nome}
+                                        <div key={espaco.id} className="space-y-3 rounded-lg border p-4">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <h4 className="font-semibold">{espaco.nome}</h4>
+                                                    <p className="text-muted-foreground text-sm">
+                                                        {espaco.andar?.modulo?.unidade?.sigla || espaco.andar?.modulo?.unidade?.nome} -{' '}
+                                                        {espaco.andar?.modulo?.nome} - {espaco.andar?.nome}
                                                     </p>
+                                                    <p className="text-muted-foreground text-xs">Capacidade: {espaco.capacidade_pessoas} pessoas</p>
                                                 </div>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
+                                                    className="bg-transparent"
                                                     onClick={() => {
                                                         router.get(route('institucional.espacos.index'));
                                                     }}
                                                 >
-                                                    <Settings className="mr-1 h-4 w-4" />
-                                                    Editar
+                                                    <Settings className="h-4 w-4" />
                                                 </Button>
                                             </div>
-
                                             <div className="space-y-2">
                                                 <h5 className="text-sm font-medium">Gestores por turno:</h5>
                                                 <div className="flex flex-wrap gap-2">

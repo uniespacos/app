@@ -1,5 +1,5 @@
 import { Modal } from '@/presentation/molecules/Modal';
-import { SetorForm, SetorFormData } from '@/presentation/organisms/SetorForm';
+import { SetorForm } from '@/presentation/organisms/SetorForm';
 import { UsuariosSetor } from '@/presentation/organisms/UsuariosSetor';
 import { Instituicao, Setor, Unidade, User } from '@/types';
 
@@ -13,8 +13,6 @@ interface Props {
     instituicao: Instituicao;
     unidades: Unidade[];
     usuarios?: User[];
-    onCreateSetor: (data: SetorFormData) => void;
-    onUpdateSetor: (setorId: number, data: SetorFormData) => void;
 }
 
 export function ModaisSetor({
@@ -27,8 +25,6 @@ export function ModaisSetor({
     instituicao,
     unidades,
     usuarios,
-    onCreateSetor,
-    onUpdateSetor,
 }: Props) {
     const getUsuariosDoSetor = (setorId: number) => {
         return usuarios ? usuarios.filter((user) => user.setor?.id === setorId) : undefined;
@@ -46,8 +42,7 @@ export function ModaisSetor({
                 <SetorForm
                     instituicao={instituicao}
                     unidades={unidades}
-                    onSubmit={(data) => {
-                        onCreateSetor(data);
+                    onSuccess={() => {
                         setIsCreateModalOpen(false);
                     }}
                     onCancel={() => {
@@ -70,8 +65,7 @@ export function ModaisSetor({
                         setor={editingSetor}
                         instituicao={instituicao}
                         unidades={unidades}
-                        onSubmit={(data) => {
-                            onUpdateSetor(editingSetor.id, data);
+                        onSuccess={() => {
                             setEditingSetor(null);
                         }}
                         onCancel={() => {

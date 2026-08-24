@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DeleteRoleConfirmation } from '@/presentation/molecules/DeleteRoleConfirmation';
 import GenericHeader from '@/presentation/molecules/generic-header';
-import { RoleFormModal } from '@/presentation/molecules/RoleFormModal';
+import { RoleFormModal } from '@/presentation/organisms/RoleFormModal';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Permission, Role } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

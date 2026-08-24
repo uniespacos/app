@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FormField } from '@/presentation/molecules/FormField';
 import { CadastrarUnidadeForm } from '@/presentation/pages/Administrativo/Unidades/CadastrarUnidade';
 import { Instituicao } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
+import type React from 'react';
 
 interface UnidadeFormProps {
     data: CadastrarUnidadeForm;
@@ -17,10 +18,12 @@ interface UnidadeFormProps {
     description: string;
     instituicao: Instituicao;
 }
+
 export default function UnidadeForm({ data, setData, submit, errors, processing, title, description, instituicao }: UnidadeFormProps) {
     useEffect(() => {
         setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, instituicao_id: instituicao.id.toString() }));
     }, [instituicao, setData]);
+
     return (
         <form onSubmit={submit}>
             <Card>
@@ -29,12 +32,11 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                     <CardDescription>{description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="instituicao">Instituicao</Label>
+                    <FormField label="Instituição" htmlFor="instituicao">
                         <Input id="instituicao" value={instituicao.nome} disabled />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="nome">Nome da unidade</Label>
+                    </FormField>
+
+                    <FormField label="Nome da unidade" htmlFor="nome" error={errors.nome} required>
                         <Input
                             id="nome"
                             value={data.nome}
@@ -42,21 +44,21 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                                 setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value }));
                             }}
                             placeholder="Ex: Jequié ou Vitória da Conquista ..."
+                            disabled={processing}
                         />
-                        {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="sigla">SIGLA da unidade</Label>
+                    </FormField>
+
+                    <FormField label="Sigla da unidade" htmlFor="sigla" error={errors.sigla} required>
                         <Input
                             id="sigla"
                             value={data.sigla}
                             onChange={(e) => {
-                                setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value }));
+                                setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value.toUpperCase() }));
                             }}
                             placeholder="Ex: JQ ou VCA ..."
+                            disabled={processing}
                         />
-                        {errors.sigla && <p className="text-destructive mt-1 text-sm">{errors.sigla}</p>}
-                    </div>
+                    </FormField>
                 </CardContent>
                 <CardFooter>
                     <Button type="submit" disabled={processing}>
