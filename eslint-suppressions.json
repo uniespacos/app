@@ -54,11 +54,6 @@
       "count": 4
     }
   },
-  "resources/js/application/ports/form-handler.interface.ts": {
-    "@typescript-eslint/unified-signatures": {
-      "count": 1
-    }
-  },
   "resources/js/application/reservas/helpers/reserva-helpers.test.ts": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
@@ -75,11 +70,6 @@
     },
     "@typescript-eslint/unbound-method": {
       "count": 1
-    }
-  },
-  "resources/js/application/reservas/use-cases/use-avaliar-reserva-usecase.ts": {
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 2
     }
   },
   "resources/js/application/reservas/use-cases/use-reservas-gestor-usecase.test.ts": {
@@ -163,11 +153,6 @@
     },
     "@typescript-eslint/unbound-method": {
       "count": 5
-    }
-  },
-  "resources/js/hooks/use-agnostic-form.ts": {
-    "@typescript-eslint/unbound-method": {
-      "count": 1
     }
   },
   "resources/js/hooks/use-dados-relatorio.ts": {
@@ -519,14 +504,6 @@
   "resources/js/presentation/organisms/ReservasList.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 2
-    }
-  },
-  "resources/js/presentation/organisms/SetorForm.tsx": {
-    "@typescript-eslint/no-misused-promises": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 4
     }
   },
   "resources/js/presentation/organisms/TabelaEspacos.tsx": {

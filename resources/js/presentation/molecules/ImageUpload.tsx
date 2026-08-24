@@ -103,7 +103,9 @@ export function ImageUpload({
                                 >
                                     <img src={img.preview || Image} alt={`Imagem ${index + 1}`} className="h-full w-full object-cover" />
                                     {mainImageIndex === index && (
-                                        <div className="bg-primary absolute top-0 left-0 rounded-br px-1.5 py-0.5 text-xs text-white">Principal</div>
+                                        <div className="bg-primary text-primary-foreground absolute top-0 left-0 rounded-br px-1.5 py-0.5 text-xs">
+                                            Principal
+                                        </div>
                                     )}
                                 </div>
                                 <div className="absolute -top-2 -right-2 flex gap-1">

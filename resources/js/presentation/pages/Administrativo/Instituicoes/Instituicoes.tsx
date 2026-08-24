@@ -1,15 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import DeleteItem from '@/presentation/molecules/delete-item';
 import GenericHeader from '@/presentation/molecules/generic-header';
 import Paginacao from '@/presentation/molecules/paginacao-listas';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 const breadcrumbs = [
     {
@@ -29,27 +30,10 @@ export default function InstituicoesPage() {
     }>().props;
 
     const [removerInstituicao, setRemoverInstituicao] = useState<Instituicao | null>(null);
-    const [searchTerm, setSearchTerm] = useState(filters?.search ?? '');
-    const isInitialMount = useRef(true);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        const timeout = setTimeout(() => {
-            router.get(
-                route('institucional.instituicoes.index'),
-                { search: searchTerm || undefined },
-                { preserveState: true, preserveScroll: true, replace: true },
-            );
-        }, 400);
-
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, [searchTerm]);
+    const { searchTerm, setSearchTerm } = useDebouncedSearch({
+        routeName: 'institucional.instituicoes.index',
+        initialSearch: filters?.search ?? '',
+    });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

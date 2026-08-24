@@ -38,7 +38,6 @@ export default function FavoritosPage() {
                             descricao="Aqui você encontra todos os espaços que você marcou como favoritos."
                         />
 
-                        {/* Exibe os cards dos espaços favoritados */}
                         {espacosFavoritos.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                                 {espacosFavoritos.map((espaco) => (
@@ -54,7 +53,6 @@ export default function FavoritosPage() {
                             </div>
                         )}
 
-                        {/* Componente de Paginação */}
                         {espacosFavoritos.length > 0 && (
                             <div className="mt-6 flex justify-center">
                                 <div className="flex gap-1">

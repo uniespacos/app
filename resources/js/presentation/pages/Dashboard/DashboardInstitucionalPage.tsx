@@ -65,7 +65,6 @@ export default function Dashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Painel Institucional</h1>
@@ -81,7 +80,6 @@ export default function Dashboard({
                     </Button>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -117,7 +115,6 @@ export default function Dashboard({
                     </Card>
                 </div>
 
-                {/* Main Content */}
                 <Tabs defaultValue="reservas" className="space-y-4">
                     <TabsList>
                         <TabsTrigger value="reservas"> Ultimas 5 reservas solicitadas </TabsTrigger>

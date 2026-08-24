@@ -101,9 +101,9 @@ export function NotificationDropdown() {
                 <Button variant="ghost" className="relative h-8 w-8 p-0">
                     <span className="sr-only">Visualizar Notificações</span>
                     <Bell className="h-5 w-5" />
-                    {/* Exibe o contador apenas se for maior que zero */}
+
                     {unreadCount > 0 && (
-                        <span className="bg-destructive absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white">
+                        <span className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full text-xs">
                             {unreadCount}
                         </span>
                     )}

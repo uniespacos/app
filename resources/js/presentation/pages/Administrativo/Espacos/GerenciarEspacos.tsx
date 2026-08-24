@@ -57,7 +57,6 @@ export default function GerenciarEspacos() {
                     inteira rolava lateralmente. */}
                 <div className="container mx-auto w-full flex-1 space-y-6 py-6">
                     <div className="space-y-6 p-6">
-                        {/* Cabeçalho */}
                         <GenericHeader
                             titulo={'Gerenciar Espaços'}
                             descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
@@ -67,7 +66,6 @@ export default function GerenciarEspacos() {
                             canSeeButton // Exibe o botão apenas para
                         />
 
-                        {/* Filtros */}
                         <EspacoFiltroBusca
                             route={route('institucional.espacos.index')}
                             unidades={unidades}
@@ -77,7 +75,6 @@ export default function GerenciarEspacos() {
                             capacidadeEspacos={capacidadeEspacos}
                         />
 
-                        {/* Tabela de Espaços */}
                         <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
                         <PaginacaoListas links={espacos.links} />
 

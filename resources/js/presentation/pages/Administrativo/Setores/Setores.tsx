@@ -1,6 +1,6 @@
 import { useFiltros } from '@/hooks/use-filtros';
 import GenericHeader from '@/presentation/molecules/generic-header';
-import { ModaisSetor } from '@/presentation/molecules/ModaisSetors';
+import { ModaisSetor } from '@/presentation/molecules/ModaisSetor';
 import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
 import { SetorFormData } from '@/presentation/organisms/SetorForm';
 import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
@@ -66,7 +66,7 @@ export default function SetoresPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Modulos" />
+            <Head title="Setores" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="container mx-auto space-y-6 py-6">
                     <div className="container mx-auto space-y-6 p-6">
