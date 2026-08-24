@@ -1,11 +1,11 @@
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
 
 import HeadingSmall from '@/presentation/atoms/heading-small';
 
@@ -21,9 +21,13 @@ export default function DeleteUser() {
 
         destroy(route('settings.profile.destroy'), {
             preserveScroll: true,
-            onSuccess: () => { closeModal(); },
+            onSuccess: () => {
+                closeModal();
+            },
             onError: () => passwordInput.current?.focus(),
-            onFinish: () => { reset(); },
+            onFinish: () => {
+                reset();
+            },
         });
     };
 
@@ -37,13 +41,18 @@ export default function DeleteUser() {
         <div className="space-y-6">
             <HeadingSmall title="Excluir conta" description="Exclua sua conta e todos os seus recursos" />
 
-            <div className="space-y-4 rounded-lg border border-destructive/25 bg-destructive-subtle p-4">
-                <div className="relative space-y-0.5 text-destructive-accent">
+            <div className="border-destructive/25 bg-destructive-subtle space-y-4 rounded-lg border p-4">
+                <div className="text-destructive-accent relative space-y-0.5">
                     <p className="font-medium">Aviso</p>
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Button variant="destructive" onClick={() => { setOpen(true); }}>
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                        setOpen(true);
+                    }}
+                >
                     Excluir conta
                 </Button>
 
@@ -65,7 +74,9 @@ export default function DeleteUser() {
                                 name="password"
                                 ref={passwordInput}
                                 value={data.password}
-                                onChange={(e) => { setData('password', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('password', e.target.value);
+                                }}
                                 placeholder="Senha"
                                 autoComplete="current-password"
                             />

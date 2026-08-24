@@ -1,13 +1,13 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
+import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
+import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
-import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
-import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
-import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
 const breadcrumbs = [
     {
         title: 'Gerenciar Espaços',
@@ -87,7 +87,9 @@ export default function GerenciarEspacos() {
                                 espaco={espacoParaGerenciar}
                                 usuarios={users}
                                 isOpen={!!espacoParaGerenciar}
-                                onClose={() => { setEspacoParaGerenciar(null); }}
+                                onClose={() => {
+                                    setEspacoParaGerenciar(null);
+                                }}
                                 onSave={handleSalvarGestores}
                             />
                         )}

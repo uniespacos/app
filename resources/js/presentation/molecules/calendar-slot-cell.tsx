@@ -88,7 +88,7 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
                 'relative flex h-12 items-center justify-center border-l p-1 text-center transition-all duration-200',
                 // Estilo para quando está selecionado: verde, é o horário que o
                 // usuário está escolhendo para reservar agora — não a cor de marca.
-                isSelecionado && 'border-success-accent bg-success-subtle shadow-md hover:bg-success-subtle/70',
+                isSelecionado && 'border-success-accent bg-success-subtle hover:bg-success-subtle/70 shadow-md',
 
                 // Estilos baseados no status do slot (SÓ APLICAR SE NÃO ESTIVER SELECIONADO)
                 !isSelecionado && [

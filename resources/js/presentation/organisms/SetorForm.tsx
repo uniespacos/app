@@ -116,7 +116,9 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
                 <Label>Nome do Setor *</Label>
                 <Input
                     value={nome}
-                    onChange={(e) => { setNome(e.target.value); }}
+                    onChange={(e) => {
+                        setNome(e.target.value);
+                    }}
                     placeholder="Ex: Recursos Humanos"
                     className={errors.nome ? 'border-destructive' : ''}
                 />
@@ -132,7 +134,9 @@ export function SetorForm({ setor, instituicao, onSubmit, onCancel }: Props) {
                 <Label>Sigla *</Label>
                 <Input
                     value={sigla}
-                    onChange={(e) => { setSigla(e.target.value.toUpperCase()); }}
+                    onChange={(e) => {
+                        setSigla(e.target.value.toUpperCase());
+                    }}
                     placeholder="Ex: RH"
                     maxLength={10}
                     className={errors.sigla ? 'border-destructive' : ''}

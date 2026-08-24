@@ -1,29 +1,20 @@
 'use client';
 
-import { Instituicao, Setor, Unidade, User } from '@/types';
+import { Modal } from '@/presentation/molecules/Modal';
 import { SetorForm, SetorFormData } from '@/presentation/organisms/SetorForm';
 import { UsuariosSetor } from '@/presentation/organisms/UsuariosSetor';
-import { Modal } from '@/presentation/molecules/Modal';
+import { Instituicao, Setor, Unidade, User } from '@/types';
 
 interface Props {
-    // Modal de criação
     isCreateModalOpen: boolean;
     setIsCreateModalOpen: (open: boolean) => void;
-
-    // Modal de edição
     editingSetor: Setor | null;
     setEditingSetor: (setor: Setor | null) => void;
-
-    // Modal de usuários
     viewingUsuarios: Setor | null;
     setViewingUsuarios: (setor: Setor | null) => void;
-
-    // Dados
     instituicao: Instituicao;
     unidades: Unidade[];
     usuarios: User[];
-
-    // Callbacks
     onCreateSetor: (data: SetorFormData) => void;
     onUpdateSetor: (setorId: number, data: SetorFormData) => void;
 }
@@ -61,13 +52,17 @@ export function ModaisSetor({
                         onCreateSetor(data);
                         setIsCreateModalOpen(false);
                     }}
-                    onCancel={() => { setIsCreateModalOpen(false); }}
+                    onCancel={() => {
+                        setIsCreateModalOpen(false);
+                    }}
                 />
             </Modal>
 
             <Modal
                 open={!!editingSetor}
-                onOpenChange={() => { setEditingSetor(null); }}
+                onOpenChange={() => {
+                    setEditingSetor(null);
+                }}
                 title="Editar Setor"
                 description="Altere as informações do setor"
                 size="md"
@@ -81,14 +76,18 @@ export function ModaisSetor({
                             onUpdateSetor(editingSetor.id, data);
                             setEditingSetor(null);
                         }}
-                        onCancel={() => { setEditingSetor(null); }}
+                        onCancel={() => {
+                            setEditingSetor(null);
+                        }}
                     />
                 )}
             </Modal>
 
             <Modal
                 open={!!viewingUsuarios}
-                onOpenChange={() => { setViewingUsuarios(null); }}
+                onOpenChange={() => {
+                    setViewingUsuarios(null);
+                }}
                 title="Usuários do Setor"
                 description={`${viewingUsuarios?.nome ?? ''} - ${viewingUsuarios?.unidade?.nome ?? ''}`}
                 size="xl"

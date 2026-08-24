@@ -18,9 +18,6 @@ class EspacoController extends Controller
         protected EspacoService $service,
     ) {}
 
-    /**
-     * Display the public listing of spaces with search and filter support.
-     */
     public function index(Request $request): Response
     {
         $user = Auth::user();
@@ -40,9 +37,6 @@ class EspacoController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified space with its week-filtered schedule.
-     */
     public function show(Request $request, Espaco $espaco): Response|RedirectResponse
     {
         $data = $this->service->getWithWeekSchedule($espaco, $request->input('semana', 'today'));
@@ -55,9 +49,6 @@ class EspacoController extends Controller
         return Inertia::render('Espacos/VisualizarEspacoPage', $data);
     }
 
-    /**
-     * Add the specified space to the authenticated user's favorites.
-     */
     public function favoritar(Espaco $espaco): RedirectResponse
     {
         $this->service->addFavorite(Auth::user(), $espaco);
@@ -66,9 +57,6 @@ class EspacoController extends Controller
         return redirect()->back()->with('success', 'Espaço adicionado aos favoritos!');
     }
 
-    /**
-     * Remove the specified space from the authenticated user's favorites.
-     */
     public function desfavoritar(Espaco $espaco): RedirectResponse
     {
         $this->service->removeFavorite(Auth::user(), $espaco);
@@ -77,9 +65,6 @@ class EspacoController extends Controller
         return redirect()->back()->with('success', 'Espaço removido dos favoritos!');
     }
 
-    /**
-     * Display the authenticated user's favorited spaces.
-     */
     public function meusFavoritos(): Response
     {
         $user = Auth::user();

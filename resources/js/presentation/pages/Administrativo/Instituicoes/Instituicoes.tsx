@@ -1,20 +1,20 @@
-import DeleteItem from "@/presentation/molecules/delete-item";
-import GenericHeader from "@/presentation/molecules/generic-header";
-import Paginacao from "@/presentation/molecules/paginacao-listas";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import AppLayout from "@/presentation/templates/app-layout";
-import { Instituicao } from "@/types";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { FilePenLine, PlusCircle, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { SearchFilter } from "@/presentation/molecules/SearchFilter";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import Paginacao from '@/presentation/molecules/paginacao-listas';
+import { SearchFilter } from '@/presentation/molecules/SearchFilter';
+import AppLayout from '@/presentation/templates/app-layout';
+import { Instituicao } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs = [
     {
-        title: "Gerenciar Instituições",
-        href: "/institucional/instituicoes",
+        title: 'Gerenciar Instituições',
+        href: '/institucional/instituicoes',
     },
 ];
 
@@ -29,7 +29,7 @@ export default function InstituicoesPage() {
     }>().props;
 
     const [removerInstituicao, setRemoverInstituicao] = useState<Instituicao | null>(null);
-    const [searchTerm, setSearchTerm] = useState(filters?.search ?? "");
+    const [searchTerm, setSearchTerm] = useState(filters?.search ?? '');
     const isInitialMount = useRef(true);
 
     useEffect(() => {
@@ -40,7 +40,7 @@ export default function InstituicoesPage() {
 
         const timeout = setTimeout(() => {
             router.get(
-                route("institucional.instituicoes.index"),
+                route('institucional.instituicoes.index'),
                 { search: searchTerm || undefined },
                 { preserveState: true, preserveScroll: true, replace: true },
             );
@@ -62,7 +62,7 @@ export default function InstituicoesPage() {
                             titulo="Gerenciar Instituições"
                             descricao="Aqui você consegue gerenciar as instituicoes cadastradas"
                             buttonText="Criar Nova"
-                            buttonLink={route("institucional.instituicoes.create")}
+                            buttonLink={route('institucional.instituicoes.create')}
                             ButtonIcon={PlusCircle}
                             canSeeButton={true}
                         />
@@ -88,14 +88,20 @@ export default function InstituicoesPage() {
                                             <TableRow key={instituicao.id}>
                                                 <TableCell>{instituicao.nome}</TableCell>
                                                 <TableCell>{instituicao.sigla}</TableCell>
-                                                <TableCell>{instituicao.endereco || "N/A"}</TableCell>
+                                                <TableCell>{instituicao.endereco || 'N/A'}</TableCell>
                                                 <TableCell className="flex items-center gap-2">
-                                                    <Link href={route("institucional.instituicoes.edit", { instituico: instituicao.id })}>
+                                                    <Link href={route('institucional.instituicoes.edit', { instituico: instituicao.id })}>
                                                         <Button variant="outline" size="icon">
                                                             <FilePenLine className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Button variant="destructive" size="icon" onClick={() => { setRemoverInstituicao(instituicao); }}>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        onClick={() => {
+                                                            setRemoverInstituicao(instituicao);
+                                                        }}
+                                                    >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </TableCell>
@@ -113,8 +119,8 @@ export default function InstituicoesPage() {
                                         setRemoverInstituicao(null);
                                     }
                                 }}
-                                itemName={removerInstituicao.nome || "Instituição"}
-                                route={route("institucional.instituicoes.destroy", removerInstituicao.id)}
+                                itemName={removerInstituicao.nome || 'Instituição'}
+                                route={route('institucional.instituicoes.destroy', removerInstituicao.id)}
                             />
                         )}
                     </div>

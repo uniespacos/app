@@ -17,9 +17,6 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Show the registration page.
-     */
     public function create(): Response
     {
         return Inertia::render('auth/register', [
@@ -27,9 +24,6 @@ class RegisteredUserController extends Controller
         ]);
     }
 
-    /**
-     * Handle an incoming registration request.
-     */
     public function store(StoreRegisterRequest $request): RedirectResponse
     {
         $validated = $request->validated();

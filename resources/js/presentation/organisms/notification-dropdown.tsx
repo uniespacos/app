@@ -1,13 +1,13 @@
-import { User } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
+import { User } from '@/types';
+import { router, usePage } from '@inertiajs/react';
+import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 interface NotificationData {
     titulo: string;
@@ -38,8 +38,6 @@ export function NotificationDropdown() {
     // unreadCount é derivado do array de notificações (única fonte de verdade),
     // que também recebe itens em tempo real via WebSocket.
     const unreadCount = useMemo(() => notifications.filter((n) => n.read_at === null).length, [notifications]);
-
-    // Função para marcar notificações como lidas
     const markAllAsRead = () => {
         if (unreadCount === 0) return;
 
@@ -65,8 +63,6 @@ export function NotificationDropdown() {
             if (!channel) return;
 
             channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
-                // Linha essencial para debug: veja exatamente o que está chegando!
-
                 // 1. Mostra o toast com a propriedade correta (ex: título)
                 toast.success(notification.titulo);
 
@@ -88,16 +84,12 @@ export function NotificationDropdown() {
                     ...prevNotifications, // Adiciona as notificações antigas depois
                 ]);
             });
-
-            // Função de limpeza para quando o componente for desmontado
             return () => {
                 channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
                 releasePrivateChannel(`App.Models.User.${String(user.id)}`);
             };
         }
     }, [user]);
-
-    // Função auxiliar para formatar a data
     const formatNotificationTime = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' - ' + date.toLocaleDateString('pt-BR');
@@ -111,7 +103,7 @@ export function NotificationDropdown() {
                     <Bell className="h-5 w-5" />
                     {/* Exibe o contador apenas se for maior que zero */}
                     {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs text-white">
+                        <span className="bg-destructive absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white">
                             {unreadCount}
                         </span>
                     )}

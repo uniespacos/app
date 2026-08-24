@@ -27,7 +27,9 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
         setIsDeleting(true);
         router.delete(route('institucional.roles.destroy', role.id), {
             onSuccess: onClose,
-            onFinish: () => { setIsDeleting(false); },
+            onFinish: () => {
+                setIsDeleting(false);
+            },
         });
     };
 
@@ -43,10 +45,11 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                             <>
                                 Tem certeza que deseja deletar o papel <strong>{role?.name}</strong>?
                                 {(role?.users_count || 0) > 0 && (
-                                    <div className="mt-2 rounded border border-warning/25 bg-warning-subtle p-2 text-sm">
+                                    <div className="border-warning/25 bg-warning-subtle mt-2 rounded border p-2 text-sm">
                                         <strong>{role?.users_count}</strong> usuário(s) será(ão) movido(s) para o papel 'comum'.
                                     </div>
-                                )} Esta ação não pode ser desfeita.
+                                )}{' '}
+                                Esta ação não pode ser desfeita.
                             </>
                         )}
                     </AlertDialogDescription>
@@ -58,7 +61,7 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                             <AlertDialogAction
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="bg-destructive text-white hover:bg-destructive/90"
+                                className="bg-destructive hover:bg-destructive/90 text-white"
                             >
                                 {isDeleting ? 'Deletando...' : 'Deletar'}
                             </AlertDialogAction>

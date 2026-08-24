@@ -62,7 +62,9 @@ function MultiSelect({ value, onValueChange, processing }: { value: string[]; on
                             <div
                                 key={tipo}
                                 className={`hover:bg-accent hover:text-accent-foreground flex items-center space-x-2 rounded-sm px-2 py-1.5 ${value.includes(tipo) ? 'bg-accent/50' : ''}`}
-                                onClick={() => { handleSelect(tipo); }}
+                                onClick={() => {
+                                    handleSelect(tipo);
+                                }}
                             >
                                 <Checkbox checked={value.includes(tipo)} className="pointer-events-none" />
                                 <span className="text-sm">{tipo}</span>
@@ -104,7 +106,9 @@ export function AddAndarDialog({ open, moduloSelecionado, setIsDialogOpen }: Add
                 onError: (errors) => {
                     toast.error(Object.values(errors)[0] || 'Erro ao adicionar andar.');
                 },
-                onFinish: () => { setIsSubmitting(false); },
+                onFinish: () => {
+                    setIsSubmitting(false);
+                },
             },
         );
     };
@@ -116,7 +120,13 @@ export function AddAndarDialog({ open, moduloSelecionado, setIsDialogOpen }: Add
             title="Adicionar Novo Andar"
             footer={
                 <>
-                    <Button variant="outline" onClick={() => { setIsDialogOpen(false); }} disabled={isSubmitting}>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            setIsDialogOpen(false);
+                        }}
+                        disabled={isSubmitting}
+                    >
                         Cancelar
                     </Button>
                     <Button onClick={handleAddNovoAndar} disabled={isSubmitting || !nomeNovoAndar || tipoAcessoNovoAndar.length === 0}>

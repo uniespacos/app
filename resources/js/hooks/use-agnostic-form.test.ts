@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useAgnosticForm } from './use-agnostic-form';
 
 jest.mock('@inertiajs/react', () => ({
-    useForm: jest.fn()
+    useForm: jest.fn(),
 }));
 
 interface MockFormShape {
@@ -37,7 +37,7 @@ describe('useAgnosticForm', () => {
             delete: jest.fn(),
             reset: jest.fn(),
             setError: jest.fn(),
-            clearErrors: jest.fn()
+            clearErrors: jest.fn(),
         };
         (useForm as jest.Mock).mockReturnValue(mockForm);
     });

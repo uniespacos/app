@@ -46,7 +46,7 @@ class Reserva extends Model
     ];
 
     /**
-     * Aplica o eixo de arquivamento a uma listagem (issue #108).
+     * Aplica o eixo de arquivamento a uma listagem.
      *
      * Fica no model, e nao em cada repositorio, porque a regra estava escrita
      * de duas formas divergentes: getPaginatedForGestor tinha o default certo,

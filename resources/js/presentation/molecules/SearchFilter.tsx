@@ -18,7 +18,9 @@ export function SearchFilter({ searchTerm, onSearchTermChange, placeholder, vari
                 placeholder={placeholder}
                 className="w-full pl-8"
                 value={searchTerm}
-                onChange={(e) => { onSearchTermChange(e.target.value); }}
+                onChange={(e) => {
+                    onSearchTermChange(e.target.value);
+                }}
             />
         </div>
     );

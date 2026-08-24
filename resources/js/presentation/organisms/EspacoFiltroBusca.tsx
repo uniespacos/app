@@ -130,7 +130,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             placeholder="Buscar por nome do espaço, andar ou módulo..."
                             className="pl-8"
                             value={localFilters.search}
-                            onChange={(value) => { handleFilterChange('search', value.target.value); }}
+                            onChange={(value) => {
+                                handleFilterChange('search', value.target.value);
+                            }}
                         />
                     </div>
 
@@ -154,7 +156,12 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                     {/* Filtro de Unidade */}
                     <div className="col-span-2 space-y-2 sm:col-span-1">
                         <Label htmlFor="espacos-unidade">Unidade</Label>
-                        <Select value={localFilters.unidade} onValueChange={(value) => { handleFilterChange('unidade', value); }}>
+                        <Select
+                            value={localFilters.unidade}
+                            onValueChange={(value) => {
+                                handleFilterChange('unidade', value);
+                            }}
+                        >
                             <SelectTrigger id="espacos-unidade" className="w-full">
                                 <SelectValue placeholder="Unidade" />
                             </SelectTrigger>
@@ -174,7 +181,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                         <Label htmlFor="espacos-modulo">Módulo</Label>
                         <Select
                             value={localFilters.modulo}
-                            onValueChange={(value) => { handleFilterChange('modulo', value); }}
+                            onValueChange={(value) => {
+                                handleFilterChange('modulo', value);
+                            }}
                             disabled={localFilters.unidade === 'all'}
                         >
                             <SelectTrigger id="espacos-modulo" className="w-full">
@@ -196,7 +205,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                         <Label htmlFor="espacos-andar">Andar</Label>
                         <Select
                             value={localFilters.andar}
-                            onValueChange={(value) => { handleFilterChange('andar', value); }}
+                            onValueChange={(value) => {
+                                handleFilterChange('andar', value);
+                            }}
                             disabled={localFilters.modulo === 'all'}
                         >
                             <SelectTrigger id="espacos-andar" className="w-full">
@@ -216,7 +227,12 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                     {/* Filtro de Capacidade */}
                     <div className="space-y-2">
                         <Label htmlFor="espacos-capacidade">Capacidade</Label>
-                        <Select value={localFilters.capacidade} onValueChange={(value) => { handleFilterChange('capacidade', value); }}>
+                        <Select
+                            value={localFilters.capacidade}
+                            onValueChange={(value) => {
+                                handleFilterChange('capacidade', value);
+                            }}
+                        >
                             <SelectTrigger id="espacos-capacidade" className="w-full">
                                 <SelectValue placeholder="Capacidade" />
                             </SelectTrigger>

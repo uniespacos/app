@@ -24,9 +24,6 @@ class InstitucionalInstituicaoController extends Controller
         protected InstituicaoService $service,
     ) {}
 
-    /**
-     * Display a paginated listing of institutions.
-     */
     public function index(ListarInstituicoesRequest $request): Response
     {
         $this->authorize('viewAny', Instituicao::class);
@@ -42,17 +39,11 @@ class InstitucionalInstituicaoController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new institution.
-     */
     public function create(): Response
     {
         return Inertia::render('Administrativo/Instituicoes/CadastrarInstituicao');
     }
 
-    /**
-     * Store a newly created institution in storage.
-     */
     public function store(StoreInstituicaoRequest $request): RedirectResponse
     {
         $this->authorize('create', Instituicao::class);
@@ -63,9 +54,6 @@ class InstitucionalInstituicaoController extends Controller
             ->with('success', 'Instituição criada com sucesso.');
     }
 
-    /**
-     * Show the form for editing the specified institution.
-     */
     public function edit(Instituicao $instituico): Response
     {
         return Inertia::render('Administrativo/Instituicoes/EditarInstituicao', [
@@ -73,9 +61,6 @@ class InstitucionalInstituicaoController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified institution in storage.
-     */
     public function update(UpdateInstituicaoRequest $request, Instituicao $instituico): RedirectResponse
     {
         $this->authorize('update', $instituico);
@@ -90,10 +75,6 @@ class InstitucionalInstituicaoController extends Controller
         }
     }
 
-    /**
-     * Remove the specified institution from storage.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Instituicao $instituico): RedirectResponse
     {
         $this->authorize('delete', $instituico);

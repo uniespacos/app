@@ -2,10 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CadastrarUnidadeForm } from '@/presentation/pages/Administrativo/Unidades/CadastrarUnidade';
 import { Instituicao } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
-import { CadastrarUnidadeForm } from '@/presentation/pages/Administrativo/Unidades/CadastrarUnidade';
 
 interface UnidadeFormProps {
     data: CadastrarUnidadeForm;
@@ -38,20 +38,24 @@ export default function UnidadeForm({ data, setData, submit, errors, processing,
                         <Input
                             id="nome"
                             value={data.nome}
-                            onChange={(e) => { setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value })); }}
+                            onChange={(e) => {
+                                setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, nome: e.target.value }));
+                            }}
                             placeholder="Ex: Jequié ou Vitória da Conquista ..."
                         />
-                        {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
+                        {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sigla">SIGLA da unidade</Label>
                         <Input
                             id="sigla"
                             value={data.sigla}
-                            onChange={(e) => { setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value })); }}
+                            onChange={(e) => {
+                                setData((prevData: CadastrarUnidadeForm) => ({ ...prevData, sigla: e.target.value }));
+                            }}
                             placeholder="Ex: JQ ou VCA ..."
                         />
-                        {errors.sigla && <p className="mt-1 text-sm text-destructive">{errors.sigla}</p>}
+                        {errors.sigla && <p className="text-destructive mt-1 text-sm">{errors.sigla}</p>}
                     </div>
                 </CardContent>
                 <CardFooter>

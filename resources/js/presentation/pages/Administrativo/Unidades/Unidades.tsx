@@ -1,20 +1,20 @@
-import DeleteItem from "@/presentation/molecules/delete-item";
-import GenericHeader from "@/presentation/molecules/generic-header";
-import Paginacao from "@/presentation/molecules/paginacao-listas";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import AppLayout from "@/presentation/templates/app-layout";
-import { Instituicao, Unidade } from "@/types";
-import { Head, Link, router, usePage } from "@inertiajs/react";
-import { FilePenLine, PlusCircle, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { SearchFilter } from "@/presentation/molecules/SearchFilter";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import Paginacao from '@/presentation/molecules/paginacao-listas';
+import { SearchFilter } from '@/presentation/molecules/SearchFilter';
+import AppLayout from '@/presentation/templates/app-layout';
+import { Instituicao, Unidade } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs = [
     {
-        title: "Gerenciar Unidades",
-        href: "/institucional/unidades",
+        title: 'Gerenciar Unidades',
+        href: '/institucional/unidades',
     },
 ];
 
@@ -30,7 +30,7 @@ export default function UnidadesPage() {
     }>().props;
 
     const [removerUnidade, setRemoverUnidade] = useState<Unidade | null>(null);
-    const [searchTerm, setSearchTerm] = useState(filters?.search ?? "");
+    const [searchTerm, setSearchTerm] = useState(filters?.search ?? '');
     const isInitialMount = useRef(true);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function UnidadesPage() {
 
         const timeout = setTimeout(() => {
             router.get(
-                route("institucional.unidades.index"),
+                route('institucional.unidades.index'),
                 { search: searchTerm || undefined },
                 { preserveState: true, preserveScroll: true, replace: true },
             );
@@ -63,7 +63,7 @@ export default function UnidadesPage() {
                             titulo="Gerenciar Unidades"
                             descricao="Aqui você consegue gerenciar as unidades cadastradas"
                             buttonText="Criar nova"
-                            buttonLink={route("institucional.unidades.create")}
+                            buttonLink={route('institucional.unidades.create')}
                             ButtonIcon={PlusCircle}
                             canSeeButton={true}
                         />
@@ -95,12 +95,18 @@ export default function UnidadesPage() {
                                                 <TableCell>{unidade.sigla}</TableCell>
                                                 <TableCell>{unidade.instituicao?.sigla}</TableCell>
                                                 <TableCell className="flex items-center gap-2">
-                                                    <Link href={route("institucional.unidades.edit", { unidade: unidade.id })}>
+                                                    <Link href={route('institucional.unidades.edit', { unidade: unidade.id })}>
                                                         <Button variant="outline" size="icon">
                                                             <FilePenLine className="h-4 w-4" />
                                                         </Button>
                                                     </Link>
-                                                    <Button variant="destructive" size="icon" onClick={() => { setRemoverUnidade(unidade); }}>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        onClick={() => {
+                                                            setRemoverUnidade(unidade);
+                                                        }}
+                                                    >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </TableCell>
@@ -118,8 +124,8 @@ export default function UnidadesPage() {
                                         setRemoverUnidade(null);
                                     }
                                 }}
-                                itemName={removerUnidade.nome || "Unidade"}
-                                route={route("institucional.unidades.destroy", removerUnidade.id)}
+                                itemName={removerUnidade.nome || 'Unidade'}
+                                route={route('institucional.unidades.destroy', removerUnidade.id)}
                             />
                         )}
                     </div>

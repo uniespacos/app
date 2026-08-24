@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import GenericHeader from '@/presentation/molecules/generic-header';
-import AppLayout from '@/presentation/templates/app-layout';
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
+import ModuloForm from '@/presentation/organisms/ModuloForm';
+import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
-import ModuloForm from '@/presentation/organisms/ModuloForm';
 const breadcrumbs = [
     {
         title: 'Gerenciar Modulos',
@@ -36,15 +36,12 @@ export default function CadastrarModuloPage() {
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         let errors = false;
-        // Validação de integridade da estrutura
         const validacaoEstrutura = validarEstrutura(data.andares);
         if (!validacaoEstrutura.valido) {
             errors = true;
             toast.error(`Estrutura inválida: ${validacaoEstrutura.erros.join(', ')}`);
             return;
         }
-
-        // Validar tipos de acesso para cada andar
         data.andares.forEach((andar) => {
             if (andar.tipo_acesso.length === 0) {
                 errors = true;

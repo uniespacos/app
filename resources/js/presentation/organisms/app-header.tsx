@@ -1,18 +1,18 @@
-import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
-import { Icon } from '@/presentation/atoms/icon';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/presentation/molecules/user-menu-content';
-import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { cn } from '@/lib/utils';
+import AppLogo from '@/presentation/atoms/app-logo';
+import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
+import { Icon } from '@/presentation/atoms/icon';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
+import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
+import { UserMenuContent } from '@/presentation/molecules/user-menu-content';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import AppLogo from '@/presentation/atoms/app-logo';
-import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
 
 const mainNavItems: NavItem[] = [
     {
@@ -165,7 +165,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             </div>
             {breadcrumbs.length > 1 && (
                 <div className="border-sidebar-border/70 flex w-full border-b">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-muted-foreground md:max-w-7xl">
+                    <div className="text-muted-foreground mx-auto flex h-12 w-full items-center justify-start px-4 md:max-w-7xl">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>

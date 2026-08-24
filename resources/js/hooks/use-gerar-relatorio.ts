@@ -1,6 +1,6 @@
+import { FiltrosRelatorio, FormatoRelatorio, TipoRelatorio } from '@/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { FormatoRelatorio, FiltrosRelatorio, TipoRelatorio } from '@/types';
 
 interface PayloadGerarRelatorio {
     tipo: TipoRelatorio;
@@ -20,7 +20,7 @@ export function useGerarRelatorio(endpoint: string) {
                 document.cookie
                     .split('; ')
                     .find((r) => r.startsWith('XSRF-TOKEN='))
-                    ?.split('=')[1] ?? ''
+                    ?.split('=')[1] ?? '',
             );
 
             const headers: Record<string, string> = {

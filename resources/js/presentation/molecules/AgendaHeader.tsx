@@ -51,7 +51,7 @@ export default function AgendaHeader({ espaco, gestoresPorTurno }: AgendaHeaderP
                         texto alinhado à esquerda mantêm a coluna reta qualquer que seja
                         o tamanho do nome.
 
-                        A ordem vem de TURNOS_ORDENADOS (issue #101) em vez de um array
+                        A ordem vem de TURNOS_ORDENADOS em vez de um array
                         literal, e o rótulo de TURNO_LABEL — "MANHA" sem til era
                         `turno.toUpperCase()` cru.
                     */}

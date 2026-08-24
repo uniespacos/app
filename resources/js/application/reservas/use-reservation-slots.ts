@@ -1,7 +1,7 @@
+import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
 import { Reserva, SlotCalendario } from '@/types';
 import { parse } from 'date-fns';
-import { useEffect, useMemo, useState, useRef } from 'react';
-import { mapearStatusBackendParaSlot } from '@/application/reservas/helpers/reserva-status.helpers';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Hook customizado para gerenciar a lógica de estado dos slots de uma reserva.
@@ -42,7 +42,8 @@ export function useReservationSlots(reserva: Reserva) {
 
     // Efeito para resetar a seleção se a reserva (e os horários) mudar.
     useEffect(() => {
-        const hasChanged = initialSlots.length !== lastInitialSlotsRef.current.length ||
+        const hasChanged =
+            initialSlots.length !== lastInitialSlotsRef.current.length ||
             initialSlots.some((slot, idx) => {
                 const prev = lastInitialSlotsRef.current[idx];
                 return !prev || slot.id !== prev.id || slot.status !== prev.status;

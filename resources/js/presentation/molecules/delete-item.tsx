@@ -1,11 +1,11 @@
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
 
 import HeadingSmall from '@/presentation/atoms/heading-small';
 
@@ -28,7 +28,9 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
 
         destroy(route, {
             preserveScroll: true,
-            onSuccess: () => { closeModal(); },
+            onSuccess: () => {
+                closeModal();
+            },
             onError: () => passwordInput.current?.focus(),
             onFinish: () => {
                 closeModal();
@@ -48,13 +50,18 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
         <div className="space-y-6">
             {showHeading && <HeadingSmall title={itemName} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
 
-            <div className="space-y-4 rounded-lg border border-destructive/25 bg-destructive-subtle p-4">
-                <div className="relative space-y-0.5 text-destructive-accent">
+            <div className="border-destructive/25 bg-destructive-subtle space-y-4 rounded-lg border p-4">
+                <div className="text-destructive-accent relative space-y-0.5">
                     <p className="font-medium">Aviso</p>
                     <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>
                 </div>
 
-                <Button variant="destructive" onClick={() => { setOpen(true); }}>
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                        setOpen(true);
+                    }}
+                >
                     Excluir {itemName}
                 </Button>
 
@@ -76,7 +83,9 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = true
                                 name="password"
                                 ref={passwordInput}
                                 value={data.password}
-                                onChange={(e) => { setData('password', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('password', e.target.value);
+                                }}
                                 placeholder="Senha"
                                 autoComplete="current-password"
                             />

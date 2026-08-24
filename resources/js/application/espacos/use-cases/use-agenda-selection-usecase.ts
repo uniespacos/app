@@ -1,11 +1,10 @@
-import { useForm } from '@inertiajs/react';
-import { Espaco, Reserva, ReservaFormData, SlotCalendario } from '@/types';
-import { useSlotSelection } from '@/hooks/use-slot-selection';
-import { format, addMonths } from 'date-fns';
-import { useEffect, useMemo, useState, FormEvent } from 'react';
-import { parse } from 'date-fns';
-import { toast } from 'sonner';
 import { opcoesRecorrencia } from '@/constants/recorrencia';
+import { useSlotSelection } from '@/hooks/use-slot-selection';
+import { Espaco, Reserva, ReservaFormData, SlotCalendario } from '@/types';
+import { useForm } from '@inertiajs/react';
+import { addMonths, format, parse } from 'date-fns';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 interface UseAgendaSelectionProps {
     espaco: Espaco;
@@ -14,11 +13,7 @@ interface UseAgendaSelectionProps {
     semanaVisivel: Date;
 }
 
-export function useAgendaSelectionUseCase({
-    reserva,
-    isEditMode,
-    semanaVisivel,
-}: UseAgendaSelectionProps) {
+export function useAgendaSelectionUseCase({ reserva, isEditMode, semanaVisivel }: UseAgendaSelectionProps) {
     const hoje = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
 
     // Generate initial slots for edit mode
@@ -44,13 +39,7 @@ export function useAgendaSelectionUseCase({
         );
     }, [reserva]);
 
-    const {
-        slotsSelecao,
-        alternarSelecaoSlot,
-        isSlotSelecionado,
-        limparSelecao,
-        setSlotsSelecao,
-    } = useSlotSelection({ hoje, slotsIniciais });
+    const { slotsSelecao, alternarSelecaoSlot, isSlotSelecionado, limparSelecao, setSlotsSelecao } = useSlotSelection({ hoje, slotsIniciais });
 
     const [dialogAberto, setDialogAberto] = useState(false);
 

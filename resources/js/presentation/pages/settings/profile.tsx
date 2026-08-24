@@ -179,7 +179,9 @@ export default function Profile({
                                 id="name"
                                 className="mt-1 block w-full"
                                 value={data.name}
-                                onChange={(e) => { setData('name', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('name', e.target.value);
+                                }}
                                 required
                                 autoComplete="name"
                                 placeholder="Nome completo"
@@ -196,7 +198,9 @@ export default function Profile({
                                 type="email"
                                 className="mt-1 block w-full"
                                 value={data.email}
-                                onChange={(e) => { setData('email', e.target.value); }}
+                                onChange={(e) => {
+                                    setData('email', e.target.value);
+                                }}
                                 required
                                 autoComplete="username"
                                 placeholder="Endereço de e-mail"

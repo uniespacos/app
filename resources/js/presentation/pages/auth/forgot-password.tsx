@@ -1,13 +1,12 @@
-// Components
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/presentation/atoms/input-error';
-import TextLink from '@/presentation/atoms/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
+import TextLink from '@/presentation/atoms/text-link';
 import AuthLayout from '@/presentation/templates/auth-layout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
@@ -25,7 +24,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <AuthLayout title="Recuperação de senha" description="Digite seu e-mail para receber um link de redefinição de senha">
             <Head title="Recuperação de senha" />
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-success-accent">{status}</div>}
+            {status && <div className="text-success-accent mb-4 text-center text-sm font-medium">{status}</div>}
 
             <div className="space-y-6">
                 <form onSubmit={submit}>
@@ -38,7 +37,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             autoComplete="off"
                             value={data.email}
                             autoFocus
-                            onChange={(e) => { setData('email', e.target.value); }}
+                            onChange={(e) => {
+                                setData('email', e.target.value);
+                            }}
                             placeholder="seu@email.com"
                         />
 

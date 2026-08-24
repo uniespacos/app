@@ -48,7 +48,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     {
         return $this->reserva->newQuery()
             ->where('user_id', $userId)
-            // Issue #108: era `->where('situacao', '!=', 'inativa')` fixo aqui,
             // o que anulava qualquer filtro por arquivadas logo abaixo.
             ->arquivo($filters['arquivo'] ?? null)
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where('titulo', 'like', '%'.$s.'%'))
@@ -57,7 +56,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                 'horarios' => function ($query) use ($weekStart, $weekEnd) {
                     $query->whereBetween('data', [$weekStart, $weekEnd])
                         ->orderBy('data')->orderBy('horario_inicio')
-                        // Issue #105: a listagem exibe espaço + módulo na coluna "Local".
                         ->with(['agenda.espaco.andar.modulo']);
                 },
                 'user:id,name',
@@ -76,8 +74,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             'horarios' => function ($query) use ($weekStart, $weekEnd) {
                 $query->whereBetween('data', [$weekStart, $weekEnd])
                     ->orderBy('data')->orderBy('horario_inicio')
-                    // agenda.user: gestor do turno, exibido no modal de detalhes
-                    // com quem avaliou/falta avaliar cada horario.
                     ->with(['agenda.espaco.andar.modulo.unidade', 'agenda.user', 'avaliador']);
             },
         ])->find($reservaId);
@@ -96,7 +92,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
             ->withHorariosStats($agendaIds)
             ->whereHas('horarios', fn ($q) => $q->whereIn('agenda_id', $agendaIds))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('titulo', 'like', "%{$s}%")->orWhere('descricao', 'like', "%{$s}%")))
-            // Issue #108: os dois eixos ficam independentes, entao "Todas as
             // situacoes" deixa de significar "todas menos as arquivadas".
             ->arquivo($filters['arquivo'] ?? null)
             ->when($filters['situacao'] ?? null, fn ($q, $s) => $q->where('situacao', $s))
@@ -105,7 +100,6 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
                 'horarios' => function ($query) use ($agendaIds) {
                     $query->whereIn('agenda_id', $agendaIds)->with([
                         'agenda:id,espaco_id,turno',
-                        // Issue #105: os selects são enxutos de propósito, mas cada
                         // relação aninhada precisa da própria chave estrangeira —
                         // sem andar_id/modulo_id a cadeia volta null silenciosamente.
                         'agenda.espaco:id,nome,andar_id',
@@ -121,7 +115,7 @@ class ReservaRepositoryEloquent implements ReservaRepositoryInterface
     /**
      * Returns a Reserva with horarios filtered to the gestor's agendas and the given week
      *
-     * Issue #119: o whereHas escopa a própria Reserva às agendas do gestor. Sem
+     *: o whereHas escopa a própria Reserva às agendas do gestor. Sem
      * ele, filtrar apenas o relacionamento devolvia titulo/descricao/user de
      * reservas fora do escopo de gestão. Mesmo critério de getPaginatedForGestor.
      *

@@ -24,9 +24,6 @@ class GestorReservaController extends Controller
         protected ReservaService $service,
     ) {}
 
-    /**
-     * Display the gestor's reservation listing with week navigation and detail modal support.
-     */
     public function index(Request $request): Response
     {
         $data = $this->service->getGestorListing(
@@ -38,9 +35,6 @@ class GestorReservaController extends Controller
         return Inertia::render('Reservas/Gestor/ReservasGestorPage', $data);
     }
 
-    /**
-     * Display the reservation detail page for gestor evaluation with conflict data.
-     */
     public function show(Request $request, Reserva $reserva): Response
     {
         $this->authorize('viewForGestor', $reserva);
@@ -54,9 +48,6 @@ class GestorReservaController extends Controller
         return Inertia::render('Reservas/Gestor/AvaliarReservaPage', $data);
     }
 
-    /**
-     * Dispatch the async job to evaluate a reservation.
-     */
     public function update(AvaliarReservaRequest $request, Reserva $reserva): RedirectResponse
     {
         $this->authorize('viewForGestor', $reserva);

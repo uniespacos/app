@@ -71,7 +71,12 @@ export default function EspacoCard({
             {/* stopPropagation: cliques nas setas do carrossel e no botão de
                 favoritar não podem "vazar" para o onClick do card e disparar
                 a navegação para a agenda. */}
-            <div className="relative" onClick={(e) => { e.stopPropagation(); }}>
+            <div
+                className="relative"
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+            >
                 <Carousel className="w-full">
                     <CarouselContent>
                         {imageSources.map((src, index) => (

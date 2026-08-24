@@ -12,4 +12,3 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
         </>
     );
 }
-

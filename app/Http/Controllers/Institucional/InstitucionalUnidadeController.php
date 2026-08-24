@@ -25,9 +25,6 @@ class InstitucionalUnidadeController extends Controller
         protected UnidadeService $service,
     ) {}
 
-    /**
-     * Display a paginated listing of units scoped to the authenticated user's institution.
-     */
     public function index(ListarUnidadesRequest $request): Response
     {
         $this->authorize('viewAny', Unidade::class);
@@ -45,9 +42,6 @@ class InstitucionalUnidadeController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new unit.
-     */
     public function create(): Response
     {
         $user = Auth::user();
@@ -57,9 +51,6 @@ class InstitucionalUnidadeController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created unit in storage.
-     */
     public function store(StoreUnidadeRequest $request): RedirectResponse
     {
         $this->authorize('create', Unidade::class);
@@ -75,9 +66,6 @@ class InstitucionalUnidadeController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified unit.
-     */
     public function edit(Unidade $unidade): Response
     {
         $user = Auth::user();
@@ -88,9 +76,6 @@ class InstitucionalUnidadeController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified unit in storage.
-     */
     public function update(UpdateUnidadeRequest $request, Unidade $unidade): RedirectResponse
     {
         $this->authorize('update', $unidade);
@@ -105,10 +90,6 @@ class InstitucionalUnidadeController extends Controller
         }
     }
 
-    /**
-     * Remove the specified unit from storage.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Unidade $unidade): RedirectResponse
     {
         $this->authorize('delete', $unidade);

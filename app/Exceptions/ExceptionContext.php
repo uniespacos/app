@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /**
- * Contexto anexado automaticamente a toda exceção logada (issue #112).
+ * Contexto anexado automaticamente a toda exceção logada.
  *
  * ALCANCE — vale para exceções que chegam ao handler (não capturadas, ou
  * passadas a report()). Chamadas manuais de `Log::error` NÃO passam por aqui:

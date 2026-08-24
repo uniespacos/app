@@ -62,7 +62,7 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
 
     return (
         <div className="space-y-2">
-            <h4 className="font-medium text-foreground">Avaliação dos gestores</h4>
+            <h4 className="text-foreground font-medium">Avaliação dos gestores</h4>
             {/* Em telas largas cada card ocupava a largura inteira do modal por
                 pouca informação — uma linha de texto virava uma faixa de 80vw.
                 A partir de sm, os cards passam a lado a lado e encolhem para o
@@ -85,15 +85,10 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
                                 <Clock className="text-warning-accent mt-0.5 h-4 w-4 shrink-0" />
                             )}
                             <div className="min-w-0">
-                                <p className="truncate font-medium text-foreground">
+                                <p className="text-foreground truncate font-medium">
                                     {TURNO_LABEL[resumo.turno] ?? resumo.turno} — {resumo.gestor}
                                 </p>
-                                <p
-                                    className={cn(
-                                        'text-xs font-semibold',
-                                        completo ? 'text-success-accent' : 'text-warning-accent',
-                                    )}
-                                >
+                                <p className={cn('text-xs font-semibold', completo ? 'text-success-accent' : 'text-warning-accent')}>
                                     {completo
                                         ? resumo.avaliadoPor.length > 0
                                             ? `Avaliado por ${resumo.avaliadoPor.join(', ')}`

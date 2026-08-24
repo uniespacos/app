@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { ComboboxFiltro } from '@/presentation/molecules/ComboboxFiltro';
 import { FiltrosRelatorio, OpcoesInventario } from '@/types';
+import { useMemo } from 'react';
 
 interface Props {
     filtros: Partial<FiltrosRelatorio>;
@@ -12,11 +12,8 @@ interface Props {
 export function FiltrosInventarioEspacos({ filtros, opcoes, onChange }: Props) {
     // Cada nivel so lista o que pertence ao nivel anterior selecionado.
     const modulos = useMemo(
-        () =>
-            filtros.unidade_id
-                ? opcoes.modulos.filter((modulo) => modulo.unidade_id === filtros.unidade_id)
-                : opcoes.modulos,
-        [opcoes.modulos, filtros.unidade_id]
+        () => (filtros.unidade_id ? opcoes.modulos.filter((modulo) => modulo.unidade_id === filtros.unidade_id) : opcoes.modulos),
+        [opcoes.modulos, filtros.unidade_id],
     );
 
     const andares = useMemo(() => {
@@ -36,22 +33,27 @@ export function FiltrosInventarioEspacos({ filtros, opcoes, onChange }: Props) {
     }, [opcoes.espacos, andares, filtros.andar_id]);
 
     // Trocar um nivel invalida os niveis abaixo dele.
-    const handleUnidade = (unidade_id?: number) =>
-        { onChange({
+    const handleUnidade = (unidade_id?: number) => {
+        onChange({
             ...filtros,
             unidade_id,
             modulo_id: undefined,
             andar_id: undefined,
             espaco_id: undefined,
-        }); };
+        });
+    };
 
-    const handleModulo = (modulo_id?: number) =>
-        { onChange({ ...filtros, modulo_id, andar_id: undefined, espaco_id: undefined }); };
+    const handleModulo = (modulo_id?: number) => {
+        onChange({ ...filtros, modulo_id, andar_id: undefined, espaco_id: undefined });
+    };
 
-    const handleAndar = (andar_id?: number) =>
-        { onChange({ ...filtros, andar_id, espaco_id: undefined }); };
+    const handleAndar = (andar_id?: number) => {
+        onChange({ ...filtros, andar_id, espaco_id: undefined });
+    };
 
-    const handleEspaco = (espaco_id?: number) => { onChange({ ...filtros, espaco_id }); };
+    const handleEspaco = (espaco_id?: number) => {
+        onChange({ ...filtros, espaco_id });
+    };
 
     return (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

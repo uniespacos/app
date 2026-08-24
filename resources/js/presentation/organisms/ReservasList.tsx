@@ -25,7 +25,6 @@ interface ReservasListProps {
     user?: UserType;
     routeName: string;
 }
-// Componente principal da lista de reservas
 export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName }: ReservasListProps) {
     const { data: reservas, links } = paginator;
     const isMobile = useIsMobile();
@@ -50,9 +49,6 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     const handleAvaliarButton = (id: number) => {
         router.get(route('gestor.reservas.show', id));
     };
-
-    // Função para ABRIR o modal de detalhes
-    // Ela faz uma requisição para buscar os dados completos da reserva
     const handleAbrirDetalhes = (reserva: Reserva) => {
         router.get(
             route(routeName),
@@ -69,9 +65,6 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
             },
         );
     };
-
-    // Função para FECHAR o modal de detalhes
-    // Ela remove o parâmetro 'reserva' da URL
     const handleFecharDetalhes = () => {
         router.get(
             route(routeName),

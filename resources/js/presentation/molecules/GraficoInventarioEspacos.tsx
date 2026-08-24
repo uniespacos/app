@@ -1,14 +1,9 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { Building, Gauge, Layers, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart';
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { TabelaDetalhamento } from '@/presentation/molecules/TabelaDetalhamento';
 import { DadosRelatorio } from '@/types';
+import { Building, Gauge, Layers, Users } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 interface Props {
     dados: DadosRelatorio;
@@ -29,9 +24,7 @@ function GraficoInventarioEspacos({ dados }: Props) {
                     <CardTitle>{dados.titulo}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">
-                        Nenhum espaço para os filtros selecionados.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Nenhum espaço para os filtros selecionados.</p>
                 </CardContent>
             </Card>
         );
@@ -56,9 +49,7 @@ function GraficoInventarioEspacos({ dados }: Props) {
                         <Building className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {String(dados.sumario['Total de Espaços'] ?? '')}
-                        </div>
+                        <div className="text-2xl font-bold">{String(dados.sumario['Total de Espaços'] ?? '')}</div>
                         <p className="text-muted-foreground text-xs">Cadastrados</p>
                     </CardContent>
                 </Card>
@@ -69,9 +60,7 @@ function GraficoInventarioEspacos({ dados }: Props) {
                         <Layers className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {String(dados.sumario['Capacidade Total'] ?? '')}
-                        </div>
+                        <div className="text-2xl font-bold">{String(dados.sumario['Capacidade Total'] ?? '')}</div>
                         <p className="text-muted-foreground text-xs">Pessoas</p>
                     </CardContent>
                 </Card>
@@ -82,9 +71,7 @@ function GraficoInventarioEspacos({ dados }: Props) {
                         <Gauge className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {String(dados.sumario['Média de Capacidade'] ?? '')}
-                        </div>
+                        <div className="text-2xl font-bold">{String(dados.sumario['Média de Capacidade'] ?? '')}</div>
                         <p className="text-muted-foreground text-xs">Por espaço</p>
                     </CardContent>
                 </Card>
@@ -95,9 +82,7 @@ function GraficoInventarioEspacos({ dados }: Props) {
                         <Users className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {String(dados.sumario['Total de Gestores Únicos'] ?? '')}
-                        </div>
+                        <div className="text-2xl font-bold">{String(dados.sumario['Total de Gestores Únicos'] ?? '')}</div>
                         <p className="text-muted-foreground text-xs">Delegados</p>
                     </CardContent>
                 </Card>
@@ -108,28 +93,13 @@ function GraficoInventarioEspacos({ dados }: Props) {
                     <CardTitle className="text-base">Top 15 Espaços por Capacidade</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer
-                        config={chartConfig}
-                        className="aspect-auto w-full"
-                        style={{ height: alturaGrafico }}
-                    >
+                    <ChartContainer config={chartConfig} className="aspect-auto w-full" style={{ height: alturaGrafico }}>
                         <BarChart accessibilityLayer data={topCapacidade} layout="vertical">
                             <CartesianGrid horizontal={false} />
                             <XAxis type="number" dataKey="capacidade_pessoas" />
-                            <YAxis
-                                type="category"
-                                dataKey="nome"
-                                width={140}
-                                tickLine={false}
-                                axisLine={false}
-                            />
+                            <YAxis type="category" dataKey="nome" width={140} tickLine={false} axisLine={false} />
                             <ChartTooltip content={<ChartTooltipContent />} />
-                            <Bar
-                                dataKey="capacidade_pessoas"
-                                fill="var(--color-capacidade_pessoas)"
-                                radius={4}
-                                maxBarSize={24}
-                            />
+                            <Bar dataKey="capacidade_pessoas" fill="var(--color-capacidade_pessoas)" radius={4} maxBarSize={24} />
                         </BarChart>
                     </ChartContainer>
                 </CardContent>

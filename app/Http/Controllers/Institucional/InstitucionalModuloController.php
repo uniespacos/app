@@ -27,9 +27,6 @@ class InstitucionalModuloController extends Controller
         protected UnidadeService $unidadeService,
     ) {}
 
-    /**
-     * Display a paginated listing of modules scoped to the authenticated user's institution.
-     */
     public function index(ListarModulosRequest $request): Response
     {
         $this->authorize('viewAny', Modulo::class);
@@ -54,9 +51,6 @@ class InstitucionalModuloController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new module.
-     */
     public function create(): Response
     {
         $user = Auth::user();
@@ -68,9 +62,6 @@ class InstitucionalModuloController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created module along with its floors in storage.
-     */
     public function store(StoreModuloRequest $request): RedirectResponse
     {
         $this->authorize('create', Modulo::class);
@@ -85,9 +76,6 @@ class InstitucionalModuloController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified module.
-     */
     public function edit(Modulo $modulo): Response
     {
         $user = Auth::user();
@@ -102,9 +90,6 @@ class InstitucionalModuloController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified module and synchronize its floors in storage.
-     */
     public function update(UpdateModuloRequest $request, Modulo $modulo): RedirectResponse
     {
         $this->authorize('update', $modulo);
@@ -119,10 +104,6 @@ class InstitucionalModuloController extends Controller
         }
     }
 
-    /**
-     * Remove the specified module and its floors from storage.
-     * Requires password confirmation from the authenticated user.
-     */
     public function destroy(ConfirmPasswordRequest $request, Modulo $modulo): RedirectResponse
     {
         $this->authorize('delete', $modulo);

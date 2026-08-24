@@ -2,12 +2,12 @@
 
 import type React from 'react';
 
-import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import type { User } from '@/types';
 import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -79,13 +79,23 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                     </div>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start" side="bottom" sideOffset={4} onCloseAutoFocus={(e) => { e.preventDefault(); }}>
+            <PopoverContent
+                className="w-full p-0"
+                align="start"
+                side="bottom"
+                sideOffset={4}
+                onCloseAutoFocus={(e) => {
+                    e.preventDefault();
+                }}
+            >
                 <div className="flex items-center border-b px-3 py-2">
                     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                     <Input
                         placeholder="Buscar por nome ou email..."
                         value={searchValue}
-                        onChange={(e) => { setSearchValue(e.target.value); }}
+                        onChange={(e) => {
+                            setSearchValue(e.target.value);
+                        }}
                         className="h-auto border-0 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                         onKeyDown={(e) => {
                             // Prevenir que o popover feche com Escape
@@ -110,7 +120,9 @@ export function UserSearchCombobox({ usuarios, value, onValueChange, placeholder
                                 <div
                                     key={user.id}
                                     className="hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-sm p-2"
-                                    onClick={() => { handleSelect(user.id); }}
+                                    onClick={() => {
+                                        handleSelect(user.id);
+                                    }}
                                 >
                                     <Check className={cn('mr-2 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')} />
                                     <UserAvatar user={user} className="h-8 w-8" fallbackClassName="text-xs" />

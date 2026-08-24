@@ -12,8 +12,8 @@ import {
     proximoNivelSubsolo,
     proximoNivelSuperior,
 } from '@/lib/utils/andars/AndarHelpers';
-import { ArrowDown, ArrowUp, Building, Info } from 'lucide-react';
 import AndarCard, { AndarFormData } from '@/presentation/organisms/AndarFormCard';
+import { ArrowDown, ArrowUp, Building, Info } from 'lucide-react';
 
 interface AndaresManagerProps {
     andares: AndarFormData[];
@@ -117,11 +117,11 @@ export default function AndaresManager({ andares, onUpdate, onRemove, onAdd, err
 
             {/* Limitações */}
             <div className="space-y-1 text-center">
-                {!podeAdicionarAcima && <p className="text-xs text-warning-accent">⚠️ Máximo de 10 andares superiores atingido</p>}
-                {!podeAdicionarAbaixo && <p className="text-xs text-warning-accent">⚠️ Máximo de 2 subsolos atingido</p>}
+                {!podeAdicionarAcima && <p className="text-warning-accent text-xs">⚠️ Máximo de 10 andares superiores atingido</p>}
+                {!podeAdicionarAbaixo && <p className="text-warning-accent text-xs">⚠️ Máximo de 2 subsolos atingido</p>}
             </div>
 
-            {errors?.andares && <p className="text-center text-sm text-destructive">{errors.andares}</p>}
+            {errors?.andares && <p className="text-destructive text-center text-sm">{errors.andares}</p>}
         </div>
     );
 }

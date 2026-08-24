@@ -1,5 +1,5 @@
-import { addDays, addMonths } from 'date-fns';
 import { OpcoesRecorrencia } from '@/types';
+import { addDays, addMonths } from 'date-fns';
 
 export const opcoesRecorrencia: OpcoesRecorrencia[] = [
     {

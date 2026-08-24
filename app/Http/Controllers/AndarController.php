@@ -16,9 +16,6 @@ class AndarController extends Controller
         protected AndarService $service,
     ) {}
 
-    /**
-     * Store a newly created floor in storage.
-     */
     public function store(StoreAndarRequest $request): RedirectResponse
     {
         try {
@@ -38,33 +35,15 @@ class AndarController extends Controller
         }
     }
 
-    /**
-     * Display a listing of floors.
-     */
     public function index(): void {}
 
-    /**
-     * Show the form for creating a new floor.
-     */
     public function create(): void {}
 
-    /**
-     * Display the specified floor.
-     */
     public function show(Andar $andar): void {}
 
-    /**
-     * Show the form for editing the specified floor.
-     */
     public function edit(Andar $andar): void {}
 
-    /**
-     * Update the specified floor in storage.
-     */
     public function update(StoreAndarRequest $request, Andar $andar): void {}
 
-    /**
-     * Remove the specified floor from storage.
-     */
     public function destroy(Andar $andar): void {}
 }

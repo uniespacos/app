@@ -1,9 +1,9 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
 import { Espaco, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 export default function TabsItemEspacosFavoritos({
     espacosFiltrados,
@@ -29,7 +29,9 @@ export default function TabsItemEspacosFavoritos({
                         <Input
                             placeholder="Buscar espaços favoritos..."
                             value={searchTerm}
-                            onChange={(e) => { setSearchTerm(e.target.value); }}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                            }}
                             className="pl-8"
                         />
                     </div>
@@ -40,7 +42,9 @@ export default function TabsItemEspacosFavoritos({
                             key={espaco.id}
                             espaco={espaco}
                             user={user}
-                            handleSolicitarReserva={() => { router.get(`/espacos/${espaco.id}`); }}
+                            handleSolicitarReserva={() => {
+                                router.get(`/espacos/${espaco.id}`);
+                            }}
                         />
                     ))}
                 </div>

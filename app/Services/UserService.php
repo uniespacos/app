@@ -49,11 +49,6 @@ class UserService
             'roles' => $user->getRoleNames(),
         ]));
         $users->withQueryString();
-
-        // Só o necessário para o <Select> de setores do filtro. Antes esta query
-        // arrastava todos os usuários de cada setor com a cadeia completa de
-        // agendas/espaços (~495KB de JSON por request) sem que a tela usasse nada
-        // disso além de id e sigla.
         $setores = Setor::select(['id', 'sigla'])->orderBy('sigla')->get();
 
         return [
@@ -82,9 +77,6 @@ class UserService
                 'permissions' => $user->getAllPermissions()->pluck('name'),
                 'direct_permissions' => $user->getDirectPermissions()->pluck('name'),
             ]),
-            // Só as colunas que o seletor em cascata desenha. Trazer a linha
-            // inteira de espaco (descricao, imagens, main_image_index) inflava
-            // esta árvore em várias vezes sem que a tela usasse nada disso.
             'instituicoes' => Instituicao::select(['id', 'nome', 'sigla'])
                 ->with([
                     'unidades:id,nome,instituicao_id',

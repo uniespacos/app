@@ -26,7 +26,12 @@ export function ModalNovaInstituicao({ open, onOpenChange, novaInstituicao, onCh
             title="Cadastrar Nova Instituição"
             footer={
                 <>
-                    <Button variant="outline" onClick={() => { onOpenChange(false); }}>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            onOpenChange(false);
+                        }}
+                    >
                         Cancelar
                     </Button>
                     <Button onClick={onSubmit} disabled={!isFormValid}>

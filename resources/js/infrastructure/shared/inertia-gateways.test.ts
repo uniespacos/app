@@ -10,8 +10,8 @@ jest.mock('@inertiajs/react', () => ({
         patch: jest.fn(),
         delete: jest.fn(),
         visit: jest.fn(),
-        reload: jest.fn()
-    }
+        reload: jest.fn(),
+    },
 }));
 
 describe('InertiaHttpGateway', () => {

@@ -7,7 +7,7 @@ export const HORARIOS_PADRAO = {
 export type Turno = keyof typeof HORARIOS_PADRAO;
 
 /**
- * Ordem canônica de exibição dos turnos (issue #101).
+ * Ordem canônica de exibição dos turnos.
  *
  * Nem `Espaco::agendas()` nem `EspacoRepositoryEloquent::getAllByInstituicao`
  * aplicam ORDER BY, então a ordem em que as agendas chegam do backend é a que o

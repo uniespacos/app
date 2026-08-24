@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enums\SituacaoReserva;
 
 /**
- * Eixo de arquivamento das listagens de reserva (issue #108).
+ * Eixo de arquivamento das listagens de reserva.
  *
  * Existe separado de SituacaoReservaEnum porque `inativa` nunca foi um
  * resultado de avaliacao: e um estado de arquivamento que apaga o resultado

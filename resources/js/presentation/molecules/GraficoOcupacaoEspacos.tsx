@@ -1,13 +1,8 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart';
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { TabelaDetalhamento } from '@/presentation/molecules/TabelaDetalhamento';
 import { DadosRelatorio } from '@/types';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 interface Props {
     dados: DadosRelatorio;
@@ -28,9 +23,7 @@ function GraficoOcupacaoEspacos({ dados }: Props) {
                     <CardTitle className="text-base">{dados.titulo}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">
-                        Nenhum dado de ocupação para os filtros selecionados.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Nenhum dado de ocupação para os filtros selecionados.</p>
                 </CardContent>
             </Card>
         );
@@ -53,34 +46,13 @@ function GraficoOcupacaoEspacos({ dados }: Props) {
                     <CardTitle className="text-base">Taxa de Ocupação — Top 15</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ChartContainer
-                        config={chartConfig}
-                        className="aspect-auto w-full"
-                        style={{ height: alturaGrafico }}
-                    >
+                    <ChartContainer config={chartConfig} className="aspect-auto w-full" style={{ height: alturaGrafico }}>
                         <BarChart accessibilityLayer data={dadosGrafico} layout="vertical">
                             <CartesianGrid horizontal={false} />
                             <XAxis type="number" dataKey="taxa_ocupacao_num" />
-                            <YAxis
-                                type="category"
-                                dataKey="nome_espaco"
-                                width={160}
-                                tickLine={false}
-                                axisLine={false}
-                            />
-                            <ChartTooltip
-                                content={
-                                    <ChartTooltipContent
-                                        formatter={(value) => `${Number(value).toFixed(2)}%`}
-                                    />
-                                }
-                            />
-                            <Bar
-                                dataKey="taxa_ocupacao_num"
-                                fill="var(--color-taxa_ocupacao_num)"
-                                radius={4}
-                                maxBarSize={24}
-                            />
+                            <YAxis type="category" dataKey="nome_espaco" width={160} tickLine={false} axisLine={false} />
+                            <ChartTooltip content={<ChartTooltipContent formatter={(value) => `${Number(value).toFixed(2)}%`} />} />
+                            <Bar dataKey="taxa_ocupacao_num" fill="var(--color-taxa_ocupacao_num)" radius={4} maxBarSize={24} />
                         </BarChart>
                     </ChartContainer>
                 </CardContent>

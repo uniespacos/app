@@ -1,9 +1,9 @@
 import {
-    acquirePublicChannel,
-    acquirePrivateChannel,
-    releasePublicChannel,
-    releasePrivateChannel,
     __resetEchoChannelRegistryForTests,
+    acquirePrivateChannel,
+    acquirePublicChannel,
+    releasePrivateChannel,
+    releasePublicChannel,
 } from './echo-channel-registry';
 
 describe('echo-channel-registry', () => {
@@ -52,9 +52,8 @@ describe('echo-channel-registry', () => {
 
     describe('acquirePublicChannel', () => {
         it('should call window.Echo.channel only once for multiple acquisitions of the same channel', () => {
-             
             const channel1 = acquirePublicChannel('test-channel');
-             
+
             const channel2 = acquirePublicChannel('test-channel');
 
             expect(mockChannel).toHaveBeenCalledTimes(1);
@@ -65,7 +64,6 @@ describe('echo-channel-registry', () => {
         it('should return undefined and not create a channel entry if window.Echo is undefined', () => {
             delete (window as unknown as { Echo?: unknown }).Echo;
 
-             
             const channel = acquirePublicChannel('test-channel');
 
             expect(channel).toBeUndefined();
@@ -73,9 +71,8 @@ describe('echo-channel-registry', () => {
         });
 
         it('should handle different public channel names independently', () => {
-             
             const channel1 = acquirePublicChannel('channel-1');
-             
+
             const channel2 = acquirePublicChannel('channel-2');
 
             expect(mockChannel).toHaveBeenCalledTimes(2);
@@ -107,13 +104,12 @@ describe('echo-channel-registry', () => {
         });
 
         it('should allow re-acquiring a channel after it has been fully released', () => {
-             
             const channel1 = acquirePublicChannel('test-channel');
             releasePublicChannel('test-channel');
 
             // Reset mocks to verify new acquisition
             mockChannel.mockClear();
-             
+
             const channel2 = acquirePublicChannel('test-channel');
 
             expect(mockChannel).toHaveBeenCalledTimes(1);
@@ -131,9 +127,8 @@ describe('echo-channel-registry', () => {
 
     describe('acquirePrivateChannel', () => {
         it('should call window.Echo.private only once for multiple acquisitions of the same channel', () => {
-             
             const channel1 = acquirePrivateChannel('App.Models.User.1');
-             
+
             const channel2 = acquirePrivateChannel('App.Models.User.1');
 
             expect(mockPrivate).toHaveBeenCalledTimes(1);
@@ -144,7 +139,6 @@ describe('echo-channel-registry', () => {
         it('should return undefined and not create a channel entry if window.Echo is undefined', () => {
             delete (window as unknown as { Echo?: unknown }).Echo;
 
-             
             const channel = acquirePrivateChannel('App.Models.User.1');
 
             expect(channel).toBeUndefined();
@@ -152,9 +146,8 @@ describe('echo-channel-registry', () => {
         });
 
         it('should handle different private channel names independently', () => {
-             
             const channel1 = acquirePrivateChannel('App.Models.User.1');
-             
+
             const channel2 = acquirePrivateChannel('App.Models.User.2');
 
             expect(mockPrivate).toHaveBeenCalledTimes(2);
@@ -186,12 +179,11 @@ describe('echo-channel-registry', () => {
         });
 
         it('should allow re-acquiring a channel after it has been fully released', () => {
-             
             const channel1 = acquirePrivateChannel('App.Models.User.1');
             releasePrivateChannel('App.Models.User.1');
 
             mockPrivate.mockClear();
-             
+
             const channel2 = acquirePrivateChannel('App.Models.User.1');
 
             expect(mockPrivate).toHaveBeenCalledTimes(1);
@@ -209,9 +201,8 @@ describe('echo-channel-registry', () => {
 
     describe('mixed public and private channels', () => {
         it('should handle public and private channels with the same name independently', () => {
-             
             const publicChannel = acquirePublicChannel('same-name');
-             
+
             const privateChannel = acquirePrivateChannel('same-name');
 
             expect(mockChannel).toHaveBeenCalledWith('same-name');

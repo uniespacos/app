@@ -11,9 +11,7 @@ export function PaginacaoLink({ url, active, label }: PaginacaoLinkProps) {
         return (
             <Link
                 href={url}
-                className={`rounded-md border px-4 py-2 text-sm ${
-                    active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'
-                }`}
+                className={`rounded-md border px-4 py-2 text-sm ${active ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'}`}
                 preserveState
                 preserveScroll
                 dangerouslySetInnerHTML={{ __html: label }}
@@ -21,10 +19,5 @@ export function PaginacaoLink({ url, active, label }: PaginacaoLinkProps) {
         );
     }
 
-    return (
-        <span
-            className="text-muted-foreground rounded-md border px-4 py-2 text-sm"
-            dangerouslySetInnerHTML={{ __html: label }}
-        />
-    );
+    return <span className="text-muted-foreground rounded-md border px-4 py-2 text-sm" dangerouslySetInnerHTML={{ __html: label }} />;
 }

@@ -1,11 +1,11 @@
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
+import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import type { Instituicao } from '@/types';
 import { LoaderCircle } from 'lucide-react';
 import type React from 'react';
-import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 
 interface FormRegistroUsuarioProps {
     data: {
@@ -38,7 +38,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         } else {
             return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
         }
-    
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +55,9 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                         <Input
                             id="name"
                             value={data.name}
-                            onChange={(e) => { onInputChange('name', e.target.value); }}
+                            onChange={(e) => {
+                                onInputChange('name', e.target.value);
+                            }}
                             placeholder="Digite seu nome completo"
                             required
                             className="h-11"
@@ -70,7 +71,9 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                             id="email"
                             type="email"
                             value={data.email}
-                            onChange={(e) => { onInputChange('email', e.target.value); }}
+                            onChange={(e) => {
+                                onInputChange('email', e.target.value);
+                            }}
                             placeholder="seu@email.com"
                             required
                             className="h-11"
@@ -97,13 +100,17 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
             <div className="space-y-4">
                 <div className="border-t pt-6">
                     <div className="mb-4 flex items-center justify-between">
-                        <h3 className="text-lg font-medium text-foreground">Informações Institucionais</h3>
+                        <h3 className="text-foreground text-lg font-medium">Informações Institucionais</h3>
                     </div>
                     <SeletorInstituicao
                         instituicaos={instituicaos}
                         processing={processing}
-                        onInstituicaoChange={(instId) => { onInputChange('instituicao_id', instId); }}
-                        onSetorChange={(setorId) => { onInputChange('setor_id', setorId); }}
+                        onInstituicaoChange={(instId) => {
+                            onInputChange('instituicao_id', instId);
+                        }}
+                        onSetorChange={(setorId) => {
+                            onInputChange('setor_id', setorId);
+                        }}
                         errors={errors}
                     />
                 </div>
@@ -112,7 +119,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
             {/* Password */}
             <div className="space-y-4">
                 <div className="border-t pt-6">
-                    <h3 className="mb-4 text-lg font-medium text-foreground">Definir Senha</h3>
+                    <h3 className="text-foreground mb-4 text-lg font-medium">Definir Senha</h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="password">Senha *</Label>
@@ -120,7 +127,9 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 id="password"
                                 type="password"
                                 value={data.password}
-                                onChange={(e) => { onInputChange('password', e.target.value); }}
+                                onChange={(e) => {
+                                    onInputChange('password', e.target.value);
+                                }}
                                 placeholder="Mínimo 8 caracteres"
                                 required
                                 className="h-11"
@@ -134,7 +143,9 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                                 id="password_confirmation"
                                 type="password"
                                 value={data.password_confirmation}
-                                onChange={(e) => { onInputChange('password_confirmation', e.target.value); }}
+                                onChange={(e) => {
+                                    onInputChange('password_confirmation', e.target.value);
+                                }}
                                 placeholder="Digite a senha novamente"
                                 required
                                 className="h-11"

@@ -6,13 +6,13 @@ import { Label } from '@/components/ui/label';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { criarTerreoInicial, garantirTerreo, nivelParaNome } from '@/lib/utils/andars/AndarHelpers';
 import { isEditMode, transformModuloToFormData } from '@/lib/utils/andars/ModuloDataFormTransformer';
+import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
+import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
+import AndaresManager from '@/presentation/organisms/AndarManager';
+import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
 import { Instituicao, Modulo, Unidade } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
-import { CadastrarModuloForm } from '@/presentation/pages/Administrativo/Modulos/CadastrarModulo';
-import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
-import AndaresManager from '@/presentation/organisms/AndarManager';
-import AndarStickFormActions from '@/presentation/molecules/AndarStickFormActions';
 
 export interface ModuloFormProps {
     data: CadastrarModuloForm;
@@ -140,7 +140,9 @@ export default function ModuloForm({
                             <Label htmlFor="unidade_id">Unidade</Label>
                             <SelectUI
                                 value={data.unidade_id}
-                                onValueChange={(value) => { setData((prev: CadastrarModuloForm) => ({ ...prev, unidade_id: value })); }}
+                                onValueChange={(value) => {
+                                    setData((prev: CadastrarModuloForm) => ({ ...prev, unidade_id: value }));
+                                }}
                                 disabled={processing}
                             >
                                 <SelectTrigger>
@@ -154,7 +156,7 @@ export default function ModuloForm({
                                     ))}
                                 </SelectContent>
                             </SelectUI>
-                            {errors.unidade_id && <p className="mt-1 text-sm text-destructive">{errors.unidade_id}</p>}
+                            {errors.unidade_id && <p className="text-destructive mt-1 text-sm">{errors.unidade_id}</p>}
                         </div>
 
                         {/* Input Nome do Módulo */}
@@ -163,10 +165,12 @@ export default function ModuloForm({
                             <Input
                                 id="nome"
                                 value={data.nome}
-                                onChange={(e) => { setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value })); }}
+                                onChange={(e) => {
+                                    setData((prev: CadastrarModuloForm) => ({ ...prev, nome: e.target.value }));
+                                }}
                                 placeholder="Ex: Bloco Administrativo"
                             />
-                            {errors.nome && <p className="mt-1 text-sm text-destructive">{errors.nome}</p>}
+                            {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
                         </div>
                     </CardContent>
                 </Card>

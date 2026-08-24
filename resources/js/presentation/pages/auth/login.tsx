@@ -2,12 +2,12 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
-import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
 
 interface LoginForm {
     email: string;
@@ -26,12 +26,14 @@ export default function Login() {
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('login'), {
-            onFinish: () => { reset('password'); },
+            onFinish: () => {
+                reset('password');
+            },
         });
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4 py-12 sm:px-6 lg:px-8">
+        <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
             <Head title="Entrar" />
             <div className="w-full max-w-md">
                 <Card className="w-full">
@@ -56,11 +58,13 @@ export default function Login() {
                                     type="email"
                                     placeholder="seu@email.com"
                                     value={data.email}
-                                    onChange={(e) => { setData('email', e.target.value); }}
+                                    onChange={(e) => {
+                                        setData('email', e.target.value);
+                                    }}
                                     className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                                     disabled={processing}
                                 />
-                                {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
+                                {errors.email && <p className="text-destructive mt-1 text-sm">{errors.email}</p>}
                             </div>
 
                             <div className="space-y-2">
@@ -69,7 +73,9 @@ export default function Login() {
                                     <button
                                         type="button"
                                         className="text-primary text-sm hover:underline"
-                                        onClick={() => { router.get(route('password.request')); }}
+                                        onClick={() => {
+                                            router.get(route('password.request'));
+                                        }}
                                     >
                                         Esqueceu a senha?
                                     </button>
@@ -80,26 +86,36 @@ export default function Login() {
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="********"
                                         value={data.password}
-                                        onChange={(e) => { setData('password', e.target.value); }}
-                                        className={errors.password ? 'border-destructive pr-10 focus-visible:ring-destructive' : 'pr-10'}
+                                        onChange={(e) => {
+                                            setData('password', e.target.value);
+                                        }}
+                                        className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
                                         disabled={processing}
                                     />
                                     <button
                                         type="button"
                                         className="absolute inset-y-0 right-0 flex items-center pr-3"
-                                        onClick={() => { setShowPassword(!showPassword); }}
+                                        onClick={() => {
+                                            setShowPassword(!showPassword);
+                                        }}
                                     >
-                                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                                        {showPassword ? (
+                                            <EyeOff className="text-muted-foreground h-4 w-4" />
+                                        ) : (
+                                            <Eye className="text-muted-foreground h-4 w-4" />
+                                        )}
                                     </button>
                                 </div>
-                                {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password}</p>}
+                                {errors.password && <p className="text-destructive mt-1 text-sm">{errors.password}</p>}
                             </div>
 
                             <div className="flex items-center space-x-2 py-4">
                                 <Checkbox
                                     id="remember"
                                     checked={data.remember}
-                                    onCheckedChange={(checked) => { setData('remember', !!checked); }}
+                                    onCheckedChange={(checked) => {
+                                        setData('remember', !!checked);
+                                    }}
                                     disabled={processing}
                                 />
                                 <Label htmlFor="remember" className="cursor-pointer text-sm font-normal select-none">
@@ -125,7 +141,9 @@ export default function Login() {
                                 <button
                                     type="button"
                                     className="text-primary font-medium hover:underline"
-                                    onClick={() => { router.get(route('register')); }}
+                                    onClick={() => {
+                                        router.get(route('register'));
+                                    }}
                                 >
                                     Cadastre-se!
                                 </button>

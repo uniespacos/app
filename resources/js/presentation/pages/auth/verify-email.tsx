@@ -1,10 +1,9 @@
-// Components
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import TextLink from '@/presentation/atoms/text-link';
 import { Button } from '@/components/ui/button';
+import TextLink from '@/presentation/atoms/text-link';
 import AuthLayout from '@/presentation/templates/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -21,7 +20,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Head title="Email verification" />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-success-accent">
+                <div className="text-success-accent mb-4 text-center text-sm font-medium">
                     Um novo link de verificação foi enviado para o endereço de e-mail que você forneceu durante o registro.
                 </div>
             )}
