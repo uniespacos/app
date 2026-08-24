@@ -1,16 +1,29 @@
 import { router } from '@inertiajs/react';
+import type { RequestPayload } from '@inertiajs/core';
 import { useEffect, useRef, useState } from 'react';
 
 interface UseDebouncedSearchOptions {
     routeName: string;
     initialSearch?: string;
-    extraParams?: Record<string, unknown>;
+    extraParams?: Record<string, string | number | boolean | undefined>;
     delay?: number;
 }
 
 export function useDebouncedSearch({ routeName, initialSearch = '', extraParams = {}, delay = 400 }: UseDebouncedSearchOptions) {
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const isInitialMount = useRef(true);
+    const extraParamsRef = useRef(extraParams);
+    extraParamsRef.current = extraParams;
+    const routeNameRef = useRef(routeName);
+    routeNameRef.current = routeName;
+
+    const prevInitialSearchRef = useRef(initialSearch);
+    useEffect(() => {
+        if (prevInitialSearchRef.current !== initialSearch) {
+            prevInitialSearchRef.current = initialSearch;
+            setSearchTerm(initialSearch);
+        }
+    }, [initialSearch]);
 
     useEffect(() => {
         if (isInitialMount.current) {
@@ -19,12 +32,19 @@ export function useDebouncedSearch({ routeName, initialSearch = '', extraParams 
         }
 
         const timeout = setTimeout(() => {
+            const cleanParams: Record<string, string | number | boolean> = {};
+            for (const [key, value] of Object.entries(extraParamsRef.current)) {
+                if (value !== undefined && value !== '' && value !== 'all') {
+                    cleanParams[key] = value;
+                }
+            }
+            if (searchTerm) {
+                cleanParams.search = searchTerm;
+            }
+
             router.get(
-                route(routeName),
-                {
-                    ...extraParams,
-                    search: searchTerm || undefined,
-                },
+                route(routeNameRef.current),
+                cleanParams as RequestPayload,
                 { preserveState: true, preserveScroll: true, replace: true },
             );
         }, delay);
@@ -32,7 +52,7 @@ export function useDebouncedSearch({ routeName, initialSearch = '', extraParams 
         return () => {
             clearTimeout(timeout);
         };
-    }, [searchTerm, routeName, delay, extraParams]);
+    }, [searchTerm, delay]);
 
     return {
         searchTerm,

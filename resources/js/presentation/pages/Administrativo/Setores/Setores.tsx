@@ -38,7 +38,7 @@ export default function SetoresPage() {
         routeName: 'institucional.setors.index',
         initialSearch: filters?.search ?? '',
         extraParams: {
-            unidade_id: selectedUnidade !== 'all' ? selectedUnidade : '',
+            unidade_id: selectedUnidade !== 'all' ? selectedUnidade : undefined,
         },
     });
 

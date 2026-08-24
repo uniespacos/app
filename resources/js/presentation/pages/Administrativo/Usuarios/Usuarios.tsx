@@ -79,7 +79,7 @@ export default function Usuarios() {
         routeName: 'institucional.usuarios.index',
         initialSearch: filters?.search ?? '',
         extraParams: {
-            setor_id: selectedSetorId !== 'all' ? selectedSetorId : '',
+            setor_id: selectedSetorId !== 'all' ? selectedSetorId : undefined,
         },
     });
 
