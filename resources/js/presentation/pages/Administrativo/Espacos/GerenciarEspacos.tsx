@@ -5,7 +5,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
-import { GerenciarGestoresDialog } from '@/presentation/organisms/GerenciarGestoresDialog';
+import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
 import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
 const breadcrumbs = [
@@ -78,10 +78,11 @@ export default function GerenciarEspacos() {
                         />
 
                         {/* Tabela de Espaços */}
-                        {!espacoParaGerenciar ? (
-                            <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
-                        ) : (
-                            <GerenciarGestoresDialog
+                        <TabelaEspacos espacos={espacos.data} onGerenciarGestores={handleGerenciarGestores} totalFiltrado={espacos.total} />
+                        <PaginacaoListas links={espacos.links} />
+
+                        {espacoParaGerenciar && (
+                            <GerenciarGestoresModal
                                 key={espacoParaGerenciar.id}
                                 espaco={espacoParaGerenciar}
                                 usuarios={users}
@@ -90,8 +91,6 @@ export default function GerenciarEspacos() {
                                 onSave={handleSalvarGestores}
                             />
                         )}
-
-                        <PaginacaoListas links={espacos.links} />
                     </div>
                 </div>
             </div>

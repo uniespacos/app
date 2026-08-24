@@ -3,8 +3,8 @@ import AppLayout from '@/presentation/templates/app-layout';
 import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { useReservationLiveUpdates } from '@/hooks/useReservationLiveUpdates';
-import { useEspacoLiveUpdates } from '@/hooks/useEspacoLiveUpdates';
+import { useReservationLiveUpdates } from '@/hooks/use-reservation-live-updates';
+import { useEspacoLiveUpdates } from '@/hooks/use-espaco-live-updates';
 
 export default function VisualizarEspaço({
     espaco,

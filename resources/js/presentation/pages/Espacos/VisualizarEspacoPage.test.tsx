@@ -3,8 +3,8 @@ import { render } from '@testing-library/react';
 import VisualizarEspaço from '@/presentation/pages/Espacos/VisualizarEspacoPage';
 import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 import * as InertiaReact from '@inertiajs/react';
-import * as UseReservationLiveUpdatesModule from '@/hooks/useReservationLiveUpdates';
-import * as UseEspacoLiveUpdatesModule from '@/hooks/useEspacoLiveUpdates';
+import * as UseReservationLiveUpdatesModule from '@/hooks/use-reservation-live-updates';
+import * as UseEspacoLiveUpdatesModule from '@/hooks/use-espaco-live-updates';
 import type { Espaco, Reserva } from '@/types';
 
 jest.mock('@inertiajs/react');
@@ -21,11 +21,11 @@ jest.mock('@/presentation/organisms/EspacoAgenda', () => {
     };
 });
 
-jest.mock('@/hooks/useReservationLiveUpdates', () => ({
+jest.mock('@/hooks/use-reservation-live-updates', () => ({
     useReservationLiveUpdates: jest.fn(),
 }));
 
-jest.mock('@/hooks/useEspacoLiveUpdates', () => ({
+jest.mock('@/hooks/use-espaco-live-updates', () => ({
     useEspacoLiveUpdates: jest.fn(),
 }));
 

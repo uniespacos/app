@@ -7,7 +7,7 @@ import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
@@ -175,6 +175,7 @@ export default function AvaliarReserva({
                                     Horários Solicitados
                                 </h4>
                                 <AgendaNavegacao
+                                    variant="compact"
                                     semanaAtual={semanaVisivel}
                                     onAnterior={irParaSemanaAnterior}
                                     onProxima={irParaProximaSemana}

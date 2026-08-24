@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-interface PaginacaoProps {
+interface PaginacaoRelatorioProps {
     totalItems: number;
     itemsPerPage: number;
     currentPage: number;
     onPageChange: (page: number) => void;
 }
 
-export function Paginacao({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginacaoProps) {
+export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginacaoRelatorioProps) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     if (totalPages <= 1) {

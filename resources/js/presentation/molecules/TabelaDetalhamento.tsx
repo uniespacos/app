@@ -17,7 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Paginacao } from '@/presentation/molecules/Paginacao';
+import { PaginacaoRelatorio } from '@/presentation/molecules/PaginacaoRelatorio';
 import { cn } from '@/lib/utils';
 import { ColunaRelatorio } from '@/types';
 
@@ -199,7 +199,7 @@ export function TabelaDetalhamento({
                         </TableBody>
                     </Table>
                 </div>
-                <Paginacao
+                <PaginacaoRelatorio
                     totalItems={linhasOrdenadas.length}
                     itemsPerPage={porPagina}
                     currentPage={pagina}

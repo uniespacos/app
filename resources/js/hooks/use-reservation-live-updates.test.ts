@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { useReservationLiveUpdates } from './useReservationLiveUpdates';
+import { useReservationLiveUpdates } from './use-reservation-live-updates';
 import { __resetEchoChannelRegistryForTests } from '@/lib/echo-channel-registry';
 
 describe('useReservationLiveUpdates', () => {
