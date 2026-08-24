@@ -40,3 +40,13 @@ beforeEach(() => {
     delete exports.storedCookies[key];
   }
 });
+
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
+if (!window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = function() {};
+}

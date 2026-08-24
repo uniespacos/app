@@ -5,12 +5,13 @@ import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useDebouncedSearch } from '@/hooks/use-debounced-search';
 import { cn } from '@/lib/utils';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
 import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface FiltroBuscaEspacosProps {
     route: string;
@@ -28,24 +29,34 @@ interface FiltroBuscaEspacosProps {
 }
 
 export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
-    const { route, filters, unidades, modulos, andares, capacidadeEspacos } = props;
+    const { route: targetRoute, filters, unidades, modulos, andares, capacidadeEspacos } = props;
     const [localFilters, setLocalFilters] = useState({
-        search: filters.search || '',
         unidade: filters.unidade || 'all',
         modulo: filters.modulo || 'all',
         andar: filters.andar || 'all',
         capacidade: filters.capacidade || 'qualquer',
     });
-    const isInitialMount = useRef(true);
+
+    const extraParams = useMemo(() => {
+        const params: Record<string, string | undefined> = {};
+        if (localFilters.unidade && localFilters.unidade !== 'all') params.unidade = localFilters.unidade;
+        if (localFilters.modulo && localFilters.modulo !== 'all') params.modulo = localFilters.modulo;
+        if (localFilters.andar && localFilters.andar !== 'all') params.andar = localFilters.andar;
+        if (localFilters.capacidade && localFilters.capacidade !== 'qualquer') params.capacidade = localFilters.capacidade;
+        return params;
+    }, [localFilters.unidade, localFilters.modulo, localFilters.andar, localFilters.capacidade]);
+
+    const { searchTerm, setSearchTerm } = useDebouncedSearch({
+        routeName: targetRoute,
+        initialSearch: filters.search || '',
+        extraParams,
+    });
 
     const filteredModulos = useMemo(() => {
         if (localFilters.unidade === 'all') {
             return [];
         }
-        const resultado = modulos.filter((m) => {
-            return m.unidade_id.toString() === localFilters.unidade;
-        });
-        return resultado;
+        return modulos.filter((m) => m.unidade_id.toString() === localFilters.unidade);
     }, [localFilters.unidade, modulos]);
 
     const filteredAndares = useMemo(() => {
@@ -55,47 +66,33 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         return andares.filter((a) => a.modulo_id.toString() === localFilters.modulo);
     }, [localFilters.modulo, andares]);
 
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
+    const handleFilterChange = (name: 'unidade' | 'modulo' | 'andar' | 'capacidade', value: string) => {
+        const newFilters = { ...localFilters, [name]: value };
+
+        if (name === 'unidade') {
+            newFilters.modulo = 'all';
+            newFilters.andar = 'all';
+        }
+        if (name === 'modulo') {
+            newFilters.andar = 'all';
         }
 
-        const handler = setTimeout(() => {
-            const queryParams = Object.fromEntries(
-                Object.entries(localFilters).filter(([key, value]) => {
-                    if (!value) return false;
-                    if (['unidade', 'modulo', 'andar'].includes(key) && value === 'all') return false;
-                    if (key === 'capacidade' && value === 'qualquer') return false;
-                    return true;
-                }),
-            );
+        setLocalFilters(newFilters);
 
-            router.get(route, queryParams, {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-            });
-        }, 400);
+        const queryParams: Record<string, string> = {};
+        if (searchTerm) queryParams.search = searchTerm;
+        if (newFilters.unidade !== 'all') queryParams.unidade = newFilters.unidade;
+        if (newFilters.modulo !== 'all') queryParams.modulo = newFilters.modulo;
+        if (newFilters.andar !== 'all') queryParams.andar = newFilters.andar;
+        if (newFilters.capacidade !== 'qualquer') queryParams.capacidade = newFilters.capacidade;
 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [localFilters, route]);
+        const targetUrl =
+            targetRoute.startsWith('http://') || targetRoute.startsWith('https://') || targetRoute.startsWith('/') ? targetRoute : route(targetRoute);
 
-    const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
-        setLocalFilters((prev) => {
-            const newFilters = { ...prev, [name]: value };
-
-            if (name === 'unidade') {
-                newFilters.modulo = 'all';
-                newFilters.andar = 'all';
-            }
-            if (name === 'modulo') {
-                newFilters.andar = 'all';
-            }
-
-            return newFilters;
+        router.get(targetUrl, queryParams, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
         });
     };
 
@@ -120,9 +117,9 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             id="espacos-busca"
                             placeholder="Buscar por nome do espaço, andar ou módulo..."
                             className="pl-8"
-                            value={localFilters.search}
-                            onChange={(value) => {
-                                handleFilterChange('search', value.target.value);
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
                             }}
                         />
                     </div>
@@ -225,13 +222,11 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="qualquer">Qualquer</SelectItem>
-                                {capacidadeEspacos.map((capacidade) => {
-                                    return (
-                                        <SelectItem key={capacidade} value={capacidade.toString()}>
-                                            {capacidade} Lugares
-                                        </SelectItem>
-                                    );
-                                })}
+                                {capacidadeEspacos.map((capacidade) => (
+                                    <SelectItem key={capacidade} value={capacidade.toString()}>
+                                        {capacidade} Lugares
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

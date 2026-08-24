@@ -1,14 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DatePicker } from '@/presentation/molecules/DatePicker';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface ReservasFiltersProps {
     searchTerm: string;
@@ -124,40 +120,16 @@ export function ReservasFilters({
                         <Label htmlFor="reservas-data" className="text-muted-foreground text-xs font-medium">
                             Data
                         </Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button id="reservas-data" variant="outline" className="w-full justify-start text-left font-normal">
-                                    <CalendarIcon className="text-muted-foreground mr-2 h-4 w-4 shrink-0" />
-                                    <span className="truncate">
-                                        {selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: ptBR }) : 'Todas as datas'}
-                                    </span>
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="end">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={(date) => {
-                                        onDateChange?.(date);
-                                    }}
-                                    initialFocus
-                                />
-                                {selectedDate && (
-                                    <div className="border-t p-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="w-full justify-center text-xs"
-                                            onClick={() => {
-                                                onDateChange?.(undefined);
-                                            }}
-                                        >
-                                            Limpar filtro de data
-                                        </Button>
-                                    </div>
-                                )}
-                            </PopoverContent>
-                        </Popover>
+                        <DatePicker
+                            id="reservas-data"
+                            value={selectedDate}
+                            onSelect={(date) => {
+                                onDateChange?.(date);
+                            }}
+                            placeholder="Todas as datas"
+                            align="end"
+                            clearable
+                        />
                     </div>
                 </div>
             </CardContent>
