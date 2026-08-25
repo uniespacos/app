@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.64](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.63...v1.3.0-rc.64) (2026-08-25)
+
+
+### Bug Fixes
+
+* **ci:** incluir globais de node e jest para __mocks__ no eslint.config.js ([#383](https://github.com/uniespacos/uniespacos/issues/383)) ([b5eb0b5](https://github.com/uniespacos/uniespacos/commit/b5eb0b5f7cdc7d4579b0ec3aca40f285b4692546))
+
 ## [1.3.0-rc.63](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.62...v1.3.0-rc.63) (2026-08-25)
 
 
