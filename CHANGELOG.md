@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.63](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.62...v1.3.0-rc.63) (2026-08-25)
+
+
+### Bug Fixes
+
+* **ci:** corrigir tipagem e podar supressoes de eslint para cicd staging ([#381](https://github.com/uniespacos/uniespacos/issues/381)) ([ffb522e](https://github.com/uniespacos/uniespacos/commit/ffb522ec8a8edc64f4522dc21e3cefea9c6cf010))
+
 ## [1.3.0-rc.62](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.61...v1.3.0-rc.62) (2026-08-25)
 
 
