@@ -1,17 +1,27 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
-import { cn } from '@/lib/utils';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
-import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
+import { RotateCcw, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
+
+declare function route(name: string, params?: unknown): string;
 
 interface FiltroBuscaEspacosProps {
     route: string;
@@ -28,14 +38,14 @@ interface FiltroBuscaEspacosProps {
     capacidadeEspacos: number[];
 }
 
-export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
-    const { route: targetRoute, filters, unidades, modulos, andares, capacidadeEspacos } = props;
+export default function EspacoFiltroBusca({ route: targetRoute, filters, unidades, modulos, andares, capacidadeEspacos }: FiltroBuscaEspacosProps) {
     const [localFilters, setLocalFilters] = useState({
         unidade: filters.unidade || 'all',
         modulo: filters.modulo || 'all',
         andar: filters.andar || 'all',
         capacidade: filters.capacidade || 'qualquer',
     });
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const extraParams = useMemo(() => {
         const params: Record<string, string | undefined> = {};
@@ -50,6 +60,7 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         routeName: targetRoute,
         initialSearch: filters.search || '',
         extraParams,
+        only: ['espacos', 'filters'],
     });
 
     const filteredModulos = useMemo(() => {
@@ -66,21 +77,11 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
         return andares.filter((a) => a.modulo_id.toString() === localFilters.modulo);
     }, [localFilters.modulo, andares]);
 
-    const handleFilterChange = (name: 'unidade' | 'modulo' | 'andar' | 'capacidade', value: string) => {
-        const newFilters = { ...localFilters, [name]: value };
-
-        if (name === 'unidade') {
-            newFilters.modulo = 'all';
-            newFilters.andar = 'all';
-        }
-        if (name === 'modulo') {
-            newFilters.andar = 'all';
-        }
-
+    const executeFilterChange = (newFilters: typeof localFilters, currentSearch: string) => {
         setLocalFilters(newFilters);
 
         const queryParams: Record<string, string> = {};
-        if (searchTerm) queryParams.search = searchTerm;
+        if (currentSearch) queryParams.search = currentSearch;
         if (newFilters.unidade !== 'all') queryParams.unidade = newFilters.unidade;
         if (newFilters.modulo !== 'all') queryParams.modulo = newFilters.modulo;
         if (newFilters.andar !== 'all') queryParams.andar = newFilters.andar;
@@ -93,144 +94,294 @@ export default function EspacoFiltroBusca(props: FiltroBuscaEspacosProps) {
             preserveState: true,
             preserveScroll: true,
             replace: true,
+            only: ['espacos', 'filters'],
         });
     };
 
-    const [filtrosAbertos, setFiltrosAbertos] = useState(false);
-    const quantidadeFiltrosAtivos = [
-        localFilters.unidade !== 'all',
-        localFilters.modulo !== 'all',
-        localFilters.andar !== 'all',
-        localFilters.capacidade !== 'qualquer',
-    ].filter(Boolean).length;
+    const handleFilterChange = (name: 'unidade' | 'modulo' | 'andar' | 'capacidade', value: string) => {
+        const newFilters = { ...localFilters, [name]: value };
+
+        if (name === 'unidade') {
+            newFilters.modulo = 'all';
+            newFilters.andar = 'all';
+        }
+        if (name === 'modulo') {
+            newFilters.andar = 'all';
+        }
+
+        executeFilterChange(newFilters, searchTerm);
+    };
+
+    const handleClearAllFilters = () => {
+        const clearedFilters = {
+            unidade: 'all',
+            modulo: 'all',
+            andar: 'all',
+            capacidade: 'qualquer',
+        };
+        setSearchTerm('');
+        executeFilterChange(clearedFilters, '');
+    };
+
+    const handleClearSearch = () => {
+        setSearchTerm('');
+        executeFilterChange(localFilters, '');
+    };
+
+    const activeFilterChips = useMemo(() => {
+        const chips: { key: 'unidade' | 'modulo' | 'andar' | 'capacidade'; label: string }[] = [];
+
+        if (localFilters.unidade !== 'all') {
+            const u = unidades.find((item) => item.id.toString() === localFilters.unidade);
+            chips.push({ key: 'unidade', label: `Unidade: ${u ? u.sigla || u.nome : localFilters.unidade}` });
+        }
+        if (localFilters.modulo !== 'all') {
+            const m = modulos.find((item) => item.id.toString() === localFilters.modulo);
+            chips.push({ key: 'modulo', label: `Módulo: ${m ? m.nome : localFilters.modulo}` });
+        }
+        if (localFilters.andar !== 'all') {
+            const a = andares.find((item) => item.id.toString() === localFilters.andar);
+            chips.push({
+                key: 'andar',
+                label: `Andar: ${a ? nivelParaLabel(nomeParaNivel(a.nome)) : localFilters.andar}`,
+            });
+        }
+        if (localFilters.capacidade !== 'qualquer') {
+            chips.push({ key: 'capacidade', label: `Capacidade: ${localFilters.capacidade} Lugares` });
+        }
+
+        return chips;
+    }, [localFilters, unidades, modulos, andares]);
+
+    const quantidadeFiltrosAtivos = activeFilterChips.length;
+    const hasActiveFilters = quantidadeFiltrosAtivos > 0 || Boolean(searchTerm);
+
+    const renderFilterSelects = (prefix = '') => (
+        <>
+            <div className="space-y-1.5">
+                <Label htmlFor={`${prefix}espacos-unidade`} className="text-muted-foreground text-xs font-medium">
+                    Unidade
+                </Label>
+                <Select
+                    value={localFilters.unidade}
+                    onValueChange={(value) => {
+                        handleFilterChange('unidade', value);
+                    }}
+                >
+                    <SelectTrigger id={`${prefix}espacos-unidade`} className="w-full">
+                        <SelectValue placeholder="Todas as Unidades" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todas as Unidades</SelectItem>
+                        {unidades.map((unidade) => (
+                            <SelectItem key={unidade.id} value={unidade.id.toString()}>
+                                {unidade.nome}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="space-y-1.5">
+                <Label htmlFor={`${prefix}espacos-modulo`} className="text-muted-foreground text-xs font-medium">
+                    Módulo
+                </Label>
+                <Select
+                    value={localFilters.modulo}
+                    onValueChange={(value) => {
+                        handleFilterChange('modulo', value);
+                    }}
+                    disabled={localFilters.unidade === 'all'}
+                >
+                    <SelectTrigger id={`${prefix}espacos-modulo`} className="w-full">
+                        <SelectValue placeholder="Todos os Módulos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos os Módulos</SelectItem>
+                        {filteredModulos.map((modulo) => (
+                            <SelectItem key={modulo.id} value={modulo.id.toString()}>
+                                {modulo.nome}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="space-y-1.5">
+                <Label htmlFor={`${prefix}espacos-andar`} className="text-muted-foreground text-xs font-medium">
+                    Andar
+                </Label>
+                <Select
+                    value={localFilters.andar}
+                    onValueChange={(value) => {
+                        handleFilterChange('andar', value);
+                    }}
+                    disabled={localFilters.modulo === 'all'}
+                >
+                    <SelectTrigger id={`${prefix}espacos-andar`} className="w-full">
+                        <SelectValue placeholder="Todos os Andares" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos os Andares</SelectItem>
+                        {filteredAndares.map((andar) => (
+                            <SelectItem key={andar.id} value={andar.id.toString()}>
+                                {nivelParaLabel(nomeParaNivel(andar.nome))}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="space-y-1.5">
+                <Label htmlFor={`${prefix}espacos-capacidade`} className="text-muted-foreground text-xs font-medium">
+                    Capacidade
+                </Label>
+                <Select
+                    value={localFilters.capacidade}
+                    onValueChange={(value) => {
+                        handleFilterChange('capacidade', value);
+                    }}
+                >
+                    <SelectTrigger id={`${prefix}espacos-capacidade`} className="w-full">
+                        <SelectValue placeholder="Qualquer capacidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="qualquer">Qualquer</SelectItem>
+                        {capacidadeEspacos.map((capacidade) => (
+                            <SelectItem key={capacidade} value={capacidade.toString()}>
+                                {capacidade} Lugares
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+        </>
+    );
 
     return (
-        <Card className="mb-6">
-            <CardContent className="space-y-4">
-                <div className="flex gap-2">
+        <Card className="border-border/80 mb-6 shadow-xs">
+            <CardContent className="space-y-4 p-4">
+                {/* Linha de Busca e Gatilho do Drawer Mobile */}
+                <div className="flex items-center gap-2">
                     <div className="relative flex-1">
                         <Label htmlFor="espacos-busca" className="sr-only">
                             Buscar
                         </Label>
-                        <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
+                        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <Input
                             id="espacos-busca"
                             placeholder="Buscar por nome do espaço, andar ou módulo..."
-                            className="pl-8"
+                            className="pr-9 pl-9"
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
                             }}
                         />
+                        {searchTerm && (
+                            <button
+                                type="button"
+                                onClick={handleClearSearch}
+                                aria-label="Limpar busca"
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted absolute top-1/2 right-2.5 -translate-y-1/2 rounded-full p-1 transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
                     </div>
 
-                    <Collapsible open={filtrosAbertos} onOpenChange={setFiltrosAbertos} className="sm:hidden">
-                        <CollapsibleTrigger asChild>
-                            <Button variant="outline" className="relative">
+                    {/* Drawer de Filtros no Mobile (< md) */}
+                    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline" className="relative flex items-center gap-2 md:hidden">
                                 <SlidersHorizontal className="h-4 w-4" />
-                                Filtros
+                                <span>Filtros</span>
                                 {quantidadeFiltrosAtivos > 0 && (
-                                    <Badge className="absolute -top-2 -right-2 h-5 min-w-5 justify-center rounded-full px-1">
+                                    <Badge className="bg-primary text-primary-foreground h-5 min-w-5 justify-center rounded-full px-1 text-xs">
                                         {quantidadeFiltrosAtivos}
                                     </Badge>
                                 )}
-                                <ChevronDown className={cn('h-4 w-4 transition-transform', filtrosAbertos && 'rotate-180')} />
                             </Button>
-                        </CollapsibleTrigger>
-                    </Collapsible>
+                        </DrawerTrigger>
+                        <DrawerContent>
+                            <DrawerHeader>
+                                <DrawerTitle>Filtros de Espaços</DrawerTitle>
+                                <DrawerDescription>Refine os espaços por unidade, módulo, andar ou capacidade</DrawerDescription>
+                            </DrawerHeader>
+                            <div className="max-h-[60vh] space-y-4 overflow-y-auto p-4">{renderFilterSelects('mobile-')}</div>
+                            <DrawerFooter>
+                                <DrawerClose asChild>
+                                    <Button className="w-full">Aplicar Filtros</Button>
+                                </DrawerClose>
+                                {hasActiveFilters && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            handleClearAllFilters();
+                                            setIsDrawerOpen(false);
+                                        }}
+                                        className="w-full"
+                                    >
+                                        Limpar Filtros
+                                    </Button>
+                                )}
+                            </DrawerFooter>
+                        </DrawerContent>
+                    </Drawer>
                 </div>
 
-                <div className={cn('grid grid-cols-2 gap-4 lg:grid-cols-4', !filtrosAbertos && 'hidden sm:grid')}>
-                    <div className="col-span-2 space-y-2 sm:col-span-1">
-                        <Label htmlFor="espacos-unidade">Unidade</Label>
-                        <Select
-                            value={localFilters.unidade}
-                            onValueChange={(value) => {
-                                handleFilterChange('unidade', value);
-                            }}
-                        >
-                            <SelectTrigger id="espacos-unidade" className="w-full">
-                                <SelectValue placeholder="Unidade" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todas as Unidades</SelectItem>
-                                {unidades.map((unidade) => (
-                                    <SelectItem key={unidade.id} value={unidade.id.toString()}>
-                                        {unidade.nome}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                {/* Filtros em Grid no Desktop (>= md) */}
+                <div className="hidden grid-cols-2 gap-4 md:grid lg:grid-cols-4">{renderFilterSelects('desktop-')}</div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="espacos-modulo">Módulo</Label>
-                        <Select
-                            value={localFilters.modulo}
-                            onValueChange={(value) => {
-                                handleFilterChange('modulo', value);
-                            }}
-                            disabled={localFilters.unidade === 'all'}
+                {/* Pílulas de Filtros Ativos (Active Filter Chips) */}
+                {hasActiveFilters && (
+                    <div className="border-border/40 flex flex-wrap items-center gap-2 border-t pt-3">
+                        <span className="text-muted-foreground text-xs">Filtros ativos:</span>
+                        {searchTerm && (
+                            <Badge
+                                variant="secondary"
+                                className="bg-secondary text-secondary-foreground flex items-center gap-1.5 px-2.5 py-1 text-xs font-normal"
+                            >
+                                <span>Busca: &ldquo;{searchTerm}&rdquo;</span>
+                                <button
+                                    type="button"
+                                    onClick={handleClearSearch}
+                                    aria-label="Remover filtro de busca"
+                                    className="text-muted-foreground hover:text-foreground rounded-full"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        )}
+                        {activeFilterChips.map((chip) => (
+                            <Badge
+                                key={chip.key}
+                                variant="secondary"
+                                className="bg-secondary text-secondary-foreground flex items-center gap-1.5 px-2.5 py-1 text-xs font-normal"
+                            >
+                                <span>{chip.label}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        handleFilterChange(chip.key, chip.key === 'capacidade' ? 'qualquer' : 'all');
+                                    }}
+                                    aria-label={`Remover filtro de ${chip.key}`}
+                                    className="text-muted-foreground hover:text-foreground rounded-full"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </Badge>
+                        ))}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleClearAllFilters}
+                            className="text-muted-foreground hover:text-foreground h-7 gap-1 px-2 text-xs"
                         >
-                            <SelectTrigger id="espacos-modulo" className="w-full">
-                                <SelectValue placeholder="Módulo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todos os Módulos</SelectItem>
-                                {filteredModulos.map((modulo) => (
-                                    <SelectItem key={modulo.id} value={modulo.id.toString()}>
-                                        {modulo.nome}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            <RotateCcw className="h-3 w-3" />
+                            Limpar tudo
+                        </Button>
                     </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="espacos-andar">Andar</Label>
-                        <Select
-                            value={localFilters.andar}
-                            onValueChange={(value) => {
-                                handleFilterChange('andar', value);
-                            }}
-                            disabled={localFilters.modulo === 'all'}
-                        >
-                            <SelectTrigger id="espacos-andar" className="w-full">
-                                <SelectValue placeholder="Andar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todos os Andares</SelectItem>
-                                {filteredAndares.map((andar) => (
-                                    <SelectItem key={andar.id} value={andar.id.toString()}>
-                                        {nivelParaLabel(nomeParaNivel(andar.nome))}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="espacos-capacidade">Capacidade</Label>
-                        <Select
-                            value={localFilters.capacidade}
-                            onValueChange={(value) => {
-                                handleFilterChange('capacidade', value);
-                            }}
-                        >
-                            <SelectTrigger id="espacos-capacidade" className="w-full">
-                                <SelectValue placeholder="Capacidade" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="qualquer">Qualquer</SelectItem>
-                                {capacidadeEspacos.map((capacidade) => (
-                                    <SelectItem key={capacidade} value={capacidade.toString()}>
-                                        {capacidade} Lugares
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+                )}
             </CardContent>
         </Card>
     );

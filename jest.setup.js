@@ -5,48 +5,72 @@ require('@testing-library/jest-dom');
 exports.storedCookies = {};
 
 Object.defineProperty(window.document, 'cookie', {
-  get: function() {
-    return Object.entries(exports.storedCookies)
-      .map(([name, value]) => `${name}=${value}`)
-      .join('; ');
-  },
-  set: function(cookieString) {
-    const parts = cookieString.split(';').map(s => s.trim());
-    const firstPart = parts[0];
-    const eqIndex = firstPart.indexOf('=');
+    get: function () {
+        return Object.entries(exports.storedCookies)
+            .map(([name, value]) => `${name}=${value}`)
+            .join('; ');
+    },
+    set: function (cookieString) {
+        const parts = cookieString.split(';').map((s) => s.trim());
+        const firstPart = parts[0];
+        const eqIndex = firstPart.indexOf('=');
 
-    let name, value;
-    if (eqIndex > -1) {
-        name = firstPart.substring(0, eqIndex);
-        value = firstPart.substring(eqIndex + 1);
-    } else {
-        name = firstPart;
-        value = ''; // No value, treat as empty
-    }
+        let name, value;
+        if (eqIndex > -1) {
+            name = firstPart.substring(0, eqIndex);
+            value = firstPart.substring(eqIndex + 1);
+        } else {
+            name = firstPart;
+            value = ''; // No value, treat as empty
+        }
 
-    const isDeletion = cookieString.includes('expires=Thu, 01 Jan 1970');
+        const isDeletion = cookieString.includes('expires=Thu, 01 Jan 1970');
 
-    if (isDeletion) {
-      delete exports.storedCookies[name.trim()];
-    } else if (name && value !== undefined) {
-      exports.storedCookies[name.trim()] = value;
-    }
-  },
-  configurable: true,
+        if (isDeletion) {
+            delete exports.storedCookies[name.trim()];
+        } else if (name && value !== undefined) {
+            exports.storedCookies[name.trim()] = value;
+        }
+    },
+    configurable: true,
 });
 
 beforeEach(() => {
-  for (const key in exports.storedCookies) {
-    delete exports.storedCookies[key];
-  }
+    for (const key in exports.storedCookies) {
+        delete exports.storedCookies[key];
+    }
 });
 
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
+global.IntersectionObserver = class IntersectionObserver {
+    constructor() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+        return [];
+    }
 };
 
 if (!window.HTMLElement.prototype.scrollIntoView) {
-  window.HTMLElement.prototype.scrollIntoView = function() {};
+    window.HTMLElement.prototype.scrollIntoView = function () {};
 }
+
+Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+    })),
+});

@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/presentation/organisms/AppSidebar';
 import { AppSidebarHeader } from '@/presentation/organisms/AppSidebarHeader';
+import { MobileBottomBar } from '@/presentation/organisms/MobileBottomBar';
 import { AppContent } from '@/presentation/templates/AppContent';
 import { AppShell } from '@/presentation/templates/AppShell';
 import { type BreadcrumbItem } from '@/types';
@@ -13,6 +14,7 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWi
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 {children}
             </AppContent>
+            <MobileBottomBar />
         </AppShell>
     );
 }
