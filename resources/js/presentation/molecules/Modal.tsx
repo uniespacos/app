@@ -1,55 +1,9 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
-import type { ReactNode } from 'react';
+import { ResponsiveModal, type ResponsiveModalProps } from '@/presentation/molecules/ResponsiveModal';
 
-const MODAL_SIZE_CLASSES = {
-    sm: 'sm:max-w-sm',
-    md: 'sm:max-w-md',
-    lg: 'sm:max-w-lg',
-    xl: 'sm:max-w-2xl',
-} as const;
+export type ModalProps = ResponsiveModalProps;
 
-type ModalSize = keyof typeof MODAL_SIZE_CLASSES;
-
-interface ModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    title: ReactNode;
-    description?: ReactNode;
-    footer?: ReactNode;
-    size?: ModalSize;
-    showCloseButton?: boolean;
-    className?: string;
-    /** Elemento que abre o modal ao ser clicado, para modais autocontidos que não dependem de estado externo para abrir (o fechamento continua via onOpenChange). */
-    trigger?: ReactNode;
-    children?: ReactNode;
+export function Modal(props: ModalProps) {
+    return <ResponsiveModal {...props} />;
 }
 
-export function Modal({
-    open,
-    onOpenChange,
-    title,
-    description,
-    footer,
-    size = 'md',
-    showCloseButton = true,
-    className,
-    trigger,
-    children,
-}: ModalProps) {
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className={cn(MODAL_SIZE_CLASSES[size], className)} showCloseButton={showCloseButton}>
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    {description && <DialogDescription>{description}</DialogDescription>}
-                </DialogHeader>
-
-                {children}
-
-                {footer && <DialogFooter>{footer}</DialogFooter>}
-            </DialogContent>
-        </Dialog>
-    );
-}
+export { ResponsiveModal };
