@@ -47,6 +47,16 @@ global.ResizeObserver = class ResizeObserver {
     disconnect() {}
 };
 
+global.IntersectionObserver = class IntersectionObserver {
+    constructor() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+        return [];
+    }
+};
+
 if (!window.HTMLElement.prototype.scrollIntoView) {
     window.HTMLElement.prototype.scrollIntoView = function () {};
 }
