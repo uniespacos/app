@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 
 interface AvaliacaoGestoresResumoProps {
     horarios: Horario[];
+    hideTitle?: boolean;
 }
 
 interface ResumoTurno {
@@ -19,7 +20,7 @@ interface ResumoTurno {
     avaliadoPor: string[];
 }
 
-export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresResumoProps) {
+export default function AvaliacaoGestoresResumo({ horarios, hideTitle = false }: AvaliacaoGestoresResumoProps) {
     const { t } = useTranslation();
 
     const resumos = useMemo(() => {
@@ -55,12 +56,12 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
     }, [horarios, t]);
 
     if (resumos.length === 0) {
-        return null;
+        return <p className="text-muted-foreground text-xs italic">{t('reservas.detalhes.gestor_nao_definido')}</p>;
     }
 
     return (
         <div className="space-y-2">
-            <h4 className="text-foreground font-medium">{t('reservas.detalhes.avaliacao_gestores')}</h4>
+            {!hideTitle && <h4 className="text-foreground font-medium">{t('reservas.detalhes.avaliacao_gestores')}</h4>}
             <ul className="flex flex-col flex-wrap gap-2 sm:flex-row">
                 {resumos.map((resumo) => {
                     const completo = resumo.avaliados === resumo.total;
@@ -69,25 +70,27 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
                         <li
                             key={resumo.agendaId}
                             className={cn(
-                                'flex items-start gap-2 rounded-lg border p-2 text-sm sm:min-w-56',
-                                completo ? 'border-success-accent/30 bg-success-subtle' : 'border-warning-accent/30 bg-warning-subtle',
+                                'flex items-start gap-2 rounded-lg border p-2 text-xs transition-colors sm:min-w-48',
+                                completo
+                                    ? 'border-success-accent/30 bg-success-subtle/60 text-foreground'
+                                    : 'border-warning-accent/30 bg-warning-subtle/60 text-foreground',
                             )}
                         >
                             {completo ? (
-                                <CheckCircle2 className="text-success-accent mt-0.5 h-4 w-4 shrink-0" />
+                                <CheckCircle2 className="text-success-accent mt-0.5 h-3.5 w-3.5 shrink-0" />
                             ) : (
-                                <Clock className="text-warning-accent mt-0.5 h-4 w-4 shrink-0" />
+                                <Clock className="text-warning-accent mt-0.5 h-3.5 w-3.5 shrink-0" />
                             )}
-                            <div className="min-w-0">
-                                <p className="text-foreground truncate font-medium">
-                                    {TURNO_LABEL[resumo.turno] ?? resumo.turno} — {resumo.gestor}
+                            <div className="min-w-0 flex-1">
+                                <p className="text-foreground truncate font-semibold">
+                                    {TURNO_LABEL[resumo.turno]} — {resumo.gestor}
                                 </p>
-                                <p className={cn('text-xs font-semibold', completo ? 'text-success-accent' : 'text-warning-accent')}>
+                                <p className={cn('text-[11px] font-medium', completo ? 'text-success-accent' : 'text-warning-accent')}>
                                     {completo
                                         ? resumo.avaliadoPor.length > 0
                                             ? `${t('reservas.situacao.deferida')} (${resumo.avaliadoPor.join(', ')})`
                                             : t('common.status.completed')
-                                        : `${t('reservas.situacao.em_analise')} — ${resumo.avaliados}/${resumo.total}`}
+                                        : `${t('reservas.situacao.em_analise')} — ${String(resumo.avaliados)}/${String(resumo.total)}`}
                                 </p>
                             </div>
                         </li>

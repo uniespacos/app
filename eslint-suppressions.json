@@ -56,14 +56,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/AvaliacaoGestoresResumo.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 2
-    }
-  },
   "resources/js/presentation/molecules/CalendarDiaMobile.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 3
@@ -71,12 +63,6 @@
   },
   "resources/js/presentation/molecules/CalendarReservationDetails.tsx": {
     "@typescript-eslint/no-empty-function": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 1
     }
   },

@@ -51,7 +51,7 @@ export default function EspacosPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('espacos.titulo')} />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 <GenericHeader
                     titulo={t('espacos.consultar_espacos')}
                     descricao={t('espacos.consultar_espacos_desc')}

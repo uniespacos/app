@@ -46,7 +46,7 @@ export default function UnidadesPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.unidades.titulo')} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
                 <GenericHeader
                     titulo={t('admin.unidades.titulo')}
                     descricao={t('admin.unidades.desc')}

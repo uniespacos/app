@@ -34,7 +34,7 @@ export default function FavoritosPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('espacos.favoritos_titulo')} />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 <GenericHeader titulo={t('espacos.favoritos_titulo')} descricao={t('espacos.favoritos_desc')} />
 
                 {espacosFavoritos.length > 0 ? (
