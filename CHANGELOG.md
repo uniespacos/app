@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.67](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.66...v1.3.0-rc.67) (2026-08-25)
+
+
+### Features
+
+* implementar contratos tipados ssot, arquitetura de i18n e testes de sincronizacao ([#390](https://github.com/uniespacos/uniespacos/issues/390)) ([8650cb9](https://github.com/uniespacos/uniespacos/commit/8650cb9dfe1d817cce535a3f0570a2f4567c5f80))
+
 ## [1.3.0-rc.66](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.65...v1.3.0-rc.66) (2026-08-25)
 
 
