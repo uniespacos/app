@@ -1,5 +1,5 @@
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
@@ -11,7 +11,7 @@ import { FiltrosOcupacaoEspacos } from '@/presentation/organisms/FiltrosOcupacao
 import { FiltrosReservasPeriodo } from '@/presentation/organisms/FiltrosReservasPeriodo';
 import AppLayout from '@/presentation/templates/AppLayout';
 import { FiltrosRelatorio, FormatoRelatorio, OpcoesInventario, TipoRelatorio, TipoRelatorioOption } from '@/types';
-import { BarChart3 } from 'lucide-react';
+import { AlertCircle, BarChart3, Filter, SlidersHorizontal } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 
 const GraficoReservasPeriodo = lazy(() => import('@/presentation/organisms/GraficoReservasPeriodo'));
@@ -38,96 +38,130 @@ export default function RelatoriosInstitucionalPage({ tipos_disponiveis, opcoes_
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Relatórios', href: '/institucional/relatorios' }]}>
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight">Relatórios — Gestão Institucional</h1>
-                            <p className="text-muted-foreground">Explore os indicadores na tela e exporte quando precisar.</p>
-                        </div>
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
+                {/* Header Institucional com Botão de Exportação */}
+                <div className="border-border/40 flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-foreground text-2xl font-bold tracking-tight">Relatórios — Gestão Institucional</h1>
+                        <p className="text-muted-foreground mt-1 text-sm">
+                            Monitore a ocupação global, inventário de espaços físicos e métricas consolidadas da UESB.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
                         <ExportarRelatorio onExport={handleExport} estaGerando={estaGerando} disabled={!tipoSelecionado} />
                     </div>
+                </div>
 
+                {/* Seleção de Tipo de Relatório */}
+                <div className="space-y-2">
                     <Tabs
                         value={tipoSelecionado}
                         onValueChange={(value) => {
                             setTipoSelecionado(value as TipoRelatorio);
                         }}
+                        className="w-full"
                     >
-                        <TabsList className="flex h-auto flex-wrap justify-start gap-1">
+                        <TabsList className="bg-muted/60 border-border/40 flex h-auto w-full flex-wrap justify-start gap-1.5 rounded-xl border p-1.5">
                             {tipos_disponiveis.map((tipo) => (
-                                <TabsTrigger key={tipo.value} value={tipo.value}>
+                                <TabsTrigger
+                                    key={tipo.value}
+                                    value={tipo.value}
+                                    className="data-[state=active]:bg-card data-[state=active]:text-primary rounded-lg px-3 py-2 text-xs font-medium transition-all data-[state=active]:shadow-xs"
+                                >
                                     {tipo.label}
                                 </TabsTrigger>
                             ))}
                         </TabsList>
                     </Tabs>
+                </div>
 
-                    {!tipoSelecionado && (
-                        <Card className="border-dashed">
-                            <CardContent className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-                                <BarChart3 className="text-muted-foreground h-8 w-8" />
-                                <p className="text-muted-foreground text-sm">Selecione um tipo de relatório para visualizar os dados.</p>
+                {/* Estado Inicial Vazio */}
+                {!tipoSelecionado && (
+                    <Card className="bg-muted/20 border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+                            <div className="bg-primary/10 text-primary rounded-full p-3">
+                                <BarChart3 className="h-8 w-8" />
+                            </div>
+                            <div className="max-w-md">
+                                <h3 className="text-foreground text-base font-semibold">Selecione um Relatório Institucional</h3>
+                                <p className="text-muted-foreground mt-1 text-xs">
+                                    Escolha uma das categorias acima para visualizar os indicadores, aplicar filtros por período e exportar documentos
+                                    diagramados.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Área de Filtros e Resultados */}
+                {tipoSelecionado && (
+                    <div className="space-y-6">
+                        <Card className="border-border/80 shadow-xs">
+                            <CardHeader className="border-border/40 border-b pb-3">
+                                <div className="flex items-center gap-2">
+                                    <SlidersHorizontal className="text-primary h-4 w-4" />
+                                    <CardTitle className="text-sm font-semibold tracking-tight">Filtros Analíticos & Período</CardTitle>
+                                </div>
+                                <CardDescription className="text-xs">
+                                    Ajuste os parâmetros para refinar os dados consolidados do relatório.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                {tipoSelecionado === 'reservas_periodo' && <FiltrosReservasPeriodo filtros={filtros} onChange={setFiltros} />}
+                                {tipoSelecionado === 'ocupacao_espacos' && <FiltrosOcupacaoEspacos filtros={filtros} onChange={setFiltros} />}
+                                {tipoSelecionado === 'inventario_espacos' && (
+                                    <FiltrosInventarioEspacos filtros={filtros} opcoes={opcoes_inventario} onChange={setFiltros} />
+                                )}
+                                {tipoSelecionado === 'indicadores_consolidados' && (
+                                    <FiltrosIndicadoresConsolidados filtros={filtros} onChange={setFiltros} />
+                                )}
                             </CardContent>
                         </Card>
-                    )}
 
-                    {tipoSelecionado && (
-                        <>
-                            <Card>
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-base">Filtros</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {tipoSelecionado === 'reservas_periodo' && <FiltrosReservasPeriodo filtros={filtros} onChange={setFiltros} />}
-                                    {tipoSelecionado === 'ocupacao_espacos' && <FiltrosOcupacaoEspacos filtros={filtros} onChange={setFiltros} />}
-                                    {tipoSelecionado === 'inventario_espacos' && (
-                                        <FiltrosInventarioEspacos filtros={filtros} opcoes={opcoes_inventario} onChange={setFiltros} />
-                                    )}
-                                    {tipoSelecionado === 'indicadores_consolidados' && (
-                                        <FiltrosIndicadoresConsolidados filtros={filtros} onChange={setFiltros} />
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            <div className="space-y-4">
-                                {status === 'loading' && (
-                                    <div className="space-y-4">
-                                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                            {Array.from({ length: 4 }).map((_, index) => (
-                                                <Skeleton key={index} className="h-28 w-full" />
-                                            ))}
-                                        </div>
-                                        <Skeleton className="h-[320px] w-full" />
+                        <div className="space-y-4">
+                            {status === 'loading' && (
+                                <div className="space-y-4">
+                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                        {Array.from({ length: 4 }).map((_, index) => (
+                                            <Skeleton key={index} className="h-28 w-full rounded-xl" />
+                                        ))}
                                     </div>
-                                )}
+                                    <Skeleton className="h-[340px] w-full rounded-xl" />
+                                </div>
+                            )}
 
-                                {status === 'error' && (
-                                    <Alert variant="destructive">
-                                        <AlertDescription>{erro}</AlertDescription>
-                                    </Alert>
-                                )}
+                            {status === 'error' && (
+                                <Alert variant="destructive" className="border-destructive/40">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>Erro ao carregar dados</AlertTitle>
+                                    <AlertDescription>{erro}</AlertDescription>
+                                </Alert>
+                            )}
 
-                                {status === 'empty' && (
-                                    <Card className="border-dashed">
-                                        <CardContent className="text-muted-foreground py-16 text-center text-sm">
-                                            Nenhum dado para os filtros selecionados.
-                                        </CardContent>
-                                    </Card>
-                                )}
+                            {status === 'empty' && (
+                                <Card className="bg-muted/10 border-2 border-dashed">
+                                    <CardContent className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-16 text-center text-sm">
+                                        <Filter className="text-muted-foreground/60 mb-1 h-6 w-6" />
+                                        <p className="text-foreground font-medium">Nenhum registro encontrado</p>
+                                        <p className="max-w-sm text-xs">
+                                            Não existem dados consolidados para o período e critérios selecionados. Tente ampliar as datas ou remover
+                                            filtros.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            )}
 
-                                {status === 'success' && dados && (
-                                    <Suspense fallback={<Skeleton className="h-[320px] w-full" />}>
-                                        {tipoSelecionado === 'reservas_periodo' && <GraficoReservasPeriodo dados={dados} />}
-                                        {tipoSelecionado === 'ocupacao_espacos' && <GraficoOcupacaoEspacos dados={dados} />}
-                                        {tipoSelecionado === 'inventario_espacos' && <GraficoInventarioEspacos dados={dados} />}
-                                        {tipoSelecionado === 'indicadores_consolidados' && <GraficoIndicadoresConsolidados dados={dados} />}
-                                    </Suspense>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </div>
+                            {status === 'success' && dados && (
+                                <Suspense fallback={<Skeleton className="h-[340px] w-full rounded-xl" />}>
+                                    {tipoSelecionado === 'reservas_periodo' && <GraficoReservasPeriodo dados={dados} />}
+                                    {tipoSelecionado === 'ocupacao_espacos' && <GraficoOcupacaoEspacos dados={dados} />}
+                                    {tipoSelecionado === 'inventario_espacos' && <GraficoInventarioEspacos dados={dados} />}
+                                    {tipoSelecionado === 'indicadores_consolidados' && <GraficoIndicadoresConsolidados dados={dados} />}
+                                </Suspense>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );
