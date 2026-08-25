@@ -10,38 +10,28 @@ tools: Read, Edit, Write, Grep, Glob
 Você executa uma tarefa de documentação já definida. Objetivo, arquivos e critério de pronto vêm no
 prompt.
 
-## ⚠️ Branching — Regra Inviolável
+## Catálogo de Documentação Viva em `/docs/`
 
-**SEMPRE crie/trabalhe em branch baseada em `develop`, NUNCA em `main`.**
+Antes de criar qualquer documento novo, verifique se o assunto pertence a um dos documentos vivos de domínio:
 
-Sequência obrigatória antes de começar qualquer tarefa:
-```bash
-git checkout develop
-git pull origin develop
-git checkout -b <nome-da-feature> origin/develop
-```
+| Documento | Assunto / Escopo de Domínio |
+|---|---|
+| `docs/core-workflow-report.md` | Fluxo central de reservas, conflitos, avaliações e topologia de componentes. |
+| `docs/authorization-policies.md` | Policies, roles do Spatie, autorizações e prevenção contra IDOR. |
+| `docs/validation-rules.md` | Validações em FormRequests e regras customizadas de disponibilidade. |
+| `docs/notifications-and-channels.md` | Notificações por e-mail e WebSocket (`ShouldQueue` obrigatório). |
+| `docs/realtime-websocket-channels.md` | Canais do Laravel Reverb (privados/presença) e eventos Echo. |
+| `docs/enums-and-constants.md` | Enums canônicos (`SituacaoReservaEnum`, `ModoArquivoEnum`, `AgendaEnum`, etc.). |
+| `docs/models-business-rules.md` | Regras de negócio de models Eloquent, casts e accessors cacheados. |
+| `docs/repositories-pattern.md` | Contratos de interface e implementações Eloquent no `AppServiceProvider`. |
+| `docs/error-handling-and-logging.md` | Envelopes padronizados de erro JSON e contexto sanitizado de logs. |
+| `docs/auto-approval-rule.md` | Regra de auto-aprovação para gestores de todas as agendas da reserva. |
+| `docs/archive-soft-delete-flow.md` | Separação estrita entre cancelamento/avaliação e arquivamento (soft-delete). |
+| `docs/backlog-issues.md` | Rastreamento histórico de issues e entregas. |
 
-- `main` é READ-ONLY (produção, release automático via release-please)
-- `develop` é a linha de desenvolvimento
-- PR deve ir sempre para `develop`, nunca para `main`
-- Se observar/receber instrução para "fazer PR para main", reporte ao master imediatamente
+## Diretrizes de Execução
 
-Quando recebe uma tarefa de **atualizar documentação após código**, o master inclui no prompt um
-bloco `contexto_de_mudanças` descrevendo o que mudou no código. **Sempre valide lendo o código
-antes de descrever** — use isso como checklist, não como verdade absoluta.
-
-Se a tarefa pedir criar documentação nova sobre uma regra de negócio, primeiro confira se já existe
-documentação relacionada em `/docs/` (ex: se mexe com auto-aprovação, veja `auto-approval-rule.md`
-antes de redesenhar). O objetivo é manter coerência e evitar duplicação.
-
-Regras:
-- Documente o que o código faz de fato — confirme lendo o código antes de descrever comportamento,
-  nunca documente por suposição.
-- Não crie arquivo `.md` novo fora do que a tarefa pediu explicitamente. O projeto já teve o hábito
-  de acumular `.md` de planejamento soltos na raiz (`plano-*.md`, `report.md`) — não repita.
-- Comentário em código só onde explica um "porquê" não óbvio (uma decisão, uma armadilha evitada),
-  nunca parafraseando o que a linha já diz.
-- Mantenha o tom e a língua do documento existente (este projeto documenta em português).
-
-Ao terminar, releia o trecho alterado como se fosse alguém sem contexto nenhum do pedido original —
-se não fizer sentido sozinho, ajuste.
+1. **Validação contra o Código Real:** Quando receber um bloco `contexto_de_mudanças`, valide sempre lendo os arquivos de código antes de redigir. Nunca documente por suposição.
+2. **Proibição de Fragmentação:** É expressamente proibido criar arquivos markdown soltos na raiz (ex.: `plano-*.md`, `report.md`). Mantenha a documentação organizada dentro de `docs/`.
+3. **Relatórios Históricos Imutáveis:** Os relatórios em `docs/auditoria*/`, `docs/plano-execucao-design*/` e `docs/update-uniespacos/` são marcos históricos e não devem ser modificados retroativamente.
+4. **Padrão de Idioma e Tom:** Mantenha a documentação técnica integralmente em português brasileiro (PT-BR), com diagramas Mermaid e tabelas claras sempre que estruturar novos fluxos.

@@ -1,7 +1,7 @@
 # UniEspaços
 
-Sistema de reserva de espaços da UESB. Laravel 12 (PHP 8.4) + Inertia 2 + React 18 + TypeScript,
-Tailwind v4, PostgreSQL 16, Laravel Reverb (WebSocket), tudo em Docker.
+Sistema de reserva de espaços da UESB. Laravel 12 (PHP 8.4) + Inertia 2 + React 19 + TypeScript 5.8,
+Tailwind v4 (Catppuccin Theming), PostgreSQL 16, Laravel Reverb (WebSocket), tudo em Docker.
 
 ## Regras invioláveis
 
@@ -53,6 +53,9 @@ npx prettier --write <arquivo>
   com binding no `AppServiceProvider`. Validação em `FormRequest`, autorização em Policy + Spatie.
 - **Frontend em atomic design:** `resources/js/presentation/{atoms,molecules,organisms,pages,templates}`.
   Primitivos shadcn ficam em `resources/js/components/ui`.
+- **Linter & Qualidade:** ESLint 9 Flat Config (`strict-type-checked`). **Tolerância Zero a Suppressions**:
+  `eslint-suppressions.json` está 100% purgado; novos arquivos ou linhas alteradas nunca devem introduzir
+  supressões no linter.
 
 Detalhe de convenção mora nas skills (carregam sob demanda, não pesam no contexto):
 `backend-conventions`, `frontend-conventions`, `testing-and-env`.
@@ -80,5 +83,5 @@ usar sempre o modelo mais leve).
   Antes de investigar comportamento assíncrono que "não acontece", compare
   `docker inspect uniespacos-queue-worker-1 --format '{{.State.StartedAt}}'` (UTC) com a data do
   commit que introduziu o código. Para broadcast, `docker logs uniespacos-reverb-1 | grep
-  "Broadcasting To"` mostra se o evento chegou ao Reverb, separando problema de backend de
+"Broadcasting To"` mostra se o evento chegou ao Reverb, separando problema de backend de
   problema de frontend.

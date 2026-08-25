@@ -1,28 +1,10 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method App\\Events\\ReservaEvent\:\:__construct\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Events/ReservaEvent.php
-
-		-
 			message: '#^Method App\\Events\\ReservaEvent\:\:broadcastAs\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/Events/ReservaEvent.php
-
-		-
-			message: '#^Property App\\Events\\ReservaEvent\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/Events/ReservaEvent.php
-
-		-
-			message: '#^Offset 0 might not exist on array\|null\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: app/Http/Controllers/AndarController.php
 
 		-
 			message: '#^Cannot access property \$email on App\\Models\\User\|null\.$#'
@@ -112,12 +94,6 @@ parameters:
 			message: '#^Parameter \#1 \$user of method App\\Services\\EspacoService\:\:removeFavorite\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: app/Http/Controllers/EspacoController.php
-
-		-
-			message: '#^Parameter \#1 \$userId of static method App\\Models\\Espaco\:\:forgetFavoritosCache\(\) expects int\|null, int\|string\|null given\.$#'
-			identifier: argument.type
-			count: 2
 			path: app/Http/Controllers/EspacoController.php
 
 		-
@@ -217,6 +193,12 @@ parameters:
 			path: app/Http/Controllers/Institucional/InstitucionalEspacoController.php
 
 		-
+			message: '#^Parameter \#2 \$search of method App\\Services\\InstituicaoService\:\:paginate\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalInstituicaoController.php
+
+		-
 			message: '#^Cannot access property \$id on App\\Models\\Instituicao\|null\.$#'
 			identifier: property.nonObject
 			count: 2
@@ -247,6 +229,18 @@ parameters:
 			path: app/Http/Controllers/Institucional/InstitucionalModuloController.php
 
 		-
+			message: '#^Parameter \#3 \$search of method App\\Services\\ModuloService\:\:paginate\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalModuloController.php
+
+		-
+			message: '#^Parameter \#4 \$unidadeNome of method App\\Services\\ModuloService\:\:paginate\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalModuloController.php
+
+		-
 			message: '#^Parameter \#1 \$user of static method App\\Enums\\Relatorio\\TipoRelatorioEnum\:\:disponiveisPara\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -271,32 +265,8 @@ parameters:
 			path: app/Http/Controllers/Institucional/InstitucionalRelatorioController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\Institucional\\InstitucionalRoleController\:\:destroy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Institucional/InstitucionalRoleController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Institucional\\InstitucionalRoleController\:\:index\(\) should return Inertia\\Response but returns Inertia\\Response\|Inertia\\ResponseFactory\.$#'
 			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/Institucional/InstitucionalRoleController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Institucional\\InstitucionalRoleController\:\:store\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Institucional/InstitucionalRoleController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Institucional\\InstitucionalRoleController\:\:syncPermissions\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Controllers/Institucional/InstitucionalRoleController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\Institucional\\InstitucionalRoleController\:\:update\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Institucional/InstitucionalRoleController.php
 
@@ -331,6 +301,18 @@ parameters:
 			path: app/Http/Controllers/Institucional/InstitucionalSetorController.php
 
 		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalSetorController.php
+
+		-
+			message: '#^Parameter \#3 \$search of method App\\Services\\SetorService\:\:paginate\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalSetorController.php
+
+		-
 			message: '#^Cannot access property \$instituicao on App\\Models\\Unidade\|null\.$#'
 			identifier: property.nonObject
 			count: 2
@@ -355,25 +337,31 @@ parameters:
 			path: app/Http/Controllers/Institucional/InstitucionalUnidadeController.php
 
 		-
+			message: '#^Parameter \#3 \$search of method App\\Services\\UnidadeService\:\:paginate\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalUnidadeController.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: app/Http/Controllers/Institucional/InstitucionalUsuarioController.php
+
+		-
 			message: '#^Parameter \#1 \$authUser of method App\\Services\\UserService\:\:getIndexData\(\) expects App\\Models\\User, App\\Models\\User\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Institucional/InstitucionalUsuarioController.php
 
 		-
-			message: '#^Cannot access property \$unreadNotifications on App\\Models\\User\|null\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: app/Http/Controllers/NotificationController.php
-
-		-
-			message: '#^Cannot call method notifications\(\) on App\\Models\\User\|null\.$#'
-			identifier: method.nonObject
+			message: '#^Parameter \#2 \$search of method App\\Services\\UserService\:\:getIndexData\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
 			count: 1
-			path: app/Http/Controllers/NotificationController.php
+			path: app/Http/Controllers/Institucional/InstitucionalUsuarioController.php
 
 		-
-			message: '#^Parameter \#2 \$values of method Illuminate\\Support\\Collection\<int,Illuminate\\Notifications\\DatabaseNotification\>\:\:whereIn\(\) expects Illuminate\\Contracts\\Support\\Arrayable\|iterable, mixed given\.$#'
+			message: '#^Parameter \#2 \$ids of method App\\Services\\NotificationService\:\:markAsRead\(\) expects array\<int, string\>\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/NotificationController.php
@@ -541,6 +529,12 @@ parameters:
 			path: app/Http/Requests/Auth/StoreRegisterRequest.php
 
 		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Http/Requests/AvaliarReservaRequest.php
+
+		-
 			message: '#^Cannot access offset ''dadosReserva'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -549,13 +543,13 @@ parameters:
 		-
 			message: '#^Cannot access offset ''horarioDB'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
+			count: 2
 			path: app/Http/Requests/AvaliarReservaRequest.php
 
 		-
 			message: '#^Cannot access offset ''id'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
+			count: 2
 			path: app/Http/Requests/AvaliarReservaRequest.php
 
 		-
@@ -573,24 +567,6 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Requests\\AvaliarReservaRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/Http/Requests/AvaliarReservaRequest.php
-
-		-
-			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), mixed\>\|iterable\<\(int\|string\), mixed\>\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Requests/AvaliarReservaRequest.php
-
-		-
-			message: '#^Unable to resolve the template type TKey in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Http/Requests/AvaliarReservaRequest.php
-
-		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
-			identifier: argument.templateType
 			count: 1
 			path: app/Http/Requests/AvaliarReservaRequest.php
 
@@ -1153,6 +1129,24 @@ parameters:
 			path: app/Models/Reserva.php
 
 		-
+			message: '#^Method App\\Models\\Reserva\:\:scopeWithHorariosStats\(\) has parameter \$agendaIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Reserva.php
+
+		-
+			message: '#^Method App\\Models\\Reserva\:\:scopeWithHorariosStats\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Reserva.php
+
+		-
+			message: '#^Method App\\Models\\Reserva\:\:scopeWithHorariosStats\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Reserva.php
+
+		-
 			message: '#^Parameter \#1 \$time of static method Carbon\\Carbon\:\:parse\(\) expects Carbon\\Month\|Carbon\\WeekDay\|DateTimeInterface\|float\|int\|string\|null, mixed given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1575,7 +1569,7 @@ parameters:
 		-
 			message: '#^Binary operation "\." between ''%%'' and mixed results in an error\.$#'
 			identifier: binaryOp.invalid
-			count: 1
+			count: 2
 			path: app/Repositories/ReservaRepositoryEloquent.php
 
 		-
@@ -2443,8 +2437,8 @@ parameters:
 			path: app/Services/RoleService.php
 
 		-
-			message: '#^Method App\\Services\\RoleService\:\:getIndexData\(\) should return array\{roles\: array\<int, array\<string, mixed\>\>, permissions\: array\<string, array\<int, array\{id\: int, name\: string, group\: string\}\>\>\} but returns array\{roles\: array\<mixed\>, permissions\: array\<string, array\<int, array\{id\: int, name\: string, group\: string\}\>\>\}\.$#'
-			identifier: return.type
+			message: '#^Method App\\Services\\RoleService\:\:getIndexData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Services/RoleService.php
 

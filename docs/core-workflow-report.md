@@ -27,8 +27,8 @@ UniEspaços é uma aplicação web de reserva de espaços acadêmicos com arquit
 
 | Camada | Tecnologia |
 |--------|-----------|
-| Backend | Laravel 12.x (PHP) |
-| Frontend | React 18 + Inertia.js (SPA) |
+| Backend | Laravel 12.x (PHP 8.4) |
+| Frontend | React 19 + Inertia.js 2 + Tailwind CSS v4 + TypeScript 5.8 (SPA) |
 | Database | PostgreSQL 16 |
 | Real-time | Laravel Reverb (WebSockets via Broadcast) |
 | Queue | Laravel Queue (background jobs) |
@@ -590,57 +590,140 @@ graph TD
 
 ---
 
-## 12. Árvore de Componentes Frontend (Fluxo de Reserva) {#frontend-tree}
+## 12. Topologia de Componentes Frontend (Atomic Design) {#frontend-tree}
+
+O frontend do UniEspaços foi integralmente reestruturado segundo o padrão **Atomic Design** dentro de `resources/js/presentation/`, garantindo separação estrita de responsabilidades, alta reutilização, responsividade nativa (Mobile-First) e conformidade com o design system (Tailwind CSS v4 + tokens semânticos Catppuccin). Os primitivos de interface acessíveis residem isolados em `resources/js/components/ui/`.
+
+### 12.1 Estrutura em Camadas do Atomic Design
+
+```mermaid
+graph TD
+    subgraph "Primitivos UI (resources/js/components/ui/)"
+        P1["button.tsx, card.tsx, dialog.tsx"]
+        P2["drawer.tsx (Vaul), popover.tsx, select.tsx"]
+        P3["table.tsx, input.tsx, sheet.tsx, etc."]
+    end
+
+    subgraph "Átomos (resources/js/presentation/atoms/)"
+        A1["SituacaoBadge.tsx, SituacaoIcon.tsx"]
+        A2["UserAvatar.tsx, PaginacaoLink.tsx"]
+        A3["Heading.tsx, Icon.tsx, TextLink.tsx"]
+    end
+
+    subgraph "Moléculas (resources/js/presentation/molecules/)"
+        M1["ResponsiveModal.tsx (Dialog/Drawer Híbrido)"]
+        M2["DataTable.tsx, DatePicker.tsx, FormField.tsx"]
+        M3["ComboboxFiltro.tsx, UserSearchComboBox.tsx"]
+        M4["ReservaCardMobile.tsx, FiltroChips.tsx, ConfirmDeleteDialog.tsx"]
+    end
+
+    subgraph "Organismos (resources/js/presentation/organisms/)"
+        O1["EspacoAgenda.tsx, AgendaCalendario.tsx"]
+        O2["EspacoCard.tsx, MobileBottomBar.tsx"]
+        O3["EvaluationForm.tsx, ReservasList.tsx, ReservasDetalhes.tsx"]
+        O4["TabelaEspacos.tsx, ModaisSetor.tsx, NotificationDropdown.tsx"]
+    end
+
+    subgraph "Templates (resources/js/presentation/templates/)"
+        T1["AppLayout.tsx, AppSidebarLayout.tsx"]
+        T2["AuthLayout.tsx, Layout.tsx (Settings)"]
+    end
+
+    subgraph "Páginas (resources/js/presentation/pages/)"
+        PG1["Espacos/EspacosPage, VisualizarEspacoPage"]
+        PG2["Reservas/ReservasPage, ReservasGestorPage, AvaliarReservaPage"]
+        PG3["Administrativo/*, Dashboard/*, auth/*"]
+    end
+
+    P1 & P2 & P3 --> A1 & A2 & A3
+    A1 & A2 & A3 --> M1 & M2 & M3 & M4
+    M1 & M2 & M3 & M4 --> O1 & O2 & O3 & O4
+    O1 & O2 & O3 & O4 --> PG1 & PG2 & PG3
+    T1 & T2 --> PG1 & PG2 & PG3
+```
+
+### 12.2 Fluxo de Componentes no Ciclo de Vida de Reservas
 
 ```mermaid
 graph TD
     subgraph "Páginas (Inertia Pages)"
-        VP["VisualizarEspacoPage"]
-        RP["ReservasPage"]
-        RGP["ReservasGestorPage"]
-        AVP["AvaliarReservaPage"]
+        VP["VisualizarEspacoPage.tsx<br/>(Detalhes do Espaço)"]
+        RP["ReservasPage.tsx<br/>(Minhas Reservas)"]
+        RGP["ReservasGestorPage.tsx<br/>(Gestão de Reservas)"]
+        AVP["AvaliarReservaPage.tsx<br/>(Avaliação pelo Gestor)"]
     end
 
     subgraph "Templates"
-        AL["AppLayout"]
+        AL["AppLayout.tsx / AppSidebarLayout.tsx"]
     end
 
     subgraph "Organisms"
-        EA["EspacoAgenda\n(agenda calendar + seleção)"]
-        AC["AgendaCalendario\n(grid semanal)"]
-        ADR["AgendaDialogReserva\n(modal confirmação)"]
-        RL["ReservasList\n(lista com modal)"]
-        RD["ReservasDetalhes\n(detalhe modal)"]
-        EF["EvaluationForm\n(formulário avaliação)"]
+        EA["EspacoAgenda.tsx<br/>(Agenda + Seleção de Slots)"]
+        AC["AgendaCalendario.tsx<br/>(Grid Semanal por Turno)"]
+        ADR["AgendaDialogReserva.tsx<br/>(Modal/Drawer Confirmação)"]
+        RL["ReservasList.tsx<br/>(Listagem Desktop & Mobile)"]
+        RD["ReservasDetalhes.tsx<br/>(Visualizador de Detalhes)"]
+        EF["EvaluationForm.tsx<br/>(Formulário de Deferimento/Recusa)"]
+        MBB["MobileBottomBar.tsx<br/>(Navegação Rápida Mobile)"]
     end
 
     subgraph "Molecules"
-        AH["AgendaHeader"]
-        AN["AgendaNavegacao"]
-        ANG["AgendaNavegacaoGestor"]
-        CRD["CalendarReservationDetails"]
-        RF["ReservasFilters"]
-        CSC["calendar-slot-cell"]
+        RM["ResponsiveModal.tsx<br/>(Adaptativo Dialog/Drawer)"]
+        DT["DataTable.tsx<br/>(Tabela com Paginação & Ordenação)"]
+        RCM["ReservaCardMobile.tsx<br/>(Card Otimizado para Mobile)"]
+        RF["ReservasFilters.tsx<br/>(Filtros por Situação & Período)"]
+        FC["FiltroChips.tsx<br/>(Chips Ativos Removíveis)"]
+        DP["DatePicker.tsx<br/>(Seletor de Data pt-BR)"]
+        CSC["CalendarSlotCell.tsx<br/>(Célula de Horário)"]
+        CSS["CalendarShiftSection.tsx<br/>(Turnos Mat/Vesp/Not)"]
     end
 
-    subgraph "Application (Use Cases)"
-        UC1["useReservasListUseCase"]
-        UC2["useAvaliarReservaUseCase"]
-        H1["useReservationSlots"]
+    subgraph "Atoms"
+        SB["SituacaoBadge.tsx<br/>(Badge Semântico Catppuccin)"]
+        UA["UserAvatar.tsx<br/>(Avatar com Fallback)"]
+        PL["PaginacaoLink.tsx<br/>(Botão de Navegação)"]
     end
 
     AL --> VP & RP & RGP & AVP
+    AL --> MBB
     VP --> EA
-    EA --> AC & ADR & AH & AN
-    AC --> CSC
-    RP --> RF & RL
-    RL --> RD
-    RGP --> RF & RL
-    AVP --> ANG & CRD & EF
-    AVP --> H1
-    AVP --> UC2
-    RP --> UC1
+    EA --> AC & ADR
+    AC --> CSS --> CSC
+    ADR --> RM
+    RP --> RF & FC & RL
+    RL --> DT & RCM & RD
+    RGP --> RF & FC & RL
+    AVP --> EF & AC
+    RCM --> SB & UA
+    DT --> PL
 ```
+
+### 12.3 Catálogo de Componentes-Chave Modernizados
+
+| Componente | Tipo / Caminho | Responsabilidade e Ergonomia |
+|---|---|---|
+| `<ResponsiveModal>` | **Molécula**<br>`presentation/molecules/ResponsiveModal.tsx` | Diálogo modal unificado e adaptativo. Renderiza um **Drawer / Bottom Sheet** via Vaul em telas móveis (`< 768px`) com suporte a drag-to-dismiss e ajuste suave ao teclado virtual, e um **Dialog** centralizado via Radix UI em desktops (`>= 768px`). Garante foco, acessibilidade WAI-ARIA e bloqueio de scroll. |
+| `<MobileBottomBar>` | **Organismo**<br>`presentation/organisms/MobileBottomBar.tsx` | Barra de navegação inferior estilo *floating dock* para dispositivos móveis. Fornece acesso direto e com ergonomia de polegar às seções principais (*Catálogo*, *Reservas*, *Gestão* e *Perfil*), com badges reativos de notificações e pendências. |
+| `<DataTable>` | **Molécula**<br>`presentation/molecules/DataTable.tsx` | Abstração padronizada de tabelas de dados. Fornece cabeçalhos com ordenação interativa, estados vazios (`EmptyState`) ilustrados, skeleton de carregamento, paginação integrada via `<PaginacaoListas>` e seleção de linhas. |
+| `<ComboboxFiltro>` / `<UserSearchComboBox>` | **Molécula**<br>`presentation/molecules/ComboboxFiltro.tsx`<br>`presentation/molecules/UserSearchComboBox.tsx` | Seletores de busca assíncrona/debounced com navegação completa por teclado, realce de termos coincidentes e renderização otimizada para listas extensas de usuários, setores e espaços. |
+| `<EspacoCard>` | **Organismo**<br>`presentation/organisms/EspacoCard.tsx` | Card visual de apresentação de espaços no catálogo. Apresenta foto/fallback, tags de capacidade, andar, módulo e unidade, botão de favoritar com mutação otimista e acionamento de modal de detalhes em drawer/dialog. |
+| `<ReservaCardMobile>` | **Molécula**<br>`presentation/molecules/ReservaCardMobile.tsx` | Componente de card otimizado para dispositivos móveis na listagem de reservas. Exibe data, horário, espaço, solicitante, badge de situação semântico (`<SituacaoBadge>`) e menu de ações rápidas. |
+| `<DatePicker>` | **Molécula**<br>`presentation/molecules/DatePicker.tsx` | Seletor de datas acessível integrado com `react-day-picker` v8, totalmente adaptado para React 19 e `date-fns` v4, com localização `pt-BR`, suporte a presets rápidos e bloqueio de dias indisponíveis. |
+| `<FiltroChips>` | **Molécula**<br>`presentation/molecules/FiltroChips.tsx` | Barra de chips semânticos que refletem os filtros atualmente aplicados na listagem (situação, data, setor), permitindo remoção individual com um clique ou limpeza geral. |
+| `<AgendaCalendario>` / `<EspacoAgenda>` | **Organismo**<br>`presentation/organisms/AgendaCalendario.tsx`<br>`presentation/organisms/EspacoAgenda.tsx` | Grid semanal responsivo dividido por turnos acadêmicos (Matutino, Vespertino, Noturno). Suporta seleção múltipla de slots, smart shift de horários anteriores e destaque visual em tempo real de conflitos. |
+| `<EvaluationForm>` | **Organismo**<br>`presentation/organisms/EvaluationForm.tsx` | Interface de avaliação de reservas para o gestor. Permite deferimento/indeferimento pontual por slot ou em lote, com campo obrigatório para justificativa de recusa. |
+| `<DeleteItem>` / `<ConfirmDeleteDialog>` | **Molécula**<br>`presentation/molecules/DeleteItem.tsx`<br>`presentation/molecules/ConfirmDeleteDialog.tsx` | Diálogo de confirmação de exclusão e cancelamento de reservas, com suporte à confirmação via senha do usuário para operações de alta criticidade e soft-delete. |
+
+### 12.4 Resumo das Camadas no Atomic Design
+
+| Camada | Diretório | Critérios e Conteúdo | Restrições |
+|---|---|---|---|
+| **Primitivos UI** | `resources/js/components/ui/` | Componentes base Shadcn / Radix UI / Vaul (`button.tsx`, `dialog.tsx`, `drawer.tsx`, `card.tsx`, `table.tsx`, `input.tsx`). | Sem regras de negócio da UESB nem chamadas Inertia. |
+| **Átomos** | `resources/js/presentation/atoms/` | Elementos de UI indivisíveis (`SituacaoBadge.tsx`, `UserAvatar.tsx`, `PaginacaoLink.tsx`, `Heading.tsx`, `Icon.tsx`). | Sem estado complexo de formulário ou mutações HTTP. |
+| **Moléculas** | `resources/js/presentation/molecules/` | Combinações funcionais com objetivo específico (`ResponsiveModal.tsx`, `DataTable.tsx`, `DatePicker.tsx`, `FormField.tsx`, `ComboboxFiltro.tsx`). | Foco em uma única responsabilidade funcional. |
+| **Organismos** | `resources/js/presentation/organisms/` | Blocos autônomos de UI (`EspacoCard.tsx`, `AgendaCalendario.tsx`, `EvaluationForm.tsx`, `MobileBottomBar.tsx`, `SetorForm.tsx`). | Reutilizáveis dentro de páginas; não representam a página inteira. |
+| **Templates** | `resources/js/presentation/templates/` | Esqueletos estruturais de layout (`AppLayout.tsx`, `AppSidebarLayout.tsx`, `AuthLayout.tsx`, `Settings/Layout.tsx`). | Não acoplados a dados específicos de uma entidade. |
+| **Páginas** | `resources/js/presentation/pages/` | Telas completas renderizadas pelo Inertia (`Espacos/*`, `Reservas/*`, `Administrativo/*`, `Dashboard/*`, `auth/*`). | Montam a composição de templates, organismos e moléculas. |
 
 ---
 

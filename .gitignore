@@ -49,10 +49,5 @@ docker/development/mailpit/*
 .env
 
 # Documentação de auditorias internas
-/docs/auditoria/
-/docs/auditoria-2/
-/docs/auditoria-design/
-/docs/auditoria-design-2/
-/docs/auditoria-issues-*.md
-/docs/plano-execucao-design/
-/docs/plano-execucao-design-2/
+/docs/auditoria*
+/docs/plano-*
