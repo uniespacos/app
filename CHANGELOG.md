@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.65](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.64...v1.3.0-rc.65) (2026-08-25)
+
+
+### Features
+
+* modernizar telas de autenticacao com splitlayout institucional e medidor de forca de senha ([#386](https://github.com/uniespacos/uniespacos/issues/386)) ([cba4515](https://github.com/uniespacos/uniespacos/commit/cba45157b9a3237439c95be04e2703554927ed0c))
+
 ## [1.3.0-rc.64](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.63...v1.3.0-rc.64) (2026-08-25)
 
 
