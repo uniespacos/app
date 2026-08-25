@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.61](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.60...v1.3.0-rc.61) (2026-08-24)
+
+
+### Miscellaneous Chores
+
+* **frontend:** modernizar ecossistema para react 19, tailwind v4 e sanear eslint ([#377](https://github.com/uniespacos/uniespacos/issues/377)) ([edca903](https://github.com/uniespacos/uniespacos/commit/edca9038477f7962ac15e7dbc5bf8380b329e698))
+
 ## [1.3.0-rc.60](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.59...v1.3.0-rc.60) (2026-08-24)
 
 
