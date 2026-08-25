@@ -156,26 +156,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/organisms/AgendaDialogReserva.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-argument": {
-      "count": 3
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 2
-    },
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 5
-    },
-    "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-plus-operands": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/organisms/AndarFormCard.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 2
@@ -250,11 +230,6 @@
   "resources/js/presentation/organisms/GraficoReservasPeriodo.tsx": {
     "@typescript-eslint/no-deprecated": {
       "count": 1
-    }
-  },
-  "resources/js/presentation/organisms/NotificationDropdown.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 2
     }
   },
   "resources/js/presentation/organisms/PermissionModal.tsx": {

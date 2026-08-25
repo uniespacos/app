@@ -1,9 +1,10 @@
 import { Card } from '@/components/ui/card';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AgendaLegenda from '@/presentation/molecules/AgendaLegenda';
-import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection'; // Importa o componente que corrigimos
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
+import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo } from 'react';
 
@@ -55,23 +56,25 @@ export default function AgendaCalendario({
     }
 
     return (
-        <Card className="gap-0 p-0">
-            <AgendaLegenda isEditMode={isEditMode} />
-            <div className="w-full overflow-auto">
-                <div className="min-w-[800px] rounded-xl">
-                    {agendasPorTurno.map((agenda) => (
-                        <CalendarShiftSection
-                            key={agenda.id}
-                            titulo={agenda.turno}
-                            diasSemana={diasSemana}
-                            isSlotSelecionado={isSlotSelecionado}
-                            alternarSelecaoSlot={alternarSelecaoSlot}
-                            agenda={agenda}
-                            slotsSolicitados={slotsDaReserva}
-                        />
-                    ))}
+        <TooltipProvider delayDuration={200} skipDelayDuration={100}>
+            <Card className="gap-0 p-0">
+                <AgendaLegenda isEditMode={isEditMode} />
+                <div className="w-full overflow-auto">
+                    <div className="min-w-[800px] rounded-xl">
+                        {agendasPorTurno.map((agenda) => (
+                            <CalendarShiftSection
+                                key={agenda.id}
+                                titulo={agenda.turno}
+                                diasSemana={diasSemana}
+                                isSlotSelecionado={isSlotSelecionado}
+                                alternarSelecaoSlot={alternarSelecaoSlot}
+                                agenda={agenda}
+                                slotsSolicitados={slotsDaReserva}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </Card>
+            </Card>
+        </TooltipProvider>
     );
 }

@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button';
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { useAgendaSelection } from '@/hooks/use-agenda-selection';
 import { cn, diasDaSemana } from '@/lib/utils';
 import AgendaEditModeAlert from '@/presentation/molecules/AgendaEditModeAlert';
 import AgendaHeader from '@/presentation/molecules/AgendaHeader';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
+import { ReservaStickySummaryBar } from '@/presentation/molecules/ReservaStickySummaryBar';
 import AgendaCalendario from '@/presentation/organisms/AgendaCalendario';
-import AgendaDialogReserva from '@/presentation/organisms/AgendaDialogReserva';
+import { ReservaStepperModal } from '@/presentation/organisms/ReservaStepperModal';
 import { Espaco, Reserva } from '@/types';
 import { parseISO } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -70,7 +70,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     }, [agendas]);
 
     return (
-        <div className={cn('container mx-auto max-w-7xl space-y-4 py-4', slotsSelecao.length > 0 && 'pb-40 sm:pb-24')}>
+        <div className={cn('container mx-auto max-w-7xl space-y-4 py-4', slotsSelecao.length > 0 && 'pb-32 md:pb-24')}>
             {isEditMode && reserva && <AgendaEditModeAlert reserva={reserva} />}
             <AgendaHeader espaco={espaco} gestoresPorTurno={gestoresPorTurno} />
             <AgendaNavegacao
@@ -98,27 +98,30 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             </div>
 
             {slotsSelecao.length > 0 && (
-                <div className="fixed right-4 bottom-4 left-4 z-20 sm:left-auto sm:max-w-sm">
-                    <div className="bg-card flex flex-col-reverse gap-2 rounded-xl border p-3 shadow-lg sm:flex-row sm:items-center">
-                        <Button variant="outline" onClick={limparSelecao} className="sm:w-auto">
-                            Limpar seleção
-                        </Button>
-                        <AgendaDialogReserva
-                            isOpen={dialogAberto}
-                            onOpenChange={setDialogAberto}
-                            onSubmit={handleFormSubmit}
-                            slotsSelecao={slotsSelecao}
-                            hoje={hoje}
-                            isSubmitting={processing}
-                            isEditMode={isEditMode}
-                            espaco={espaco}
-                            formData={formData}
-                            setFormData={setFormData}
-                            setSlotsSelecao={setSlotsSelecao}
-                        />
-                    </div>
-                </div>
+                <ReservaStickySummaryBar
+                    slots={slotsSelecao}
+                    onConfirm={() => {
+                        setDialogAberto(true);
+                    }}
+                    onClear={limparSelecao}
+                    disabled={processing}
+                    isEditMode={isEditMode}
+                />
             )}
+
+            <ReservaStepperModal
+                isOpen={dialogAberto}
+                onOpenChange={setDialogAberto}
+                onSubmit={handleFormSubmit}
+                slotsSelecao={slotsSelecao}
+                hoje={hoje}
+                isSubmitting={processing}
+                isEditMode={isEditMode}
+                espaco={espaco}
+                formData={formData}
+                setFormData={setFormData}
+                setSlotsSelecao={setSlotsSelecao}
+            />
         </div>
     );
 }

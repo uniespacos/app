@@ -1,40 +1,41 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { acquirePrivateChannel, releasePrivateChannel } from '@/lib/echo-channel-registry';
 import { User } from '@/types';
+import { DatabaseNotificationItem, NotificationType } from '@/types/notification';
 import { router, usePage } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-
-interface NotificationData {
-    titulo: string;
-    descricao: string;
-    url?: string;
-}
-
-interface UserNotification {
-    id: string;
-    type: string;
-    data: NotificationData;
-    read_at: string | null;
-    created_at: string;
-}
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useNotificationAudio } from '@/hooks/useNotificationAudio';
+import { NotificationGroupList } from '@/presentation/molecules/NotificationGroupList';
 
 export function NotificationDropdown() {
     const { props } = usePage<{
         auth: {
             user: User;
         };
-        notifications: UserNotification[];
+        notifications?: DatabaseNotificationItem[];
     }>();
     const user = props.auth.user;
-    const [notifications, setNotifications] = useState<UserNotification[]>(props.notifications ?? []);
+    const [notifications, setNotifications] = useState<DatabaseNotificationItem[]>(props.notifications ?? []);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const isMobile = useIsMobile();
+    const { playNotificationFeedback } = useNotificationAudio();
+
+    // Sincroniza se as props de notificações mudarem via navegação Inertia
+    useEffect(() => {
+        if (props.notifications !== undefined) {
+            setNotifications(props.notifications);
+        }
+    }, [props.notifications]);
 
     const unreadCount = useMemo(() => notifications.filter((n) => n.read_at === null).length, [notifications]);
+
     const markAllAsRead = () => {
         if (unreadCount === 0) return;
 
@@ -45,109 +46,138 @@ export function NotificationDropdown() {
             {},
             {
                 onSuccess: () => {
-                    setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
+                    setNotifications((prev) =>
+                        prev.map((n) => ({
+                            ...n,
+                            read_at: n.read_at ?? new Date().toISOString(),
+                        })),
+                    );
                 },
-
                 onFinish: () => {
                     setIsLoading(false);
                 },
             },
         );
     };
-    useEffect(() => {
-        if (user) {
-            const channel = acquirePrivateChannel(`App.Models.User.${String(user.id)}`);
-            if (!channel) return;
 
-            channel.notification((notification: { titulo: string; descricao: string; url?: string; type: string; id?: string }) => {
-                setNotifications((prevNotifications) => [
-                    {
-                        id: notification.id ?? String(Date.now()),
-                        type: notification.type,
-                        read_at: null,
-                        created_at: new Date().toISOString(),
-                        data: {
-                            titulo: notification.titulo,
-                            descricao: notification.descricao,
-                            url: notification.url,
-                        },
+    useEffect(() => {
+        const channelName = `App.Models.User.${String(user.id)}`;
+        const channel = acquirePrivateChannel(channelName);
+        if (!channel) return;
+
+        channel.notification(
+            (notification: {
+                id?: string;
+                type?: string;
+                titulo?: string;
+                descricao?: string;
+                mensagem?: string;
+                url?: string;
+                reserva_id?: number;
+                tipo?: NotificationType;
+            }) => {
+                const newItem: DatabaseNotificationItem = {
+                    id: notification.id ?? String(Date.now()),
+                    type: notification.type ?? 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated',
+                    read_at: null,
+                    created_at: new Date().toISOString(),
+                    data: {
+                        titulo: notification.titulo ?? 'Nova Notificação',
+                        mensagem: notification.mensagem,
+                        descricao: notification.descricao,
+                        url: notification.url,
+                        reserva_id: notification.reserva_id,
+                        tipo: notification.tipo,
                     },
-                    ...prevNotifications,
-                ]);
-            });
-            return () => {
-                channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
-                releasePrivateChannel(`App.Models.User.${String(user.id)}`);
-            };
-        }
-    }, [user]);
-    const formatNotificationTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' - ' + date.toLocaleDateString('pt-BR');
+                };
+
+                setNotifications((prev) => [newItem, ...prev]);
+                playNotificationFeedback();
+            },
+        );
+
+        return () => {
+            channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated');
+            releasePrivateChannel(channelName);
+        };
+    }, [user.id, playNotificationFeedback]);
+
+    const handleItemClick = () => {
+        setIsOpen(false);
     };
+
+    const triggerButton = (
+        <Button variant="ghost" className="relative h-8 w-8 p-0" aria-label="Visualizar Notificações" data-testid="notification-trigger">
+            <span className="sr-only">Visualizar Notificações</span>
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 ? (
+                <span
+                    className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
+                    data-testid="notification-badge"
+                >
+                    {unreadCount > 9 ? '9+' : String(unreadCount)}
+                </span>
+            ) : null}
+        </Button>
+    );
+
+    if (isMobile) {
+        return (
+            <Drawer open={isOpen} onOpenChange={setIsOpen}>
+                <DrawerTrigger asChild>{triggerButton}</DrawerTrigger>
+                <DrawerContent className="max-h-[85vh]" data-testid="notification-drawer">
+                    <DrawerHeader className="border-border/40 border-b pb-3 text-left">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <DrawerTitle className="text-base font-semibold">
+                                    Notificações{unreadCount > 0 ? ` (${String(unreadCount)})` : ''}
+                                </DrawerTitle>
+                                <DrawerDescription className="text-muted-foreground text-xs">Atualizações e avisos do sistema</DrawerDescription>
+                            </div>
+                            {unreadCount > 0 ? (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={markAllAsRead}
+                                    disabled={isLoading}
+                                    className="text-muted-foreground hover:text-primary h-auto p-0 text-xs"
+                                    data-testid="mark-all-read-btn"
+                                >
+                                    {isLoading ? 'Marcando...' : 'Marcar todas como lidas'}
+                                </Button>
+                            ) : null}
+                        </div>
+                    </DrawerHeader>
+                    <div className="max-h-[calc(85vh-100px)] overflow-y-auto px-2 py-3 pb-8">
+                        <NotificationGroupList notifications={notifications} onItemClick={handleItemClick} />
+                    </div>
+                </DrawerContent>
+            </Drawer>
+        );
+    }
 
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 p-0">
-                    <span className="sr-only">Visualizar Notificações</span>
-                    <Bell className="h-5 w-5" />
-
-                    {unreadCount > 0 && (
-                        <span className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full text-xs">
-                            {unreadCount}
-                        </span>
-                    )}
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[calc(100vw-2rem)] p-0 sm:w-80" align="end">
-                <div className="flex items-center justify-between p-3">
-                    <h4 className="text-sm font-semibold">Notificações{unreadCount > 0 && ` (${String(unreadCount)})`}</h4>
-                    {unreadCount > 0 && (
+            <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+            <PopoverContent className="flex max-h-[85vh] w-80 flex-col overflow-hidden p-0 sm:w-96" align="end" data-testid="notification-popover">
+                <div className="flex shrink-0 items-center justify-between p-3">
+                    <h4 className="text-foreground text-sm font-semibold">Notificações{unreadCount > 0 ? ` (${String(unreadCount)})` : ''}</h4>
+                    {unreadCount > 0 ? (
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={markAllAsRead}
                             disabled={isLoading}
                             className="text-muted-foreground hover:text-primary h-auto p-0 text-xs"
+                            data-testid="mark-all-read-btn"
                         >
-                            Marcar todas como lidas
+                            {isLoading ? 'Marcando...' : 'Marcar todas como lidas'}
                         </Button>
-                    )}
+                    ) : null}
                 </div>
-                <Separator />
-                <ScrollArea className="h-[300px]">
-                    <div className="space-y-2 p-3">
-                        {isLoading ? (
-                            <p className="text-muted-foreground text-center text-sm">Carregando...</p>
-                        ) : notifications.length === 0 ? (
-                            <div className="text-muted-foreground flex flex-col items-center gap-2 py-8 text-center text-sm">
-                                <Bell className="h-8 w-8 opacity-40" />
-                                Nenhuma notificação por aqui.
-                            </div>
-                        ) : (
-                            notifications.map((notification) => {
-                                const lida = !!notification.read_at;
-                                return (
-                                    <div
-                                        key={notification.id}
-                                        className={`rounded-md border-l-2 p-2 ${lida ? 'border-transparent' : 'border-primary bg-primary/5'}`}
-                                    >
-                                        <p className={`text-sm ${lida ? 'text-muted-foreground font-normal' : 'font-medium'}`}>
-                                            {notification.data.titulo}
-                                        </p>
-                                        <p className="text-muted-foreground text-sm">{notification.data.descricao}</p>
-                                        <p className="text-muted-foreground mt-1 text-xs">{formatNotificationTime(notification.created_at)}</p>
-                                        {notification.data.url && (
-                                            <a href={notification.data.url} className="text-info-accent mt-1 block text-xs hover:underline">
-                                                Ver detalhes
-                                            </a>
-                                        )}
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
+                <Separator className="shrink-0" />
+                <ScrollArea className="h-[360px] w-full p-2">
+                    <NotificationGroupList notifications={notifications} onItemClick={handleItemClick} />
                 </ScrollArea>
             </PopoverContent>
         </Popover>

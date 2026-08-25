@@ -55,45 +55,45 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total de Espaços</CardTitle>
-                        <Building className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Total de Espaços</CardTitle>
+                        <Building className="text-primary h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Espaços'])}</div>
-                        <p className="text-muted-foreground text-xs">Espaços cadastrados</p>
+                        <div className="text-foreground text-2xl font-bold">{numero(dados.sumario['Total de Espaços'])}</div>
+                        <p className="text-muted-foreground mt-1 text-xs">Espaços acadêmicos cadastrados</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total de Gestores</CardTitle>
-                        <Users className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Total de Gestores</CardTitle>
+                        <Users className="text-primary h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Gestores'])}</div>
-                        <p className="text-muted-foreground text-xs">Gestores delegados</p>
+                        <div className="text-foreground text-2xl font-bold">{numero(dados.sumario['Total de Gestores'])}</div>
+                        <p className="text-muted-foreground mt-1 text-xs">Gestores delegados</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total de Reservas</CardTitle>
-                        <CalendarCheck className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Total de Reservas</CardTitle>
+                        <CalendarCheck className="text-primary h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Reservas'])}</div>
-                        <p className="text-muted-foreground text-xs">Total de reservas</p>
+                        <div className="text-foreground text-2xl font-bold">{numero(dados.sumario['Total de Reservas'])}</div>
+                        <p className="text-muted-foreground mt-1 text-xs">Demandas registradas no período</p>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader>
-                        <CardTitle>Distribuição de Situações</CardTitle>
+                        <CardTitle className="text-sm font-semibold tracking-tight">Distribuição de Situações</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ChartContainer config={situacoesConfig} className="aspect-auto h-[260px] w-full">
@@ -108,9 +108,9 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader>
-                        <CardTitle>Top 5 Espaços</CardTitle>
+                        <CardTitle className="text-sm font-semibold tracking-tight">Top 5 Espaços Mais Demandados</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {(() => {

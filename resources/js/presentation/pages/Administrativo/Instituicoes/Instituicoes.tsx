@@ -5,7 +5,7 @@ import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Instituicao } from '@/types';
+import type { Instituicao } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -18,9 +18,9 @@ const breadcrumbs = [
 ];
 
 const columns: ColumnDef<Instituicao>[] = [
-    { header: 'Nome', accessorKey: 'nome' },
-    { header: 'Sigla', accessorKey: 'sigla', width: '120px' },
-    { header: 'Endereço', accessorKey: 'endereco' },
+    { id: 'nome', header: 'Nome', accessorKey: 'nome', enableSorting: true },
+    { id: 'sigla', header: 'Sigla', accessorKey: 'sigla', width: '120px', enableSorting: true },
+    { id: 'endereco', header: 'Endereço', accessorKey: 'endereco' },
 ];
 
 export default function InstituicoesPage() {
@@ -56,6 +56,8 @@ export default function InstituicoesPage() {
                 <DataTable
                     data={instituicoes.data}
                     columns={columns}
+                    autoCardViewOnMobile={true}
+                    enableColumnVisibility={true}
                     pagination={{ links: instituicoes.links }}
                     emptyState={{
                         title: 'Nenhuma instituição encontrada',
@@ -64,7 +66,7 @@ export default function InstituicoesPage() {
                     actions={(instituicao) => (
                         <div className="flex justify-end gap-2">
                             <Link href={route('institucional.instituicoes.edit', { instituico: instituicao.id })}>
-                                <Button variant="outline" size="icon">
+                                <Button variant="outline" size="icon" aria-label="Editar instituição">
                                     <FilePenLine className="h-4 w-4" />
                                 </Button>
                             </Link>
@@ -74,6 +76,7 @@ export default function InstituicoesPage() {
                                 onClick={() => {
                                     setRemoverInstituicao(instituicao);
                                 }}
+                                aria-label="Excluir instituição"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>

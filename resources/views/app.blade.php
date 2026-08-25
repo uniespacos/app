@@ -2,8 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => (request()->cookie('appearance', 'system')) == 'dark'])>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <!-- PWA Web App Manifest e iOS Support -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#1e1e2e" media="(prefers-color-scheme: dark)">
+        <meta name="theme-color" content="#eff1f5" media="(prefers-color-scheme: light)">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="UniEspaços">
+        <link rel="apple-touch-icon" href="/favicon.ico">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>

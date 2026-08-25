@@ -1,7 +1,8 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ESTILO_SLOT } from '@/constants/situacao-reserva';
 import { cn } from '@/lib/utils';
-import { SlotCalendario } from '@/types';
+import { CalendarSlotHoverCard } from '@/presentation/molecules/CalendarSlotHoverCard';
+import { SituacaoReserva, SlotCalendario } from '@/types';
 import { JSX } from 'react';
 
 interface CalendarSlotCellProps {
@@ -41,21 +42,40 @@ export default function CalendarSlotCell({ slot, isSelecionado, onSelect }: Cale
         }
 
         if (slot.status === 'reservado') {
+            const horarioDB = slot.dadosReserva?.horarioDB;
+            const reserva = horarioDB?.reserva;
+            const reservaId = reserva?.id;
+            const titulo = slot.dadosReserva?.reserva_titulo ?? reserva?.titulo ?? 'Reserva';
+            const solicitanteNome = slot.dadosReserva?.autor ?? reserva?.user?.name ?? 'Solicitante Institucional';
+            const solicitanteSetor = reserva?.user?.setor?.sigla ?? reserva?.user?.setor?.nome;
+            const situacao: SituacaoReserva = (horarioDB?.situacao as SituacaoReserva | undefined) ?? reserva?.situacao ?? 'deferida';
+            const justificativa = horarioDB?.justificativa ?? reserva?.observacao ?? undefined;
+            const horarioInicio = slot.horario_inicio.substring(0, 5);
+            const horarioFim = slot.horario_fim.substring(0, 5);
+
             return (
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className={cn('truncate text-xs font-bold', TEXTO_STATUS.reservado)}>
-                                {slot.dadosReserva?.reserva_titulo.substring(0, 15)}
-                                {slot.dadosReserva ? (slot.dadosReserva.reserva_titulo.length > 30 ? '...' : '') : null}
-                            </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p className="font-bold">{slot.dadosReserva?.reserva_titulo}</p>
-                            <p>Reservado por: {slot.dadosReserva?.autor}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className={cn('w-full cursor-default truncate px-1 text-xs font-bold', TEXTO_STATUS.reservado)}>
+                            {titulo.substring(0, 15)}
+                            {titulo.length > 15 ? '...' : ''}
+                        </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center" className="border-none bg-transparent p-0 shadow-none [&>svg]:hidden">
+                        <CalendarSlotHoverCard
+                            data={{
+                                reservaId,
+                                titulo,
+                                solicitanteNome,
+                                solicitanteSetor,
+                                horarioInicio,
+                                horarioFim,
+                                situacao,
+                                justificativa,
+                            }}
+                        />
+                    </TooltipContent>
+                </Tooltip>
             );
         }
 

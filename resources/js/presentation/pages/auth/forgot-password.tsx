@@ -16,49 +16,61 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-
         post(route('password.email'));
     };
 
     return (
-        <AuthLayout title="Recuperação de senha" description="Digite seu e-mail para receber um link de redefinição de senha">
+        <AuthLayout
+            title="Recuperação de Senha"
+            description="Digite seu e-mail institucional para receber um link de redefinição seguro"
+            maxWidth="md"
+        >
             <Head title="Recuperação de senha" />
 
-            {status && <div className="text-success-accent mb-4 text-center text-sm font-medium">{status}</div>}
-
-            <div className="space-y-6">
-                <form onSubmit={submit}>
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Endereço de e-mail</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            autoComplete="off"
-                            value={data.email}
-                            autoFocus
-                            onChange={(e) => {
-                                setData('email', e.target.value);
-                            }}
-                            placeholder="seu@email.com"
-                        />
-
-                        <InputError message={errors.email} />
-                    </div>
-
-                    <div className="my-6 flex items-center justify-start">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                            Enviar link de redefinição
-                        </Button>
-                    </div>
-                </form>
-
-                <div className="text-muted-foreground space-x-1 text-center text-sm">
-                    <span>Ou, retorne para</span>
-                    <TextLink href={route('login')}>fazer login</TextLink>
+            {status && (
+                <div className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium">
+                    {status}
                 </div>
-            </div>
+            )}
+
+            <form onSubmit={submit} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="email">E-mail Institucional</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        autoComplete="email"
+                        value={data.email}
+                        autoFocus
+                        onChange={(e) => {
+                            setData('email', e.target.value);
+                        }}
+                        placeholder="seu@uesb.edu.br"
+                        className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
+                        disabled={processing}
+                    />
+                    <InputError message={errors.email} />
+                </div>
+
+                <Button type="submit" className="h-11 w-full text-base font-medium" disabled={processing}>
+                    {processing ? (
+                        <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Enviando link...
+                        </>
+                    ) : (
+                        'Enviar Link de Redefinição'
+                    )}
+                </Button>
+
+                <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
+                    Lembrou da senha?{' '}
+                    <TextLink href={route('login')} className="text-primary font-medium">
+                        Voltar para o login
+                    </TextLink>
+                </div>
+            </form>
         </AuthLayout>
     );
 }

@@ -26,7 +26,7 @@ export function useGerarRelatorio(endpoint: string) {
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                Accept: 'application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                Accept: 'application/json, application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             };
 
             if (xsrfCookie) {
@@ -47,16 +47,27 @@ export function useGerarRelatorio(endpoint: string) {
             });
 
             if (!response.ok) {
-                if (response.status === 422) {
-                    try {
-                        const data = await response.json();
-                        toast.error(data.message || 'Erro ao gerar relatório.');
-                    } catch {
-                        toast.error('Erro ao gerar relatório.');
+                let errorMessage = 'Erro ao gerar relatório.';
+                try {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const data = (await response.json()) as { message?: string; error?: string };
+                        errorMessage = data.message || data.error || errorMessage;
+                    } else {
+                        const text = await response.text();
+                        // Se o backend retornar texto simples ou HTML, extrai a mensagem limpa
+                        const match = text.match(/<title>(.*?)<\/title>/i) || text.match(/class="[^"]*message[^"]*">([^<]+)</i);
+                        if (match && match[1]) {
+                            errorMessage = match[1].trim();
+                        } else if (text.length < 200) {
+                            errorMessage = text.trim();
+                        }
                     }
-                } else {
-                    toast.error('Erro ao gerar relatório.');
+                } catch {
+                    // Mantém a mensagem padrão
                 }
+
+                toast.error(errorMessage);
                 return;
             }
 
@@ -66,7 +77,7 @@ export function useGerarRelatorio(endpoint: string) {
             let filename = `relatorio.${payload.formato}`;
 
             if (contentDisposition) {
-                const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(contentDisposition);
+                const match = /filename\*?=(?:UTF-8\x27\x27)?"?([^";]+)"?/i.exec(contentDisposition);
                 if (match && match[1]) {
                     filename = decodeURIComponent(match[1].trim());
                 }
@@ -81,7 +92,9 @@ export function useGerarRelatorio(endpoint: string) {
             document.body.removeChild(anchor);
             URL.revokeObjectURL(url);
 
-            toast.success('Relatório gerado com sucesso.');
+            toast.success('Relatório gerado e baixado com sucesso.');
+        } catch {
+            toast.error('Falha na comunicação com o servidor ao gerar o relatório.');
         } finally {
             setEstaGerando(false);
         }

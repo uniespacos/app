@@ -1,3 +1,4 @@
+import { InstallPwaBanner } from '@/presentation/molecules/InstallPwaBanner';
 import { AppSidebar } from '@/presentation/organisms/AppSidebar';
 import { AppSidebarHeader } from '@/presentation/organisms/AppSidebarHeader';
 import { MobileBottomBar } from '@/presentation/organisms/MobileBottomBar';
@@ -15,6 +16,7 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWi
                 {children}
             </AppContent>
             <MobileBottomBar />
+            <InstallPwaBanner />
         </AppShell>
     );
 }

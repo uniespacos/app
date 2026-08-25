@@ -157,10 +157,14 @@ final class RelatorioService
 
     private function validarLimites(DadosRelatorio $dados, FormatoRelatorioEnum $formato): void
     {
+        // O formato PDF gera um documento executivo/analítico de apresentação (máx 2-3 páginas)
+        // com consolidação de KPIs e amostragem dos principais registros.
+        if ($formato === FormatoRelatorioEnum::PDF) {
+            return;
+        }
+
         $totalLinhas = $dados->totalLinhas();
-        $limite = $formato === FormatoRelatorioEnum::PDF
-            ? config('relatorios.limites.max_linhas_pdf')
-            : config('relatorios.limites.max_linhas_csv_xlsx');
+        $limite = (int) config('relatorios.limites.max_linhas_csv_xlsx', 10_000);
 
         if ($totalLinhas > $limite) {
             abort(422, "Relatório excede o limite de {$limite} linhas para este formato. Refine os filtros.");

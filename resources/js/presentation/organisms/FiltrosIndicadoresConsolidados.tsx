@@ -1,5 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/presentation/molecules/DatePicker';
+import { PeriodoQuickShortcuts, PeriodoShortcutKey } from '@/presentation/molecules/PeriodoQuickShortcuts';
 import { FiltrosRelatorio } from '@/types';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -10,10 +11,25 @@ interface Props {
 }
 
 export function FiltrosIndicadoresConsolidados({ filtros, onChange }: Props) {
-    const [dataInicio, setDataInicio] = useState<Date | undefined>(filtros.data_inicio ? new Date(filtros.data_inicio) : undefined);
-    const [dataFim, setDataFim] = useState<Date | undefined>(filtros.data_fim ? new Date(filtros.data_fim) : undefined);
+    const [dataInicio, setDataInicio] = useState<Date | undefined>(filtros.data_inicio ? new Date(filtros.data_inicio + 'T00:00:00') : undefined);
+    const [dataFim, setDataFim] = useState<Date | undefined>(filtros.data_fim ? new Date(filtros.data_fim + 'T23:59:59') : undefined);
+    const [activeShortcut, setActiveShortcut] = useState<PeriodoShortcutKey | undefined>(
+        !filtros.data_inicio && !filtros.data_fim ? undefined : 'custom',
+    );
+
+    const handleShortcutSelect = (inicio: string, fim: string, key: PeriodoShortcutKey) => {
+        setActiveShortcut(key);
+        setDataInicio(new Date(inicio + 'T00:00:00'));
+        setDataFim(new Date(fim + 'T23:59:59'));
+        onChange({
+            ...filtros,
+            data_inicio: inicio,
+            data_fim: fim,
+        });
+    };
 
     const handleDataInicioChange = (date: Date | undefined) => {
+        setActiveShortcut('custom');
         setDataInicio(date);
         onChange({
             ...filtros,
@@ -22,6 +38,7 @@ export function FiltrosIndicadoresConsolidados({ filtros, onChange }: Props) {
     };
 
     const handleDataFimChange = (date: Date | undefined) => {
+        setActiveShortcut('custom');
         setDataFim(date);
         onChange({
             ...filtros,
@@ -31,15 +48,22 @@ export function FiltrosIndicadoresConsolidados({ filtros, onChange }: Props) {
 
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label className="mb-2 block">Data Início</Label>
-                    <DatePicker value={dataInicio} onSelect={handleDataInicioChange} placeholder="Selecione..." />
+            <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Atalhos Rápidos de Período</Label>
+                    <PeriodoQuickShortcuts activeShortcut={activeShortcut} onSelectRange={handleShortcutSelect} />
                 </div>
 
-                <div>
-                    <Label className="mb-2 block">Data Fim</Label>
-                    <DatePicker value={dataFim} onSelect={handleDataFimChange} placeholder="Selecione..." />
+                <div className="grid gap-3 pt-1 sm:grid-cols-2">
+                    <div>
+                        <Label className="mb-1.5 block text-xs font-medium">Data Início</Label>
+                        <DatePicker value={dataInicio} onSelect={handleDataInicioChange} placeholder="Selecione início..." />
+                    </div>
+
+                    <div>
+                        <Label className="mb-1.5 block text-xs font-medium">Data Fim</Label>
+                        <DatePicker value={dataFim} onSelect={handleDataFimChange} placeholder="Selecione fim..." />
+                    </div>
                 </div>
             </div>
         </div>

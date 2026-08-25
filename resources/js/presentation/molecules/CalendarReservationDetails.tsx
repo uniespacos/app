@@ -1,8 +1,9 @@
 import { Card } from '@/components/ui/card';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
+import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
 interface CalendarReservationDetailsProps {
@@ -34,38 +35,40 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
     }
 
     return (
-        <Card className="p-0">
-            <div className="w-full overflow-auto">
-                <div className="min-w-[800px] rounded-xl">
-                    <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
-                        <div className="text-muted-foreground text-center text-sm font-medium"></div>
-                        {diasSemana.map((dia) => (
-                            <div
-                                key={dia.valor}
-                                className={cn('bg-muted/50 border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
-                            >
-                                <div className="capitalize">{dia.abreviado}</div>
-                                <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
-                            </div>
-                        ))}
+        <TooltipProvider delayDuration={200} skipDelayDuration={100}>
+            <Card className="p-0">
+                <div className="w-full overflow-auto">
+                    <div className="min-w-[800px] rounded-xl">
+                        <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
+                            <div className="text-muted-foreground text-center text-sm font-medium"></div>
+                            {diasSemana.map((dia) => (
+                                <div
+                                    key={dia.valor}
+                                    className={cn('bg-muted/50 border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
+                                >
+                                    <div className="capitalize">{dia.abreviado}</div>
+                                    <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
+                                </div>
+                            ))}
+                        </div>
+                        {agendas.map((agenda) => {
+                            if (!agenda) {
+                                return null;
+                            }
+                            return (
+                                <CalendarShiftSection
+                                    key={agenda.id}
+                                    titulo={agenda.turno}
+                                    agenda={agenda}
+                                    diasSemana={diasSemana}
+                                    slotsSolicitados={slotsSolicitados}
+                                    alternarSelecaoSlot={alternarSelecaoSlotFn}
+                                />
+                            );
+                        })}
                     </div>
-                    {agendas.map((agenda) => {
-                        if (!agenda) {
-                            return null;
-                        }
-                        return (
-                            <CalendarShiftSection
-                                key={agenda.id}
-                                titulo={agenda.turno}
-                                agenda={agenda}
-                                diasSemana={diasSemana}
-                                slotsSolicitados={slotsSolicitados}
-                                alternarSelecaoSlot={alternarSelecaoSlotFn}
-                            />
-                        );
-                    })}
                 </div>
-            </div>
-        </Card>
+            </Card>
+        </TooltipProvider>
     );
 }

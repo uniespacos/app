@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TrendIndicatorBadge } from '@/presentation/atoms/TrendIndicatorBadge';
 import { TabelaDetalhamento } from '@/presentation/organisms/TabelaDetalhamento';
 import { DadosRelatorio } from '@/types';
 import { CalendarCheck, CircleCheck, CircleX, Clock } from 'lucide-react';
@@ -30,64 +31,78 @@ function GraficoReservasPeriodo({ dados }: Props) {
         );
     }
 
+    const totalReservas = numero(dados.sumario['Total de Reservas']);
+    const deferidas = numero(dados.sumario.Deferidas);
+    const indeferidas = numero(dados.sumario.Indeferidas);
+    const emAnalise = numero(dados.sumario['Em Análise']);
+
+    const pctDeferidas = totalReservas > 0 ? (deferidas / totalReservas) * 100 : 0;
+    const pctIndeferidas = totalReservas > 0 ? (indeferidas / totalReservas) * 100 : 0;
+
     const distribuicao = [
-        { situacao: 'Deferidas', total: numero(dados.sumario.Deferidas) },
-        { situacao: 'Indeferidas', total: numero(dados.sumario.Indeferidas) },
-        { situacao: 'Em Análise', total: numero(dados.sumario['Em Análise']) },
+        { situacao: 'Deferidas', total: deferidas },
+        { situacao: 'Indeferidas', total: indeferidas },
+        { situacao: 'Em Análise', total: emAnalise },
     ];
 
     return (
         <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total de Reservas</CardTitle>
-                        <CalendarCheck className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Total de Reservas</CardTitle>
+                        <CalendarCheck className="text-primary h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Reservas'])}</div>
-                        <p className="text-muted-foreground text-xs">No período</p>
+                        <div className="text-foreground text-2xl font-bold">{totalReservas}</div>
+                        <p className="text-muted-foreground mt-1 text-xs">No período selecionado</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Deferidas</CardTitle>
-                        <CircleCheck className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Deferidas</CardTitle>
+                        <CircleCheck className="text-success-accent h-4 w-4" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario.Deferidas)}</div>
-                        <p className="text-muted-foreground text-xs">Aprovadas</p>
+                    <CardContent className="space-y-1.5">
+                        <div className="flex items-baseline justify-between">
+                            <div className="text-foreground text-2xl font-bold">{deferidas}</div>
+                            {totalReservas > 0 && <TrendIndicatorBadge value={pctDeferidas} isPositiveGood={true} showSign={false} />}
+                        </div>
+                        <p className="text-muted-foreground text-xs">Aprovadas institucionalmente</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Indeferidas</CardTitle>
-                        <CircleX className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Indeferidas</CardTitle>
+                        <CircleX className="text-destructive-accent h-4 w-4" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario.Indeferidas)}</div>
-                        <p className="text-muted-foreground text-xs">Recusadas</p>
+                    <CardContent className="space-y-1.5">
+                        <div className="flex items-baseline justify-between">
+                            <div className="text-foreground text-2xl font-bold">{indeferidas}</div>
+                            {totalReservas > 0 && <TrendIndicatorBadge value={pctIndeferidas} isPositiveGood={false} showSign={false} />}
+                        </div>
+                        <p className="text-muted-foreground text-xs">Recusadas ou com conflito</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
-                        <Clock className="text-muted-foreground h-4 w-4" />
+                        <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Em Análise</CardTitle>
+                        <Clock className="text-warning-accent h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{numero(dados.sumario['Em Análise'])}</div>
-                        <p className="text-muted-foreground text-xs">Pendentes</p>
+                        <div className="text-foreground text-2xl font-bold">{emAnalise}</div>
+                        <p className="text-muted-foreground mt-1 text-xs">Pendentes de deliberação</p>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader>
-                        <CardTitle>Distribuição por Situação</CardTitle>
+                        <CardTitle className="text-sm font-semibold tracking-tight">Distribuição por Situação</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {(() => {
@@ -112,25 +127,30 @@ function GraficoReservasPeriodo({ dados }: Props) {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="shadow-xs">
                     <CardHeader>
-                        <CardTitle>Resumo</CardTitle>
+                        <CardTitle className="text-sm font-semibold tracking-tight">Resumo Quantitativo</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Situação</TableHead>
-                                    <TableHead>Total</TableHead>
+                                    <TableHead className="text-right">Total</TableHead>
+                                    <TableHead className="text-right">Proporção</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {distribuicao.map((item) => (
-                                    <TableRow key={item.situacao}>
-                                        <TableCell>{item.situacao}</TableCell>
-                                        <TableCell>{item.total}</TableCell>
-                                    </TableRow>
-                                ))}
+                                {distribuicao.map((item) => {
+                                    const pct = totalReservas > 0 ? (item.total / totalReservas) * 100 : 0;
+                                    return (
+                                        <TableRow key={item.situacao}>
+                                            <TableCell className="font-medium">{item.situacao}</TableCell>
+                                            <TableCell className="text-right">{item.total}</TableCell>
+                                            <TableCell className="text-muted-foreground text-right text-xs">{pct.toFixed(1)}%</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </CardContent>
