@@ -54,7 +54,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
                     onClick={() => {
                         handlePageChange(i);
                     }}
-                    className="h-9 w-9"
+                    className="h-11 min-h-[44px] w-11 min-w-[44px] text-sm md:h-9 md:min-h-9 md:w-9 md:min-w-9"
                 >
                     {i}
                 </Button>,
@@ -65,12 +65,12 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
     };
 
     return (
-        <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex flex-col items-center justify-between gap-4 py-4 sm:flex-row">
             <div className="text-muted-foreground text-sm">Total de {totalItems} item(s) encontrado(s).</div>
-            <div className="flex items-center space-x-2">
+            <nav aria-label="Paginação do relatório" className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <Button
                     variant="outline"
-                    className="hidden h-9 w-9 p-0 lg:flex"
+                    className="hidden h-11 min-h-[44px] w-11 min-w-[44px] p-0 md:h-9 md:min-h-9 md:w-9 md:min-w-9 lg:flex"
                     onClick={() => {
                         handlePageChange(1);
                     }}
@@ -81,7 +81,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
                 </Button>
                 <Button
                     variant="outline"
-                    className="h-9 w-9 p-0"
+                    className="h-11 min-h-[44px] w-11 min-w-[44px] p-0 md:h-9 md:min-h-9 md:w-9 md:min-w-9"
                     onClick={() => {
                         handlePageChange(currentPage - 1);
                     }}
@@ -95,7 +95,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
 
                 <Button
                     variant="outline"
-                    className="h-9 w-9 p-0"
+                    className="h-11 min-h-[44px] w-11 min-w-[44px] p-0 md:h-9 md:min-h-9 md:w-9 md:min-w-9"
                     onClick={() => {
                         handlePageChange(currentPage + 1);
                     }}
@@ -106,7 +106,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
                 </Button>
                 <Button
                     variant="outline"
-                    className="hidden h-9 w-9 p-0 lg:flex"
+                    className="hidden h-11 min-h-[44px] w-11 min-w-[44px] p-0 md:h-9 md:min-h-9 md:w-9 md:min-w-9 lg:flex"
                     onClick={() => {
                         handlePageChange(totalPages);
                     }}
@@ -115,7 +115,7 @@ export function PaginacaoRelatorio({ totalItems, itemsPerPage, currentPage, onPa
                     <span className="sr-only">Última página</span>
                     <ChevronsRight className="h-4 w-4" />
                 </Button>
-            </div>
+            </nav>
         </div>
     );
 }
