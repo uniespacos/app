@@ -16,7 +16,7 @@ export default function EditarModulo() {
         },
         {
             title: 'Editar Modulo',
-            href: `/institucional/modulos/${modulo.id}/edit`,
+            href: `/institucional/modulos/${modulo.id.toString()}/edit`,
         },
     ];
     const { data, setData, patch, processing, errors } = useForm<CadastrarModuloForm>({
@@ -27,19 +27,18 @@ export default function EditarModulo() {
 
     const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
-        let errors = false;
         const validacaoEstrutura = validarEstrutura(data.andares);
         if (!validacaoEstrutura.valido) {
-            errors = true;
             toast.error(`Estrutura inválida: ${validacaoEstrutura.erros.join(', ')}`);
             return;
         }
+        let hasAcessoError = false;
         data.andares.forEach((andar) => {
             if (andar.tipo_acesso.length === 0) {
-                errors = true;
+                hasAcessoError = true;
             }
         });
-        if (errors) {
+        if (hasAcessoError) {
             toast.error('Todos os andares devem ter pelo menos um tipo de acesso definido.');
             return;
         }

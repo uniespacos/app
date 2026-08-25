@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { validarEstrutura } from '@/lib/utils/andars/AndarHelpers';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { AndarFormData } from '@/presentation/organisms/AndarFormCard';
@@ -7,6 +6,7 @@ import AppLayout from '@/presentation/templates/AppLayout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
+
 const breadcrumbs = [
     {
         title: 'Gerenciar Modulos',
@@ -17,12 +17,13 @@ const breadcrumbs = [
         href: `/institucional/modulos/create`,
     },
 ];
-export interface CadastrarModuloForm {
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- useForm<T> do Inertia exige um index signature que `interface` não satisfaz.
+export type CadastrarModuloForm = {
     nome: string;
     unidade_id: string;
     andares: AndarFormData[];
-    [key: string]: any;
-}
+};
 
 export default function CadastrarModuloPage() {
     const { instituicao, unidades } = usePage<{ instituicao: Instituicao; unidades: Unidade[] }>().props;
@@ -35,19 +36,18 @@ export default function CadastrarModuloPage() {
 
     const submit = (e: React.SyntheticEvent) => {
         e.preventDefault();
-        let errors = false;
         const validacaoEstrutura = validarEstrutura(data.andares);
         if (!validacaoEstrutura.valido) {
-            errors = true;
             toast.error(`Estrutura inválida: ${validacaoEstrutura.erros.join(', ')}`);
             return;
         }
+        let hasAcessoError = false;
         data.andares.forEach((andar) => {
             if (andar.tipo_acesso.length === 0) {
-                errors = true;
+                hasAcessoError = true;
             }
         });
-        if (errors) {
+        if (hasAcessoError) {
             toast.error('Todos os andares devem ter pelo menos um tipo de acesso definido.');
             return;
         }

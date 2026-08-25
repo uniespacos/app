@@ -17,23 +17,6 @@
       "count": 1
     }
   },
-  "resources/js/hooks/use-gerar-relatorio.ts": {
-    "@typescript-eslint/no-unsafe-argument": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    },
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    },
-    "@typescript-eslint/prefer-optional-chain": {
-      "count": 1
-    }
-  },
   "resources/js/hooks/use-mobile.tsx": {
     "@typescript-eslint/restrict-template-expressions": {
       "count": 1
@@ -65,16 +48,6 @@
       "count": 1
     },
     "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/atoms/SituacaoBadge.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
-  "resources/js/presentation/atoms/SituacaoIcon.tsx": {
-    "@typescript-eslint/no-redundant-type-constituents": {
       "count": 1
     }
   },
@@ -156,11 +129,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/organisms/AndarFormCard.tsx": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 2
-    }
-  },
   "resources/js/presentation/organisms/AppSidebar.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
@@ -237,11 +205,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/organisms/ReservasDetalhes.tsx": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/organisms/RoleFormModal.tsx": {
     "@typescript-eslint/no-misused-promises": {
       "count": 1
@@ -272,9 +235,6 @@
   },
   "resources/js/presentation/pages/Administrativo/Modulos/EditarModulo.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
       "count": 1
     }
   },

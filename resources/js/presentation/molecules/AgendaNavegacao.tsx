@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import React from 'react';
 
@@ -33,6 +33,7 @@ export function AgendaNavegacao({
     isLoading = false,
     variant = 'full',
 }: AgendaNavegacaoProps) {
+    const { t } = useTranslation();
     const dataRef = semanaAtual ?? dataReferencia ?? new Date();
     const handleAnterior = onAnterior ?? onSemanaAnterior;
     const handleProxima = onProxima ?? onProximaSemana;
@@ -43,7 +44,7 @@ export function AgendaNavegacao({
     const inicioDaSemana = startOfWeek(dataRef, { weekStartsOn: 1 });
     const fimDaSemana = endOfWeek(dataRef, { weekStartsOn: 1 });
     const formatoFim = variant === 'compact' ? 'dd/MM/yyyy' : 'dd/MM';
-    const textoIntervalo = `${format(inicioDaSemana, 'dd/MM', { locale: ptBR })} - ${format(fimDaSemana, formatoFim, { locale: ptBR })}`;
+    const textoIntervalo = `${format(inicioDaSemana, 'dd/MM')} - ${format(fimDaSemana, formatoFim)}`;
 
     if (variant === 'compact') {
         return (
@@ -53,12 +54,12 @@ export function AgendaNavegacao({
                     size="sm"
                     onClick={handleAnterior}
                     disabled={desabAnterior}
-                    aria-label="Semana anterior"
+                    aria-label={t('agenda.semana_anterior_label')}
                     className="h-8 px-2 text-xs transition-transform active:scale-95"
                 >
                     <ChevronLeft className="mr-1 h-4 w-4" />
-                    <span className="hidden sm:inline">Semana Anterior</span>
-                    <span className="sm:hidden">Anterior</span>
+                    <span className="hidden sm:inline">{t('agenda.semana_anterior')}</span>
+                    <span className="sm:hidden">{t('agenda.anterior')}</span>
                 </Button>
 
                 <div className="text-foreground flex items-center gap-1.5 text-xs font-semibold tracking-tight transition-all duration-300 sm:text-sm">
@@ -71,11 +72,11 @@ export function AgendaNavegacao({
                     size="sm"
                     onClick={handleProxima}
                     disabled={desabProxima}
-                    aria-label="Próxima semana"
+                    aria-label={t('agenda.proxima_semana_label')}
                     className="h-8 px-2 text-xs transition-transform active:scale-95"
                 >
-                    <span className="hidden sm:inline">Próxima Semana</span>
-                    <span className="sm:hidden">Próxima</span>
+                    <span className="hidden sm:inline">{t('agenda.proxima_semana')}</span>
+                    <span className="sm:hidden">{t('agenda.proxima')}</span>
                     <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
             </div>
@@ -90,11 +91,11 @@ export function AgendaNavegacao({
                     size="sm"
                     onClick={handleAnterior}
                     disabled={desabAnterior}
-                    aria-label="Semana anterior"
+                    aria-label={t('agenda.semana_anterior_label')}
                     className="h-8 px-2 text-xs transition-transform active:scale-95 sm:px-3"
                 >
                     <ChevronLeft className="mr-0 h-4 w-4 sm:mr-1" />
-                    <span className="hidden sm:inline">Anterior</span>
+                    <span className="hidden sm:inline">{t('agenda.anterior')}</span>
                 </Button>
 
                 {handleReset && (
@@ -105,7 +106,7 @@ export function AgendaNavegacao({
                         disabled={isLoading}
                         className="h-8 px-2.5 text-xs font-medium transition-transform active:scale-95"
                     >
-                        Hoje
+                        {t('agenda.hoje')}
                     </Button>
                 )}
 
@@ -114,10 +115,10 @@ export function AgendaNavegacao({
                     size="sm"
                     onClick={handleProxima}
                     disabled={desabProxima}
-                    aria-label="Próxima semana"
+                    aria-label={t('agenda.proxima_semana_label')}
                     className="h-8 px-2 text-xs transition-transform active:scale-95 sm:hidden"
                 >
-                    <span className="hidden sm:inline">Próxima</span>
+                    <span className="hidden sm:inline">{t('agenda.proxima')}</span>
                     <ChevronRight className="ml-0 h-4 w-4 sm:ml-1" />
                 </Button>
             </div>
@@ -134,10 +135,10 @@ export function AgendaNavegacao({
                     size="sm"
                     onClick={handleProxima}
                     disabled={desabProxima}
-                    aria-label="Próxima semana"
+                    aria-label={t('agenda.proxima_semana_label')}
                     className="h-8 px-3 text-xs transition-transform active:scale-95"
                 >
-                    <span>Próxima</span>
+                    <span>{t('agenda.proxima')}</span>
                     <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
             </div>

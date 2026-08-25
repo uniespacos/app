@@ -1,4 +1,5 @@
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { ModaisSetor } from '@/presentation/organisms/ModaisSetor';
 import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
@@ -17,6 +18,7 @@ const breadcrumbs = [
 ];
 
 export default function SetoresPage() {
+    const { t } = useTranslation();
     const { instituicao, unidades, setores, filters } = usePage<{
         instituicao: Instituicao;
         unidades: Unidade[];
@@ -71,13 +73,13 @@ export default function SetoresPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Setores" />
+            <Head title={t('admin.setores.titulo')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo={'Gerenciar Setores'}
-                    descricao={'Gerencie os setores das unidades organizacionais'}
+                    titulo={t('admin.setores.titulo')}
+                    descricao={t('admin.setores.desc')}
                     canSeeButton
-                    buttonText="Cadastrar setor"
+                    buttonText={t('admin.setores.novo')}
                     ButtonIcon={PlusCircle}
                     buttonOnClick={() => {
                         setIsCreateModalOpen(true);

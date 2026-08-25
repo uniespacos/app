@@ -2,6 +2,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    ModoArquivo,
+    type ModoArquivoType,
+    OrdenacaoReserva,
+    type OrdenacaoReservaType,
+    SituacaoReserva,
+    type SituacaoReservaType,
+} from '@/contracts';
+import { useTranslation } from '@/i18n';
 import { DatePicker } from '@/presentation/molecules/DatePicker';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
 import { Search } from 'lucide-react';
@@ -9,14 +18,14 @@ import { Search } from 'lucide-react';
 interface ReservasFiltersProps {
     searchTerm: string;
     onSearchTermChange: (value: string) => void;
-    selectedSituacao: string;
-    onSituacaoChange: (value: string) => void;
+    selectedSituacao: SituacaoReservaType | '';
+    onSituacaoChange: (value: SituacaoReservaType | '') => void;
     /** Eixo de arquivamento: 'ativas' | 'arquivadas' | 'todas'. */
-    selectedArquivo: string;
-    onArquivoChange: (value: string) => void;
+    selectedArquivo: ModoArquivoType;
+    onArquivoChange: (value: ModoArquivoType) => void;
     /** Critério de ordenação: 'data_solicitacao' | 'situacao'. */
-    selectedOrdenar: string;
-    onOrdenarChange: (value: string) => void;
+    selectedOrdenar: OrdenacaoReservaType;
+    onOrdenarChange: (value: OrdenacaoReservaType) => void;
     selectedDate?: Date;
     onDateChange?: (date: Date | undefined) => void;
     viewMode?: ViewMode;
@@ -37,6 +46,8 @@ export function ReservasFilters({
     viewMode,
     onViewModeChange,
 }: ReservasFiltersProps) {
+    const { t } = useTranslation();
+
     return (
         <Card className="w-full">
             <CardContent className="flex flex-col gap-4 p-4">
@@ -46,7 +57,7 @@ export function ReservasFilters({
                         <Input
                             id="reservas-busca"
                             type="search"
-                            placeholder="Buscar por título ou descrição..."
+                            placeholder={t('reservas.filtros.busca_placeholder')}
                             className="w-full pl-9"
                             value={searchTerm}
                             onChange={(e) => {
@@ -64,61 +75,71 @@ export function ReservasFilters({
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-1.5">
                         <Label htmlFor="reservas-situacao" className="text-muted-foreground text-xs font-medium">
-                            Situação
+                            {t('reservas.filtros.situacao')}
                         </Label>
                         <Select
                             value={selectedSituacao || 'todas'}
                             onValueChange={(value) => {
-                                onSituacaoChange(value === 'todas' ? '' : value);
+                                onSituacaoChange(value === 'todas' ? '' : (value as SituacaoReservaType));
                             }}
                         >
-                            <SelectTrigger id="reservas-situacao" className="w-full" aria-label="Situação">
-                                <SelectValue placeholder="Situação" />
+                            <SelectTrigger id="reservas-situacao" className="w-full" aria-label={t('reservas.filtros.situacao')}>
+                                <SelectValue placeholder={t('reservas.filtros.situacao')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="todas">Todas as situações</SelectItem>
-                                <SelectItem value="em_analise">Em Análise</SelectItem>
-                                <SelectItem value="indeferida">Indeferida</SelectItem>
-                                <SelectItem value="parcialmente_deferida">Parcialmente Deferida</SelectItem>
-                                <SelectItem value="deferida">Deferida</SelectItem>
+                                <SelectItem value="todas">{t('reservas.filtros.todas_situacoes')}</SelectItem>
+                                <SelectItem value={SituacaoReserva.EM_ANALISE}>{t('reservas.situacao.em_analise')}</SelectItem>
+                                <SelectItem value={SituacaoReserva.INDEFERIDA}>{t('reservas.situacao.indeferida')}</SelectItem>
+                                <SelectItem value={SituacaoReserva.PARCIALMENTE_DEFERIDA}>{t('reservas.situacao.parcialmente_deferida')}</SelectItem>
+                                <SelectItem value={SituacaoReserva.DEFERIDA}>{t('reservas.situacao.deferida')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-1.5">
                         <Label htmlFor="reservas-exibir" className="text-muted-foreground text-xs font-medium">
-                            Exibir
+                            {t('reservas.filtros.exibir')}
                         </Label>
-                        <Select value={selectedArquivo || 'ativas'} onValueChange={onArquivoChange}>
-                            <SelectTrigger id="reservas-exibir" className="w-full" aria-label="Exibir">
-                                <SelectValue placeholder="Exibir" />
+                        <Select
+                            value={selectedArquivo}
+                            onValueChange={(value) => {
+                                onArquivoChange(value as ModoArquivoType);
+                            }}
+                        >
+                            <SelectTrigger id="reservas-exibir" className="w-full" aria-label={t('reservas.filtros.exibir')}>
+                                <SelectValue placeholder={t('reservas.filtros.exibir')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="ativas">Ativas</SelectItem>
-                                <SelectItem value="arquivadas">Arquivadas</SelectItem>
-                                <SelectItem value="todas">Todas</SelectItem>
+                                <SelectItem value={ModoArquivo.ATIVAS}>{t('reservas.arquivo.ativas')}</SelectItem>
+                                <SelectItem value={ModoArquivo.ARQUIVADAS}>{t('reservas.arquivo.arquivadas')}</SelectItem>
+                                <SelectItem value={ModoArquivo.TODAS}>{t('reservas.arquivo.todas')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-1.5">
                         <Label htmlFor="reservas-ordenar" className="text-muted-foreground text-xs font-medium">
-                            Ordenar por
+                            {t('reservas.filtros.ordenar_por')}
                         </Label>
-                        <Select value={selectedOrdenar || 'data_solicitacao'} onValueChange={onOrdenarChange}>
-                            <SelectTrigger id="reservas-ordenar" className="w-full" aria-label="Ordenar por">
-                                <SelectValue placeholder="Ordenar por" />
+                        <Select
+                            value={selectedOrdenar}
+                            onValueChange={(value) => {
+                                onOrdenarChange(value as OrdenacaoReservaType);
+                            }}
+                        >
+                            <SelectTrigger id="reservas-ordenar" className="w-full" aria-label={t('reservas.filtros.ordenar_por')}>
+                                <SelectValue placeholder={t('reservas.filtros.ordenar_por')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="data_solicitacao">Data de solicitação</SelectItem>
-                                <SelectItem value="situacao">Situação</SelectItem>
+                                <SelectItem value={OrdenacaoReserva.DATA_SOLICITACAO}>{t('reservas.ordenar.data_solicitacao')}</SelectItem>
+                                <SelectItem value={OrdenacaoReserva.SITUACAO}>{t('reservas.ordenar.situacao')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-1.5">
                         <Label htmlFor="reservas-data" className="text-muted-foreground text-xs font-medium">
-                            Data
+                            {t('reservas.filtros.data')}
                         </Label>
                         <DatePicker
                             id="reservas-data"
@@ -126,7 +147,7 @@ export function ReservasFilters({
                             onSelect={(date) => {
                                 onDateChange?.(date);
                             }}
-                            placeholder="Todas as datas"
+                            placeholder={t('reservas.filtros.todas_datas')}
                             align="end"
                             clearable
                         />

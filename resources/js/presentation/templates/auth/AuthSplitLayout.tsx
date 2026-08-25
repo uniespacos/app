@@ -98,7 +98,7 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                     </div>
 
                     {/* Cabeçalho da Tela */}
-                    {(title || description) && (
+                    {(title ?? description) && (
                         <div className="flex flex-col space-y-1.5 text-center sm:text-left">
                             {title && <h1 className="text-foreground text-2xl font-bold tracking-tight">{title}</h1>}
                             {description && <p className="text-muted-foreground text-sm text-balance">{description}</p>}

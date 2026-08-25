@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from '@/i18n';
 import TabsItemEspacosFavoritos from '@/presentation/molecules/TabsItemEspacosFavoritos';
 import TabsItemReserva from '@/presentation/molecules/TabsItemReserva';
 import AppLayout from '@/presentation/templates/AppLayout';
@@ -30,6 +31,7 @@ interface DashboardUsuarioProps {
 }
 
 export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
+    const { t } = useTranslation();
     const pageProps = usePage<{
         user: User;
         espacosFavoritos?: Espaco[];
@@ -58,81 +60,81 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
     const [searchTermFavoritos, setSearchTermFavoritos] = useState('');
 
     const filteredEspacosFavoritos = useMemo(() => {
-        if (!searchTermFavoritos.trim()) return espacosFavoritos;
-        const term = searchTermFavoritos.toLowerCase();
-        return espacosFavoritos.filter(
-            (espaco) =>
-                espaco.nome.toLowerCase().includes(term) ||
-                (espaco.andar?.nome.toLowerCase().includes(term) ?? false) ||
-                (espaco.andar?.modulo?.nome.toLowerCase().includes(term) ?? false),
-        );
+        if (!searchTermFavoritos) return espacosFavoritos;
+        const termo = searchTermFavoritos.toLowerCase();
+        return espacosFavoritos.filter((e) => e.nome.toLowerCase().includes(termo) || e.andar?.modulo?.unidade?.nome.toLowerCase().includes(termo));
     }, [espacosFavoritos, searchTermFavoritos]);
 
     const kpiCards = [
         {
-            title: 'Em Análise',
+            title: t('dashboard.stats.em_analise'),
             value: statusDasReservas.em_analise,
-            description: 'Aguardando avaliação do gestor',
+            description: t('reservas.situacao.em_analise'),
             icon: Clock,
-            iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+            color: 'text-warning',
+            iconBg: 'bg-warning/10 text-warning',
         },
         {
-            title: 'Deferidas',
+            title: t('dashboard.stats.deferida'),
             value: statusDasReservas.deferida,
-            description: 'Aprovadas para utilização',
+            description: t('reservas.situacao.deferida'),
             icon: CheckCircle2,
-            iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+            color: 'text-success',
+            iconBg: 'bg-success/10 text-success',
         },
         {
-            title: 'Parciais',
+            title: t('dashboard.stats.parcialmente_deferida'),
             value: statusDasReservas.parcialmente_deferida,
-            description: 'Com horários aprovados',
+            description: t('reservas.situacao.parcialmente_deferida'),
             icon: AlertCircle,
-            iconBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+            color: 'text-accent-foreground',
+            iconBg: 'bg-accent/20 text-accent-foreground',
         },
         {
-            title: 'Indeferidas',
+            title: t('dashboard.stats.indeferida'),
             value: statusDasReservas.indeferida,
-            description: 'Recusadas ou indisponíveis',
+            description: t('reservas.situacao.indeferida'),
             icon: XCircle,
-            iconBg: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+            color: 'text-destructive',
+            iconBg: 'bg-destructive/10 text-destructive',
         },
     ];
 
     const atalhosSecundarios = [
         {
-            label: 'Minhas Reservas',
-            descricao: 'Acompanhe o andamento das suas solicitações',
+            label: t('dashboard.actions.consultar_espacos'),
+            descricao: t('espacos.consultar_espacos_desc'),
+            Icone: CalendarPlus,
+            href: route('espacos.index'),
+        },
+        {
+            label: t('nav.minhas_reservas'),
+            descricao: t('reservas.subtitulo'),
             Icone: ListChecks,
             href: route('reservas.index'),
         },
-        {
-            label: 'Espaços Favoritos',
-            descricao: 'Acesse rapidamente os espaços salvos',
-            Icone: Star,
-            href: route('espacos.favoritos'),
-        },
-    ] as const;
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6">
-                {/* Banner de Boas-Vindas com Gradiente Catppuccin */}
-                <div className="border-border/70 from-primary/15 via-primary/5 to-card relative overflow-hidden rounded-2xl border bg-gradient-to-br p-6 shadow-xs sm:p-8">
+            <Head title={t('dashboard.title')} />
+
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
+                {/* Hero Banner Boas-vindas */}
+                <div className="border-border/80 from-card via-card/80 to-primary/5 relative overflow-hidden rounded-2xl border bg-gradient-to-br p-6 shadow-xs sm:p-8">
                     <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-2">
                             <div className="inline-flex items-center gap-2">
                                 <Badge variant="secondary" className="bg-background/80 text-xs font-medium backdrop-blur-xs">
                                     <Sparkles className="text-primary mr-1 h-3 w-3" />
-                                    Painel do Solicitante
+                                    UniEspaços
                                 </Badge>
                             </div>
-                            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">Olá, {user.name}!</h1>
+                            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">{t('dashboard.welcome', { name: user.name })}</h1>
                             <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
                                 {user.setor
-                                    ? `${user.setor.nome} (${user.setor.sigla}) • Bem-vindo ao UniEspaços`
-                                    : 'Bem-vindo ao UniEspaços! Consulte a disponibilidade e reserve espaços com facilidade.'}
+                                    ? `${user.setor.nome} (${user.setor.sigla}) • ${t('dashboard.welcome_sub')}`
+                                    : `${t('dashboard.welcome_sub')}! ${t('espacos.consultar_espacos_desc')}`}
                             </p>
                         </div>
                         <div className="flex flex-col gap-2.5 sm:flex-row">
@@ -144,14 +146,14 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                                 className="shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 <CalendarPlus className="mr-2 h-5 w-5" />
-                                Reservar um Espaço
+                                {t('dashboard.actions.solicitar_reserva')}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
                     </div>
                 </div>
 
-                {/* Grid de Indicadores de KPIs (Shadcn UI Blocks) */}
+                {/* Grid de Indicadores de KPIs */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {kpiCards.map((kpi) => {
                         const Icon = kpi.icon;
@@ -214,11 +216,11 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                         <TabsList className="grid w-full grid-cols-2 sm:w-[400px]">
                             <TabsTrigger value="reservas">
                                 <ListChecks className="mr-2 h-4 w-4" />
-                                Reservas Recentes
+                                {t('dashboard.tabs.solicitacoes')}
                             </TabsTrigger>
                             <TabsTrigger value="favoritos">
                                 <Star className="mr-2 h-4 w-4" />
-                                Espaços Favoritos ({String(espacosFavoritos.length)})
+                                {t('dashboard.tabs.favoritos')} ({String(espacosFavoritos.length)})
                             </TabsTrigger>
                         </TabsList>
 
@@ -228,7 +230,7 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                             ) : (
                                 <Card>
                                     <CardContent className="text-muted-foreground py-12 text-center text-sm">
-                                        Você ainda não possui reservas cadastradas.
+                                        {t('dashboard.empty.no_reservas')}
                                     </CardContent>
                                 </Card>
                             )}
@@ -245,7 +247,7 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                             ) : (
                                 <Card>
                                     <CardContent className="text-muted-foreground py-12 text-center text-sm">
-                                        Você ainda não favoritou nenhum espaço.
+                                        {t('dashboard.empty.no_favoritos')}
                                     </CardContent>
                                 </Card>
                             )}

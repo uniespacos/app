@@ -13,7 +13,7 @@ export default typescript.config(
         extends: [...typescript.configs.strictTypeChecked, ...typescript.configs.stylisticTypeChecked],
         languageOptions: {
             parserOptions: {
-                project: true,
+                projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
         },

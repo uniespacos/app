@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
@@ -39,6 +40,7 @@ interface FiltroBuscaEspacosProps {
 }
 
 export default function EspacoFiltroBusca({ route: targetRoute, filters, unidades, modulos, andares, capacidadeEspacos }: FiltroBuscaEspacosProps) {
+    const { t } = useTranslation();
     const [localFilters, setLocalFilters] = useState({
         unidade: filters.unidade || 'all',
         modulo: filters.modulo || 'all',
@@ -119,8 +121,22 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
             andar: 'all',
             capacidade: 'qualquer',
         };
+        setLocalFilters(clearedFilters);
         setSearchTerm('');
-        executeFilterChange(clearedFilters, '');
+
+        const targetUrl =
+            targetRoute.startsWith('http://') || targetRoute.startsWith('https://') || targetRoute.startsWith('/') ? targetRoute : route(targetRoute);
+
+        router.get(
+            targetUrl,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['espacos', 'filters'],
+            },
+        );
     };
 
     const handleClearSearch = () => {
@@ -128,39 +144,50 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
         executeFilterChange(localFilters, '');
     };
 
+    const hasActiveFilters = useMemo(() => {
+        return (
+            searchTerm !== '' ||
+            localFilters.unidade !== 'all' ||
+            localFilters.modulo !== 'all' ||
+            localFilters.andar !== 'all' ||
+            localFilters.capacidade !== 'qualquer'
+        );
+    }, [searchTerm, localFilters]);
+
     const activeFilterChips = useMemo(() => {
         const chips: { key: 'unidade' | 'modulo' | 'andar' | 'capacidade'; label: string }[] = [];
 
         if (localFilters.unidade !== 'all') {
             const u = unidades.find((item) => item.id.toString() === localFilters.unidade);
-            chips.push({ key: 'unidade', label: `Unidade: ${u ? u.sigla || u.nome : localFilters.unidade}` });
+            if (u) chips.push({ key: 'unidade', label: t('espacos.filtros.unidade_chip', { sigla: u.sigla }) });
         }
         if (localFilters.modulo !== 'all') {
             const m = modulos.find((item) => item.id.toString() === localFilters.modulo);
-            chips.push({ key: 'modulo', label: `Módulo: ${m ? m.nome : localFilters.modulo}` });
+            if (m) chips.push({ key: 'modulo', label: `${t('espacos.filtros.modulo')}: ${m.nome}` });
         }
         if (localFilters.andar !== 'all') {
             const a = andares.find((item) => item.id.toString() === localFilters.andar);
-            chips.push({
-                key: 'andar',
-                label: `Andar: ${a ? nivelParaLabel(nomeParaNivel(a.nome)) : localFilters.andar}`,
-            });
+            if (a) {
+                const nivel = nomeParaNivel(a.nome);
+                const label = nivelParaLabel(nivel);
+                chips.push({ key: 'andar', label: `${t('espacos.filtros.andar')}: ${label}` });
+            }
         }
         if (localFilters.capacidade !== 'qualquer') {
-            chips.push({ key: 'capacidade', label: `Capacidade: ${localFilters.capacidade} Lugares` });
+            chips.push({ key: 'capacidade', label: t('espacos.capacidade_chip', { capacidade: localFilters.capacidade }) });
         }
 
         return chips;
-    }, [localFilters, unidades, modulos, andares]);
+    }, [localFilters, unidades, modulos, andares, t]);
 
-    const quantidadeFiltrosAtivos = activeFilterChips.length;
-    const hasActiveFilters = quantidadeFiltrosAtivos > 0 || Boolean(searchTerm);
+    const quantidadeFiltrosAtivos = activeFilterChips.length + (searchTerm ? 1 : 0);
 
     const renderFilterSelects = (prefix = '') => (
         <>
+            {/* Filtro Unidade */}
             <div className="space-y-1.5">
                 <Label htmlFor={`${prefix}espacos-unidade`} className="text-muted-foreground text-xs font-medium">
-                    Unidade
+                    {t('espacos.filtros.unidade')}
                 </Label>
                 <Select
                     value={localFilters.unidade}
@@ -169,10 +196,10 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                     }}
                 >
                     <SelectTrigger id={`${prefix}espacos-unidade`} className="w-full">
-                        <SelectValue placeholder="Todas as Unidades" />
+                        <SelectValue placeholder={t('espacos.filtros.todas_unidades')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todas as Unidades</SelectItem>
+                        <SelectItem value="all">{t('espacos.filtros.todas_unidades')}</SelectItem>
                         {unidades.map((unidade) => (
                             <SelectItem key={unidade.id} value={unidade.id.toString()}>
                                 {unidade.nome}
@@ -182,9 +209,10 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 </Select>
             </div>
 
+            {/* Filtro Módulo */}
             <div className="space-y-1.5">
                 <Label htmlFor={`${prefix}espacos-modulo`} className="text-muted-foreground text-xs font-medium">
-                    Módulo
+                    {t('espacos.filtros.modulo')}
                 </Label>
                 <Select
                     value={localFilters.modulo}
@@ -194,10 +222,10 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                     disabled={localFilters.unidade === 'all'}
                 >
                     <SelectTrigger id={`${prefix}espacos-modulo`} className="w-full">
-                        <SelectValue placeholder="Todos os Módulos" />
+                        <SelectValue placeholder={t('espacos.filtros.todos_modulos')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos os Módulos</SelectItem>
+                        <SelectItem value="all">{t('espacos.filtros.todos_modulos')}</SelectItem>
                         {filteredModulos.map((modulo) => (
                             <SelectItem key={modulo.id} value={modulo.id.toString()}>
                                 {modulo.nome}
@@ -207,9 +235,10 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 </Select>
             </div>
 
+            {/* Filtro Andar */}
             <div className="space-y-1.5">
                 <Label htmlFor={`${prefix}espacos-andar`} className="text-muted-foreground text-xs font-medium">
-                    Andar
+                    {t('espacos.filtros.andar')}
                 </Label>
                 <Select
                     value={localFilters.andar}
@@ -219,22 +248,27 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                     disabled={localFilters.modulo === 'all'}
                 >
                     <SelectTrigger id={`${prefix}espacos-andar`} className="w-full">
-                        <SelectValue placeholder="Todos os Andares" />
+                        <SelectValue placeholder={t('espacos.filtros.todos_andares')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos os Andares</SelectItem>
-                        {filteredAndares.map((andar) => (
-                            <SelectItem key={andar.id} value={andar.id.toString()}>
-                                {nivelParaLabel(nomeParaNivel(andar.nome))}
-                            </SelectItem>
-                        ))}
+                        <SelectItem value="all">{t('espacos.filtros.todos_andares')}</SelectItem>
+                        {filteredAndares.map((andar) => {
+                            const nivel = nomeParaNivel(andar.nome);
+                            const label = nivelParaLabel(nivel);
+                            return (
+                                <SelectItem key={andar.id} value={andar.id.toString()}>
+                                    {label}
+                                </SelectItem>
+                            );
+                        })}
                     </SelectContent>
                 </Select>
             </div>
 
+            {/* Filtro Capacidade */}
             <div className="space-y-1.5">
                 <Label htmlFor={`${prefix}espacos-capacidade`} className="text-muted-foreground text-xs font-medium">
-                    Capacidade
+                    {t('espacos.capacidade_minima')}
                 </Label>
                 <Select
                     value={localFilters.capacidade}
@@ -243,13 +277,13 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                     }}
                 >
                     <SelectTrigger id={`${prefix}espacos-capacidade`} className="w-full">
-                        <SelectValue placeholder="Qualquer capacidade" />
+                        <SelectValue placeholder={t('espacos.filtros.qualquer_capacidade')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="qualquer">Qualquer</SelectItem>
+                        <SelectItem value="qualquer">{t('espacos.filtros.qualquer')}</SelectItem>
                         {capacidadeEspacos.map((capacidade) => (
                             <SelectItem key={capacidade} value={capacidade.toString()}>
-                                {capacidade} Lugares
+                                {capacidade} {t('espacos.filtros.lugares')}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -265,12 +299,12 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1">
                         <Label htmlFor="espacos-busca" className="sr-only">
-                            Buscar
+                            {t('common.actions.search')}
                         </Label>
                         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <Input
                             id="espacos-busca"
-                            placeholder="Buscar por nome do espaço, andar ou módulo..."
+                            placeholder={t('espacos.filtros.buscar')}
                             className="pr-9 pl-9"
                             value={searchTerm}
                             onChange={(e) => {
@@ -294,7 +328,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                         <DrawerTrigger asChild>
                             <Button variant="outline" className="relative flex items-center gap-2 md:hidden">
                                 <SlidersHorizontal className="h-4 w-4" />
-                                <span>Filtros</span>
+                                <span>{t('espacos.filtros.filtros_button')}</span>
                                 {quantidadeFiltrosAtivos > 0 && (
                                     <Badge className="bg-primary text-primary-foreground h-5 min-w-5 justify-center rounded-full px-1 text-xs">
                                         {quantidadeFiltrosAtivos}
@@ -304,13 +338,13 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                         </DrawerTrigger>
                         <DrawerContent>
                             <DrawerHeader>
-                                <DrawerTitle>Filtros de Espaços</DrawerTitle>
-                                <DrawerDescription>Refine os espaços por unidade, módulo, andar ou capacidade</DrawerDescription>
+                                <DrawerTitle>{t('common.actions.filter')}</DrawerTitle>
+                                <DrawerDescription>{t('espacos.consultar_espacos_desc')}</DrawerDescription>
                             </DrawerHeader>
                             <div className="max-h-[60vh] space-y-4 overflow-y-auto p-4">{renderFilterSelects('mobile-')}</div>
                             <DrawerFooter>
                                 <DrawerClose asChild>
-                                    <Button className="w-full">Aplicar Filtros</Button>
+                                    <Button className="w-full">{t('common.actions.filter')}</Button>
                                 </DrawerClose>
                                 {hasActiveFilters && (
                                     <Button
@@ -321,7 +355,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                                         }}
                                         className="w-full"
                                     >
-                                        Limpar Filtros
+                                        {t('espacos.limpar_filtros')}
                                     </Button>
                                 )}
                             </DrawerFooter>
@@ -332,16 +366,16 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 {/* Filtros em Grid no Desktop (>= md) */}
                 <div className="hidden grid-cols-2 gap-4 md:grid lg:grid-cols-4">{renderFilterSelects('desktop-')}</div>
 
-                {/* Pílulas de Filtros Ativos (Active Filter Chips) */}
+                {/* Pílulas de Filtros Ativos */}
                 {hasActiveFilters && (
                     <div className="border-border/40 flex flex-wrap items-center gap-2 border-t pt-3">
-                        <span className="text-muted-foreground text-xs">Filtros ativos:</span>
+                        <span className="text-muted-foreground text-xs">{t('espacos.filtros.filtros_ativos')}</span>
                         {searchTerm && (
                             <Badge
                                 variant="secondary"
                                 className="bg-secondary text-secondary-foreground flex items-center gap-1.5 px-2.5 py-1 text-xs font-normal"
                             >
-                                <span>Busca: &ldquo;{searchTerm}&rdquo;</span>
+                                <span>{t('espacos.filtros.busca_chip', { query: searchTerm })}</span>
                                 <button
                                     type="button"
                                     onClick={handleClearSearch}
@@ -378,7 +412,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                             className="text-muted-foreground hover:text-foreground h-7 gap-1 px-2 text-xs"
                         >
                             <RotateCcw className="h-3 w-3" />
-                            Limpar tudo
+                            {t('espacos.filtros.limpar_tudo')}
                         </Button>
                     </div>
                 )}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
+import { useTranslation } from '@/i18n';
 import { hasPermission } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
@@ -34,6 +35,7 @@ export default function EspacoCard({
     handleExcluirEspaco,
     showFavoritar = true,
 }: CardEspacoProps) {
+    const { t } = useTranslation();
     const [isFavorited, setIsFavorited] = useState<boolean>(espaco.is_favorited_by_user ?? false);
     const [processing, setProcessing] = useState(false);
 
@@ -160,8 +162,8 @@ export default function EspacoCard({
                         type="button"
                         onClick={handleFavoritarEspaco}
                         disabled={processing}
-                        title={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
-                        aria-label={isFavorited ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
+                        title={isFavorited ? t('espacos.card.desfavoritar') : t('espacos.card.favorito')}
+                        aria-label={isFavorited ? t('espacos.card.desfavoritar') : t('espacos.card.favorito')}
                         className={cn(
                             'absolute top-2.5 right-2.5 z-10 flex h-11 min-h-[44px] w-11 min-w-[44px] items-center justify-center rounded-full',
                             'bg-background/85 hover:bg-background shadow-sm backdrop-blur-md transition-transform active:scale-90',
@@ -181,7 +183,7 @@ export default function EspacoCard({
                 </CardTitle>
                 <div className="text-muted-foreground flex items-center gap-1.5 truncate text-xs">
                     <MapPin className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{modulo ? `${modulo} • ${andarLabel ?? 'Térreo'}` : 'Localização não informada'}</span>
+                    <span className="truncate">{modulo ? `${modulo} • ${andarLabel ?? 'Térreo'}` : t('common.status.unknown')}</span>
                 </div>
             </CardHeader>
 
@@ -190,7 +192,9 @@ export default function EspacoCard({
                 <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
                     <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-medium">
                         <Users className="h-3.5 w-3.5 shrink-0" />
-                        {espaco.capacidade_pessoas} {espaco.capacidade_pessoas === 1 ? 'pessoa' : 'pessoas'}
+                        {espaco.capacidade_pessoas === 1
+                            ? t('espacos.pessoa')
+                            : t('espacos.pessoas', { count: String(espaco.capacidade_pessoas) })}
                     </span>
                     {andarLabel && (
                         <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-medium">
@@ -205,15 +209,15 @@ export default function EspacoCard({
             {isModoGerenciamento ? (
                 <CardFooter className="border-border/60 bg-muted/20 flex flex-wrap items-center justify-end gap-2 border-t p-3">
                     <Button variant="outline" size="sm" onClick={() => handleSolicitarReserva?.(String(espaco.id))}>
-                        Detalhes
+                        {t('common.actions.details')}
                     </Button>
                     <Button variant="secondary" size="sm" onClick={() => handleEditarEspaco?.(String(espaco.id))}>
                         <Edit className="mr-1.5 h-3.5 w-3.5" />
-                        Editar
+                        {t('common.actions.edit')}
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
                         <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                        Excluir
+                        {t('common.actions.delete')}
                     </Button>
                 </CardFooter>
             ) : (
@@ -229,7 +233,7 @@ export default function EspacoCard({
                             }
                         }}
                     >
-                        <span>Consultar horários</span>
+                        <span>{t('espacos.card.consultar_horarios')}</span>
                         <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </CardFooter>

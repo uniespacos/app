@@ -1,7 +1,11 @@
 import { comSituacaoEfetivaDoGestor } from '@/lib/utils/reserva-helpers';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { PERMISSION_RESERVAS_AVALIAR } from '@/constants/permissions';
+import { SituacaoReserva } from '@/contracts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from '@/i18n';
+import { Can, useCan } from '@/lib/auth-can';
 import { formatDate } from '@/lib/utils';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
@@ -12,7 +16,6 @@ import { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { Edit, FileText, MoreHorizontal, XCircle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -28,15 +31,19 @@ interface ReservasListProps {
 }
 
 export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName, viewMode: controlledViewMode }: ReservasListProps) {
+    const { t } = useTranslation();
     const { data: reservas, links } = paginator;
     const isMobile = useIsMobile();
     const [internalViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
     const viewMode = controlledViewMode ?? internalViewMode;
 
+    const canAvaliar = useCan({ permission: PERMISSION_RESERVAS_AVALIAR });
+    const isModoGestor = isGestor || canAvaliar;
+
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
 
-    const reservasFiltradas = useMemo(() => (isGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas), [isGestor, reservas]);
+    const reservasFiltradas = useMemo(() => (isModoGestor ? comSituacaoEfetivaDoGestor(reservas) : reservas), [isModoGestor, reservas]);
 
     useEffect(() => {
         if (reservaToShow) {
@@ -55,12 +62,10 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     };
 
     const handleAbrirDetalhes = (reserva: Reserva) => {
+        setSelectedReserva(reserva);
         router.get(
             route(routeName),
-            {
-                reserva: reserva.id,
-                semana: format(new Date(reserva.data_inicial), 'yyyy-MM-dd'),
-            },
+            { reserva: reserva.id },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -83,9 +88,9 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     };
 
     const renderActions = (reserva: Reserva) => {
-        const canEdit = !isGestor && reserva.situacao !== 'inativa' && (reserva.can_update ?? false);
-        const canCancel = !isGestor && reserva.situacao !== 'inativa';
-        const isGestorEvaluable = isGestor && reserva.situacao !== 'inativa';
+        const canEdit = !isModoGestor && reserva.situacao !== SituacaoReserva.INATIVA && (reserva.can_update ?? false);
+        const canCancel = !isModoGestor && reserva.situacao !== SituacaoReserva.INATIVA;
+        const isGestorEvaluable = isModoGestor && reserva.situacao !== SituacaoReserva.INATIVA;
 
         return (
             <div className="flex items-center justify-end gap-1.5">
@@ -98,21 +103,35 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                     }}
                 >
                     <FileText className="h-3.5 w-3.5" />
-                    Detalhes
+                    {t('reservas.acoes.ver_detalhes')}
                 </Button>
 
                 {isGestorEvaluable && (
-                    <Button
-                        variant="default"
-                        size="sm"
-                        className="h-8 gap-1 px-2.5 text-xs font-medium"
-                        onClick={() => {
-                            handleAvaliarButton(reserva.id);
-                        }}
-                    >
-                        <Edit className="h-3.5 w-3.5" />
-                        {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
-                    </Button>
+                    <Can permission={PERMISSION_RESERVAS_AVALIAR} fallback={
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="h-8 gap-1 px-2.5 text-xs font-medium"
+                            onClick={() => {
+                                handleAvaliarButton(reserva.id);
+                            }}
+                        >
+                            <Edit className="h-3.5 w-3.5" />
+                            {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
+                        </Button>
+                    }>
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="h-8 gap-1 px-2.5 text-xs font-medium"
+                            onClick={() => {
+                                handleAvaliarButton(reserva.id);
+                            }}
+                        >
+                            <Edit className="h-3.5 w-3.5" />
+                            {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
+                        </Button>
+                    </Can>
                 )}
 
                 {(canEdit || canCancel) && (
@@ -120,7 +139,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
                                 <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Mais ações</span>
+                                <span className="sr-only">{t('reservas.tabela.acoes')}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -131,7 +150,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     }}
                                 >
                                     <Edit className="mr-2 h-4 w-4" />
-                                    Editar
+                                    {t('reservas.acoes.editar')}
                                 </DropdownMenuItem>
                             )}
                             {canCancel && (
@@ -142,7 +161,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     className="text-destructive focus:text-destructive"
                                 >
                                     <XCircle className="mr-2 h-4 w-4" />
-                                    Cancelar
+                                    {t('reservas.acoes.cancelar')}
                                 </DropdownMenuItem>
                             )}
                         </DropdownMenuContent>
@@ -154,7 +173,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
 
     const columns: ColumnDef<Reserva>[] = [
         {
-            header: 'Título',
+            header: t('reservas.tabela.espaco'),
             className: 'min-w-[180px]',
             cell: (reserva) => (
                 <div className="min-w-0 space-y-0.5">
@@ -166,21 +185,21 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                             {reserva.descricao}
                         </p>
                     ) : null}
-                    {isGestor && reserva.user ? (
+                    {isModoGestor && reserva.user ? (
                         <p className="text-muted-foreground truncate text-xs">
-                            <span className="font-medium">Solicitante:</span> {reserva.user.name}
+                            <span className="font-medium">{t('reservas.tabela.solicitante')}:</span> {reserva.user.name}
                         </p>
                     ) : null}
                 </div>
             ),
         },
         {
-            header: 'Local',
+            header: t('espacos.titulo'),
             className: 'min-w-[160px]',
             cell: (reserva) => <LocalReserva espaco={reserva.horarios[0]?.agenda?.espaco} />,
         },
         {
-            header: 'Período',
+            header: t('reservas.tabela.data_solicitacao'),
             className: 'min-w-[130px] whitespace-nowrap',
             cell: (reserva) => (
                 <div className="text-sm">
@@ -192,7 +211,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
             ),
         },
         {
-            header: 'Situação',
+            header: t('reservas.tabela.situacao'),
             align: 'center',
             className: 'w-[150px]',
             cell: (reserva) => <SituacaoBadge situacao={reserva.situacao} />,
@@ -203,7 +222,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
         <ReservaCardMobile
             key={reserva.id}
             reserva={reserva}
-            isGestor={isGestor}
+            isGestor={isModoGestor}
             onDetalhes={handleAbrirDetalhes}
             onAvaliar={handleAvaliarButton}
             onEditar={(id) => {
@@ -228,13 +247,13 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
 
             {selectedReserva && (
                 <ReservaDetalhes
-                    isOpen={!!selectedReserva}
+                    isOpen={Boolean(selectedReserva)}
                     onOpenChange={(open) => {
                         if (!open) {
                             handleFecharDetalhes();
                         }
                     }}
-                    isGestor={isGestor}
+                    isGestor={isModoGestor}
                     selectedReserva={selectedReserva}
                     setRemoverReserva={setRemoverReserva}
                     routeName={routeName}

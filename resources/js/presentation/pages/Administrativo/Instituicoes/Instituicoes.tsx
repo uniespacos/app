@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
@@ -24,6 +25,7 @@ const columns: ColumnDef<Instituicao>[] = [
 ];
 
 export default function InstituicoesPage() {
+    const { t } = useTranslation();
     const { instituicoes, filters } = usePage<{
         instituicoes: {
             data: Instituicao[];
@@ -41,18 +43,18 @@ export default function InstituicoesPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Instituições" />
+            <Head title={t('admin.instituicoes.titulo')} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo="Gerenciar Instituições"
-                    descricao="Aqui você consegue gerenciar as instituicoes cadastradas"
-                    buttonText="Criar Nova"
+                    titulo={t('admin.instituicoes.titulo')}
+                    descricao={t('admin.instituicoes.desc')}
+                    buttonText={t('admin.instituicoes.novo')}
                     buttonLink={route('institucional.instituicoes.create')}
                     ButtonIcon={PlusCircle}
                     canSeeButton={true}
                 />
-                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder="Buscar por nome ou sigla" variant="card" />
+                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder={t('common.actions.search')} variant="card" />
                 <DataTable
                     data={instituicoes.data}
                     columns={columns}
@@ -60,13 +62,13 @@ export default function InstituicoesPage() {
                     enableColumnVisibility={true}
                     pagination={{ links: instituicoes.links }}
                     emptyState={{
-                        title: 'Nenhuma instituição encontrada',
-                        description: 'Tente ajustar sua busca ou cadastre uma nova instituição.',
+                        title: t('admin.instituicoes.nenhuma'),
+                        description: t('common.empty.adjustFilter'),
                     }}
                     actions={(instituicao) => (
                         <div className="flex justify-end gap-2">
                             <Link href={route('institucional.instituicoes.edit', { instituico: instituicao.id })}>
-                                <Button variant="outline" size="icon" aria-label="Editar instituição">
+                                <Button variant="outline" size="icon" aria-label={t('common.actions.edit')}>
                                     <FilePenLine className="h-4 w-4" />
                                 </Button>
                             </Link>
@@ -76,7 +78,7 @@ export default function InstituicoesPage() {
                                 onClick={() => {
                                     setRemoverInstituicao(instituicao);
                                 }}
-                                aria-label="Excluir instituição"
+                                aria-label={t('common.actions.delete')}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>

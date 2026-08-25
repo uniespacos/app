@@ -50,14 +50,14 @@ export function useGerarRelatorio(endpoint: string) {
                 let errorMessage = 'Erro ao gerar relatório.';
                 try {
                     const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
+                    if (contentType?.includes('application/json')) {
                         const data = (await response.json()) as { message?: string; error?: string };
-                        errorMessage = data.message || data.error || errorMessage;
+                        errorMessage = data.message ?? data.error ?? errorMessage;
                     } else {
                         const text = await response.text();
                         // Se o backend retornar texto simples ou HTML, extrai a mensagem limpa
-                        const match = text.match(/<title>(.*?)<\/title>/i) || text.match(/class="[^"]*message[^"]*">([^<]+)</i);
-                        if (match && match[1]) {
+                        const match = /<title>(.*?)<\/title>/i.exec(text) ?? /class="[^"]*message[^"]*">([^<]+)</i.exec(text);
+                        if (match?.[1]) {
                             errorMessage = match[1].trim();
                         } else if (text.length < 200) {
                             errorMessage = text.trim();
@@ -78,7 +78,7 @@ export function useGerarRelatorio(endpoint: string) {
 
             if (contentDisposition) {
                 const match = /filename\*?=(?:UTF-8\x27\x27)?"?([^";]+)"?/i.exec(contentDisposition);
-                if (match && match[1]) {
+                if (match?.[1]) {
                     filename = decodeURIComponent(match[1].trim());
                 }
             }

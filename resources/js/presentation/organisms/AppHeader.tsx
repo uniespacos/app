@@ -9,6 +9,7 @@ import AppLogoIcon from '@/presentation/atoms/AppLogoIcon';
 import { Icon } from '@/presentation/atoms/Icon';
 import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Breadcrumbs } from '@/presentation/molecules/Breadcrumbs';
+import { LanguageSelector } from '@/presentation/molecules/LanguageSelector';
 import { UserMenuContent } from '@/presentation/molecules/UserMenuContent';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -16,7 +17,7 @@ import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Painel',
         href: '/dashboard',
         icon: LayoutGrid,
     },
@@ -24,18 +25,18 @@ const mainNavItems: NavItem[] = [
 
 const rightNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: 'Repositório',
+        href: 'https://github.com/phplemos/uniespacos',
         icon: Folder,
     },
     {
-        title: 'Documentation',
+        title: 'Documentação',
         href: 'https://laravel.com/docs/starter-kits',
         icon: BookOpen,
     },
 ];
 
-const activeItemStyles = 'text-foreground dark:bg-accent';
+const activeItemStyles = 'text-neutral-900 dark:text-neutral-100';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
@@ -44,6 +45,7 @@ interface AppHeaderProps {
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
+
     return (
         <>
             <div className="border-sidebar-border/80 border-b">
@@ -125,6 +127,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
+                            <LanguageSelector />
                             <div className="hidden lg:flex">
                                 {rightNavItems.map((item) => (
                                     <TooltipProvider key={item.title} delayDuration={0}>

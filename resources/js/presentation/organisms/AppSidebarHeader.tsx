@@ -1,6 +1,7 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import AppLogoIcon from '@/presentation/atoms/AppLogoIcon';
 import { Breadcrumbs } from '@/presentation/molecules/Breadcrumbs';
+import { LanguageSelector } from '@/presentation/molecules/LanguageSelector';
 import { NotificationDropdown } from '@/presentation/organisms/NotificationDropdown';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -20,7 +21,10 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                     </div>
                 </div>
 
-                <NotificationDropdown />
+                <div className="flex items-center gap-2">
+                    <LanguageSelector />
+                    <NotificationDropdown />
+                </div>
             </div>
         </header>
     );

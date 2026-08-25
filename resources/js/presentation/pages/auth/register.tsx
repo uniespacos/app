@@ -5,8 +5,10 @@ import { Instituicao } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type React from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function Register() {
+    const { t } = useTranslation();
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;
     const [showModal, setShowModal] = useState(false);
 
@@ -37,11 +39,11 @@ export default function Register() {
 
     return (
         <AuthLayout
-            title="Criar Conta Institucional"
-            description="Preencha as informações abaixo para solicitar seu acesso ao UniEspaços"
+            title={t('auth.register.header_title')}
+            description={t('auth.register.header_desc')}
             maxWidth="2xl"
         >
-            <Head title="Criar conta" />
+            <Head title={t('auth.register.head_title')} />
 
             <FormRegistroUsuario
                 data={data}
@@ -53,9 +55,9 @@ export default function Register() {
             />
 
             <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
-                Já possui uma conta institucional?{' '}
+                {t('auth.register.has_account_text')}{' '}
                 <Link href={route('login')} className="text-primary font-medium underline-offset-4 hover:underline">
-                    Fazer login
+                    {t('auth.register.do_login')}
                 </Link>
             </div>
 

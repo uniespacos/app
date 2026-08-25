@@ -5,11 +5,13 @@ import { SyntheticEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
 import TextLink from '@/presentation/atoms/TextLink';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm<Required<{ email: string }>>({
         email: '',
     });
@@ -21,11 +23,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     return (
         <AuthLayout
-            title="Recuperação de Senha"
-            description="Digite seu e-mail institucional para receber um link de redefinição seguro"
+            title={t('auth.forgotPassword.header_title')}
+            description={t('auth.forgotPassword.header_desc')}
             maxWidth="md"
         >
-            <Head title="Recuperação de senha" />
+            <Head title={t('auth.forgotPassword.head_title')} />
 
             {status && (
                 <div className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium">
@@ -35,7 +37,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="email">E-mail Institucional</Label>
+                    <Label htmlFor="email">{t('auth.forgotPassword.email_institutional')}</Label>
                     <Input
                         id="email"
                         type="email"
@@ -46,7 +48,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         onChange={(e) => {
                             setData('email', e.target.value);
                         }}
-                        placeholder="seu@uesb.edu.br"
+                        placeholder={t('auth.forgotPassword.email_placeholder')}
                         className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                         disabled={processing}
                     />
@@ -57,17 +59,17 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     {processing ? (
                         <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Enviando link...
+                            {t('auth.forgotPassword.sending')}
                         </>
                     ) : (
-                        'Enviar Link de Redefinição'
+                        t('auth.forgotPassword.submit_button')
                     )}
                 </Button>
 
                 <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
-                    Lembrou da senha?{' '}
+                    {t('auth.forgotPassword.remembered_password')}{' '}
                     <TextLink href={route('login')} className="text-primary font-medium">
-                        Voltar para o login
+                        {t('auth.forgotPassword.back_to_login')}
                     </TextLink>
                 </div>
             </form>

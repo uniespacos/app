@@ -1,30 +1,38 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation, type TranslationKey } from '@/i18n';
 import { cn } from '@/lib/utils';
 import Heading from '@/presentation/atoms/Heading';
-import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
+interface SettingsNavItem {
+    title: string;
+    titleKey: TranslationKey;
+    href: string;
+}
+
+const sidebarNavItems: SettingsNavItem[] = [
     {
         title: 'Perfil',
+        titleKey: 'settings.nav.profile',
         href: '/settings/profile',
-        icon: null,
     },
     {
         title: 'Senha',
+        titleKey: 'settings.nav.password',
         href: '/settings/password',
-        icon: null,
     },
     {
         title: 'Aparência',
+        titleKey: 'settings.nav.appearance',
         href: '/settings/appearance',
-        icon: null,
     },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { t } = useTranslation();
+
     if (typeof window === 'undefined') {
         return null;
     }
@@ -33,7 +41,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Configurações" description="Gerencie as configurações do seu perfil e conta" />
+            <Heading title={t('settings.titulo')} description={t('settings.subtitulo')} />
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
@@ -49,7 +57,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 })}
                             >
                                 <Link href={item.href} prefetch>
-                                    {item.title}
+                                    {t(item.titleKey)}
                                 </Link>
                             </Button>
                         ))}

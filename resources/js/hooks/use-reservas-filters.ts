@@ -1,3 +1,10 @@
+import {
+    ModoArquivo,
+    type ModoArquivoType,
+    OrdenacaoReserva,
+    type OrdenacaoReservaType,
+    type SituacaoReservaType,
+} from '@/contracts';
 import { useDebounce } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -9,15 +16,22 @@ const PROPS_DA_LISTAGEM = ['reservas', 'filters', 'reservaToShow', 'semana'];
 
 export interface UseReservasFiltersProps {
     routeName: 'reservas.index' | 'gestor.reservas.index';
-    initialFilters: { search?: string; situacao?: string; arquivo?: string; ordenar?: string };
+    initialFilters: {
+        search?: string;
+        situacao?: SituacaoReservaType | '';
+        arquivo?: ModoArquivoType;
+        ordenar?: OrdenacaoReservaType;
+    };
     initialSemana: { referencia: string };
 }
 
 export function useReservasFilters({ routeName, initialFilters, initialSemana }: UseReservasFiltersProps) {
-    const [searchTerm, setSearchTerm] = useState(initialFilters.search ?? '');
-    const [selectedSituacao, setSelectedSituacao] = useState(initialFilters.situacao ?? '');
-    const [selectedArquivo, setSelectedArquivo] = useState(initialFilters.arquivo ?? 'ativas');
-    const [selectedOrdenar, setSelectedOrdenar] = useState(initialFilters.ordenar ?? 'data_solicitacao');
+    const [searchTerm, setSearchTerm] = useState<string>(initialFilters.search ?? '');
+    const [selectedSituacao, setSelectedSituacao] = useState<SituacaoReservaType | ''>(initialFilters.situacao ?? '');
+    const [selectedArquivo, setSelectedArquivo] = useState<ModoArquivoType>(initialFilters.arquivo ?? ModoArquivo.ATIVAS);
+    const [selectedOrdenar, setSelectedOrdenar] = useState<OrdenacaoReservaType>(
+        initialFilters.ordenar ?? OrdenacaoReserva.DATA_SOLICITACAO,
+    );
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(initialSemana.referencia + 'T12:00:00'));
     const debouncedSearch = useDebounce(searchTerm, 500);
     const isInitialMount = useRef(true);
@@ -31,8 +45,8 @@ export function useReservasFilters({ routeName, initialFilters, initialSemana }:
         const params: Record<string, string | undefined> = {
             search: debouncedSearch || undefined,
             situacao: selectedSituacao || undefined,
-            arquivo: selectedArquivo && selectedArquivo !== 'ativas' ? selectedArquivo : undefined,
-            ordenar: selectedOrdenar && selectedOrdenar !== 'data_solicitacao' ? selectedOrdenar : undefined,
+            arquivo: selectedArquivo !== ModoArquivo.ATIVAS ? selectedArquivo : undefined,
+            ordenar: selectedOrdenar !== OrdenacaoReserva.DATA_SOLICITACAO ? selectedOrdenar : undefined,
             semana: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined,
         };
 

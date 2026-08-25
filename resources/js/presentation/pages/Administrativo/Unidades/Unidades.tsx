@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
@@ -24,6 +25,7 @@ const columns: ColumnDef<Unidade>[] = [
 ];
 
 export default function UnidadesPage() {
+    const { t } = useTranslation();
     const { unidades, filters } = usePage<{
         unidades: {
             data: Unidade[];
@@ -42,18 +44,18 @@ export default function UnidadesPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Unidades" />
+            <Head title={t('admin.unidades.titulo')} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo="Gerenciar Unidades"
-                    descricao="Aqui você consegue gerenciar as unidades cadastradas"
-                    buttonText="Criar nova"
+                    titulo={t('admin.unidades.titulo')}
+                    descricao={t('admin.unidades.desc')}
+                    buttonText={t('admin.unidades.novo')}
                     buttonLink={route('institucional.unidades.create')}
                     ButtonIcon={PlusCircle}
                     canSeeButton={true}
                 />
-                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder="Buscar por nome ou sigla" variant="card" />
+                <SearchFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} placeholder={t('common.actions.search')} variant="card" />
                 <DataTable
                     data={unidades.data}
                     columns={columns}
@@ -61,13 +63,13 @@ export default function UnidadesPage() {
                     enableColumnVisibility={true}
                     pagination={{ links: unidades.links }}
                     emptyState={{
-                        title: 'Nenhuma unidade encontrada',
-                        description: 'Tente ajustar sua busca ou cadastre uma nova unidade.',
+                        title: t('admin.unidades.nenhuma'),
+                        description: t('common.empty.adjustFilter'),
                     }}
                     actions={(unidade) => (
                         <div className="flex justify-end gap-2">
                             <Link href={route('institucional.unidades.edit', { unidade: unidade.id })}>
-                                <Button variant="outline" size="icon" aria-label="Editar unidade">
+                                <Button variant="outline" size="icon" aria-label={t('common.actions.edit')}>
                                     <FilePenLine className="h-4 w-4" />
                                 </Button>
                             </Link>
@@ -77,7 +79,7 @@ export default function UnidadesPage() {
                                 onClick={() => {
                                     setRemoverUnidade(unidade);
                                 }}
-                                aria-label="Excluir unidade"
+                                aria-label={t('common.actions.delete')}
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>

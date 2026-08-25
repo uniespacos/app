@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import PaginacaoListas from '@/presentation/molecules/PaginacaoListas';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
@@ -13,6 +14,7 @@ const breadcrumbs = [
 ];
 
 export default function FavoritosPage() {
+    const { t } = useTranslation();
     const {
         favoritos: { data: espacosFavoritos, links },
         user,
@@ -31,9 +33,9 @@ export default function FavoritosPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Meus Favoritos" />
+            <Head title={t('espacos.favoritos_titulo')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <GenericHeader titulo="Meus Espaços Favoritos" descricao="Aqui você encontra todos os espaços que você marcou como favoritos." />
+                <GenericHeader titulo={t('espacos.favoritos_titulo')} descricao={t('espacos.favoritos_desc')} />
 
                 {espacosFavoritos.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -43,9 +45,9 @@ export default function FavoritosPage() {
                     </div>
                 ) : (
                     <div className="text-muted-foreground py-10 text-center">
-                        <p>Você ainda não favoritou nenhum espaço. Explore e adicione seus favoritos!</p>
-                        <Link href={route('espacos.index')} className="text-info-accent mt-4 block hover:underline">
-                            Ver todos os espaços
+                        <p>{t('espacos.sem_favoritos_desc')}</p>
+                        <Link href={route('espacos.index')} className="text-primary mt-4 block hover:underline">
+                            {t('espacos.consultar_espacos')}
                         </Link>
                     </div>
                 )}

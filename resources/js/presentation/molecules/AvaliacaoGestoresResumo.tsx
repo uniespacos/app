@@ -1,4 +1,6 @@
 import { TURNO_LABEL, type Turno } from '@/constants/turnos';
+import { SituacaoReserva } from '@/contracts';
+import { useTranslation } from '@/i18n';
 import { cn } from '@/lib/utils';
 import { Horario } from '@/types';
 import { CheckCircle2, Clock } from 'lucide-react';
@@ -18,6 +20,8 @@ interface ResumoTurno {
 }
 
 export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresResumoProps) {
+    const { t } = useTranslation();
+
     const resumos = useMemo(() => {
         const porAgenda = new Map<number, ResumoTurno>();
 
@@ -30,14 +34,14 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
             const atual = porAgenda.get(agenda.id) ?? {
                 agendaId: agenda.id,
                 turno: agenda.turno,
-                gestor: agenda.user?.name ?? 'Gestor não definido',
+                gestor: agenda.user?.name ?? t('reservas.detalhes.gestor_nao_definido'),
                 total: 0,
                 avaliados: 0,
                 avaliadoPor: [],
             };
 
             atual.total += 1;
-            if (horario.situacao !== 'em_analise') {
+            if (horario.situacao !== SituacaoReserva.EM_ANALISE) {
                 atual.avaliados += 1;
                 if (horario.avaliador && !atual.avaliadoPor.includes(horario.avaliador.name)) {
                     atual.avaliadoPor.push(horario.avaliador.name);
@@ -48,7 +52,7 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
         });
 
         return [...porAgenda.values()].sort((a, b) => a.turno.localeCompare(b.turno));
-    }, [horarios]);
+    }, [horarios, t]);
 
     if (resumos.length === 0) {
         return null;
@@ -56,7 +60,7 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
 
     return (
         <div className="space-y-2">
-            <h4 className="text-foreground font-medium">Avaliação dos gestores</h4>
+            <h4 className="text-foreground font-medium">{t('reservas.detalhes.avaliacao_gestores')}</h4>
             <ul className="flex flex-col flex-wrap gap-2 sm:flex-row">
                 {resumos.map((resumo) => {
                     const completo = resumo.avaliados === resumo.total;
@@ -81,9 +85,9 @@ export default function AvaliacaoGestoresResumo({ horarios }: AvaliacaoGestoresR
                                 <p className={cn('text-xs font-semibold', completo ? 'text-success-accent' : 'text-warning-accent')}>
                                     {completo
                                         ? resumo.avaliadoPor.length > 0
-                                            ? `Avaliado por ${resumo.avaliadoPor.join(', ')}`
-                                            : 'Avaliado'
-                                        : `Aguardando — ${resumo.avaliados}/${resumo.total} horários`}
+                                            ? `${t('reservas.situacao.deferida')} (${resumo.avaliadoPor.join(', ')})`
+                                            : t('common.status.completed')
+                                        : `${t('reservas.situacao.em_analise')} — ${resumo.avaliados}/${resumo.total}`}
                                 </p>
                             </div>
                         </li>

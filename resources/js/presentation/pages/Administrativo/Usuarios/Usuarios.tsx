@@ -5,7 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ROLE_COMUM } from '@/constants/permissions';
+import { getRoleBadgeClass, getRoleLabel } from '@/constants/role-labels';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import { cn } from '@/lib/utils';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
@@ -27,38 +30,8 @@ const breadcrumbs = [
     },
 ];
 
-const ROLE_COMUM = 'usuario';
-
-const getRoleBadgeClass = (role: string) => {
-    switch (role.toLowerCase()) {
-        case 'super-admin':
-        case 'administrador':
-            return 'bg-destructive-subtle text-destructive border-destructive/25';
-        case 'gestor':
-            return 'bg-info-subtle text-info-accent border-info/25';
-        case 'usuario':
-            return 'bg-secondary text-secondary-foreground border-border';
-        default:
-            return 'bg-muted text-muted-foreground border-border';
-    }
-};
-
-const getRoleLabel = (role: string) => {
-    switch (role.toLowerCase()) {
-        case 'super-admin':
-            return 'Super Admin';
-        case 'administrador':
-            return 'Administrador';
-        case 'gestor':
-            return 'Gestor';
-        case 'usuario':
-            return 'Usuário';
-        default:
-            return role;
-    }
-};
-
 export default function UsuariosPage() {
+    const { t } = useTranslation();
     const { users, setores, filters } = usePage<{
         users: {
             data: User[];
@@ -132,32 +105,24 @@ export default function UsuariosPage() {
     const renderUserActions = (user: User) => (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Ações do usuário">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                     <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    onClick={() => {
-                        handleOpenEditModal(user);
-                    }}
-                >
+                <DropdownMenuItem onClick={() => { handleOpenEditModal(user); }}>
                     <Edit className="mr-2 h-4 w-4" />
-                    Editar Dados
+                    Editar
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => {
-                        handleOpenPermissionModal(user);
-                    }}
-                >
+                <DropdownMenuItem onClick={() => { handleOpenPermissionModal(user); }}>
                     <Key className="mr-2 h-4 w-4" />
-                    Gerenciar Permissões
+                    Permissões
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
                     onClick={() => {
                         setRemoverUsuario(user);
                     }}
-                    className="text-destructive focus:text-destructive"
                 >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir
@@ -166,15 +131,14 @@ export default function UsuariosPage() {
         </DropdownMenu>
     );
 
-    const columns = useMemo<ColumnDef<User>[]>(
+    const columns: ColumnDef<User>[] = useMemo(
         () => [
             {
                 id: 'usuario',
-                header: 'Usuário',
-                enableSorting: true,
+                header: t('usuarios.colunas.nome'),
                 cell: (user) => (
-                    <div className="flex min-w-[200px] items-center space-x-3">
-                        <Avatar className="h-9 w-9 shrink-0">
+                    <div className="flex items-center space-x-3">
+                        <Avatar className="h-8 w-8">
                             <AvatarFallback>
                                 {user.name
                                     .split(' ')
@@ -193,28 +157,28 @@ export default function UsuariosPage() {
             },
             {
                 id: 'setor',
-                header: 'Setor',
+                header: t('usuarios.colunas.setor'),
                 cell: (user) => user.setor?.sigla ?? 'N/A',
             },
             {
                 id: 'papel',
-                header: 'Papel',
+                header: t('usuarios.colunas.perfil'),
                 cell: (user) => <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>,
             },
             {
                 id: 'status',
-                header: 'Status',
+                header: t('usuarios.colunas.status'),
                 cell: (user) => (
                     <div className="flex items-center space-x-2">
                         <div className={cn('h-2 w-2 shrink-0 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
                         <span className="text-muted-foreground text-xs whitespace-nowrap">
-                            {user.email_verified_at ? 'Verificado' : 'Não verificado'}
+                            {user.email_verified_at ? t('common.status.verified') : t('common.status.notVerified')}
                         </span>
                     </div>
                 ),
             },
         ],
-        [],
+        [t],
     );
 
     const renderUserCard = (user: User) => (
@@ -241,7 +205,7 @@ export default function UsuariosPage() {
                         <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>
                         <div className="flex items-center space-x-1.5">
                             <div className={cn('h-2 w-2 rounded-full', user.email_verified_at ? 'bg-success' : 'bg-destructive')} />
-                            <span className="text-muted-foreground text-xs">{user.email_verified_at ? 'Verificado' : 'Não verificado'}</span>
+                            <span className="text-muted-foreground text-xs">{user.email_verified_at ? t('common.status.verified') : t('common.status.notVerified')}</span>
                         </div>
                     </div>
                     <div>{renderUserActions(user)}</div>
@@ -252,12 +216,12 @@ export default function UsuariosPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Gerenciar Usuários" />
+            <Head title={t('usuarios.gerenciar_usuarios')} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo="Gerenciar Usuários"
-                    descricao="Visualize e gerencie os usuários cadastrados no sistema"
+                    titulo={t('usuarios.gerenciar_usuarios')}
+                    descricao={t('usuarios.gerenciar_usuarios_desc')}
                     buttonText="Novo Usuário"
                     ButtonIcon={UserPlus}
                     canSeeButton={false}
@@ -269,7 +233,7 @@ export default function UsuariosPage() {
                             <SearchFilter
                                 searchTerm={searchTerm}
                                 onSearchTermChange={setSearchTerm}
-                                placeholder="Buscar por nome, email ou telefone..."
+                                placeholder={t('usuarios.buscar_placeholder')}
                                 variant="plain"
                             />
                         </div>
@@ -281,7 +245,7 @@ export default function UsuariosPage() {
                                         <SelectValue placeholder="Setor" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">Todos os setores</SelectItem>
+                                        <SelectItem value="all">{t('usuarios.todos_setores')}</SelectItem>
                                         {setores.map((setor) => (
                                             <SelectItem key={setor.id} value={setor.id.toString()}>
                                                 {setor.sigla}
@@ -307,8 +271,8 @@ export default function UsuariosPage() {
                     gridClassName="grid gap-4 grid-cols-1"
                     pagination={{ links: users.links }}
                     emptyState={{
-                        title: 'Nenhum usuário encontrado',
-                        description: 'Tente ajustar sua busca ou filtros selecionados.',
+                        title: t('usuarios.nenhum_usuario'),
+                        description: t('usuarios.ajustar_busca'),
                     }}
                     actions={renderUserActions}
                 />

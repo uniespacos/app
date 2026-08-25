@@ -1,7 +1,10 @@
 import { Badge } from '@/components/ui/badge';
+import { SituacaoReserva, ValidationStatus, type SituacaoReservaType } from '@/contracts';
 import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { useAvaliarReserva } from '@/hooks/use-avaliar-reserva';
+import { useReservationLiveUpdates } from '@/hooks/use-reservation-live-updates';
 import { useReservationSlots } from '@/hooks/use-reservation-slots';
+import { useTranslation } from '@/i18n';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { verificarStatusReserva } from '@/lib/utils/reserva-status.helpers';
@@ -11,38 +14,47 @@ import CalendarReservationDetails from '@/presentation/molecules/CalendarReserva
 import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, User as UserType } from '@/types';
+import { Agenda, Reserva, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { format, parse, parseISO } from 'date-fns';
 import { Clock, Loader2 } from 'lucide-react';
+import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
-    { title: 'Avaliar reserva', href: '#' },
+    {
+        title: 'Gerenciar Reservas',
+        href: '/gestor/reservas',
+    },
+    {
+        title: 'Avaliar Reserva',
+        href: '#',
+    },
 ];
 
-export default function AvaliarReserva({
-    reserva,
-    semana,
-    todosOsConflitos = {},
-}: {
+interface ConflitoItem {
+    horario_checado_id: number;
+    conflito_reserva_id: number;
+    conflito_reserva_titulo: string;
+    conflito_user_name: string;
+    conflito_tipo: string;
+}
+
+interface AvaliarReservaPageProps {
     reserva: Reserva;
-    user: UserType;
-    isReavaliacao?: boolean;
-    semana: { referencia: string };
-    todosOsConflitos?: Record<
-        string,
-        {
-            horario_checado_id: number;
-            conflito_reserva_id: number;
-            conflito_reserva_titulo: string;
-            conflito_user_name: string;
-            conflito_tipo: string;
-        }
-    >;
-}) {
-    const isReavaliacao = reserva.situacao !== 'em_analise';
+    semana: {
+        inicio?: string;
+        fim?: string;
+        referencia: string;
+    };
+    todosOsConflitos?: Record<string, ConflitoItem>;
+}
+
+export default function AvaliarReservaPage({ reserva, semana, todosOsConflitos = {} }: AvaliarReservaPageProps) {
+    const { t } = useTranslation();
+    useReservationLiveUpdates();
+
+    const isReavaliacao = reserva.situacao !== SituacaoReserva.EM_ANALISE;
 
     const agendas = useMemo(() => {
         return reserva.horarios
@@ -111,7 +123,7 @@ export default function AvaliarReserva({
         }));
     }, [setData, slotsSelecao]);
 
-    const [decisao, setDecisao] = useState<SituacaoReserva>(reserva.situacao);
+    const [decisao, setDecisao] = useState<SituacaoReservaType>(reserva.situacao);
 
     const isRadioGroupDisabled = useMemo(() => {
         const statusUnicos = new Set(slotsSelecao.filter((slot) => !slot.isLocked).map((slot) => slot.status));
@@ -123,9 +135,9 @@ export default function AvaliarReserva({
         if (slotsAvaliáveis.length > 0) {
             const primeiroStatus = slotsAvaliáveis[0].status;
             const todosComMesmoStatus = slotsAvaliáveis.every((s) => s.status === primeiroStatus);
-            setDecisao(todosComMesmoStatus ? (primeiroStatus as SituacaoReserva) : 'em_analise');
+            setDecisao(todosComMesmoStatus ? (primeiroStatus as SituacaoReservaType) : SituacaoReserva.EM_ANALISE);
         } else {
-            setDecisao('em_analise');
+            setDecisao(SituacaoReserva.EM_ANALISE);
         }
     }, [slotsSelecao]);
 
@@ -133,22 +145,22 @@ export default function AvaliarReserva({
         submitEvaluation(e);
     };
 
-    const handleDecisaoChange = (novaDecisao: SituacaoReserva) => {
+    const handleDecisaoChange = (novaDecisao: SituacaoReservaType) => {
         setDecisao(novaDecisao);
-        if (novaDecisao === 'deferida' || novaDecisao === 'indeferida') {
+        if (novaDecisao === SituacaoReserva.DEFERIDA || novaDecisao === SituacaoReserva.INDEFERIDA) {
             handleDecisaoGlobalChange(novaDecisao);
         }
     };
 
     const situacaoHeader = verificarStatusReserva(slotsSelecao);
 
-    if (reserva.validation_status === 'processing' || reserva.validation_status === 'pending') {
+    if (reserva.validation_status === ValidationStatus.PROCESSING || reserva.validation_status === ValidationStatus.PENDING) {
         return (
             <div className="flex h-full flex-col items-center justify-center">
                 <Loader2 className="text-primary mb-4 h-12 w-12 animate-spin" />
-                <h2 className="text-xl font-semibold">Processando Conflitos...</h2>
+                <h2 className="text-xl font-semibold">{t('common.status.processing')}</h2>
                 <p className="text-muted-foreground">
-                    A validação para esta reserva grande está sendo executada em segundo plano. A página será atualizada automaticamente.
+                    {t('common.actions.loading')}
                 </p>
             </div>
         );
@@ -156,13 +168,15 @@ export default function AvaliarReserva({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Avaliar reserva" />
+            <Head title={isReavaliacao ? t('reservas.avaliacao.reavaliacao_titulo') : t('reservas.avaliacao.titulo')} />
             <div className="mx-auto flex h-full w-full max-w-4xl flex-1 flex-col gap-6 rounded-xl p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-foreground text-3xl font-bold">Avaliar Reserva</h1>
+                        <h1 className="text-foreground text-3xl font-bold">
+                            {isReavaliacao ? t('reservas.avaliacao.reavaliacao_titulo') : t('reservas.avaliacao.titulo')}
+                        </h1>
                         <p className="text-muted-foreground mt-1">
-                            Espaço: {reserva.horarios[0]?.agenda?.espaco?.nome} /{' '}
+                            {t('espacos.titulo')}: {reserva.horarios[0]?.agenda?.espaco?.nome} /{' '}
                             {reserva.horarios[0]?.agenda?.espaco?.andar?.nome
                                 ? getAndarLabelByValue(reserva.horarios[0].agenda.espaco.andar.nome)
                                 : null}
@@ -178,7 +192,7 @@ export default function AvaliarReserva({
                     <div>
                         <h4 className="text-foreground mb-3 flex items-center gap-2 font-medium">
                             <Clock className="h-4 w-4" />
-                            Horários Solicitados
+                            {t('reservas.tabela.horarios_solicitados')}
                         </h4>
                         <AgendaNavegacao
                             variant="compact"

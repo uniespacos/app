@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
 import TextLink from '@/presentation/atoms/TextLink';
 import AuthLayout from '@/presentation/templates/AuthLayout';
@@ -22,6 +23,7 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword = true }: LoginProps) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
@@ -39,8 +41,12 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Acessar UniEspaços" description="Informe seu e-mail e senha para gerenciar ou reservar espaços" maxWidth="md">
-            <Head title="Entrar" />
+        <AuthLayout
+            title={t('auth.login.header_title')}
+            description={t('auth.login.header_desc')}
+            maxWidth="md"
+        >
+            <Head title={t('auth.login.head_title')} />
 
             {status && (
                 <div className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium">
@@ -50,13 +56,13 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="email">E-mail Institucional</Label>
+                    <Label htmlFor="email">{t('auth.login.email_institutional')}</Label>
                     <Input
                         id="email"
                         type="email"
                         name="email"
                         autoComplete="username"
-                        placeholder="seu@uesb.edu.br"
+                        placeholder={t('auth.login.email_placeholder')}
                         value={data.email}
                         autoFocus
                         onChange={(e) => {
@@ -70,10 +76,10 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <Label htmlFor="password">Senha</Label>
+                        <Label htmlFor="password">{t('auth.login.password_label')}</Label>
                         {canResetPassword && (
                             <TextLink href={route('password.request')} className="text-muted-foreground hover:text-primary text-xs">
-                                Esqueceu a senha?
+                                {t('auth.login.forgotPassword')}
                             </TextLink>
                         )}
                     </div>
@@ -83,7 +89,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                             type={showPassword ? 'text' : 'password'}
                             name="password"
                             autoComplete="current-password"
-                            placeholder="Sua senha de acesso"
+                            placeholder={t('auth.login.password_placeholder')}
                             value={data.password}
                             onChange={(e) => {
                                 setData('password', e.target.value);
@@ -93,7 +99,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                         />
                         <button
                             type="button"
-                            aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                            aria-label={showPassword ? t('auth.login.hide_password') : t('auth.login.show_password')}
                             className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
                             onClick={() => {
                                 setShowPassword(!showPassword);
@@ -115,7 +121,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                         disabled={processing}
                     />
                     <Label htmlFor="remember" className="text-muted-foreground cursor-pointer text-sm font-normal select-none">
-                        Lembrar meus dados neste dispositivo
+                        {t('auth.login.remember_device')}
                     </Label>
                 </div>
 
@@ -123,17 +129,17 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                     {processing ? (
                         <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Entrando...
+                            {t('auth.login.entering')}
                         </>
                     ) : (
-                        'Entrar no Sistema'
+                        t('auth.login.submit_system')
                     )}
                 </Button>
 
                 <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
-                    Ainda não possui cadastro?{' '}
+                    {t('auth.login.no_account_text')}{' '}
                     <Link href={route('register')} className="text-primary font-medium underline-offset-4 hover:underline">
-                        Criar uma nova conta
+                        {t('auth.login.create_account')}
                     </Link>
                 </div>
             </form>
