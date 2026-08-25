@@ -1,19 +1,19 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
-import PaginacaoListas from '@/presentation/molecules/PaginacaoListas';
+import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Modulo, Unidade } from '@/types';
+import type { Modulo, Unidade } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Building, ChevronDown, ChevronRight, Edit, Layers, MapPin, PlusCircle, Search, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Building, ChevronDown, ChevronRight, Edit, Layers, PlusCircle, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs = [
     {
@@ -22,13 +22,13 @@ const breadcrumbs = [
     },
 ];
 
-const tiposAcessoColors: Record<string, string> = {
+const tiposAcessoColors: Record<string, string | undefined> = {
     Livre: 'bg-success-subtle text-success-accent border-success/25',
     Restrito: 'bg-warning-subtle text-warning-accent border-warning/25',
     Controlado: 'bg-destructive-subtle text-destructive-accent border-destructive/25',
 };
 
-const nivelLabels: Record<number, string> = {
+const nivelLabels: Record<number, string | undefined> = {
     0: 'Térreo',
     1: '1º Andar',
     2: '2º Andar',
@@ -50,7 +50,7 @@ function nomeParaNivel(nome: string): number {
 }
 
 function nivelParaLabel(nivel: number): string {
-    return nivelLabels[nivel] || `${String(nivel)}º Andar`;
+    return nivelLabels[nivel] ?? `${String(nivel)}º Andar`;
 }
 
 export default function Modulos() {
@@ -98,16 +98,180 @@ export default function Modulos() {
         );
     };
 
-    const handleClearFilters = () => {
-        setSearchTerm('');
-        setSelectedUnidade('all');
-        router.get(
-            route('institucional.modulos.index'),
-            {},
+    const columns = useMemo<ColumnDef<Modulo>[]>(
+        () => [
             {
-                preserveState: true,
-                preserveScroll: true,
+                id: 'modulo',
+                header: 'Módulo',
+                enableSorting: true,
+                cell: (modulo) => (
+                    <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg">
+                            <Layers className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <div className="text-foreground font-semibold">{modulo.nome}</div>
+                            <div className="text-muted-foreground text-xs">{String(modulo.andars?.length ?? 0)} andar(es)</div>
+                        </div>
+                    </div>
+                ),
             },
+            {
+                id: 'unidade',
+                header: 'Unidade',
+                cell: (modulo) => (
+                    <div className="flex items-center gap-2">
+                        <Building className="text-muted-foreground h-4 w-4" />
+                        <span>{modulo.unidade?.nome ?? 'N/A'}</span>
+                        {modulo.unidade?.sigla && (
+                            <Badge variant="secondary" className="text-xs">
+                                {modulo.unidade.sigla}
+                            </Badge>
+                        )}
+                    </div>
+                ),
+            },
+            {
+                id: 'instituicao',
+                header: 'Instituição',
+                cell: (modulo) => <span className="text-sm font-medium">{modulo.unidade?.instituicao?.sigla ?? 'N/A'}</span>,
+            },
+            {
+                id: 'andares',
+                header: 'Andares',
+                cell: (modulo) => (
+                    <div className="flex flex-wrap gap-1">
+                        {modulo.andars && modulo.andars.length > 0 ? (
+                            modulo.andars.slice(0, 3).map((andar) => (
+                                <Badge key={andar.id} variant="outline" className="text-xs">
+                                    {nivelParaLabel(nomeParaNivel(andar.nome))}
+                                </Badge>
+                            ))
+                        ) : (
+                            <span className="text-muted-foreground text-xs">Sem andares</span>
+                        )}
+                        {modulo.andars && modulo.andars.length > 3 && (
+                            <Badge variant="secondary" className="text-xs">
+                                +{String(modulo.andars.length - 3)}
+                            </Badge>
+                        )}
+                    </div>
+                ),
+            },
+        ],
+        [],
+    );
+
+    const renderCard = (modulo: Modulo) => {
+        const isExpanded = expandedModulos[modulo.id] ?? false;
+        return (
+            <Card key={modulo.id} className="border-border transition-shadow hover:shadow-md">
+                <Collapsible
+                    open={isExpanded}
+                    onOpenChange={() => {
+                        toggleModulo(modulo.id);
+                    }}
+                >
+                    <CollapsibleTrigger asChild>
+                        <CardHeader className="hover:bg-muted/50 cursor-pointer p-4 transition-colors">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex min-w-0 flex-1 items-center space-x-3">
+                                    <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                                        <Layers className="h-5 w-5" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <CardTitle className="truncate text-base font-semibold">{modulo.nome}</CardTitle>
+                                        <p className="text-muted-foreground truncate text-xs">
+                                            {modulo.unidade?.nome} ({modulo.unidade?.sigla}) • {String(modulo.andars?.length ?? 0)} andar(es)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex shrink-0 items-center gap-1">
+                                    <Link
+                                        href={route('institucional.modulos.edit', { modulo: modulo.id })}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Editar módulo">
+                                            <Edit className="h-4 w-4" />
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-destructive hover:text-destructive h-8 w-8"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setRemoverModulo(modulo);
+                                        }}
+                                        aria-label="Excluir módulo"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                    {isExpanded ? (
+                                        <ChevronDown className="text-muted-foreground h-4 w-4" />
+                                    ) : (
+                                        <ChevronRight className="text-muted-foreground h-4 w-4" />
+                                    )}
+                                </div>
+                            </div>
+                        </CardHeader>
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent>
+                        <CardContent className="border-border/60 border-t p-4 pt-0">
+                            <div className="space-y-4">
+                                <div className="bg-muted/30 space-y-1 rounded-lg p-3 text-xs">
+                                    <div>
+                                        <span className="text-foreground font-semibold">Instituição:</span> {modulo.unidade?.instituicao?.nome} (
+                                        {modulo.unidade?.instituicao?.sigla})
+                                    </div>
+                                    <div>
+                                        <span className="text-foreground font-semibold">Endereço:</span> {modulo.unidade?.instituicao?.endereco}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Andares do Módulo</h4>
+                                    {modulo.andars && modulo.andars.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {modulo.andars
+                                                .sort((a, b) => nomeParaNivel(a.nome) - nomeParaNivel(b.nome))
+                                                .map((andar) => (
+                                                    <div
+                                                        key={andar.id}
+                                                        className="bg-card flex items-center justify-between gap-2 rounded-md border p-2.5 text-xs"
+                                                    >
+                                                        <div>
+                                                            <div className="text-foreground font-medium">
+                                                                {nivelParaLabel(nomeParaNivel(andar.nome))}
+                                                            </div>
+                                                            <div className="text-muted-foreground">Nível: {String(nomeParaNivel(andar.nome))}</div>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {andar.tipo_acesso.map((tipo) => (
+                                                                <Badge
+                                                                    key={tipo}
+                                                                    variant="outline"
+                                                                    className={tiposAcessoColors[tipo] ?? 'bg-muted text-foreground'}
+                                                                >
+                                                                    {tipo}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-muted-foreground text-xs">Nenhum andar cadastrado para este módulo.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </CollapsibleContent>
+                </Collapsible>
+            </Card>
         );
     };
 
@@ -118,225 +282,89 @@ export default function Modulos() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
                     titulo="Gerenciar Módulos"
-                    descricao="Gerencie os módulos e andares das unidades organizacionais"
-                    buttonText="Cadastrar módulo"
-                    ButtonIcon={PlusCircle}
+                    descricao="Aqui você consegue gerenciar os módulos das unidades"
+                    buttonText="Criar novo"
                     buttonLink={route('institucional.modulos.create')}
+                    ButtonIcon={PlusCircle}
                     canSeeButton={true}
                 />
 
                 <Card>
-                    <CardContent className="p-4">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                            <div className="space-y-2">
-                                <Label>Buscar</Label>
-                                <div className="relative">
-                                    <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-                                    <Input
-                                        placeholder="Nome ou sigla do módulo..."
-                                        value={searchTerm}
-                                        onChange={(e) => {
-                                            setSearchTerm(e.target.value);
-                                        }}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
+                    <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-end">
+                        <div className="w-full flex-1">
+                            <SearchFilter
+                                searchTerm={searchTerm}
+                                onSearchTermChange={setSearchTerm}
+                                placeholder="Buscar módulo por nome..."
+                                variant="plain"
+                            />
+                        </div>
 
-                            <div className="space-y-2">
-                                <Label>Unidade</Label>
-                                <Select value={selectedUnidade} onValueChange={handleUnidadeChange}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Todas as unidades" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Todas as unidades</SelectItem>
-                                        {unidades.map((unidade) => (
-                                            <SelectItem key={unidade.id} value={unidade.id.toString()}>
-                                                <div className="flex items-center gap-2">
-                                                    <MapPin className="h-4 w-4" />
-                                                    {unidade.nome} ({unidade.sigla})
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="flex items-end gap-2">
-                                <Button variant="outline" onClick={handleClearFilters} className="flex-1 bg-transparent">
-                                    Limpar Filtros
-                                </Button>
-                            </div>
+                        <div className="space-y-2 sm:w-[220px]">
+                            <Label>Unidade</Label>
+                            <Select value={selectedUnidade} onValueChange={handleUnidadeChange}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Todas as Unidades" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todas as Unidades</SelectItem>
+                                    {unidades.map((unidade) => (
+                                        <SelectItem key={unidade.id} value={unidade.id.toString()}>
+                                            {unidade.nome} ({unidade.sigla})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </CardContent>
                 </Card>
 
-                <div className="space-y-4">
-                    {modulos.data.length === 0 ? (
-                        <Card>
-                            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                                <Building className="text-muted-foreground mb-4 h-12 w-12" />
-                                <h3 className="text-lg font-semibold">Nenhum módulo encontrado</h3>
-                                <p className="text-muted-foreground mt-2 text-sm">
-                                    {searchTerm || selectedUnidade !== 'all'
-                                        ? 'Tente ajustar os filtros de busca'
-                                        : 'Comece criando o primeiro módulo da instituição'}
-                                </p>
-                                {!searchTerm && selectedUnidade === 'all' && (
-                                    <Link href={route('institucional.modulos.create')}>
-                                        <Button className="mt-4 gap-2">
-                                            <PlusCircle className="h-4 w-4" />
-                                            Cadastrar Primeiro Módulo
-                                        </Button>
-                                    </Link>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        modulos.data.map((modulo) => (
-                            <div key={modulo.id}>
-                                <Card>
-                                    <Collapsible
-                                        open={expandedModulos[modulo.id]}
-                                        onOpenChange={() => {
-                                            toggleModulo(modulo.id);
-                                        }}
-                                    >
-                                        <CollapsibleTrigger asChild>
-                                            <CardHeader className="hover:bg-muted/50 cursor-pointer transition-colors">
-                                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="bg-primary/10 text-primary mt-1 rounded-lg p-2">
-                                                            <Building className="h-6 w-6" />
-                                                        </div>
-                                                        <div>
-                                                            <CardTitle className="text-lg">{modulo.nome}</CardTitle>
-                                                            <CardDescription className="mt-1 flex flex-wrap items-center gap-2">
-                                                                <span className="flex items-center gap-1">
-                                                                    <MapPin className="h-3 w-3" />
-                                                                    {modulo.unidade?.nome} ({modulo.unidade?.sigla})
-                                                                </span>
-                                                                <span>•</span>
-                                                                <span className="flex items-center gap-1">
-                                                                    <Layers className="h-3 w-3" />
-                                                                    {modulo.andars?.length ?? 0} andares
-                                                                </span>
-                                                            </CardDescription>
-                                                        </div>
-                                                    </div>
-
-                                                    <div
-                                                        className="flex items-center gap-2"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                        }}
-                                                    >
-                                                        <Link href={route('institucional.modulos.edit', modulo.id)}>
-                                                            <Button variant="outline" size="sm" className="gap-1">
-                                                                <Edit className="h-3 w-3" />
-                                                                Editar
-                                                            </Button>
-                                                        </Link>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setRemoverModulo(modulo);
-                                                            }}
-                                                            className="gap-1"
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                            Excluir
-                                                        </Button>
-                                                        {expandedModulos[modulo.id] ? (
-                                                            <ChevronDown className="h-4 w-4" />
-                                                        ) : (
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </CollapsibleTrigger>
-
-                                        <CollapsibleContent>
-                                            <CardContent className="pt-0">
-                                                <div className="space-y-4">
-                                                    <div className="bg-muted/30 rounded-lg p-4">
-                                                        <h4 className="mb-2 font-semibold">Informações da Instituição</h4>
-                                                        <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
-                                                            <div>
-                                                                <span className="font-medium">Nome:</span> {modulo.unidade?.instituicao?.nome}
-                                                            </div>
-                                                            <div>
-                                                                <span className="font-medium">Sigla:</span> {modulo.unidade?.instituicao?.sigla}
-                                                            </div>
-                                                            <div className="md:col-span-2">
-                                                                <span className="font-medium">Endereço:</span> {modulo.unidade?.instituicao?.endereco}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <h4 className="mb-3 font-semibold">Andares do Módulo</h4>
-                                                        {modulo.andars && modulo.andars.length > 0 ? (
-                                                            <div className="space-y-3">
-                                                                {modulo.andars
-                                                                    .sort((a, b) => nomeParaNivel(a.nome) - nomeParaNivel(b.nome))
-                                                                    .map((andar) => (
-                                                                        <div key={andar.id} className="bg-card rounded-lg border p-4">
-                                                                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                                                                <div>
-                                                                                    <h5 className="font-medium">
-                                                                                        {nivelParaLabel(nomeParaNivel(andar.nome))}
-                                                                                    </h5>
-                                                                                    <p className="text-muted-foreground text-sm">
-                                                                                        Nível: {nomeParaNivel(andar.nome)}
-                                                                                    </p>
-                                                                                </div>
-                                                                                <div className="flex flex-wrap gap-2">
-                                                                                    {andar.tipo_acesso.map((tipo) => (
-                                                                                        <Badge
-                                                                                            key={tipo}
-                                                                                            variant="outline"
-                                                                                            className={
-                                                                                                tiposAcessoColors[tipo] || 'bg-muted text-foreground'
-                                                                                            }
-                                                                                        >
-                                                                                            {tipo}
-                                                                                        </Badge>
-                                                                                    ))}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                            </div>
-                                                        ) : (
-                                                            <p className="text-muted-foreground text-sm">Nenhum andar cadastrado para este módulo.</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </CollapsibleContent>
-                                    </Collapsible>
-                                </Card>
-                                {removerModulo?.id === modulo.id && (
-                                    <DeleteItem
-                                        itemName={removerModulo.nome}
-                                        isOpen={(open) => {
-                                            if (!open) {
-                                                setRemoverModulo(null);
-                                            }
-                                        }}
-                                        route={route('institucional.modulos.destroy', { modulo: removerModulo.id })}
-                                    />
-                                )}
-                            </div>
-                        ))
+                <DataTable
+                    data={modulos.data}
+                    columns={columns}
+                    autoCardViewOnMobile={true}
+                    enableColumnVisibility={true}
+                    renderCard={renderCard}
+                    gridClassName="grid gap-4 grid-cols-1"
+                    pagination={{ links: modulos.links }}
+                    emptyState={{
+                        title: 'Nenhum módulo encontrado',
+                        description: 'Tente ajustar sua busca ou cadastre um novo módulo.',
+                    }}
+                    actions={(modulo) => (
+                        <div className="flex justify-end gap-2">
+                            <Link href={route('institucional.modulos.edit', { modulo: modulo.id })}>
+                                <Button variant="outline" size="sm" className="gap-1 text-xs">
+                                    <Edit className="h-3 w-3" />
+                                    Editar
+                                </Button>
+                            </Link>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                    setRemoverModulo(modulo);
+                                }}
+                                className="gap-1 text-xs"
+                            >
+                                <Trash2 className="h-3 w-3" />
+                                Excluir
+                            </Button>
+                        </div>
                     )}
-                </div>
+                />
 
-                <PaginacaoListas links={modulos.links} />
+                {removerModulo && (
+                    <DeleteItem
+                        itemName={removerModulo.nome}
+                        isOpen={(open) => {
+                            if (!open) {
+                                setRemoverModulo(null);
+                            }
+                        }}
+                        route={route('institucional.modulos.destroy', { modulo: removerModulo.id })}
+                    />
+                )}
             </div>
         </AppLayout>
     );

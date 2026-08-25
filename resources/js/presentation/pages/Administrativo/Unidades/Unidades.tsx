@@ -5,7 +5,7 @@ import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Instituicao, Unidade } from '@/types';
+import type { Instituicao, Unidade } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -18,9 +18,9 @@ const breadcrumbs = [
 ];
 
 const columns: ColumnDef<Unidade>[] = [
-    { header: 'Nome', accessorKey: 'nome' },
-    { header: 'Sigla', accessorKey: 'sigla', width: '120px' },
-    { header: 'Instituição', cell: (unidade) => unidade.instituicao?.sigla ?? 'N/A' },
+    { id: 'nome', header: 'Nome', accessorKey: 'nome', enableSorting: true },
+    { id: 'sigla', header: 'Sigla', accessorKey: 'sigla', width: '120px', enableSorting: true },
+    { id: 'instituicao', header: 'Instituição', cell: (unidade) => unidade.instituicao?.sigla ?? 'N/A' },
 ];
 
 export default function UnidadesPage() {
@@ -57,6 +57,8 @@ export default function UnidadesPage() {
                 <DataTable
                     data={unidades.data}
                     columns={columns}
+                    autoCardViewOnMobile={true}
+                    enableColumnVisibility={true}
                     pagination={{ links: unidades.links }}
                     emptyState={{
                         title: 'Nenhuma unidade encontrada',
@@ -65,7 +67,7 @@ export default function UnidadesPage() {
                     actions={(unidade) => (
                         <div className="flex justify-end gap-2">
                             <Link href={route('institucional.unidades.edit', { unidade: unidade.id })}>
-                                <Button variant="outline" size="icon">
+                                <Button variant="outline" size="icon" aria-label="Editar unidade">
                                     <FilePenLine className="h-4 w-4" />
                                 </Button>
                             </Link>
@@ -75,6 +77,7 @@ export default function UnidadesPage() {
                                 onClick={() => {
                                     setRemoverUnidade(unidade);
                                 }}
+                                aria-label="Excluir unidade"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>

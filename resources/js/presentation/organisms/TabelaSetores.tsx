@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
-import { Setor, User } from '@/types';
+import type { Setor, User } from '@/types';
 import { Edit, Trash2, Users } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -36,7 +36,9 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
     const columns = useMemo<ColumnDef<Setor>[]>(
         () => [
             {
+                id: 'setor',
                 header: 'Setor',
+                enableSorting: true,
                 cell: (setor) => (
                     <div>
                         <div className="font-medium">{setor.nome}</div>
@@ -45,6 +47,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                 ),
             },
             {
+                id: 'unidade',
                 header: 'Unidade',
                 cell: (setor) => (
                     <div>
@@ -54,6 +57,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                 ),
             },
             {
+                id: 'instituicao',
                 header: 'Instituição',
                 cell: (setor) => (
                     <div>
@@ -63,6 +67,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                 ),
             },
             {
+                id: 'usuarios',
                 header: 'Usuários',
                 align: 'center',
                 width: '110px',
@@ -74,6 +79,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                             onViewUsuarios(setor);
                         }}
                         className="flex items-center gap-1"
+                        aria-label={`Ver usuários do setor ${setor.sigla}`}
                     >
                         <Users className="h-4 w-4" />
                         <Badge variant="secondary">{getUsuariosDoSetor(setor)}</Badge>
@@ -85,7 +91,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
     );
 
     const renderCard = (setor: Setor) => (
-        <Card key={setor.id} className="transition-shadow hover:shadow-md">
+        <Card key={setor.id} className="border-border transition-shadow hover:shadow-md">
             <CardContent className="space-y-3 p-4">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -99,6 +105,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                             onViewUsuarios(setor);
                         }}
                         className="flex shrink-0 items-center gap-1"
+                        aria-label={`Ver usuários do setor ${setor.sigla}`}
                     >
                         <Users className="h-4 w-4" />
                         <Badge variant="secondary">{getUsuariosDoSetor(setor)}</Badge>
@@ -117,6 +124,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                         onClick={() => {
                             onEdit(setor);
                         }}
+                        aria-label="Editar setor"
                     >
                         <Edit className="h-4 w-4" />
                     </Button>
@@ -126,6 +134,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                         onClick={() => {
                             setRemoverSetor(setor);
                         }}
+                        aria-label="Excluir setor"
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
@@ -140,6 +149,8 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                 data={setores}
                 columns={columns}
                 viewMode={viewMode}
+                autoCardViewOnMobile={true}
+                enableColumnVisibility={true}
                 renderCard={renderCard}
                 gridClassName="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                 cardTitle="Setores Cadastrados"
@@ -158,6 +169,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                             onClick={() => {
                                 onEdit(setor);
                             }}
+                            aria-label="Editar setor"
                         >
                             <Edit className="h-4 w-4" />
                         </Button>
@@ -167,6 +179,7 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                             onClick={() => {
                                 setRemoverSetor(setor);
                             }}
+                            aria-label="Excluir setor"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>
@@ -187,3 +200,5 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
         </>
     );
 }
+
+export default TabelaSetores;

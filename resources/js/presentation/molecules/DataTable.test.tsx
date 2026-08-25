@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
-import { ColumnDef, DataTable } from './DataTable';
+import { fireEvent, render, screen } from '@testing-library/react';
+import type { BulkAction, ColumnDef } from '@/types/data-table';
+import { DataTable } from './DataTable';
 
 interface TestItem {
     id: number;
@@ -13,12 +14,12 @@ const mockData: TestItem[] = [
 ];
 
 const mockColumns: ColumnDef<TestItem>[] = [
-    { header: 'Nome', accessorKey: 'nome' },
-    { header: 'Sigla', accessorKey: 'sigla' },
+    { id: 'nome', header: 'Nome', accessorKey: 'nome', enableSorting: true },
+    { id: 'sigla', header: 'Sigla', accessorKey: 'sigla' },
 ];
 
 describe('DataTable', () => {
-    it('renders column headers and cell values', () => {
+    it('renders column headers and cell values in desktop table mode', () => {
         render(<DataTable data={mockData} columns={mockColumns} />);
 
         expect(screen.getByText('Nome')).toBeInTheDocument();
@@ -63,5 +64,58 @@ describe('DataTable', () => {
 
         expect(screen.getByText('Itens do Sistema')).toBeInTheDocument();
         expect(screen.getByText('Listagem geral de itens')).toBeInTheDocument();
+    });
+
+    it('supports sorting when enableSorting is true', () => {
+        const onSort = jest.fn();
+        render(<DataTable data={mockData} columns={mockColumns} sortColumn="nome" sortDirection="asc" onSort={onSort} />);
+
+        const sortButton = screen.getByRole('button', { name: /nome/i });
+        fireEvent.click(sortButton);
+
+        expect(onSort).toHaveBeenCalledWith('nome', 'desc');
+    });
+
+    it('supports row selection and renders bulk actions floating bar', () => {
+        const onBulkAction = jest.fn();
+        const bulkActions: BulkAction<TestItem>[] = [{ id: 'delete', label: 'Excluir Selecionados', action: onBulkAction }];
+
+        render(<DataTable data={mockData} columns={mockColumns} selectable={true} bulkActions={bulkActions} />);
+
+        const selectAllCheckbox = screen.getByLabelText(/selecionar todos os itens da página/i);
+        expect(selectAllCheckbox).toBeInTheDocument();
+
+        const row1Checkbox = screen.getByLabelText(/selecionar linha 1/i);
+        fireEvent.click(row1Checkbox);
+
+        expect(screen.getByText('1 selecionado')).toBeInTheDocument();
+        const actionBtn = screen.getByRole('button', { name: /excluir selecionados/i });
+        fireEvent.click(actionBtn);
+
+        expect(onBulkAction).toHaveBeenCalledWith([mockData[0]]);
+    });
+
+    it('supports selecting and deselecting all items', () => {
+        const bulkActions: BulkAction<TestItem>[] = [{ id: 'process', label: 'Processar', action: jest.fn() }];
+
+        render(<DataTable data={mockData} columns={mockColumns} selectable={true} bulkActions={bulkActions} />);
+
+        const selectAllCheckbox = screen.getByLabelText(/selecionar todos os itens da página/i);
+        fireEvent.click(selectAllCheckbox);
+
+        expect(screen.getByText('2 selecionados')).toBeInTheDocument();
+
+        fireEvent.click(selectAllCheckbox);
+        expect(screen.queryByText(/selecionados/i)).not.toBeInTheDocument();
+    });
+
+    it('supports column visibility toggle via DataTableViewOptions', () => {
+        render(<DataTable data={mockData} columns={mockColumns} enableColumnVisibility={true} />);
+
+        const columnsTrigger = screen.getByRole('button', { name: /colunas/i });
+        expect(columnsTrigger).toBeInTheDocument();
+
+        fireEvent.keyDown(columnsTrigger, { key: 'Enter' });
+        expect(screen.getByText('Alternar Colunas')).toBeInTheDocument();
     });
 });

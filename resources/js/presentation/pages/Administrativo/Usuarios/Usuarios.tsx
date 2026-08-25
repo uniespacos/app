@@ -6,19 +6,18 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
-import { EditUserModal } from '@/presentation/organisms/EditUserModal';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { SearchFilter } from '@/presentation/molecules/SearchFilter';
 import { ViewMode, ViewModeToggle } from '@/presentation/molecules/ViewModeToggle';
+import { EditUserModal } from '@/presentation/organisms/EditUserModal';
 import { PermissionModal } from '@/presentation/organisms/PermissionModal';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Setor, User } from '@/types';
+import type { Setor, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Edit, Settings, Shield, Trash, UserPlus } from 'lucide-react';
+import { Edit, Key, MoreHorizontal, Trash2, UserPlus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 const breadcrumbs = [
@@ -37,6 +36,8 @@ const getRoleBadgeClass = (role: string) => {
             return 'bg-destructive-subtle text-destructive border-destructive/25';
         case 'gestor':
             return 'bg-info-subtle text-info-accent border-info/25';
+        case 'usuario':
+            return 'bg-secondary text-secondary-foreground border-border';
         default:
             return 'bg-muted text-muted-foreground border-border';
     }
@@ -50,30 +51,31 @@ const getRoleLabel = (role: string) => {
             return 'Administrador';
         case 'gestor':
             return 'Gestor';
-        default:
+        case 'usuario':
             return 'Usuário';
+        default:
+            return role;
     }
 };
 
-export default function Usuarios() {
+export default function UsuariosPage() {
     const { users, setores, filters } = usePage<{
         users: {
             data: User[];
             links: { url: string | null; label: string; active: boolean }[];
-            total: number;
+            meta: object;
         };
         setores: Setor[];
         filters?: { search: string | null; setor_id: string | null };
     }>().props;
 
-    const isMobile = useIsMobile();
-    const [viewMode, setViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
-    const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
+    const [selectedUser, setSelectedUser] = useState<User | undefined>();
+    const [editingUser, setEditingUser] = useState<User | undefined>();
+    const [removerUsuario, setRemoverUsuario] = useState<User | undefined>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
-    const [editingUser, setEditingUser] = useState<User | undefined>(undefined);
-    const [removerUsuario, setRemoverUsuario] = useState<User | undefined>(undefined);
     const [selectedSetorId, setSelectedSetorId] = useState<string>(filters?.setor_id ?? 'all');
+    const [viewMode, setViewMode] = useState<ViewMode>('table');
 
     const { searchTerm, setSearchTerm } = useDebouncedSearch({
         routeName: 'institucional.usuarios.index',
@@ -98,12 +100,12 @@ export default function Usuarios() {
         );
     };
 
-    const handleUserClick = (user: User) => {
+    const handleOpenPermissionModal = (user: User) => {
         setSelectedUser(user);
         setIsModalOpen(true);
     };
 
-    const handleEditUser = (user: User) => {
+    const handleOpenEditModal = (user: User) => {
         setEditingUser(user);
     };
 
@@ -130,35 +132,34 @@ export default function Usuarios() {
     const renderUserActions = (user: User) => (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="shrink-0">
-                    <Settings className="mr-1.5 h-4 w-4" />
-                    Gerenciar
+                <Button variant="ghost" size="icon" aria-label="Ações do usuário">
+                    <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem
                     onClick={() => {
-                        handleEditUser(user);
+                        handleOpenEditModal(user);
                     }}
                 >
                     <Edit className="mr-2 h-4 w-4" />
-                    Editar
+                    Editar Dados
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => {
-                        handleUserClick(user);
+                        handleOpenPermissionModal(user);
                     }}
                 >
-                    <Shield className="mr-2 h-4 w-4" />
-                    Permissões
+                    <Key className="mr-2 h-4 w-4" />
+                    Gerenciar Permissões
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => {
                         setRemoverUsuario(user);
                     }}
-                    className="text-destructive"
+                    className="text-destructive focus:text-destructive"
                 >
-                    <Trash className="mr-2 h-4 w-4" />
+                    <Trash2 className="mr-2 h-4 w-4" />
                     Excluir
                 </DropdownMenuItem>
             </DropdownMenuContent>
@@ -168,7 +169,9 @@ export default function Usuarios() {
     const columns = useMemo<ColumnDef<User>[]>(
         () => [
             {
+                id: 'usuario',
                 header: 'Usuário',
+                enableSorting: true,
                 cell: (user) => (
                     <div className="flex min-w-[200px] items-center space-x-3">
                         <Avatar className="h-9 w-9 shrink-0">
@@ -189,14 +192,17 @@ export default function Usuarios() {
                 ),
             },
             {
+                id: 'setor',
                 header: 'Setor',
                 cell: (user) => user.setor?.sigla ?? 'N/A',
             },
             {
+                id: 'papel',
                 header: 'Papel',
                 cell: (user) => <Badge className={getRoleBadgeClass(user.roles[0] ?? ROLE_COMUM)}>{getRoleLabel(user.roles[0] ?? ROLE_COMUM)}</Badge>,
             },
             {
+                id: 'status',
                 header: 'Status',
                 cell: (user) => (
                     <div className="flex items-center space-x-2">
@@ -212,7 +218,7 @@ export default function Usuarios() {
     );
 
     const renderUserCard = (user: User) => (
-        <Card key={user.id} className="transition-shadow hover:shadow-md">
+        <Card key={user.id} className="border-border transition-shadow hover:shadow-md">
             <CardContent className="space-y-4 p-4">
                 <div className="flex items-center space-x-3">
                     <Avatar className="h-11 w-11 shrink-0">
@@ -295,6 +301,8 @@ export default function Usuarios() {
                     data={users.data}
                     columns={columns}
                     viewMode={viewMode}
+                    autoCardViewOnMobile={true}
+                    enableColumnVisibility={true}
                     renderCard={renderUserCard}
                     gridClassName="grid gap-4 grid-cols-1"
                     pagination={{ links: users.links }}
@@ -319,7 +327,7 @@ export default function Usuarios() {
 
                 <EditUserModal
                     user={editingUser}
-                    isOpen={!!editingUser}
+                    isOpen={Boolean(editingUser)}
                     onClose={() => {
                         setEditingUser(undefined);
                     }}
