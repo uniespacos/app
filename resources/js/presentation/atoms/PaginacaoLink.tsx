@@ -4,9 +4,10 @@ interface PaginacaoLinkProps {
     url?: string | null;
     active?: boolean;
     label: string;
+    only?: string[];
 }
 
-export function PaginacaoLink({ url, active, label }: PaginacaoLinkProps) {
+export function PaginacaoLink({ url, active, label, only }: PaginacaoLinkProps) {
     if (url) {
         return (
             <Link
@@ -16,6 +17,7 @@ export function PaginacaoLink({ url, active, label }: PaginacaoLinkProps) {
                 }`}
                 preserveState
                 preserveScroll
+                {...(only ? { only } : {})}
                 dangerouslySetInnerHTML={{ __html: label }}
             />
         );

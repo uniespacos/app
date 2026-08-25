@@ -123,3 +123,37 @@ export function __resetEchoChannelRegistryForTests(): void {
     publicChannels.clear();
     privateChannels.clear();
 }
+
+/**
+ * Reconecta a conexão Pusher/Reverb se a aba voltar a ficar visível e a conexão estiver inativa/fechada.
+ */
+export function handleEchoVisibilityChange(): void {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    if (document.visibilityState === 'visible') {
+        const echoConnector = (
+            window as unknown as {
+                Echo?: {
+                    connector?: {
+                        pusher?: {
+                            connection?: {
+                                isOpen: () => boolean;
+                            };
+                            connect: () => void;
+                        };
+                    };
+                };
+            }
+        )?.Echo?.connector;
+
+        if (echoConnector?.pusher?.connection && !echoConnector.pusher.connection.isOpen()) {
+            echoConnector.pusher.connect();
+        }
+    }
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', handleEchoVisibilityChange);
+}

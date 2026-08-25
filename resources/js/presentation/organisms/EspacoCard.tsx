@@ -9,7 +9,7 @@ import { hasPermission } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import type { Espaco, User } from '@/types';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Building2, ChevronRight, Edit, Heart, Layers, MapPin, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 
@@ -39,7 +39,7 @@ export default function EspacoCard({
 
     const modulo = espaco.andar?.modulo?.nome;
     const andarLabel = espaco.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : undefined;
-    const unidadeSigla = espaco.andar?.modulo?.unidade?.sigla || espaco.andar?.modulo?.unidade?.nome || 'UESB';
+    const unidadeSigla = espaco.andar?.modulo?.unidade?.sigla ?? espaco.andar?.modulo?.unidade?.nome ?? 'UESB';
 
     const handleFavoritarEspaco = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -94,7 +94,7 @@ export default function EspacoCard({
             if (handleSolicitarReserva) {
                 handleSolicitarReserva(String(espaco.id));
             } else {
-                router.get(`/espacos/${espaco.id}`);
+                router.get(`/espacos/${String(espaco.id)}`);
             }
         }
     };
@@ -104,14 +104,21 @@ export default function EspacoCard({
             role={isClicavel ? 'button' : undefined}
             tabIndex={isClicavel ? 0 : undefined}
             onClick={handleCardClick}
-            onKeyDown={(e) => isClicavel && e.key === 'Enter' && handleCardClick()}
+            onKeyDown={(e) => {
+                if (isClicavel && e.key === 'Enter') handleCardClick();
+            }}
             className={cn(
                 'group border-border/80 bg-card flex flex-col overflow-hidden rounded-2xl border transition-all duration-300',
                 isClicavel && 'hover:border-primary/40 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]',
             )}
         >
             {/* Carousel & Media Container */}
-            <div className="bg-muted relative overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div
+                className="bg-muted relative overflow-hidden"
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
+            >
                 <AspectRatio ratio={16 / 9}>
                     <Carousel className="h-full w-full">
                         <CarouselContent className="ml-0 h-full">
@@ -119,7 +126,7 @@ export default function EspacoCard({
                                 <CarouselItem key={index} className="h-full pl-0">
                                     <img
                                         src={src}
-                                        alt={`Foto ${index + 1} de ${espaco.nome}`}
+                                        alt={`Foto ${String(index + 1)} de ${espaco.nome}`}
                                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         loading="lazy"
                                         decoding="async"
@@ -211,8 +218,20 @@ export default function EspacoCard({
                 </CardFooter>
             ) : (
                 <CardFooter className="border-border/40 text-primary flex items-center justify-between border-t p-4 pt-2 text-xs font-medium">
-                    <span>Consultar horários</span>
-                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <Link
+                        href={`/espacos/${String(espaco.id)}`}
+                        prefetch={['mount', 'hover']}
+                        className="text-primary flex w-full items-center justify-between group-hover:underline"
+                        onClick={(e) => {
+                            if (handleSolicitarReserva) {
+                                e.preventDefault();
+                                handleSolicitarReserva(String(espaco.id));
+                            }
+                        }}
+                    >
+                        <span>Consultar horários</span>
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
                 </CardFooter>
             )}
         </Card>

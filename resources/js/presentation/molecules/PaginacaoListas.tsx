@@ -7,9 +7,10 @@ interface PaginacaoListasProps {
         url?: string | null;
         active?: boolean;
     }[];
+    only?: string[];
 }
 
-export default function PaginacaoListas({ links }: PaginacaoListasProps) {
+export default function PaginacaoListas({ links, only }: PaginacaoListasProps) {
     const isMobile = useIsMobile();
 
     if (links.length <= 1) {
@@ -27,13 +28,13 @@ export default function PaginacaoListas({ links }: PaginacaoListasProps) {
 
         return (
             <nav aria-label="Paginação" className="mt-6 flex items-center justify-between gap-2">
-                <PaginacaoLink url={anterior.url} active={false} label={anterior.label} />
+                <PaginacaoLink url={anterior.url} active={false} label={anterior.label} only={only} />
                 {atual && totalPaginas && (
                     <span className="text-muted-foreground text-sm font-medium whitespace-nowrap">
                         Página {atual.label} de {totalPaginas}
                     </span>
                 )}
-                <PaginacaoLink url={proximo.url} active={false} label={proximo.label} />
+                <PaginacaoLink url={proximo.url} active={false} label={proximo.label} only={only} />
             </nav>
         );
     }
@@ -42,7 +43,7 @@ export default function PaginacaoListas({ links }: PaginacaoListasProps) {
         <nav aria-label="Paginação" className="mt-6 flex justify-center">
             <div className="flex flex-wrap justify-center gap-1.5">
                 {links.map((link, index) => (
-                    <PaginacaoLink key={index} url={link.url} active={link.active} label={link.label} />
+                    <PaginacaoLink key={index} url={link.url} active={link.active} label={link.label} only={only} />
                 ))}
             </div>
         </nav>

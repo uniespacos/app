@@ -2,6 +2,7 @@ import {
     __resetEchoChannelRegistryForTests,
     acquirePrivateChannel,
     acquirePublicChannel,
+    handleEchoVisibilityChange,
     releasePrivateChannel,
     releasePublicChannel,
 } from './echo-channel-registry';
@@ -242,6 +243,129 @@ describe('echo-channel-registry', () => {
 
             expect(mockChannel).toHaveBeenCalledTimes(1);
             expect(mockPrivate).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe('handleEchoVisibilityChange and visibilitychange listener', () => {
+        it('should call pusher.connect when document is visible and connection is closed', () => {
+            const mockConnect = jest.fn();
+            const mockIsOpen = jest.fn().mockReturnValue(false);
+
+            Object.defineProperty(window, 'Echo', {
+                value: {
+                    connector: {
+                        pusher: {
+                            connection: {
+                                isOpen: mockIsOpen,
+                            },
+                            connect: mockConnect,
+                        },
+                    },
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            Object.defineProperty(document, 'visibilityState', {
+                value: 'visible',
+                writable: true,
+                configurable: true,
+            });
+
+            handleEchoVisibilityChange();
+
+            expect(mockIsOpen).toHaveBeenCalled();
+            expect(mockConnect).toHaveBeenCalledTimes(1);
+        });
+
+        it('should not call pusher.connect when document is visible but connection is already open', () => {
+            const mockConnect = jest.fn();
+            const mockIsOpen = jest.fn().mockReturnValue(true);
+
+            Object.defineProperty(window, 'Echo', {
+                value: {
+                    connector: {
+                        pusher: {
+                            connection: {
+                                isOpen: mockIsOpen,
+                            },
+                            connect: mockConnect,
+                        },
+                    },
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            Object.defineProperty(document, 'visibilityState', {
+                value: 'visible',
+                writable: true,
+                configurable: true,
+            });
+
+            handleEchoVisibilityChange();
+
+            expect(mockIsOpen).toHaveBeenCalled();
+            expect(mockConnect).not.toHaveBeenCalled();
+        });
+
+        it('should not call pusher.connect when document is hidden', () => {
+            const mockConnect = jest.fn();
+            const mockIsOpen = jest.fn().mockReturnValue(false);
+
+            Object.defineProperty(window, 'Echo', {
+                value: {
+                    connector: {
+                        pusher: {
+                            connection: {
+                                isOpen: mockIsOpen,
+                            },
+                            connect: mockConnect,
+                        },
+                    },
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            Object.defineProperty(document, 'visibilityState', {
+                value: 'hidden',
+                writable: true,
+                configurable: true,
+            });
+
+            handleEchoVisibilityChange();
+
+            expect(mockConnect).not.toHaveBeenCalled();
+        });
+
+        it('should trigger reconnection when visibilitychange event is fired on document', () => {
+            const mockConnect = jest.fn();
+            const mockIsOpen = jest.fn().mockReturnValue(false);
+
+            Object.defineProperty(window, 'Echo', {
+                value: {
+                    connector: {
+                        pusher: {
+                            connection: {
+                                isOpen: mockIsOpen,
+                            },
+                            connect: mockConnect,
+                        },
+                    },
+                },
+                writable: true,
+                configurable: true,
+            });
+
+            Object.defineProperty(document, 'visibilityState', {
+                value: 'visible',
+                writable: true,
+                configurable: true,
+            });
+
+            document.dispatchEvent(new Event('visibilitychange'));
+
+            expect(mockConnect).toHaveBeenCalledTimes(1);
         });
     });
 });

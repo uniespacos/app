@@ -64,7 +64,7 @@ export default function EspacosPage() {
                     ))}
                 </div>
 
-                <PaginacaoListas links={links} />
+                <PaginacaoListas links={links} only={['espacos', 'filters']} />
             </div>
         </AppLayout>
     );

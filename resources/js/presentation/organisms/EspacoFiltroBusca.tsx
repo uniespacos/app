@@ -15,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
-import { cn } from '@/lib/utils';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 import { router } from '@inertiajs/react';
@@ -61,6 +60,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
         routeName: targetRoute,
         initialSearch: filters.search || '',
         extraParams,
+        only: ['espacos', 'filters'],
     });
 
     const filteredModulos = useMemo(() => {
@@ -94,6 +94,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
             preserveState: true,
             preserveScroll: true,
             replace: true,
+            only: ['espacos', 'filters'],
         });
     };
 
@@ -161,7 +162,12 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 <Label htmlFor={`${prefix}espacos-unidade`} className="text-muted-foreground text-xs font-medium">
                     Unidade
                 </Label>
-                <Select value={localFilters.unidade} onValueChange={(value) => handleFilterChange('unidade', value)}>
+                <Select
+                    value={localFilters.unidade}
+                    onValueChange={(value) => {
+                        handleFilterChange('unidade', value);
+                    }}
+                >
                     <SelectTrigger id={`${prefix}espacos-unidade`} className="w-full">
                         <SelectValue placeholder="Todas as Unidades" />
                     </SelectTrigger>
@@ -182,7 +188,9 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 </Label>
                 <Select
                     value={localFilters.modulo}
-                    onValueChange={(value) => handleFilterChange('modulo', value)}
+                    onValueChange={(value) => {
+                        handleFilterChange('modulo', value);
+                    }}
                     disabled={localFilters.unidade === 'all'}
                 >
                     <SelectTrigger id={`${prefix}espacos-modulo`} className="w-full">
@@ -205,7 +213,9 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 </Label>
                 <Select
                     value={localFilters.andar}
-                    onValueChange={(value) => handleFilterChange('andar', value)}
+                    onValueChange={(value) => {
+                        handleFilterChange('andar', value);
+                    }}
                     disabled={localFilters.modulo === 'all'}
                 >
                     <SelectTrigger id={`${prefix}espacos-andar`} className="w-full">
@@ -226,7 +236,12 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                 <Label htmlFor={`${prefix}espacos-capacidade`} className="text-muted-foreground text-xs font-medium">
                     Capacidade
                 </Label>
-                <Select value={localFilters.capacidade} onValueChange={(value) => handleFilterChange('capacidade', value)}>
+                <Select
+                    value={localFilters.capacidade}
+                    onValueChange={(value) => {
+                        handleFilterChange('capacidade', value);
+                    }}
+                >
                     <SelectTrigger id={`${prefix}espacos-capacidade`} className="w-full">
                         <SelectValue placeholder="Qualquer capacidade" />
                     </SelectTrigger>
@@ -258,7 +273,9 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                             placeholder="Buscar por nome do espaço, andar ou módulo..."
                             className="pr-9 pl-9"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                            }}
                         />
                         {searchTerm && (
                             <button
@@ -344,7 +361,9 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
                                 <span>{chip.label}</span>
                                 <button
                                     type="button"
-                                    onClick={() => handleFilterChange(chip.key, chip.key === 'capacidade' ? 'qualquer' : 'all')}
+                                    onClick={() => {
+                                        handleFilterChange(chip.key, chip.key === 'capacidade' ? 'qualquer' : 'all');
+                                    }}
                                     aria-label={`Remover filtro de ${chip.key}`}
                                     className="text-muted-foreground hover:text-foreground rounded-full"
                                 >

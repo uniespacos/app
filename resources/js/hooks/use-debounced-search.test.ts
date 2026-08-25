@@ -50,4 +50,28 @@ describe('useDebouncedSearch', () => {
             { preserveState: true, preserveScroll: true, replace: true },
         );
     });
+
+    it('passes partial reload options (only) when specified', () => {
+        const { result } = renderHook(() =>
+            useDebouncedSearch({
+                routeName: 'espacos.index',
+                delay: 300,
+                only: ['espacos', 'filters'],
+            }),
+        );
+
+        act(() => {
+            result.current.setSearchTerm('auditorio');
+        });
+
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
+
+        expect(getSpy).toHaveBeenCalledWith(
+            'https://localhost/espacos/index',
+            { search: 'auditorio' },
+            { preserveState: true, preserveScroll: true, replace: true, only: ['espacos', 'filters'] },
+        );
+    });
 });

@@ -9,7 +9,24 @@ jest.mock('@inertiajs/react', () => ({
         get: jest.fn(),
         post: jest.fn(),
         delete: jest.fn(),
+        prefetch: jest.fn(),
     },
+    Link: ({
+        children,
+        href,
+        className,
+        onClick,
+    }: {
+        children: React.ReactNode;
+        href: string;
+        className?: string;
+        onClick?: React.MouseEventHandler;
+        prefetch?: unknown;
+    }) => (
+        <a href={href} className={className} onClick={onClick}>
+            {children}
+        </a>
+    ),
 }));
 
 const mockUser: User = {
