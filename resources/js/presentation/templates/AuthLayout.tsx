@@ -1,9 +1,17 @@
-import AuthLayoutTemplate from '@/presentation/templates/auth/AuthSimpleLayout';
+import AuthSplitLayout from '@/presentation/templates/auth/AuthSplitLayout';
+import React from 'react';
 
-export default function AuthLayout({ children, title, description, ...props }: { children: React.ReactNode; title: string; description: string }) {
+interface AuthLayoutProps {
+    children: React.ReactNode;
+    title?: string;
+    description?: string;
+    maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+}
+
+export default function AuthLayout({ children, title, description, maxWidth, ...props }: AuthLayoutProps) {
     return (
-        <AuthLayoutTemplate title={title} description={description} {...props}>
+        <AuthSplitLayout title={title} description={description} maxWidth={maxWidth} {...props}>
             {children}
-        </AuthLayoutTemplate>
+        </AuthSplitLayout>
     );
 }

@@ -1,13 +1,14 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { SyntheticEvent, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLogoIcon from '@/presentation/atoms/AppLogoIcon';
+import InputError from '@/presentation/atoms/InputError';
+import TextLink from '@/presentation/atoms/TextLink';
+import AuthLayout from '@/presentation/templates/AuthLayout';
 
 interface LoginForm {
     email: string;
@@ -15,7 +16,12 @@ interface LoginForm {
     remember: boolean;
 }
 
-export default function Login() {
+interface LoginProps {
+    status?: string;
+    canResetPassword?: boolean;
+}
+
+export default function Login({ status, canResetPassword = true }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
@@ -33,125 +39,104 @@ export default function Login() {
     };
 
     return (
-        <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <AuthLayout title="Acessar UniEspaços" description="Informe seu e-mail e senha para gerenciar ou reservar espaços" maxWidth="md">
             <Head title="Entrar" />
-            <div className="w-full max-w-md">
-                <Card className="w-full">
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-center text-2xl font-bold">
-                            <div className="mb-2 flex justify-center">
-                                <AppLogoIcon className="text-foreground size-34" />
-                            </div>
-                            Bem-vindo ao UniEspaços
-                        </CardTitle>
-                        <CardDescription className="text-muted-foreground text-center">
-                            Entre com suas credenciais para acessar sua conta
-                        </CardDescription>
-                    </CardHeader>
 
-                    <form onSubmit={handleSubmit}>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="seu@email.com"
-                                    value={data.email}
-                                    onChange={(e) => {
-                                        setData('email', e.target.value);
-                                    }}
-                                    className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
-                                    disabled={processing}
-                                />
-                                {errors.email && <p className="text-destructive mt-1 text-sm">{errors.email}</p>}
-                            </div>
+            {status && (
+                <div className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium">
+                    {status}
+                </div>
+            )}
 
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password">Senha</Label>
-                                    <button
-                                        type="button"
-                                        className="text-primary text-sm hover:underline"
-                                        onClick={() => {
-                                            router.get(route('password.request'));
-                                        }}
-                                    >
-                                        Esqueceu a senha?
-                                    </button>
-                                </div>
-                                <div className="relative">
-                                    <Input
-                                        id="password"
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="********"
-                                        value={data.password}
-                                        onChange={(e) => {
-                                            setData('password', e.target.value);
-                                        }}
-                                        className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
-                                        disabled={processing}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                                        onClick={() => {
-                                            setShowPassword(!showPassword);
-                                        }}
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="text-muted-foreground h-4 w-4" />
-                                        ) : (
-                                            <Eye className="text-muted-foreground h-4 w-4" />
-                                        )}
-                                    </button>
-                                </div>
-                                {errors.password && <p className="text-destructive mt-1 text-sm">{errors.password}</p>}
-                            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="email">E-mail Institucional</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        autoComplete="username"
+                        placeholder="seu@uesb.edu.br"
+                        value={data.email}
+                        autoFocus
+                        onChange={(e) => {
+                            setData('email', e.target.value);
+                        }}
+                        className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
+                        disabled={processing}
+                    />
+                    <InputError message={errors.email} />
+                </div>
 
-                            <div className="flex items-center space-x-2 py-4">
-                                <Checkbox
-                                    id="remember"
-                                    checked={data.remember}
-                                    onCheckedChange={(checked) => {
-                                        setData('remember', !!checked);
-                                    }}
-                                    disabled={processing}
-                                />
-                                <Label htmlFor="remember" className="cursor-pointer text-sm font-normal select-none">
-                                    Lembrar-me
-                                </Label>
-                            </div>
-                        </CardContent>
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Senha</Label>
+                        {canResetPassword && (
+                            <TextLink href={route('password.request')} className="text-muted-foreground hover:text-primary text-xs">
+                                Esqueceu a senha?
+                            </TextLink>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <Input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            autoComplete="current-password"
+                            placeholder="Sua senha de acesso"
+                            value={data.password}
+                            onChange={(e) => {
+                                setData('password', e.target.value);
+                            }}
+                            className={errors.password ? 'border-destructive focus-visible:ring-destructive pr-10' : 'pr-10'}
+                            disabled={processing}
+                        />
+                        <button
+                            type="button"
+                            aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                            className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
+                            onClick={() => {
+                                setShowPassword(!showPassword);
+                            }}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
+                    <InputError message={errors.password} />
+                </div>
 
-                        <CardFooter className="flex flex-col space-y-4">
-                            <Button type="submit" className="w-full" disabled={processing}>
-                                {processing ? (
-                                    <>
-                                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                        Entrando...
-                                    </>
-                                ) : (
-                                    'Entrar'
-                                )}
-                            </Button>
+                <div className="flex items-center space-x-2 py-1">
+                    <Checkbox
+                        id="remember"
+                        checked={data.remember}
+                        onCheckedChange={(checked) => {
+                            setData('remember', !!checked);
+                        }}
+                        disabled={processing}
+                    />
+                    <Label htmlFor="remember" className="text-muted-foreground cursor-pointer text-sm font-normal select-none">
+                        Lembrar meus dados neste dispositivo
+                    </Label>
+                </div>
 
-                            <div className="text-muted-foreground text-center text-sm">
-                                Não tem uma conta?{' '}
-                                <button
-                                    type="button"
-                                    className="text-primary font-medium hover:underline"
-                                    onClick={() => {
-                                        router.get(route('register'));
-                                    }}
-                                >
-                                    Cadastre-se!
-                                </button>
-                            </div>
-                        </CardFooter>
-                    </form>
-                </Card>
-            </div>
-        </div>
+                <Button type="submit" className="h-11 w-full text-base font-medium" disabled={processing}>
+                    {processing ? (
+                        <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Entrando...
+                        </>
+                    ) : (
+                        'Entrar no Sistema'
+                    )}
+                </Button>
+
+                <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
+                    Ainda não possui cadastro?{' '}
+                    <Link href={route('register')} className="text-primary font-medium underline-offset-4 hover:underline">
+                        Criar uma nova conta
+                    </Link>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }

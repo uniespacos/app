@@ -1,15 +1,13 @@
-import { Button } from '@/components/ui/button';
 import { ModalNovaInstituicao } from '@/presentation/organisms/ModalNovaInstituicao';
 import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
+import AuthLayout from '@/presentation/templates/AuthLayout';
 import { Instituicao } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import type React from 'react';
 
 export default function Register() {
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;
-
     const [showModal, setShowModal] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -37,50 +35,31 @@ export default function Register() {
         });
     };
 
-    const handleBackToLogin = () => {
-        router.get(route('login'));
-    };
-
     return (
-        <div className="bg-muted flex min-h-screen items-center justify-center">
+        <AuthLayout
+            title="Criar Conta Institucional"
+            description="Preencha as informações abaixo para solicitar seu acesso ao UniEspaços"
+            maxWidth="2xl"
+        >
             <Head title="Criar conta" />
-            <div className="container mx-auto px-4 py-8">
-                <div className="mx-auto max-w-6xl">
-                    <div className="grid items-center gap-8 lg:grid-cols-2">
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="text-center">
-                                <img src="/_img/uniespacos_logo.png" alt="Logo UniEspaços" className="h-100 w-auto" />
-                                <p className="text-muted-foreground text-lg">Crie sua conta para começar a usar nossa plataforma</p>
-                            </div>
-                        </div>
 
-                        <div className="bg-card rounded-2xl p-8 shadow-xl">
-                            <div className="mb-8">
-                                <h2 className="text-foreground mb-2 text-2xl font-semibold">Criar conta</h2>
-                                <p className="text-muted-foreground">Preencha os dados abaixo para se cadastrar</p>
-                            </div>
+            <FormRegistroUsuario
+                data={data}
+                onInputChange={handleInputChange}
+                errors={errors}
+                processing={processing}
+                instituicaos={instituicaos}
+                onSubmit={handleSubmit}
+            />
 
-                            <FormRegistroUsuario
-                                data={data}
-                                onInputChange={handleInputChange}
-                                errors={errors}
-                                processing={processing}
-                                instituicaos={instituicaos}
-                                onSubmit={handleSubmit}
-                            />
-
-                            <div className="border-border mt-6 border-t pt-6">
-                                <Button variant="outline" className="w-full bg-transparent" onClick={handleBackToLogin}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Voltar para o login
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
+                Já possui uma conta institucional?{' '}
+                <Link href={route('login')} className="text-primary font-medium underline-offset-4 hover:underline">
+                    Fazer login
+                </Link>
             </div>
 
             <ModalNovaInstituicao open={showModal} onOpenChange={setShowModal} />
-        </div>
+        </AuthLayout>
     );
 }
