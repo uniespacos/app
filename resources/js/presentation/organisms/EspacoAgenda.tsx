@@ -70,7 +70,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     }, [agendas]);
 
     return (
-        <div className={cn('container mx-auto max-w-7xl space-y-4 py-4', slotsSelecao.length > 0 && 'pb-40 sm:pb-24')}>
+        <div className={cn('container mx-auto max-w-7xl space-y-4 py-4', slotsSelecao.length > 0 && 'pb-32 md:pb-24')}>
             {isEditMode && reserva && <AgendaEditModeAlert reserva={reserva} />}
             <AgendaHeader espaco={espaco} gestoresPorTurno={gestoresPorTurno} />
             <AgendaNavegacao
@@ -98,8 +98,8 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
             </div>
 
             {slotsSelecao.length > 0 && (
-                <div className="fixed right-4 bottom-4 left-4 z-20 sm:left-auto sm:max-w-sm">
-                    <div className="bg-card flex flex-col-reverse gap-2 rounded-xl border p-3 shadow-lg sm:flex-row sm:items-center">
+                <div className="fixed right-4 bottom-20 left-4 z-30 sm:left-auto sm:max-w-sm md:right-8 md:bottom-4">
+                    <div className="bg-card/95 border-border flex flex-col-reverse gap-2 rounded-xl border p-3 shadow-xl backdrop-blur-md sm:flex-row sm:items-center">
                         <Button variant="outline" onClick={limparSelecao} className="sm:w-auto">
                             Limpar seleção
                         </Button>
