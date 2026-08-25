@@ -1,22 +1,26 @@
-name: Lint Static Analysis
+name: Lint & Static Analysis
 
 on:
-  pull_request_target:
+  pull_request:
+    branches:
+      - develop
+      - main
     types:
       - opened
-      - edited
+      - reopened
       - synchronize
+      - ready_for_review
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   lint:
     name: 🔍 Lint & Static Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -36,6 +40,9 @@ jobs:
 
       - name: Run Pint (PHP Code Style)
         run: vendor/bin/pint --test
+
+      - name: Run TypeScript Check
+        run: npx tsc --noEmit
 
       - name: Run ESLint (Frontend Linting)
         run: npm run lint
