@@ -1,12 +1,9 @@
-import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Camera, Trash2 } from 'lucide-react';
-import { SyntheticEvent, useRef, useState } from 'react';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getRoleLabel } from '@/constants/role-labels';
+import { useTranslation } from '@/i18n';
 import HeadingSmall from '@/presentation/atoms/HeadingSmall';
 import InputError from '@/presentation/atoms/InputError';
 import { UserAvatar } from '@/presentation/atoms/UserAvatar';
@@ -14,6 +11,12 @@ import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import AppLayout from '@/presentation/templates/AppLayout';
 import SettingsLayout from '@/presentation/templates/settings/Layout';
+import { type BreadcrumbItem, type Instituicao, type SharedData } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Camera, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import type React from 'react';
+import { type SyntheticEvent } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,14 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const ROLE_LABEL: Record<string, string> = {
-    institucional: 'Institucional',
-    gestor: 'Gestor',
-    comum: 'Usuário',
-};
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- useForm<T> do Inertia exige um index signature que `interface` não satisfaz.
-type ProfileForm = {
+interface ProfileForm {
     name: string;
     email: string;
     phone: string;
@@ -38,7 +34,7 @@ type ProfileForm = {
     photo: File | null;
     remove_photo: boolean;
     _method: 'patch';
-};
+}
 
 export default function Profile({
     mustVerifyEmail,
@@ -49,11 +45,12 @@ export default function Profile({
     status?: string;
     instituicaos: Instituicao[];
 }) {
+    const { t } = useTranslation();
     const { auth } = usePage<SharedData>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
         phone: auth.user.telefone || '',
@@ -63,6 +60,10 @@ export default function Profile({
         remove_photo: false,
         _method: 'patch',
     });
+
+    const previewUser = photoPreview
+        ? { ...auth.user, profile_pic: photoPreview }
+        : { ...auth.user, profile_pic: data.remove_photo ? undefined : auth.user.profile_pic };
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -81,10 +82,6 @@ export default function Profile({
             fileInputRef.current.value = '';
         }
     };
-
-    const previewUser = photoPreview
-        ? { ...auth.user, profile_pic: photoPreview }
-        : { ...auth.user, profile_pic: data.remove_photo ? undefined : auth.user.profile_pic };
 
     const formatPhoneNumber = (value: string) => {
         const cleaned = value.replace(/\D/g, '');
@@ -127,7 +124,7 @@ export default function Profile({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Configurações de perfil" />
+            <Head title={t('auth.profile.head_title')} />
 
             <SettingsLayout>
                 <div className="flex items-center gap-4 border-b pb-6">
@@ -137,7 +134,7 @@ export default function Profile({
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             className="bg-primary text-primary-foreground border-background absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2"
-                            aria-label="Alterar foto de perfil"
+                            aria-label={t('auth.profile.change_photo')}
                         >
                             <Camera className="h-3 w-3" />
                         </button>
@@ -150,7 +147,7 @@ export default function Profile({
                         <div className="mt-1 flex flex-wrap gap-1">
                             {auth.user.roles.map((role) => (
                                 <Badge key={role} variant="secondary">
-                                    {ROLE_LABEL[role] ?? role}
+                                    {getRoleLabel(role)}
                                 </Badge>
                             ))}
                         </div>
@@ -159,17 +156,17 @@ export default function Profile({
                     {(previewUser.profile_pic || auth.user.profile_pic) && !data.remove_photo && (
                         <Button type="button" variant="ghost" size="sm" onClick={handleRemovePhoto}>
                             <Trash2 className="mr-1.5 h-4 w-4" />
-                            Remover foto
+                            {t('auth.profile.remove_photo')}
                         </Button>
                     )}
                 </div>
 
                 <div className="space-y-6">
-                    <HeadingSmall title="Informações do perfil" description="Atualize seu nome, endereço de e-mail, telefone e setor" />
+                    <HeadingSmall title={t('auth.profile.info_title')} description={t('auth.profile.info_desc')} />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Nome</Label>
+                            <Label htmlFor="name">{t('auth.profile.name_label')}</Label>
 
                             <Input
                                 id="name"
@@ -180,14 +177,14 @@ export default function Profile({
                                 }}
                                 required
                                 autoComplete="name"
-                                placeholder="Nome completo"
+                                placeholder={t('auth.profile.fullname_placeholder')}
                             />
 
                             <InputError className="mt-2" message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Endereço de e-mail</Label>
+                            <Label htmlFor="email">{t('auth.profile.email_label')}</Label>
 
                             <Input
                                 id="email"
@@ -199,14 +196,14 @@ export default function Profile({
                                 }}
                                 required
                                 autoComplete="username"
-                                placeholder="Endereço de e-mail"
+                                placeholder={t('auth.profile.email_placeholder')}
                             />
 
                             <InputError className="mt-2" message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="phone">Número de celular</Label>
+                            <Label htmlFor="phone">{t('auth.profile.phone_label')}</Label>
 
                             <Input
                                 id="phone"
@@ -222,7 +219,7 @@ export default function Profile({
                         </div>
 
                         <div className="border-t pt-6">
-                            <h3 className="text-foreground mb-4 text-lg font-medium">Informações Institucionais</h3>
+                            <h3 className="text-foreground mb-4 text-lg font-medium">{t('auth.profile.institutional_info')}</h3>
                             <SeletorInstituicao
                                 instituicaos={instituicaos}
                                 processing={processing}
@@ -256,9 +253,9 @@ export default function Profile({
                         )}
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Salvar</Button>
+                            <Button disabled={processing}>{t('auth.profile.save_button')}</Button>
 
-                            {recentlySuccessful && <p className="text-muted-foreground text-sm">Salvo</p>}
+                            {recentlySuccessful && <p className="text-muted-foreground text-sm">{t('auth.profile.saved_text')}</p>}
                         </div>
                     </form>
                 </div>

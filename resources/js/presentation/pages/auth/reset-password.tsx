@@ -5,6 +5,7 @@ import { SyntheticEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
 import { PasswordStrengthMeter } from '@/presentation/molecules/PasswordStrengthMeter';
 import AuthLayout from '@/presentation/templates/AuthLayout';
@@ -22,6 +23,7 @@ interface ResetPasswordForm {
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
         token: token,
         email: email,
@@ -39,12 +41,16 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     };
 
     return (
-        <AuthLayout title="Redefinição de Senha" description="Informe sua nova senha para restaurar o acesso à plataforma" maxWidth="md">
-            <Head title="Redefinição de senha" />
+        <AuthLayout
+            title={t('auth.resetPassword.title')}
+            description={t('auth.resetPassword.subtitle')}
+            maxWidth="md"
+        >
+            <Head title={t('auth.resetPassword.head_title')} />
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
+                    <Label htmlFor="email">{t('auth.resetPassword.email')}</Label>
                     <Input
                         id="email"
                         type="email"
@@ -59,7 +65,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password">Nova Senha</Label>
+                    <Label htmlFor="password">{t('auth.resetPassword.password')}</Label>
                     <Input
                         id="password"
                         type="password"
@@ -70,7 +76,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         onChange={(e) => {
                             setData('password', e.target.value);
                         }}
-                        placeholder="Digite sua nova senha"
+                        placeholder={t('auth.resetPassword.password_placeholder')}
                         className={errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}
                         disabled={processing}
                     />
@@ -79,7 +85,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password_confirmation">Confirmar Nova Senha</Label>
+                    <Label htmlFor="password_confirmation">{t('auth.resetPassword.password_confirmation')}</Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -89,7 +95,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         onChange={(e) => {
                             setData('password_confirmation', e.target.value);
                         }}
-                        placeholder="Confirme sua nova senha"
+                        placeholder={t('auth.resetPassword.password_confirmation_placeholder')}
                         className={errors.password_confirmation ? 'border-destructive focus-visible:ring-destructive' : ''}
                         disabled={processing}
                     />
@@ -100,17 +106,17 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     {processing ? (
                         <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Redefinindo senha...
+                            {t('auth.resetPassword.submitting')}
                         </>
                     ) : (
-                        'Salvar Nova Senha'
+                        t('auth.resetPassword.submit')
                     )}
                 </Button>
 
                 <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
-                    Lembrou da senha antiga?{' '}
+                    {t('auth.resetPassword.remembered_password')}{' '}
                     <Link href={route('login')} className="text-primary font-medium underline-offset-4 hover:underline">
-                        Voltar para o login
+                        {t('auth.resetPassword.back_to_login')}
                     </Link>
                 </div>
             </form>

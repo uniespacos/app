@@ -1,12 +1,30 @@
 import { opcoesRecorrencia } from '@/constants/recorrencia';
 import { useSlotSelection } from '@/hooks/use-slot-selection';
-import { Espaco, Reserva, ReservaFormData, SlotCalendario } from '@/types';
+import { Espaco, Reserva, SlotCalendario, ValorOcorrenciaType } from '@/types';
+import { ReservaFormData } from '@/types/reserva-stepper';
 import { useForm } from '@inertiajs/react';
 import { addMonths, format, parse } from 'date-fns';
 import { type SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 declare function route(name: string, params?: unknown): string;
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- useForm<T> do Inertia exige um index signature que `interface` não satisfaz.
+type AgendaSelectionFormData = {
+    titulo: string;
+    descricao: string;
+    data_inicial: Date | null;
+    data_final: Date | null;
+    recorrencia: ValorOcorrenciaType;
+    horarios_solicitados: {
+        data: string;
+        horario_inicio: string;
+        horario_fim: string;
+        agenda_id?: number;
+    }[];
+    edit_scope?: 'single' | 'recurring';
+    edited_week_date?: string;
+};
 
 interface UseAgendaSelectionProps {
     espaco: Espaco;
@@ -41,7 +59,7 @@ export function useAgendaSelection({ reserva, isEditMode, semanaVisivel }: UseAg
 
     const [dialogAberto, setDialogAberto] = useState(false);
 
-    const { data, setData, post, patch, processing, reset } = useForm<ReservaFormData>({
+    const { data, setData, post, patch, processing, reset } = useForm<AgendaSelectionFormData>({
         titulo: reserva?.titulo ?? '',
         descricao: reserva?.descricao ?? '',
         data_inicial: reserva?.data_inicial ? new Date(reserva.data_inicial) : hoje,
@@ -138,8 +156,8 @@ export function useAgendaSelection({ reserva, isEditMode, semanaVisivel }: UseAg
         setSlotsSelecao,
         dialogAberto,
         setDialogAberto,
-        formData: data,
-        setFormData: setData,
+        formData: data as unknown as ReservaFormData,
+        setFormData: setData as unknown as (key: keyof ReservaFormData, value: unknown) => void,
         processing,
         handleFormSubmit,
     };

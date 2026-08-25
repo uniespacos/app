@@ -5,17 +5,18 @@ import { SyntheticEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<{ password: string }>>({
+    const { t } = useTranslation();
+    const { data, setData, post, processing, errors, reset } = useForm({
         password: '',
     });
 
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-
         post(route('password.confirm'), {
             onFinish: () => {
                 reset('password');
@@ -25,20 +26,20 @@ export default function ConfirmPassword() {
 
     return (
         <AuthLayout
-            title="Confirmar Senha"
-            description="Esta é uma área segura da plataforma. Por favor, confirme sua senha antes de continuar."
+            title={t('auth.confirmPassword.title')}
+            description={t('auth.confirmPassword.subtitle')}
             maxWidth="md"
         >
-            <Head title="Confirmar senha" />
+            <Head title={t('auth.confirmPassword.head_title')} />
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
+                    <Label htmlFor="password">{t('auth.confirmPassword.password')}</Label>
                     <Input
                         id="password"
                         type="password"
                         name="password"
-                        placeholder="Digite sua senha de acesso"
+                        placeholder={t('auth.confirmPassword.password_placeholder')}
                         autoComplete="current-password"
                         value={data.password}
                         autoFocus
@@ -55,10 +56,10 @@ export default function ConfirmPassword() {
                     {processing ? (
                         <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Confirmando...
+                            {t('auth.confirmPassword.submitting')}
                         </>
                     ) : (
-                        'Confirmar Senha'
+                        t('auth.confirmPassword.submit')
                     )}
                 </Button>
             </form>

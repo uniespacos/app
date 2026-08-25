@@ -5,6 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { useTranslation } from '@/i18n';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
@@ -54,6 +55,7 @@ function nivelParaLabel(nivel: number): string {
 }
 
 export default function Modulos() {
+    const { t } = useTranslation();
     const { modulos, unidades, filters } = usePage<{
         modulos: {
             data: Modulo[];
@@ -102,7 +104,7 @@ export default function Modulos() {
         () => [
             {
                 id: 'modulo',
-                header: 'Módulo',
+                header: t('admin.modulos.titulo'),
                 enableSorting: true,
                 cell: (modulo) => (
                     <div className="flex items-center gap-3">
@@ -118,7 +120,7 @@ export default function Modulos() {
             },
             {
                 id: 'unidade',
-                header: 'Unidade',
+                header: t('admin.unidades.titulo'),
                 cell: (modulo) => (
                     <div className="flex items-center gap-2">
                         <Building className="text-muted-foreground h-4 w-4" />
@@ -133,12 +135,12 @@ export default function Modulos() {
             },
             {
                 id: 'instituicao',
-                header: 'Instituição',
+                header: t('admin.instituicoes.titulo'),
                 cell: (modulo) => <span className="text-sm font-medium">{modulo.unidade?.instituicao?.sigla ?? 'N/A'}</span>,
             },
             {
                 id: 'andares',
-                header: 'Andares',
+                header: t('espacos.filtros.andar'),
                 cell: (modulo) => (
                     <div className="flex flex-wrap gap-1">
                         {modulo.andars && modulo.andars.length > 0 ? (
@@ -148,7 +150,7 @@ export default function Modulos() {
                                 </Badge>
                             ))
                         ) : (
-                            <span className="text-muted-foreground text-xs">Sem andares</span>
+                            <span className="text-muted-foreground text-xs">{t('common.empty.noRecords')}</span>
                         )}
                         {modulo.andars && modulo.andars.length > 3 && (
                             <Badge variant="secondary" className="text-xs">
@@ -159,7 +161,7 @@ export default function Modulos() {
                 ),
             },
         ],
-        [],
+        [t],
     );
 
     const renderCard = (modulo: Modulo) => {
@@ -180,93 +182,69 @@ export default function Modulos() {
                                         <Layers className="h-5 w-5" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <CardTitle className="truncate text-base font-semibold">{modulo.nome}</CardTitle>
-                                        <p className="text-muted-foreground truncate text-xs">
-                                            {modulo.unidade?.nome} ({modulo.unidade?.sigla}) • {String(modulo.andars?.length ?? 0)} andar(es)
-                                        </p>
+                                        <CardTitle className="text-foreground truncate text-base font-semibold">{modulo.nome}</CardTitle>
+                                        <div className="text-muted-foreground mt-0.5 flex items-center space-x-2 text-xs">
+                                            <span className="truncate">{modulo.unidade?.nome ?? 'Sem unidade'}</span>
+                                            {modulo.unidade?.sigla && (
+                                                <Badge variant="secondary" className="text-[10px]">
+                                                    {modulo.unidade.sigla}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex shrink-0 items-center gap-1">
-                                    <Link
-                                        href={route('institucional.modulos.edit', { modulo: modulo.id })}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                        }}
-                                    >
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Editar módulo">
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-destructive hover:text-destructive h-8 w-8"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setRemoverModulo(modulo);
-                                        }}
-                                        aria-label="Excluir módulo"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
+                                <div className="flex items-center space-x-2">
+                                    <Badge variant="outline" className="text-xs">
+                                        {String(modulo.andars?.length ?? 0)} andar(es)
+                                    </Badge>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                     </Button>
-                                    {isExpanded ? (
-                                        <ChevronDown className="text-muted-foreground h-4 w-4" />
-                                    ) : (
-                                        <ChevronRight className="text-muted-foreground h-4 w-4" />
-                                    )}
                                 </div>
                             </div>
                         </CardHeader>
                     </CollapsibleTrigger>
-
                     <CollapsibleContent>
-                        <CardContent className="border-border/60 border-t p-4 pt-0">
-                            <div className="space-y-4">
-                                <div className="bg-muted/30 space-y-1 rounded-lg p-3 text-xs">
-                                    <div>
-                                        <span className="text-foreground font-semibold">Instituição:</span> {modulo.unidade?.instituicao?.nome} (
-                                        {modulo.unidade?.instituicao?.sigla})
-                                    </div>
-                                    <div>
-                                        <span className="text-foreground font-semibold">Endereço:</span> {modulo.unidade?.instituicao?.endereco}
-                                    </div>
+                        <CardContent className="border-border space-y-4 border-t p-4 pt-3">
+                            <div>
+                                <div className="mb-2 flex items-center justify-between">
+                                    <h4 className="text-foreground text-sm font-medium">Andares do Módulo</h4>
+                                    <span className="text-muted-foreground text-xs">{String(modulo.andars?.length ?? 0)} cadastrado(s)</span>
                                 </div>
 
-                                <div>
-                                    <h4 className="text-foreground mb-2 text-xs font-semibold tracking-wider uppercase">Andares do Módulo</h4>
-                                    {modulo.andars && modulo.andars.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {modulo.andars
-                                                .sort((a, b) => nomeParaNivel(a.nome) - nomeParaNivel(b.nome))
-                                                .map((andar) => (
-                                                    <div
-                                                        key={andar.id}
-                                                        className="bg-card flex items-center justify-between gap-2 rounded-md border p-2.5 text-xs"
-                                                    >
-                                                        <div>
-                                                            <div className="text-foreground font-medium">
-                                                                {nivelParaLabel(nomeParaNivel(andar.nome))}
-                                                            </div>
-                                                            <div className="text-muted-foreground">Nível: {String(nomeParaNivel(andar.nome))}</div>
+                                {modulo.andars && modulo.andars.length > 0 ? (
+                                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                        {modulo.andars
+                                            .slice()
+                                            .sort((a, b) => nomeParaNivel(a.nome) - nomeParaNivel(b.nome))
+                                            .map((andar) => (
+                                                <div
+                                                    key={andar.id}
+                                                    className="bg-card flex items-center justify-between gap-2 rounded-md border p-2.5 text-xs"
+                                                >
+                                                    <div>
+                                                        <div className="text-foreground font-medium">
+                                                            {nivelParaLabel(nomeParaNivel(andar.nome))}
                                                         </div>
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {andar.tipo_acesso.map((tipo) => (
-                                                                <Badge
-                                                                    key={tipo}
-                                                                    variant="outline"
-                                                                    className={tiposAcessoColors[tipo] ?? 'bg-muted text-foreground'}
-                                                                >
-                                                                    {tipo}
-                                                                </Badge>
-                                                            ))}
-                                                        </div>
+                                                        <div className="text-muted-foreground">Nível: {String(nomeParaNivel(andar.nome))}</div>
                                                     </div>
-                                                ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-muted-foreground text-xs">Nenhum andar cadastrado para este módulo.</p>
-                                    )}
-                                </div>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {andar.tipo_acesso.map((tipo) => (
+                                                            <Badge
+                                                                key={tipo}
+                                                                variant="outline"
+                                                                className={tiposAcessoColors[tipo] ?? 'bg-muted text-foreground'}
+                                                            >
+                                                                {tipo}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground text-xs">{t('common.empty.noRecords')}</p>
+                                )}
                             </div>
                         </CardContent>
                     </CollapsibleContent>
@@ -277,13 +255,13 @@ export default function Modulos() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Módulos" />
+            <Head title={t('admin.modulos.titulo')} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo="Gerenciar Módulos"
-                    descricao="Aqui você consegue gerenciar os módulos das unidades"
-                    buttonText="Criar novo"
+                    titulo={t('admin.modulos.titulo')}
+                    descricao={t('admin.modulos.desc')}
+                    buttonText={t('admin.modulos.novo')}
                     buttonLink={route('institucional.modulos.create')}
                     ButtonIcon={PlusCircle}
                     canSeeButton={true}
@@ -295,19 +273,19 @@ export default function Modulos() {
                             <SearchFilter
                                 searchTerm={searchTerm}
                                 onSearchTermChange={setSearchTerm}
-                                placeholder="Buscar módulo por nome..."
+                                placeholder={t('common.actions.search')}
                                 variant="plain"
                             />
                         </div>
 
                         <div className="space-y-2 sm:w-[220px]">
-                            <Label>Unidade</Label>
+                            <Label>{t('espacos.filtros.unidade')}</Label>
                             <Select value={selectedUnidade} onValueChange={handleUnidadeChange}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Todas as Unidades" />
+                                    <SelectValue placeholder={t('espacos.filtros.unidade')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Todas as Unidades</SelectItem>
+                                    <SelectItem value="all">{t('common.empty.noResults')}</SelectItem>
                                     {unidades.map((unidade) => (
                                         <SelectItem key={unidade.id} value={unidade.id.toString()}>
                                             {unidade.nome} ({unidade.sigla})
@@ -328,15 +306,15 @@ export default function Modulos() {
                     gridClassName="grid gap-4 grid-cols-1"
                     pagination={{ links: modulos.links }}
                     emptyState={{
-                        title: 'Nenhum módulo encontrado',
-                        description: 'Tente ajustar sua busca ou cadastre um novo módulo.',
+                        title: t('admin.modulos.nenhum'),
+                        description: t('common.empty.adjustFilter'),
                     }}
                     actions={(modulo) => (
                         <div className="flex justify-end gap-2">
                             <Link href={route('institucional.modulos.edit', { modulo: modulo.id })}>
                                 <Button variant="outline" size="sm" className="gap-1 text-xs">
                                     <Edit className="h-3 w-3" />
-                                    Editar
+                                    {t('common.actions.edit')}
                                 </Button>
                             </Link>
                             <Button
@@ -348,7 +326,7 @@ export default function Modulos() {
                                 className="gap-1 text-xs"
                             >
                                 <Trash2 className="h-3 w-3" />
-                                Excluir
+                                {t('common.actions.delete')}
                             </Button>
                         </div>
                     )}

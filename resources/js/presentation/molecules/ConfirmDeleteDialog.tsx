@@ -11,6 +11,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n';
 
 interface ConfirmDeleteDialogProps {
     open: boolean;
@@ -29,21 +30,28 @@ interface ConfirmDeleteDialogProps {
 export function ConfirmDeleteDialog({
     open,
     onOpenChange,
-    title = 'Confirmar Exclusão',
+    title,
     description,
     onConfirm,
     isDeleting = false,
-    confirmText = 'Excluir',
-    cancelText = 'Cancelar',
+    confirmText,
+    cancelText,
     disabled = false,
     showCancel = true,
     closeText,
 }: ConfirmDeleteDialogProps) {
+    const { t } = useTranslation();
+
+    const dialogTitle = title ?? t('common.dialogs.deleteTitle');
+    const dialogConfirmText = confirmText ?? t('common.actions.delete');
+    const dialogCancelText = cancelText ?? t('common.actions.cancel');
+    const dialogCloseText = closeText ?? t('common.actions.close');
+
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
                     <AlertDialogDescription>{description}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="gap-2">
@@ -55,11 +63,11 @@ export function ConfirmDeleteDialog({
                             }}
                             type="button"
                         >
-                            {closeText}
+                            {dialogCloseText}
                         </Button>
                     ) : (
                         <>
-                            {showCancel && <AlertDialogCancel disabled={isDeleting}>{cancelText}</AlertDialogCancel>}
+                            {showCancel && <AlertDialogCancel disabled={isDeleting}>{dialogCancelText}</AlertDialogCancel>}
                             <AlertDialogAction
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -68,7 +76,7 @@ export function ConfirmDeleteDialog({
                                 disabled={disabled || isDeleting}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                                {isDeleting ? 'Excluindo...' : confirmText}
+                                {isDeleting ? t('common.actions.deleting') : dialogConfirmText}
                             </AlertDialogAction>
                         </>
                     )}

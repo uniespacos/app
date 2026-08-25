@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslation } from '@/i18n';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { DeleteRoleConfirmation } from '@/presentation/organisms/DeleteRoleConfirmation';
@@ -23,6 +24,7 @@ const breadcrumbs = [
 ];
 
 export default function RolesPage() {
+    const { t } = useTranslation();
     const { roles, permissions } = usePage<{
         roles: Role[];
         permissions: Record<string, Permission[]>;
@@ -85,7 +87,7 @@ export default function RolesPage() {
                     }}
                 >
                     <Edit className="mr-2 h-4 w-4" />
-                    Editar
+                    {t('common.actions.edit')}
                 </DropdownMenuItem>
                 {!role.is_system && (
                     <DropdownMenuItem
@@ -95,7 +97,7 @@ export default function RolesPage() {
                         className="text-destructive focus:text-destructive"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Deletar
+                        {t('common.actions.delete')}
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>
@@ -106,7 +108,7 @@ export default function RolesPage() {
         () => [
             {
                 id: 'nome',
-                header: 'Papel',
+                header: t('admin.roles.titulo'),
                 enableSorting: true,
                 cell: (role) => (
                     <div className="flex items-center gap-2.5">
@@ -128,12 +130,12 @@ export default function RolesPage() {
             },
             {
                 id: 'descricao',
-                header: 'Descrição',
-                cell: (role) => <span className="text-muted-foreground text-sm">{role.description ?? 'Sem descrição'}</span>,
+                header: t('espacos.detalhes.descricao'),
+                cell: (role) => <span className="text-muted-foreground text-sm">{role.description ?? t('common.empty.noData')}</span>,
             },
             {
                 id: 'permissoes',
-                header: 'Permissões',
+                header: t('usuarios.gerenciar.permissoes'),
                 align: 'center',
                 width: '120px',
                 cell: (role) => (
@@ -144,13 +146,13 @@ export default function RolesPage() {
             },
             {
                 id: 'usuarios',
-                header: 'Usuários',
+                header: t('usuarios.titulo'),
                 align: 'center',
                 width: '120px',
-                cell: (role) => <span className="text-foreground text-sm font-medium">{String(role.users_count ?? 0)} usuário(s)</span>,
+                cell: (role) => <span className="text-foreground text-sm font-medium">{String(role.users_count ?? 0)}</span>,
             },
         ],
-        [],
+        [t],
     );
 
     const renderCard = (role: Role) => (
@@ -184,12 +186,12 @@ export default function RolesPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Gerenciar Papéis" />
+            <Head title={t('admin.roles.titulo')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo="Gestão de Papéis"
-                    descricao="Crie, edite e gerencie os papéis e suas permissões."
-                    buttonText="Novo Papel"
+                    titulo={t('admin.roles.titulo')}
+                    descricao={t('admin.roles.desc')}
+                    buttonText={t('admin.roles.novo')}
                     ButtonIcon={Plus}
                     canSeeButton={true}
                     buttonOnClick={handleCreateNew}
@@ -198,9 +200,9 @@ export default function RolesPage() {
                 <Card>
                     <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-end">
                         <div className="flex-1 space-y-2">
-                            <Label>Buscar</Label>
+                            <Label>{t('common.actions.search')}</Label>
                             <Input
-                                placeholder="Buscar por nome ou descrição..."
+                                placeholder={t('common.actions.search')}
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -209,7 +211,7 @@ export default function RolesPage() {
                         </div>
 
                         <div className="space-y-2 sm:w-[180px]">
-                            <Label>Tipo</Label>
+                            <Label>{t('espacos.filtros.tipo')}</Label>
                             <Select
                                 value={typeFilter}
                                 onValueChange={(v) => {
@@ -220,7 +222,7 @@ export default function RolesPage() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Todas</SelectItem>
+                                    <SelectItem value="all">{t('common.empty.noResults')}</SelectItem>
                                     <SelectItem value="system">Sistema</SelectItem>
                                     <SelectItem value="custom">Customizadas</SelectItem>
                                 </SelectContent>
@@ -237,8 +239,8 @@ export default function RolesPage() {
                     renderCard={renderCard}
                     gridClassName="grid gap-4 grid-cols-1"
                     emptyState={{
-                        title: 'Nenhum papel encontrado',
-                        description: 'Ajuste seus filtros para encontrar outros papéis.',
+                        title: t('admin.roles.nenhum'),
+                        description: t('common.empty.adjustFilter'),
                     }}
                     actions={renderRoleActions}
                 />

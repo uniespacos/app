@@ -54,7 +54,10 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
                     <span className="text-foreground font-semibold">{strengthLabel}</span>
                 </div>
                 <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
-                    <div className={cn('h-full rounded-full transition-all duration-300', progressColor)} style={{ width: `${strengthScore}%` }} />
+                    <div
+                        className={cn('h-full rounded-full transition-all duration-300', progressColor)}
+                        style={{ width: `${strengthScore.toString()}%` }}
+                    />
                 </div>
             </div>
 

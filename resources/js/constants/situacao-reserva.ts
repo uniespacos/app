@@ -1,17 +1,12 @@
-import type { SituacaoReserva } from '@/types';
+import { SituacaoReserva, type SituacaoReservaType } from '@/contracts/situacao-reserva.contract';
+
+export * from '@/contracts/situacao-reserva.contract';
 
 /**
  * Estilo visual de cada situação de reserva, em um lugar só.
  *
- * Antes existiam quatro definições divergentes do que é "deferida", cada uma
- * com um tom diferente do verde do Tailwind: o badge usava a escala 50/200/700,
- * getStatusReservaColor usava a 500, a célula do calendário a 100/300 e a lista
- * mobile a 500 de novo.
- *
- * Quatro tons para o mesmo significado, e nenhum deles reagia ao modo escuro —
- * um texto na escala 700 sobre fundo escuro fica ilegível. Os tokens semânticos
- * (success/warning/info/destructive) resolvem os dois problemas: uma definição
- * por significado, e o próprio token troca de valor no tema escuro.
+ * Utiliza tokens semânticos Catppuccin sob Tailwind v4 para garantir contraste
+ * e suporte nativo a modo claro e escuro.
  */
 export interface EstiloSituacao {
     /** Rótulo em português, já acentuado. */
@@ -24,32 +19,32 @@ export interface EstiloSituacao {
     celula: string;
 }
 
-export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
-    em_analise: {
+export const ESTILO_SITUACAO: Record<SituacaoReservaType, EstiloSituacao> = {
+    [SituacaoReserva.EM_ANALISE]: {
         label: 'Em Análise',
         badge: 'border-warning-accent/30 bg-warning-subtle text-warning-accent',
         solido: 'bg-warning',
         celula: 'border-warning-accent/30 bg-warning-subtle',
     },
-    parcialmente_deferida: {
+    [SituacaoReserva.PARCIALMENTE_DEFERIDA]: {
         label: 'Parcialmente Deferida',
         badge: 'border-info-accent/30 bg-info-subtle text-info-accent',
         solido: 'bg-info',
         celula: 'border-info-accent/30 bg-info-subtle',
     },
-    deferida: {
+    [SituacaoReserva.DEFERIDA]: {
         label: 'Deferida',
         badge: 'border-success-accent/30 bg-success-subtle text-success-accent',
         solido: 'bg-success',
         celula: 'border-success-accent/30 bg-success-subtle',
     },
-    indeferida: {
+    [SituacaoReserva.INDEFERIDA]: {
         label: 'Indeferida',
         badge: 'border-destructive-accent/30 bg-destructive-subtle text-destructive-accent',
         solido: 'bg-destructive',
         celula: 'border-destructive-accent/30 bg-destructive-subtle',
     },
-    inativa: {
+    [SituacaoReserva.INATIVA]: {
         label: 'Inativa / Cancelada',
         badge: 'border-neutral-accent/30 bg-neutral-subtle text-neutral-accent',
         solido: 'bg-neutral-accent',
@@ -63,20 +58,8 @@ export const ESTILO_SITUACAO: Record<SituacaoReserva, EstiloSituacao> = {
  * situações de reserva nenhuma.
  */
 export const ESTILO_SLOT = {
-    // `fundo` fica vazio de propósito: livre é o estado neutro de repouso, a
-    // cor entra só no hover (grade desktop e lista mobile aplicam isso na
-    // própria classe do container, não aqui, porque hover não é um valor
-    // estático). Mantido aqui só para as duas visões usarem o mesmo shape.
     livre: { label: 'Livre', solido: 'bg-muted-foreground/25', fundo: '' },
     reservado: { label: 'Reservado', solido: 'bg-info', fundo: 'bg-info-subtle' },
-    /*
-      `selecionado` é o horário que o usuário está escolhendo para reservar
-      agora — verde, não a cor de marca. Reutiliza o mesmo token de `deferida`
-      de propósito: para quem está montando a reserva, "vou pegar este
-      horário" e "este horário foi aprovado" são a mesma sinalização de
-      positivo, e usar cores diferentes para os dois criaria uma distinção que
-      o usuário não precisa fazer nesse momento.
-    */
     selecionado: { label: 'Selecionado', solido: 'bg-success', fundo: 'bg-success-subtle' },
     solicitado: { label: 'Em análise', solido: 'bg-warning', fundo: 'bg-warning-subtle' },
     deferida: { label: 'Deferida', solido: 'bg-success', fundo: 'bg-success-subtle' },

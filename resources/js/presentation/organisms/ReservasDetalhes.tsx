@@ -1,6 +1,10 @@
 import { mapearStatusBackendParaSlot } from '@/lib/utils/reserva-status.helpers';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { PERMISSION_RESERVAS_AVALIAR } from '@/constants/permissions';
+import { SituacaoReserva } from '@/contracts';
+import { useTranslation } from '@/i18n';
+import { Can } from '@/lib/auth-can';
 import { diasDaSemana, formatDate } from '@/lib/utils';
 import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
@@ -13,6 +17,8 @@ import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, s
 import { CalendarDays, Clock, Edit, ExternalLink, FileText, Home, Loader2, User, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+declare function route(name: string, params?: unknown): string;
+
 interface ReservaDetalhesProps {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
@@ -23,6 +29,7 @@ interface ReservaDetalhesProps {
 }
 
 export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva, isGestor, setRemoverReserva, routeName }: ReservaDetalhesProps) {
+    const { t } = useTranslation();
     const { semana } = usePage<{ semana?: { referencia: string } }>().props;
 
     const [isLoading, setIsLoading] = useState(false);
@@ -51,12 +58,12 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
         [selectedReserva.horarios],
     );
 
-    const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === 'indeferida')?.justificativa;
+    const justificativaReserva = selectedReserva.horarios.find((horario) => horario.situacao === SituacaoReserva.INDEFERIDA)?.justificativa;
     const espaco = selectedReserva.horarios[0]?.agenda?.espaco;
 
     const navegarParaSemana = (novaData: Date) => {
         setSemanaVisivel(novaData);
-        const params = {
+        const params: { reserva: number; semana: string } = {
             reserva: selectedReserva.id,
             semana: format(novaData, 'yyyy-MM-dd'),
         };
@@ -105,11 +112,11 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                 <span className="flex flex-col justify-between">
                     <span className="flex items-center gap-2 p-1">
                         <User className="h-4 w-4" />
-                        Solicitado por: {selectedReserva.user?.name}
+                        {t('reservas.detalhes.solicitante')}: {selectedReserva.user?.name}
                     </span>
                     <span className="flex items-center gap-2 p-1">
                         <Home className="h-4 w-4" />
-                        Espaço: {espaco?.nome ?? ' '}
+                        {t('reservas.detalhes.espaco')}: {espaco?.nome ?? ' '}
                         {espaco && (
                             <Button
                                 variant="link"
@@ -119,7 +126,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                                     router.get(route('espacos.show', espaco.id));
                                 }}
                             >
-                                Ver agenda do espaço <ExternalLink className="ml-1 h-3 w-3" />
+                                {t('espacos.card.ver_agenda')} <ExternalLink className="ml-1 h-3 w-3" />
                             </Button>
                         )}
                     </span>
@@ -130,14 +137,28 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             }
             footer={
                 isGestor ? (
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            router.get(`/gestor/reservas/${selectedReserva.id}`);
-                        }}
+                    <Can
+                        permission={PERMISSION_RESERVAS_AVALIAR}
+                        fallback={
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    router.get(`/gestor/reservas/${String(selectedReserva.id)}`);
+                                }}
+                            >
+                                <Edit className="mr-1 h-4 w-4" /> {t('reservas.acoes.avaliar')}
+                            </Button>
+                        }
                     >
-                        <Edit className="mr-1 h-4 w-4" /> Avaliar
-                    </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                router.get(`/gestor/reservas/${String(selectedReserva.id)}`);
+                            }}
+                        >
+                            <Edit className="mr-1 h-4 w-4" /> {t('reservas.acoes.avaliar')}
+                        </Button>
+                    </Can>
                 ) : (
                     <div className="flex gap-2">
                         {selectedReserva.can_update && (
@@ -147,30 +168,32 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
                                     router.get(route('reservas.edit', selectedReserva.id));
                                 }}
                             >
-                                <Edit className="mr-1 h-4 w-4" /> Editar
+                                <Edit className="mr-1 h-4 w-4" /> {t('reservas.acoes.editar')}
                             </Button>
                         )}
-                        <Button
-                            variant="destructive"
-                            onClick={() => {
-                                setRemoverReserva(selectedReserva);
-                            }}
-                        >
-                            <XCircle className="mr-1 h-4 w-4" /> Cancelar
-                        </Button>
+                        {selectedReserva.situacao !== SituacaoReserva.INATIVA && (
+                            <Button
+                                variant="destructive"
+                                onClick={() => {
+                                    setRemoverReserva(selectedReserva);
+                                }}
+                            >
+                                <XCircle className="mr-1 h-4 w-4" /> {t('reservas.acoes.cancelar')}
+                            </Button>
+                        )}
                     </div>
                 )
             }
         >
             <span>
-                <h4 className="text-foreground mb-2 font-medium">Descrição</h4>
-                <p className="bg-muted/50 text-foreground rounded-lg p-3">{selectedReserva.descricao}</p>
+                <h4 className="text-foreground mb-2 font-medium">{t('reservas.detalhes.justificativa')}</h4>
+                <p className="bg-muted/50 text-foreground rounded-lg p-3">{selectedReserva.descricao || t('reservas.detalhes.sem_justificativa')}</p>
             </span>
             <Separator />
             <div className="flex items-center gap-2">
                 <CalendarDays className="text-muted-foreground h-4 w-4" />
                 <div>
-                    <p className="text-muted-foreground text-sm">Período Total da Reserva</p>
+                    <p className="text-muted-foreground text-sm">{t('reservas.stepper.period_recurrence')}</p>
                     <p className="font-medium">
                         {formatDate(selectedReserva.data_inicial)} até {formatDate(selectedReserva.data_final)}
                     </p>
@@ -180,7 +203,7 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             <div className="mb-4 space-y-4">
                 <h4 className="text-foreground flex items-center gap-2 font-medium">
                     <Clock className="h-4 w-4" />
-                    Horários Solicitados
+                    {t('reservas.tabela.horarios_solicitados')}
                 </h4>
 
                 <div className="relative mb-4 space-y-4">
@@ -210,14 +233,14 @@ export default function ReservaDetalhes({ isOpen, onOpenChange, selectedReserva,
             <Separator />
             {justificativaReserva && (
                 <div>
-                    <h4 className="text-destructive mb-2 font-medium">Justificativa do indeferimento</h4>
+                    <h4 className="text-destructive mb-2 font-medium">{t('reservas.avaliacao.parecer')}</h4>
                     <p className="bg-destructive-subtle text-destructive rounded-lg p-3">{justificativaReserva}</p>
                     <Separator className="mt-10" />
                 </div>
             )}
             {selectedReserva.observacao && (
                 <div>
-                    <h4 className="text-info-accent mb-2 font-medium">Observação</h4>
+                    <h4 className="text-info-accent mb-2 font-medium">{t('reservas.avaliacao.observacao')}</h4>
                     <p className="bg-info-subtle text-info-accent rounded-lg p-3">{selectedReserva.observacao}</p>
                     <Separator className="mt-5" />
                 </div>

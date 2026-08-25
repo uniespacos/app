@@ -2,13 +2,14 @@ import React, { useMemo } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Building2, Calendar, FileText, CheckCircle2, Sparkles, Users } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Espaco, SlotCalendario } from '@/types';
 import { ReservaFormData } from '@/types/reserva-stepper';
 import { opcoesRecorrencia } from '@/constants/recorrencia';
+import { useTranslation } from '@/i18n';
 
 export interface StepRevisaoConfirmacaoProps {
     espaco: Espaco;
@@ -25,6 +26,8 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
     slotsSelecao,
     isEditMode = false,
 }) => {
+    const { t } = useTranslation();
+
     const rotuloRecorrencia = useMemo(() => {
         const op = opcoesRecorrencia.find((o) => o.valor === formData.recorrencia);
         return op?.label ?? formData.recorrencia;
@@ -55,8 +58,8 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                 <Sparkles className="text-primary h-4 w-4 shrink-0" />
                 <span className="text-foreground">
                     {isEditMode
-                        ? 'Revise cuidadosamente as alterações solicitadas antes de salvar.'
-                        : 'Revise os dados abaixo antes de submeter a solicitação de reserva.'}
+                        ? t('reservas.stepper.review_edit_mode')
+                        : t('reservas.stepper.review_create_mode')}
                 </span>
             </div>
 
@@ -66,12 +69,12 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                 <div className="bg-card border-border/80 space-y-2 rounded-xl border p-3.5 shadow-xs">
                     <div className="text-foreground flex items-center gap-2 text-xs font-semibold">
                         <Building2 className="text-primary h-4 w-4" />
-                        Espaço Selecionado
+                        {t('reservas.stepper.selected_space')}
                     </div>
                     <div className="space-y-0.5 pl-6">
                         <p className="text-foreground text-sm font-semibold">{espaco.nome}</p>
                         <p className="text-muted-foreground text-xs">
-                            Capacidade: {espaco.capacidade_pessoas ? `${String(espaco.capacidade_pessoas)} pessoas` : 'Não informada'}
+                            {t('espacos.capacidade', { count: espaco.capacidade_pessoas ? String(espaco.capacidade_pessoas) : '0' })}
                         </p>
                     </div>
                 </div>
@@ -80,7 +83,7 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                 <div className="bg-card border-border/80 space-y-2 rounded-xl border p-3.5 shadow-xs">
                     <div className="text-foreground flex items-center gap-2 text-xs font-semibold">
                         <Calendar className="text-primary h-4 w-4" />
-                        Período & Recorrência
+                        {t('reservas.stepper.period_recurrence')}
                     </div>
                     <div className="space-y-0.5 pl-6">
                         <p className="text-foreground text-xs font-medium">{rotuloRecorrencia}</p>
@@ -96,7 +99,7 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                 <div className="flex items-center justify-between">
                     <div className="text-foreground flex items-center gap-2 text-xs font-semibold">
                         <FileText className="text-primary h-4 w-4" />
-                        Dados da Atividade
+                        {t('reservas.stepper.activity_data')}
                     </div>
                     {formData.publico_estimado ? (
                         <Badge variant="secondary" className="gap-1 text-[10px]">
@@ -118,7 +121,7 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                 <div className="flex items-center justify-between">
                     <span className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                         <CheckCircle2 className="text-primary h-3.5 w-3.5" />
-                        Horários da Reserva
+                        {t('reservas.stepper.reservation_slots')}
                     </span>
                     <span className="text-muted-foreground text-[11px]">{slotsSelecao.length} selecionados</span>
                 </div>
@@ -153,11 +156,10 @@ export const StepRevisaoConfirmacao: React.FC<StepRevisaoConfirmacaoProps> = ({
                     />
                     <div className="grid gap-1">
                         <Label htmlFor="termo_responsabilidade" className="text-foreground cursor-pointer text-xs leading-none font-semibold">
-                            Termo de Compromisso e Responsabilidade
+                            {t('reservas.stepper.terms_title')}
                         </Label>
                         <p className="text-muted-foreground text-[11px] leading-relaxed">
-                            Declaro que estou ciente das normas de utilização dos espaços físicos da UESB e me comprometo com o zelo, guarda
-                            patrimonial e conservação do local durante o período reservado.
+                            {t('reservas.stepper.terms_description', { institution_name: 'UESB' })}
                         </p>
                     </div>
                 </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import { GerenciarGestoresModal } from '@/presentation/organisms/GerenciarGestoresModal';
@@ -16,6 +17,7 @@ const breadcrumbs = [
 ];
 
 export default function GerenciarEspacos() {
+    const { t } = useTranslation();
     const { unidades, modulos, andares, espacos, users, filters, capacidadeEspacos } = usePage<{
         espacos: {
             data: Espaco[];
@@ -51,12 +53,12 @@ export default function GerenciarEspacos() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Gerenciar Espaços" />
+            <Head title={t('admin.espacos.titulo')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <GenericHeader
-                    titulo={'Gerenciar Espaços'}
-                    descricao={'Gerencie todos os espaços disponíveis, seus dados e gestores'}
-                    buttonText="Cadastrar Espaço"
+                    titulo={t('admin.espacos.titulo')}
+                    descricao={t('admin.espacos.desc')}
+                    buttonText={t('admin.espacos.novo')}
                     ButtonIcon={PlusCircle}
                     buttonOnClick={handleCadastrarEspaco}
                     canSeeButton
@@ -83,7 +85,7 @@ export default function GerenciarEspacos() {
                         key={espacoParaGerenciar.id}
                         espaco={espacoParaGerenciar}
                         usuarios={users}
-                        isOpen={!!espacoParaGerenciar}
+                        isOpen={Boolean(espacoParaGerenciar)}
                         onClose={() => {
                             setEspacoParaGerenciar(null);
                         }}

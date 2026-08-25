@@ -1,3 +1,4 @@
+import { ModoArquivo, OrdenacaoReserva, SituacaoReserva } from '@/contracts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ReservasFilters } from './ReservasFilters';
 
@@ -5,11 +6,11 @@ describe('ReservasFilters', () => {
     const props = {
         searchTerm: '',
         onSearchTermChange: jest.fn(),
-        selectedSituacao: '',
+        selectedSituacao: '' as const,
         onSituacaoChange: jest.fn(),
-        selectedArquivo: 'ativas',
+        selectedArquivo: ModoArquivo.ATIVAS,
         onArquivoChange: jest.fn(),
-        selectedOrdenar: 'data_solicitacao',
+        selectedOrdenar: OrdenacaoReserva.DATA_SOLICITACAO,
         onOrdenarChange: jest.fn(),
     };
 
@@ -24,13 +25,13 @@ describe('ReservasFilters', () => {
     });
 
     it('mostra o modo selecionado', () => {
-        render(<ReservasFilters {...props} selectedArquivo="arquivadas" />);
+        render(<ReservasFilters {...props} selectedArquivo={ModoArquivo.ARQUIVADAS} />);
 
         expect(screen.getByLabelText('Exibir')).toHaveTextContent('Arquivadas');
     });
 
     it('cai em Ativas quando nao recebe valor', () => {
-        render(<ReservasFilters {...props} selectedArquivo="" />);
+        render(<ReservasFilters {...props} selectedArquivo={ModoArquivo.ATIVAS} />);
 
         expect(screen.getByLabelText('Exibir')).toHaveTextContent('Ativas');
     });
@@ -64,7 +65,7 @@ describe('ReservasFilters', () => {
         fireEvent.click(screen.getByLabelText('Exibir'));
         fireEvent.click(screen.getByText('Arquivadas'));
 
-        expect(props.onArquivoChange).toHaveBeenCalledWith('arquivadas');
+        expect(props.onArquivoChange).toHaveBeenCalledWith(ModoArquivo.ARQUIVADAS);
     });
 
     it('oferece o seletor de ordenacao com Data de solicitacao como padrao', () => {
@@ -79,6 +80,15 @@ describe('ReservasFilters', () => {
         fireEvent.click(screen.getByLabelText('Ordenar por'));
         fireEvent.click(screen.getByRole('option', { name: 'Situação' }));
 
-        expect(props.onOrdenarChange).toHaveBeenCalledWith('situacao');
+        expect(props.onOrdenarChange).toHaveBeenCalledWith(OrdenacaoReserva.SITUACAO);
+    });
+
+    it('notifica o pai ao escolher situacao especifica', () => {
+        render(<ReservasFilters {...props} />);
+
+        fireEvent.click(screen.getByLabelText('Situação'));
+        fireEvent.click(screen.getByRole('option', { name: 'Em Análise' }));
+
+        expect(props.onSituacaoChange).toHaveBeenCalledWith(SituacaoReserva.EM_ANALISE);
     });
 });

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/i18n';
 import HeadingSmall from '@/presentation/atoms/HeadingSmall';
 import AppearanceTabs from '@/presentation/molecules/AppearanceTabs';
 import AppLayout from '@/presentation/templates/AppLayout';
@@ -13,15 +14,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Appearance() {
+    const { t } = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Configurações de aparência" />
+            <Head title={t('settings.appearance.title')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Aparência"
-                        description="Personalize o tema visual do sistema escolhendo entre modo claro, escuro ou automático"
+                        title={t('settings.appearance.title')}
+                        description={t('settings.appearance.desc')}
                     />
                     <AppearanceTabs />
                 </div>

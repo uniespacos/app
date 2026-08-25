@@ -15,6 +15,7 @@ use App\Http\Controllers\Institucional\InstitucionalRoleController;
 use App\Http\Controllers\Institucional\InstitucionalSetorController;
 use App\Http\Controllers\Institucional\InstitucionalUnidadeController;
 use App\Http\Controllers\Institucional\InstitucionalUsuarioController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReservaController;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,9 @@ Route::get('/', function () {
         ? redirect()->route('dashboard')
         : redirect()->route('login');
 })->name('home');
+
+// Troca de idioma da interface (acessível por autenticados e não autenticados)
+Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 

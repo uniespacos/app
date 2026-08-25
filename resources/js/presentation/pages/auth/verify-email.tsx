@@ -3,10 +3,12 @@ import { LoaderCircle } from 'lucide-react';
 import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n';
 import TextLink from '@/presentation/atoms/TextLink';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const { t } = useTranslation();
     const { post, processing } = useForm({});
 
     const submit = (e: SyntheticEvent) => {
@@ -16,15 +18,15 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
     return (
         <AuthLayout
-            title="Verificação de E-mail"
-            description="Por favor, verifique seu endereço de e-mail clicando no link que acabamos de enviar para sua caixa de entrada."
+            title={t('auth.verifyEmail.title')}
+            description={t('auth.verifyEmail.subtitle')}
             maxWidth="md"
         >
-            <Head title="Verificação de e-mail" />
+            <Head title={t('auth.verifyEmail.head_title')} />
 
             {status === 'verification-link-sent' && (
                 <div className="bg-success-subtle text-success-accent border-success/20 mb-4 rounded-lg border p-3 text-center text-sm font-medium">
-                    Um novo link de verificação foi enviado para o seu endereço de e-mail institucional.
+                    {t('auth.verifyEmail.sent_message')}
                 </div>
             )}
 
@@ -33,16 +35,16 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     {processing ? (
                         <>
                             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Enviando...
+                            {t('auth.verifyEmail.resending')}
                         </>
                     ) : (
-                        'Reenviar E-mail de Verificação'
+                        t('auth.verifyEmail.resend_button')
                     )}
                 </Button>
 
                 <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
                     <TextLink href={route('logout')} method="post" className="text-destructive font-medium hover:underline">
-                        Encerrar sessão / Sair
+                        {t('auth.verifyEmail.logout_link')}
                     </TextLink>
                 </div>
             </form>

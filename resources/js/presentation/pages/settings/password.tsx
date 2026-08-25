@@ -8,6 +8,7 @@ import { SyntheticEvent, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/i18n';
 import HeadingSmall from '@/presentation/atoms/HeadingSmall';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,6 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Password() {
+    const { t } = useTranslation();
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -51,18 +53,18 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Configurações de Senha" />
+            <Head title={t('settings.password.title')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Atualizar Senha"
-                        description="Certifique-se que sua conta está usando uma senha longa e aleatória para permanecer segura"
+                        title={t('settings.password.title')}
+                        description={t('settings.password.desc')}
                     />
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="current_password">Senha Atual</Label>
+                            <Label htmlFor="current_password">{t('settings.password.current')}</Label>
 
                             <Input
                                 id="current_password"
@@ -74,14 +76,14 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
-                                placeholder="Senha atual"
+                                placeholder={t('settings.password.current_placeholder')}
                             />
 
                             <InputError message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Nova Senha</Label>
+                            <Label htmlFor="password">{t('settings.password.new')}</Label>
 
                             <Input
                                 id="password"
@@ -93,14 +95,14 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
-                                placeholder="Nova senha"
+                                placeholder={t('settings.password.new_placeholder')}
                             />
 
                             <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirmar Senha</Label>
+                            <Label htmlFor="password_confirmation">{t('settings.password.confirm')}</Label>
 
                             <Input
                                 id="password_confirmation"
@@ -111,16 +113,16 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
-                                placeholder="Confirmar senha"
+                                placeholder={t('settings.password.confirm_placeholder')}
                             />
 
                             <InputError message={errors.password_confirmation} />
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Salvar Senha</Button>
+                            <Button disabled={processing}>{t('settings.password.submit')}</Button>
 
-                            {recentlySuccessful && <p className="text-muted-foreground text-sm">Salvo</p>}
+                            {recentlySuccessful && <p className="text-muted-foreground text-sm">{t('settings.password.saved')}</p>}
                         </div>
                     </form>
                 </div>

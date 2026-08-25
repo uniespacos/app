@@ -76,7 +76,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                             onChange={(e) => {
                                 onInputChange('email', e.target.value);
                             }}
-                            placeholder="seu@uesb.edu.br"
+                            placeholder="usuario@example.com"
                             required
                             disabled={processing}
                             className="h-11"

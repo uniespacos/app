@@ -9,6 +9,7 @@ import { StepRevisaoConfirmacao } from '@/presentation/molecules/StepRevisaoConf
 import { useReservaStepper } from '@/hooks/useReservaStepper';
 import { Espaco, SlotCalendario } from '@/types';
 import { ReservaFormData } from '@/types/reserva-stepper';
+import { useTranslation } from '@/i18n';
 
 export interface ReservaStepperModalProps {
     isOpen: boolean;
@@ -37,6 +38,7 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
     setFormData,
     setSlotsSelecao,
 }) => {
+    const { t } = useTranslation();
     const {
         currentStepId,
         steps,
@@ -57,7 +59,6 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
         isEditMode,
     });
 
-    // Reset stepper to first step when modal is opened afresh
     useEffect(() => {
         if (isOpen) {
             resetStepper();
@@ -122,12 +123,12 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
                     className="h-9 px-3 text-xs"
                 >
                     <X className="mr-1 h-3.5 w-3.5" />
-                    Cancelar
+                    {t('common.actions.cancel')}
                 </Button>
             ) : (
                 <Button type="button" variant="outline" size="sm" onClick={prevStep} disabled={isSubmitting} className="h-9 gap-1.5 px-3 text-xs">
                     <ArrowLeft className="h-3.5 w-3.5" />
-                    Voltar
+                    {t('common.actions.back')}
                 </Button>
             )}
 
@@ -154,12 +155,12 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                <span>{isEditMode ? 'Salvando...' : 'Enviando...'}</span>
+                                <span>{isEditMode ? t('reservas.stepper.saving') : t('reservas.stepper.submitting')}</span>
                             </>
                         ) : (
                             <>
                                 <Check className="h-3.5 w-3.5 stroke-[2.5]" />
-                                <span>{isEditMode ? 'Atualizar Reserva' : 'Confirmar Reserva'}</span>
+                                <span>{isEditMode ? t('reservas.stepper.save_changes') : t('reservas.stepper.submit')}</span>
                             </>
                         )}
                     </Button>
@@ -176,17 +177,15 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
             onOpenChange={onOpenChange}
             size="2xl"
             title={modalTitle}
-            description="Preencha os passos abaixo para registrar sua solicitação de reserva no espaço."
+            description={t('reservas.stepper.step1_subtitle')}
             footer={footerContent}
             className="sm:max-w-2xl"
         >
             <form onSubmit={handleFormSubmit} className="space-y-5">
-                {/* Indicador de Progresso Tátil */}
                 <div className="border-border border-b pb-3">
                     <StepperProgress steps={steps} currentStepId={currentStepId} onStepClick={goToStep} />
                 </div>
 
-                {/* Conteúdo Dinâmico do Passo Atual */}
                 <div className="max-h-[58vh] min-h-[280px] overflow-y-auto px-0.5 py-1">{renderStepContent()}</div>
             </form>
         </ResponsiveModal>

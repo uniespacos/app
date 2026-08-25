@@ -1,5 +1,9 @@
 import { Button } from '@/components/ui/button';
+import { PERMISSION_RESERVAS_AVALIAR } from '@/constants/permissions';
 import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
+import { SituacaoReserva } from '@/contracts';
+import { useTranslation } from '@/i18n';
+import { useCan } from '@/lib/auth-can';
 import { cn, formatDate } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
@@ -8,7 +12,7 @@ import { Calendar, Edit, FileText, MapPin, XCircle } from 'lucide-react';
 
 interface ReservaCardMobileProps {
     reserva: Reserva;
-    isGestor: boolean;
+    isGestor?: boolean;
     onDetalhes: (reserva: Reserva) => void;
     onAvaliar: (id: number) => void;
     onEditar: (id: number) => void;
@@ -16,10 +20,14 @@ interface ReservaCardMobileProps {
 }
 
 export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
+    const { t } = useTranslation();
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;
     const andar = espaco?.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : undefined;
     const local = [espaco?.nome, espaco?.andar?.modulo?.nome, andar].filter(Boolean).join(' - ');
+
+    const hasEvalPermission = useCan({ permission: PERMISSION_RESERVAS_AVALIAR });
+    const isModoGestor = isGestor ?? hasEvalPermission;
 
     return (
         <div className="bg-card border-border/80 relative flex overflow-hidden rounded-xl border shadow-xs transition-all duration-200 active:scale-[0.99]">
@@ -37,12 +45,12 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                 <div className="text-muted-foreground space-y-1.5 text-xs">
                     <div className="flex items-center gap-1.5">
                         <MapPin className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{local || 'Local não informado'}</span>
+                        <span className="truncate">{local || t('common.status.unknown')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Calendar className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0" />
                         <span>
-                            {formatDate(reserva.data_inicial)} à {formatDate(reserva.data_final)}
+                            {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
                         </span>
                     </div>
                 </div>
@@ -57,11 +65,11 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                         }}
                     >
                         <FileText className="mr-1.5 h-4 w-4" />
-                        Detalhes
+                        {t('reservas.acoes.ver_detalhes')}
                     </Button>
 
-                    {reserva.situacao !== 'inativa' &&
-                        (isGestor ? (
+                    {reserva.situacao !== SituacaoReserva.INATIVA &&
+                        (isModoGestor ? (
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -71,7 +79,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                 }}
                             >
                                 <Edit className="mr-1.5 h-4 w-4" />
-                                {reserva.situacao === 'em_analise' ? 'Avaliar' : 'Reavaliar'}
+                                {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
                             </Button>
                         ) : (
                             <>
@@ -85,7 +93,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                         }}
                                     >
                                         <Edit className="mr-1.5 h-4 w-4" />
-                                        Editar
+                                        {t('reservas.acoes.editar')}
                                     </Button>
                                 )}
                                 <Button
@@ -97,7 +105,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                     }}
                                 >
                                     <XCircle className="mr-1.5 h-4 w-4" />
-                                    Cancelar
+                                    {t('reservas.acoes.cancelar')}
                                 </Button>
                             </>
                         ))}

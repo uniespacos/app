@@ -6,6 +6,7 @@ use App\Exceptions\ErrorEnvelope;
 use App\Exceptions\ExceptionContext;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\HandleLocale;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
@@ -40,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             HandleAppearance::class,
+            HandleLocale::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
@@ -52,7 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Sessão expirada numa visita Inertia (ex.: paginação, favoritar) vira um
         // redirect 302 comum pro login, que o cliente Inertia não reconhece como
         // resposta válida ("All Inertia requests must receive a valid Inertia
-        // response") porque não é um visit — Inertia::location() força reload
+        // resposta") porque não é um visit — Inertia::location() força reload
         // completo do navegador em vez de tentar tratar como partial visit.
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
             if ($request->header('X-Inertia')) {

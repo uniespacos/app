@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from '@/i18n';
 import { getTurnoText } from '@/lib/utils';
 import TabsItemEspacosFavoritos from '@/presentation/molecules/TabsItemEspacosFavoritos';
 import TabsItemReserva from '@/presentation/molecules/TabsItemReserva';
@@ -42,6 +43,7 @@ export default function DashboardInstitucionalPage({
     espacosFavoritos,
     reservas,
 }: DashboardInstitucionalProps) {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     const filteredEspacosFavoritos = useMemo(() => {
@@ -57,38 +59,38 @@ export default function DashboardInstitucionalPage({
 
     const kpiCards = [
         {
-            title: 'Total de Espaços',
+            title: t('dashboard.stats.total_reservas'),
             value: estatisticasPainel.total_espacos,
-            description: 'Espaços cadastrados no sistema',
+            description: t('espacos.titulo'),
             icon: Building2,
             iconBg: 'bg-primary/10 text-primary',
         },
         {
-            title: 'Gestores Ativos',
+            title: t('usuarios.roles.gestor'),
             value: estatisticasPainel.total_gestores,
-            description: 'Com delegações atribuídas',
+            description: t('usuarios.subtitulo'),
             icon: Users,
-            iconBg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+            iconBg: 'bg-primary/10 text-primary',
         },
         {
-            title: 'Reservas do Mês',
+            title: t('nav.minhas_reservas'),
             value: estatisticasPainel.reservas_mes,
-            description: 'Solicitações no mês corrente',
+            description: t('reservas.titulo'),
             icon: CalendarDays,
-            iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+            iconBg: 'bg-primary/10 text-primary',
         },
         {
-            title: 'Unidades Integradas',
+            title: t('admin.unidades.titulo'),
             value: unidades.length,
-            description: 'Campi e módulos operacionais',
+            description: t('admin.unidades.desc'),
             icon: Layers,
-            iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+            iconBg: 'bg-primary/10 text-primary',
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title={t('dashboard.institucional_title')} />
             <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4 sm:p-6">
                 {/* Banner Institucional com Gradiente Catppuccin */}
                 <div className="border-border/70 from-primary/15 via-primary/5 to-card relative overflow-hidden rounded-2xl border bg-gradient-to-br p-6 shadow-xs sm:p-8">
@@ -97,12 +99,12 @@ export default function DashboardInstitucionalPage({
                             <div className="inline-flex items-center gap-2">
                                 <Badge variant="secondary" className="bg-background/80 text-xs font-medium backdrop-blur-xs">
                                     <Globe className="text-primary mr-1 h-3 w-3" />
-                                    Painel da Gestão Institucional
+                                    {t('dashboard.institucional_title')}
                                 </Badge>
                             </div>
-                            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">Olá, {user.name}!</h1>
+                            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">{t('dashboard.welcome', { name: user.name })}</h1>
                             <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
-                                Visão macro de todos os espaços, gestores cadastrados, unidades e volume de reservas da UESB.
+                                {t('relatorios.institucional_subtitulo', { institution_name: 'UESB' })}
                             </p>
                         </div>
                         <Button
@@ -110,23 +112,20 @@ export default function DashboardInstitucionalPage({
                             onClick={() => {
                                 router.get(route('institucional.espacos.create'));
                             }}
-                            className="shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="shrink-0"
                         >
-                            <Plus className="mr-2 h-5 w-5" />
-                            Cadastrar Espaço
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('admin.espacos.novo')}
                         </Button>
                     </div>
                 </div>
 
-                {/* Grid de KPIs Institucionais (Shadcn UI Blocks) */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Grid de Métricas Principais (Cards de KPI) */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {kpiCards.map((kpi) => {
                         const Icon = kpi.icon;
                         return (
-                            <Card
-                                key={kpi.title}
-                                className="border-border/70 bg-card hover:border-primary/40 transition-all duration-200 hover:shadow-xs"
-                            >
+                            <Card key={kpi.title} className="border-border/70 bg-card hover:border-primary/40 transition-colors">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5 pb-2">
                                     <CardTitle className="text-muted-foreground text-sm font-medium">{kpi.title}</CardTitle>
                                     <div className={`rounded-xl p-2.5 ${kpi.iconBg}`}>
@@ -142,35 +141,35 @@ export default function DashboardInstitucionalPage({
                     })}
                 </div>
 
-                {/* Abas com Conteúdo Detalhado */}
-                <Tabs defaultValue="geral" className="w-full space-y-4">
-                    <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:w-auto">
-                        <TabsTrigger value="geral" className="gap-2">
-                            <ListChecks className="h-4 w-4" />
-                            Visão Geral
+                {/* Tabs de Conteúdo: Reservas, Espaços, Gestores e Favoritos */}
+                <Tabs defaultValue="reservas" className="w-full space-y-4">
+                    <TabsList className="bg-muted/60 flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl p-1 sm:w-auto">
+                        <TabsTrigger value="reservas" className="text-xs sm:text-sm">
+                            <ListChecks className="mr-2 h-4 w-4" />
+                            {t('dashboard.tabs.solicitacoes')} ({reservas.length})
                         </TabsTrigger>
-                        <TabsTrigger value="espacos" className="gap-2">
-                            <Building2 className="h-4 w-4" />
-                            Espaços Recentes ({espacos.length})
+                        <TabsTrigger value="espacos" className="text-xs sm:text-sm">
+                            <Building2 className="mr-2 h-4 w-4" />
+                            {t('espacos.titulo')} ({espacos.length})
                         </TabsTrigger>
-                        <TabsTrigger value="gestores" className="gap-2">
-                            <Users className="h-4 w-4" />
-                            Gestores ({gestores.length})
+                        <TabsTrigger value="gestores" className="text-xs sm:text-sm">
+                            <Users className="mr-2 h-4 w-4" />
+                            {t('usuarios.roles.gestor')} ({gestores.length})
                         </TabsTrigger>
-                        <TabsTrigger value="favoritos" className="gap-2">
-                            <Star className="h-4 w-4" />
-                            Favoritos ({espacosFavoritos.length})
+                        <TabsTrigger value="favoritos" className="text-xs sm:text-sm">
+                            <Star className="mr-2 h-4 w-4" />
+                            {t('dashboard.tabs.favoritos')} ({espacosFavoritos.length})
                         </TabsTrigger>
                     </TabsList>
 
-                    {/* Aba Geral */}
-                    <TabsContent value="geral" className="mt-0 space-y-6">
+                    {/* Aba Reservas */}
+                    <TabsContent value="reservas" className="mt-0">
                         {reservas.length > 0 ? (
                             <TabsItemReserva reservas={reservas} />
                         ) : (
                             <Card className="border-border/70">
                                 <CardContent className="text-muted-foreground py-12 text-center text-sm">
-                                    Nenhuma reserva registrada recentemente.
+                                    {t('dashboard.empty.no_reservas')}
                                 </CardContent>
                             </Card>
                         )}
@@ -181,8 +180,8 @@ export default function DashboardInstitucionalPage({
                         <Card className="border-border/70">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5">
                                 <div>
-                                    <CardTitle className="text-base font-semibold">Espaços Cadastrados Recentemente</CardTitle>
-                                    <CardDescription className="text-xs">Distribuição de gestores e turnos por espaço</CardDescription>
+                                    <CardTitle className="text-base font-semibold">{t('espacos.titulo')}</CardTitle>
+                                    <CardDescription className="text-xs">{t('espacos.consultar_espacos_desc')}</CardDescription>
                                 </div>
                                 <Button
                                     variant="outline"
@@ -191,7 +190,7 @@ export default function DashboardInstitucionalPage({
                                         router.get(route('institucional.espacos.index'));
                                     }}
                                 >
-                                    Gerenciar Espaços
+                                    {t('nav.gerir_espacos')}
                                     <ArrowRight className="ml-1.5 h-4 w-4" />
                                 </Button>
                             </CardHeader>
@@ -203,11 +202,11 @@ export default function DashboardInstitucionalPage({
                                                 <h4 className="text-foreground text-sm font-semibold">{espaco.nome}</h4>
                                                 <span className="text-muted-foreground text-xs">
                                                     {espaco.andar?.modulo?.unidade?.nome ?? 'UESB'} • {espaco.andar?.modulo?.nome} •{' '}
-                                                    {espaco.capacidade_pessoas} lugares
+                                                    {espaco.capacidade_pessoas ? t('espacos.capacidade', { count: String(espaco.capacidade_pessoas) }) : ''}
                                                 </span>
                                             </div>
                                             <div className="flex flex-wrap items-center gap-2 pt-1">
-                                                <span className="text-muted-foreground text-xs font-medium">Turnos:</span>
+                                                <span className="text-muted-foreground text-xs font-medium">{t('relatorios.filtros.turnos')}:</span>
                                                 {espaco.agendas && espaco.agendas.length > 0 ? (
                                                     espaco.agendas.map((agenda) => (
                                                         <div
@@ -217,11 +216,11 @@ export default function DashboardInstitucionalPage({
                                                             <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
                                                                 {getTurnoText(agenda.turno)}
                                                             </Badge>
-                                                            <span className="text-muted-foreground">{agenda.user?.name ?? 'Não atribuído'}</span>
+                                                            <span className="text-muted-foreground">{agenda.user?.name ?? t('reservas.detalhes.gestor_nao_definido')}</span>
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <span className="text-muted-foreground text-xs italic">Nenhuma agenda configurada</span>
+                                                    <span className="text-muted-foreground text-xs italic">{t('common.empty.noData')}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -236,8 +235,8 @@ export default function DashboardInstitucionalPage({
                         <Card className="border-border/70">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5">
                                 <div>
-                                    <CardTitle className="text-base font-semibold">Gestores de Espaços</CardTitle>
-                                    <CardDescription className="text-xs">Usuários com permissões de gestão e delegação de horários</CardDescription>
+                                    <CardTitle className="text-base font-semibold">{t('usuarios.roles.gestor')}</CardTitle>
+                                    <CardDescription className="text-xs">{t('usuarios.subtitulo')}</CardDescription>
                                 </div>
                                 <Button
                                     variant="outline"
@@ -246,7 +245,7 @@ export default function DashboardInstitucionalPage({
                                         router.get(route('institucional.usuarios.index'));
                                     }}
                                 >
-                                    Gerenciar Usuários
+                                    {t('nav.gerenciar_usuarios')}
                                     <ArrowRight className="ml-1.5 h-4 w-4" />
                                 </Button>
                             </CardHeader>
@@ -260,7 +259,7 @@ export default function DashboardInstitucionalPage({
                                                         <h4 className="truncate text-sm font-semibold">{gestor.name}</h4>
                                                         <Badge variant="secondary" className="text-[10px]">
                                                             <UserCheck className="mr-1 h-3 w-3" />
-                                                            Gestor
+                                                            {t('usuarios.roles.gestor')}
                                                         </Badge>
                                                     </div>
                                                     <p className="text-muted-foreground truncate text-xs">{gestor.email}</p>
@@ -277,7 +276,7 @@ export default function DashboardInstitucionalPage({
                                                     }}
                                                 >
                                                     <Calendar className="mr-1.5 h-3.5 w-3.5" />
-                                                    Ver Delegações
+                                                    {t('common.actions.viewDetails')}
                                                 </Button>
                                             </CardContent>
                                         </Card>
@@ -299,7 +298,7 @@ export default function DashboardInstitucionalPage({
                         ) : (
                             <Card className="border-border/70">
                                 <CardContent className="text-muted-foreground py-12 text-center text-sm">
-                                    Nenhum espaço marcado como favorito.
+                                    {t('dashboard.empty.no_favoritos')}
                                 </CardContent>
                             </Card>
                         )}
