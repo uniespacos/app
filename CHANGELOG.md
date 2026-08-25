@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.62](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.61...v1.3.0-rc.62) (2026-08-25)
+
+
+### Features
+
+* **design:** modernização de design system, eficiência mobile e theming catppuccin ([#379](https://github.com/uniespacos/uniespacos/issues/379)) ([6543e72](https://github.com/uniespacos/uniespacos/commit/6543e7268f0579e6cb990ebb75e1d1ce9117a89a))
+
 ## [1.3.0-rc.61](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.60...v1.3.0-rc.61) (2026-08-24)
 
 
