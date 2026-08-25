@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.66](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.65...v1.3.0-rc.66) (2026-08-25)
+
+
+### Bug Fixes
+
+* **lint:** ajustar quebra de linha com pint em InstitucionalRelatoriosTest ([#388](https://github.com/uniespacos/uniespacos/issues/388)) ([a11737d](https://github.com/uniespacos/uniespacos/commit/a11737d2edcd8c26ce65fffb22db2a05b193117b))
+
 ## [1.3.0-rc.65](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.64...v1.3.0-rc.65) (2026-08-25)
 
 
