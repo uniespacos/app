@@ -1,6 +1,90 @@
 // jest.setup.js
 require('@testing-library/jest-dom');
 
+// Mock @inertiajs/react globally with DOM attribute filtering
+jest.mock('@inertiajs/react', () => {
+    const React = require('react');
+    return {
+        Link: (allProps) => {
+            const {
+                children,
+                href,
+                className,
+                dangerouslySetInnerHTML,
+                as: Component = 'a',
+            } = allProps;
+
+            const nonDomKeys = ['preserveState', 'preserveScroll', 'only', 'replace', 'as'];
+            const domProps = Object.keys(allProps)
+                .filter(
+                    (key) =>
+                        !nonDomKeys.includes(key) &&
+                        key !== 'children' &&
+                        key !== 'href' &&
+                        key !== 'className' &&
+                        key !== 'dangerouslySetInnerHTML',
+                )
+                .reduce((acc, key) => {
+                    acc[key] = allProps[key];
+                    return acc;
+                }, {});
+
+            if (dangerouslySetInnerHTML) {
+                return React.createElement(Component, {
+                    href,
+                    className,
+                    dangerouslySetInnerHTML,
+                    ...domProps,
+                });
+            }
+            return React.createElement(
+                Component,
+                {
+                    href,
+                    className,
+                    ...domProps,
+                },
+                children,
+            );
+        },
+        usePage: jest.fn(() => ({
+            props: {
+                auth: { user: null },
+                errors: {},
+                flash: {},
+            },
+            url: '/',
+            component: '',
+            version: null,
+        })),
+        useForm: jest.fn((initialValues = {}) => ({
+            data: initialValues,
+            setData: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            patch: jest.fn(),
+            delete: jest.fn(),
+            processing: false,
+            errors: {},
+            clearErrors: jest.fn(),
+            reset: jest.fn(),
+            hasErrors: false,
+            isDirty: false,
+        })),
+        router: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            patch: jest.fn(),
+            delete: jest.fn(),
+            reload: jest.fn(),
+            visit: jest.fn(),
+            prefetch: jest.fn(),
+        },
+        Head: ({ children }) => children || null,
+    };
+});
+
 // Manual cookie mock management
 exports.storedCookies = {};
 

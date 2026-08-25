@@ -9,9 +9,50 @@ description: Armadilhas e bugs pré-existentes do UniEspaços. Carregue quando i
 
 **Sintoma:** `ErrorHandlingTest > inertia request does not receive the envelope` falha localmente, espera 403 mas recebe 409.
 
-**Raiz:** Quando `public/build/manifest.json` existe, o teste quebra. É **pré-existente**, não relacionado a mudanças recentes.
+**Raiz:** Quando `public/build/manifest.json` existe em disco após um build de frontend, o teste quebra. É **pré-existente**, não relacionado a mudanças recentes.
 
-**Resolução:** `rm public/build/manifest.json` ou `git stash` antes de assumir regressão sua.
+**Resolução:** Mover ou remover temporariamente `public/build/manifest.json` (`mv public/build/manifest.json /tmp/manifest.json`) antes de rodar os testes da feature.
+
+---
+
+## Caminho Órfão no `phpstan-baseline.neon`
+
+**Sintoma:** `composer analyse` (PHPStan Nível 9) falha acusando erro de baseline:
+```
+Invalid entry in ignoreErrors:
+Path "/var/www/app/Http/Controllers/AndarController.php" is neither a directory, nor a file path, nor a fnmatch pattern.
+```
+
+**Raiz:** O baseline do PHPStan armazena caminhos fixos de arquivos. Quando um arquivo com erros suprimidos é deletado ou refatorado/movido para outra camada, a referência permanece no baseline sem alvo correspondente em disco.
+
+**Diagnóstico:**
+```bash
+docker exec uniespacos-workspace-1 composer analyse
+```
+
+**Resolução:** Localizar a linha correspondente ao arquivo deletado dentro de `phpstan-baseline.neon` e remover manualmente a entrada órfã, ou regenerar a baseline se expressamente instruído pelo desenvolvedor.
+
+---
+
+## Aviso de Atributos DOM em Mocks de Teste React 19 (Inertia Link)
+
+**Sintoma:** Warnings no console durante a execução do Jest (`console.error`):
+```
+React does not recognize the 'preserveState' (or 'preserveScroll', 'only', 'as') prop on a DOM element.
+```
+
+**Raiz:** No React 19, a validação de atributos repassados para elementos HTML nativos (`<a>`, `<button>`) é estrita. Mocks simplificados de `@inertiajs/react` que repassam todas as props (`<a {...props} />`) vazam propriedades proprietárias do Inertia para o DOM.
+
+**Diagnóstico:** Executar `npx jest` e inspecionar warnings em testes de componentes que utilizam paginação ou navegação (ex.: `PaginacaoListas.test.tsx`).
+
+**Resolução:** Nos mocks de teste de `Link`, desestruturar as props exclusivas do Inertia antes de repassar para o elemento HTML:
+```tsx
+jest.mock('@inertiajs/react', () => ({
+    Link: ({ children, href, preserveState, preserveScroll, only, ...rest }: any) => (
+        <a href={href} {...rest}>{children}</a>
+    ),
+}));
+```
 
 ---
 
@@ -143,4 +184,3 @@ return response()->json($espaco);
 **Contexto:** Reverb roda em HTTP interno. Se você forçar HTTPS na URL interna, vai dar SSL error mesmo que o certificado Caddy esteja correto.
 
 **Quando mexer:** Se implementar broadcast ou WebSocket, confirme que o backend está usando `http://reverb:8080` (ou equivalente em .env), não `https://`.
-
