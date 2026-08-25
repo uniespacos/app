@@ -60,12 +60,14 @@ export function ResponsiveModal({
         '5xl': 'sm:max-w-5xl',
     };
 
+    const hasHeader = Boolean(title ?? description);
+
     if (isMobile) {
         return (
             <Drawer open={effectiveOpen} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
                 <DrawerContent className={cn('px-4 pb-6', className)}>
-                    {(title || description) && (
+                    {hasHeader && (
                         <DrawerHeader className="px-0 pt-2 pb-3 text-left">
                             {title && <DrawerTitle>{title}</DrawerTitle>}
                             {description && <DrawerDescription>{description}</DrawerDescription>}
@@ -81,8 +83,8 @@ export function ResponsiveModal({
     return (
         <Dialog open={effectiveOpen} onOpenChange={handleOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className={cn(maxWidthClasses[effectiveSize] ?? 'sm:max-w-lg', className)} showCloseButton={showCloseButton}>
-                {(title || description) && (
+            <DialogContent className={cn(maxWidthClasses[effectiveSize], className)} showCloseButton={showCloseButton}>
+                {hasHeader && (
                     <DialogHeader>
                         {title && <DialogTitle>{title}</DialogTitle>}
                         {description && <DialogDescription>{description}</DialogDescription>}

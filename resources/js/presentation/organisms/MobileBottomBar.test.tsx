@@ -2,13 +2,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MobileBottomBar } from './MobileBottomBar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { usePage } from '@inertiajs/react';
+import type { Page } from '@inertiajs/core';
+import type React from 'react';
 
 jest.mock('@/components/ui/sidebar', () => ({
     useSidebar: jest.fn(),
 }));
 
 jest.mock('@inertiajs/react', () => ({
-    Link: ({ children, href, className, ...props }: any) => (
+    Link: ({ children, href, className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
         <a href={href} className={className} {...props}>
             {children}
         </a>
@@ -18,6 +20,18 @@ jest.mock('@inertiajs/react', () => ({
 
 const mockedUseSidebar = useSidebar as jest.MockedFunction<typeof useSidebar>;
 const mockedUsePage = usePage as jest.MockedFunction<typeof usePage>;
+
+const createMockPage = (url: string): Page => ({
+    component: 'TestComponent',
+    props: {
+        errors: {},
+    },
+    url,
+    version: '1',
+    clearHistory: false,
+    encryptHistory: false,
+    rememberedState: {},
+});
 
 describe('MobileBottomBar', () => {
     const mockToggleSidebar = jest.fn();
@@ -33,10 +47,7 @@ describe('MobileBottomBar', () => {
             isMobile: true,
             state: 'expanded',
         });
-        mockedUsePage.mockReturnValue({
-            url: '/dashboard',
-            props: {},
-        } as any);
+        mockedUsePage.mockReturnValue(createMockPage('/dashboard'));
     });
 
     it('renders all 4 navigation items (Início, Espaços, Reservas, Menu)', () => {
@@ -49,10 +60,7 @@ describe('MobileBottomBar', () => {
     });
 
     it('highlights active item based on current url', () => {
-        mockedUsePage.mockReturnValue({
-            url: '/espacos',
-            props: {},
-        } as any);
+        mockedUsePage.mockReturnValue(createMockPage('/espacos'));
 
         render(<MobileBottomBar />);
 

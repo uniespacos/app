@@ -146,7 +146,7 @@ export function handleEchoVisibilityChange(): void {
                     };
                 };
             }
-        )?.Echo?.connector;
+        ).Echo?.connector;
 
         if (echoConnector?.pusher?.connection && !echoConnector.pusher.connection.isOpen()) {
             echoConnector.pusher.connect();

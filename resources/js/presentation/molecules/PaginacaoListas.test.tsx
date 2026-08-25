@@ -1,13 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import PaginacaoListas from './PaginacaoListas';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type React from 'react';
+
+interface MockLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+    href: string;
+    dangerouslySetInnerHTML?: { __html: string };
+    preserveState?: boolean;
+    preserveScroll?: boolean;
+}
 
 jest.mock('@/hooks/use-mobile', () => ({
     useIsMobile: jest.fn(),
 }));
 
 jest.mock('@inertiajs/react', () => ({
-    Link: ({ children, href, className, dangerouslySetInnerHTML, preserveState, preserveScroll, ...props }: any) => {
+    Link: ({ children, href, className, dangerouslySetInnerHTML, ...props }: MockLinkProps) => {
         if (dangerouslySetInnerHTML) {
             return <a href={href} className={className} dangerouslySetInnerHTML={dangerouslySetInnerHTML} {...props} />;
         }

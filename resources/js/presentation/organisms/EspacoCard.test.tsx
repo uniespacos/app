@@ -1,14 +1,23 @@
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
 import type { Espaco, User } from '@/types';
-import { router } from '@inertiajs/react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import EspacoCard from './EspacoCard';
 
+const mockPost = jest.fn();
+const mockDelete = jest.fn();
+const mockGet = jest.fn();
+
 jest.mock('@inertiajs/react', () => ({
     router: {
-        get: jest.fn(),
-        post: jest.fn(),
-        delete: jest.fn(),
+        get: (...args: unknown[]) => {
+            mockGet(...args);
+        },
+        post: (...args: unknown[]) => {
+            mockPost(...args);
+        },
+        delete: (...args: unknown[]) => {
+            mockDelete(...args);
+        },
         prefetch: jest.fn(),
     },
     Link: ({
@@ -72,8 +81,10 @@ const mockEspaco: Espaco = {
 describe('EspacoCard', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        (globalThis as unknown as { route: jest.Mock }).route = jest.fn(
-            (name: string, params?: unknown) => `https://localhost/${name}/${params || ''}`,
+        (globalThis as unknown as { route: jest.Mock }).route = jest.fn((name: string, params?: unknown) =>
+            typeof params === 'string' || typeof params === 'number'
+                ? 'https://localhost/' + name + '/' + String(params)
+                : 'https://localhost/' + name,
         );
     });
 
@@ -108,7 +119,7 @@ describe('EspacoCard', () => {
         expect(favoriteBtn).toBeInTheDocument();
 
         fireEvent.click(favoriteBtn);
-        expect(router.post).toHaveBeenCalledWith('https://localhost/espacos.favoritar/10', {}, expect.any(Object));
+        expect(mockPost).toHaveBeenCalledWith('https://localhost/espacos.favoritar/10', {}, expect.any(Object));
     });
 
     it('renderiza botões de gerenciamento quando isGerenciarEspacos está ativo e usuário tem permissão', () => {
