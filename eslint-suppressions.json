@@ -207,9 +207,6 @@
   "resources/js/presentation/organisms/EspacoCard.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
     }
   },
   "resources/js/presentation/organisms/EspacoFiltroBusca.tsx": {
@@ -314,19 +311,9 @@
       "count": 1
     }
   },
-  "resources/js/presentation/pages/Dashboard/DashboardGestorPage.tsx": {
-    "@typescript-eslint/no-confusing-void-expression": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/pages/Dashboard/DashboardInstitucionalPage.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
-      "count": 2
-    }
-  },
-  "resources/js/presentation/pages/Dashboard/DashboardUsuarioPage.tsx": {
-    "@typescript-eslint/no-confusing-void-expression": {
-      "count": 2
+      "count": 1
     }
   },
   "resources/js/presentation/pages/Espacos/VisualizarEspacoPage.tsx": {

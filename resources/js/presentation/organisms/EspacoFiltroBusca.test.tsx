@@ -1,11 +1,14 @@
 import type { Andar, Modulo, Unidade } from '@/types';
-import { router } from '@inertiajs/react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import EspacoFiltroBusca from './EspacoFiltroBusca';
 
+const mockGet = jest.fn();
+
 jest.mock('@inertiajs/react', () => ({
     router: {
-        get: jest.fn(),
+        get: (...args: unknown[]) => {
+            mockGet(...args);
+        },
     },
 }));
 
@@ -87,7 +90,7 @@ describe('EspacoFiltroBusca', () => {
         expect(clearAllBtn).toBeInTheDocument();
 
         fireEvent.click(clearAllBtn);
-        expect(router.get).toHaveBeenCalledWith('https://localhost/espacos', {}, expect.any(Object));
+        expect(mockGet).toHaveBeenCalledWith('https://localhost/espacos', {}, expect.any(Object));
     });
 
     it('remove filtro individual ao clicar no X do chip', () => {
@@ -107,6 +110,6 @@ describe('EspacoFiltroBusca', () => {
         const removeUnidadeBtn = screen.getByLabelText('Remover filtro de unidade');
         fireEvent.click(removeUnidadeBtn);
 
-        expect(router.get).toHaveBeenCalledWith('https://localhost/espacos', {}, expect.any(Object));
+        expect(mockGet).toHaveBeenCalledWith('https://localhost/espacos', {}, expect.any(Object));
     });
 });

@@ -1,4 +1,4 @@
-import type { Reserva } from '@/types';
+import type { Horario, Reserva } from '@/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ReservaCardMobile } from './ReservaCardMobile';
 
@@ -9,27 +9,50 @@ const mockReserva: Reserva = {
     situacao: 'deferida',
     data_inicial: new Date('2026-09-01T09:00:00Z'),
     data_final: new Date('2026-09-01T12:00:00Z'),
+    recorrencia: 'unica',
+    observacao: null,
+    created_at: '',
+    updated_at: '',
     can_update: true,
     horarios: [
         {
+            id: 1,
+            data: '2026-09-01',
+            horario_inicio: '09:00:00',
+            horario_fim: '12:00:00',
+            situacao: 'deferida',
+            validation_status: 'completed',
+            conflict_cache: null,
+            cache_validated_at: null,
             agenda: {
+                id: 1,
+                turno: 'manha',
                 espaco: {
                     id: 5,
                     nome: 'Laboratório 3',
+                    capacidade_pessoas: 30,
+                    descricao: '',
+                    imagens: [],
+                    main_image_index: null,
                     andar: {
                         id: 1,
                         nome: 'andar-2',
+                        modulo_id: 1,
+                        created_at: '',
+                        updated_at: '',
                         modulo: {
                             id: 1,
                             nome: 'Módulo Central',
                             unidade_id: 1,
+                            created_at: '',
+                            updated_at: '',
                         },
                     },
                 },
             },
-        } as any,
+        } as unknown as Horario,
     ],
-} as unknown as Reserva;
+};
 
 describe('ReservaCardMobile', () => {
     it('renderiza título, localização, datas e badge de situação', () => {
