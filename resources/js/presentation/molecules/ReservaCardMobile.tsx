@@ -30,7 +30,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
     const isModoGestor = isGestor ?? hasEvalPermission;
 
     return (
-        <div className="bg-card border-border/80 relative flex overflow-hidden rounded-xl border shadow-xs transition-all duration-200 active:scale-[0.99]">
+        <div className="bg-card border-border/80 relative flex w-full min-w-0 overflow-hidden rounded-xl border shadow-xs transition-all duration-200 active:scale-[0.99]">
             {/* Faixa Vertical Semântica */}
             {estilo && <div className={cn('w-1.5 shrink-0', estilo.solido)} />}
 
@@ -43,23 +43,25 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                 </div>
 
                 <div className="text-muted-foreground space-y-1.5 text-xs">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex min-w-0 items-center gap-1.5">
                         <MapPin className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{local || t('common.status.unknown')}</span>
+                        <span className="min-w-0 truncate" title={local || t('common.status.unknown')}>
+                            {local || t('common.status.unknown')}
+                        </span>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex min-w-0 items-center gap-1.5">
                         <Calendar className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0" />
-                        <span>
+                        <span className="min-w-0 truncate">
                             {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
                         </span>
                     </div>
                 </div>
 
-                <div className="border-border/60 flex flex-wrap gap-2 border-t pt-3">
+                <div className="border-border/60 flex flex-wrap items-center gap-2 border-t pt-3">
                     <Button
                         variant="outline"
                         size="sm"
-                        className="min-h-[44px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                        className="min-h-[44px] min-w-[120px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
                         onClick={() => {
                             onDetalhes(reserva);
                         }}
@@ -73,13 +75,15 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="min-h-[44px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                className="min-h-[44px] min-w-[120px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
                                 onClick={() => {
                                     onAvaliar(reserva.id);
                                 }}
                             >
                                 <Edit className="mr-1.5 h-4 w-4" />
-                                {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
+                                {reserva.situacao === SituacaoReserva.EM_ANALISE
+                                    ? t('reservas.acoes.avaliar')
+                                    : t('reservas.avaliacao.reavaliacao_titulo')}
                             </Button>
                         ) : (
                             <>
@@ -87,7 +91,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="min-h-[44px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                        className="min-h-[44px] min-w-[100px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
                                         onClick={() => {
                                             onEditar(reserva.id);
                                         }}
@@ -99,7 +103,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                 <Button
                                     variant="destructive"
                                     size="sm"
-                                    className="min-h-[44px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                    className="min-h-[44px] min-w-[100px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
                                     onClick={() => {
                                         onCancelar(reserva);
                                     }}

@@ -363,7 +363,11 @@ export function DataTable<T>({
                         };
 
                         if (renderCard) {
-                            return <div key={getRowKey(item, index)}>{renderCard(item, index, isSelected, toggle)}</div>;
+                            return (
+                                <div key={getRowKey(item, index)} className="w-full min-w-0">
+                                    {renderCard(item, index, isSelected, toggle)}
+                                </div>
+                            );
                         }
 
                         return renderDefaultCard(item, index);

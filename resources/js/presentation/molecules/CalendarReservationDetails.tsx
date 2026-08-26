@@ -1,7 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import CalendarDiaMobile from '@/presentation/molecules/CalendarDiaMobile';
 import CalendarShiftSection from '@/presentation/molecules/CalendarShiftSection';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
@@ -16,7 +15,7 @@ interface CalendarReservationDetailsProps {
 const SEM_SELECAO = () => false;
 
 export default function CalendarReservationDetails({ diasSemana, agendas, slotsSolicitados, alternarSelecaoSlot }: CalendarReservationDetailsProps) {
-    const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
+    const alternarSelecaoSlotFn = alternarSelecaoSlot ?? (() => {});
     const isMobile = useIsMobile();
 
     if (isMobile) {
@@ -41,31 +40,18 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
                     <div className="min-w-[800px] rounded-xl">
                         <div className="bg-background sticky grid grid-cols-[80px_repeat(7,1fr)] border-b">
                             <div className="text-muted-foreground text-center text-sm font-medium"></div>
-                            {diasSemana.map((dia) => (
-                                <div
-                                    key={dia.valor}
-                                    className={cn('bg-muted/50 border-l p-2 text-center text-sm font-medium', dia.ehHoje && 'bg-primary/5')}
-                                >
-                                    <div className="capitalize">{dia.abreviado}</div>
-                                    <div className="font-normal">{dia.diaMes.split('/')[0]}</div>
-                                </div>
-                            ))}
+
                         </div>
-                        {agendas.map((agenda) => {
-                            if (!agenda) {
-                                return null;
-                            }
-                            return (
-                                <CalendarShiftSection
-                                    key={agenda.id}
-                                    titulo={agenda.turno}
-                                    agenda={agenda}
-                                    diasSemana={diasSemana}
-                                    slotsSolicitados={slotsSolicitados}
-                                    alternarSelecaoSlot={alternarSelecaoSlotFn}
-                                />
-                            );
-                        })}
+                        {agendas.map((agenda) => (
+                            <CalendarShiftSection
+                                key={agenda.id}
+                                titulo={agenda.turno}
+                                agenda={agenda}
+                                diasSemana={diasSemana}
+                                slotsSolicitados={slotsSolicitados}
+                                alternarSelecaoSlot={alternarSelecaoSlotFn}
+                            />
+                        ))}
                     </div>
                 </div>
             </Card>

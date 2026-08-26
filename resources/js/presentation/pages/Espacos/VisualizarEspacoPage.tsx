@@ -56,7 +56,7 @@ export default function VisualizarEspaço({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Agenda - ${espaco.nome}`} />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
                 <AgendaEspaço isEditMode={!!reserva} reserva={reserva} espaco={espaco} semana={semana} />
             </div>
         </AppLayout>

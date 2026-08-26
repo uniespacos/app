@@ -187,7 +187,7 @@ export default function RolesPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('admin.roles.titulo')} />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
                 <GenericHeader
                     titulo={t('admin.roles.titulo')}
                     descricao={t('admin.roles.desc')}

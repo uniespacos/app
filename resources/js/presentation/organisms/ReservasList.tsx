@@ -5,7 +5,7 @@ import { PERMISSION_RESERVAS_AVALIAR } from '@/constants/permissions';
 import { SituacaoReserva } from '@/contracts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from '@/i18n';
-import { Can, useCan } from '@/lib/auth-can';
+import { Can } from '@/lib/auth-can';
 import { formatDate } from '@/lib/utils';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
@@ -37,8 +37,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     const [internalViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
     const viewMode = controlledViewMode ?? internalViewMode;
 
-    const canAvaliar = useCan({ permission: PERMISSION_RESERVAS_AVALIAR });
-    const isModoGestor = isGestor || canAvaliar;
+    const isModoGestor = isGestor;
 
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
@@ -107,7 +106,24 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 </Button>
 
                 {isGestorEvaluable && (
-                    <Can permission={PERMISSION_RESERVAS_AVALIAR} fallback={
+                    <Can
+                        permission={PERMISSION_RESERVAS_AVALIAR}
+                        fallback={
+                            <Button
+                                variant="default"
+                                size="sm"
+                                className="h-8 gap-1 px-2.5 text-xs font-medium"
+                                onClick={() => {
+                                    handleAvaliarButton(reserva.id);
+                                }}
+                            >
+                                <Edit className="h-3.5 w-3.5" />
+                                {reserva.situacao === SituacaoReserva.EM_ANALISE
+                                    ? t('reservas.acoes.avaliar')
+                                    : t('reservas.avaliacao.reavaliacao_titulo')}
+                            </Button>
+                        }
+                    >
                         <Button
                             variant="default"
                             size="sm"
@@ -117,19 +133,9 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                             }}
                         >
                             <Edit className="h-3.5 w-3.5" />
-                            {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
-                        </Button>
-                    }>
-                        <Button
-                            variant="default"
-                            size="sm"
-                            className="h-8 gap-1 px-2.5 text-xs font-medium"
-                            onClick={() => {
-                                handleAvaliarButton(reserva.id);
-                            }}
-                        >
-                            <Edit className="h-3.5 w-3.5" />
-                            {reserva.situacao === SituacaoReserva.EM_ANALISE ? t('reservas.acoes.avaliar') : t('reservas.avaliacao.reavaliacao_titulo')}
+                            {reserva.situacao === SituacaoReserva.EM_ANALISE
+                                ? t('reservas.acoes.avaliar')
+                                : t('reservas.avaliacao.reavaliacao_titulo')}
                         </Button>
                     </Can>
                 )}
@@ -239,7 +245,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 columns={columns}
                 viewMode={viewMode}
                 renderCard={renderCard}
-                gridClassName="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                gridClassName="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 pagination={{ links }}
                 cardWrapper={false}
                 actions={renderActions}

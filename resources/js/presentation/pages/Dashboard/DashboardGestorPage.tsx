@@ -7,12 +7,11 @@ import { PERMISSION_SECAO_RELATORIOS } from '@/constants/permissions';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 import { useTranslation } from '@/i18n';
 import { hasPermission } from '@/lib/auth';
-import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import AppLayout from '@/presentation/templates/AppLayout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format, subDays } from 'date-fns';
-import { ArrowRight, BarChart3, Building2, CalendarSearch, CheckCircle2, Clock, Eye, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, BarChart3, CalendarSearch, Eye, ShieldCheck, Star } from 'lucide-react';
 import { lazy, Suspense, useMemo } from 'react';
 
 const GraficoReservasPeriodo = lazy(() => import('@/presentation/organisms/GraficoReservasPeriodo'));
@@ -27,11 +26,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface DashboardGestorProps {
     user?: User;
     espacos?: Espaco[];
-    reservasPendentes?: Reserva[];
     statusDasReservas?: {
         pendentes: number;
-        avaliadas_hoje: number;
-        total_espacos: number;
     };
     agendas?: Agenda[];
     espacosFavoritos?: Espaco[];
@@ -44,11 +40,8 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
         auth: { user: User };
         user?: User;
         espacos?: Espaco[];
-        reservasPendentes?: Reserva[];
         statusDasReservas?: {
             pendentes: number;
-            avaliadas_hoje: number;
-            total_espacos: number;
         };
         agendas?: Agenda[];
         espacosFavoritos?: Espaco[];
@@ -57,12 +50,9 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
 
     const user = props.user ?? pageProps.user ?? pageProps.auth.user;
     const authUser = pageProps.auth.user;
-    const reservasPendentes = props.reservasPendentes ?? pageProps.reservasPendentes ?? [];
     const statusDasReservas = props.statusDasReservas ??
         pageProps.statusDasReservas ?? {
             pendentes: 0,
-            avaliadas_hoje: 0,
-            total_espacos: 0,
         };
 
     const podeVerRelatorios = hasPermission(authUser, PERMISSION_SECAO_RELATORIOS);
@@ -107,33 +97,6 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
         },
     ];
 
-    const kpiCards = [
-        {
-            title: t('dashboard.stats.pendentes'),
-            value: statusDasReservas.pendentes,
-            description: t('reservas.situacao.em_analise'),
-            icon: Clock,
-            color: 'text-warning',
-            iconBg: 'bg-warning/10 text-warning',
-        },
-        {
-            title: t('dashboard.stats.avaliadas_hoje'),
-            value: statusDasReservas.avaliadas_hoje,
-            description: t('common.status.completed'),
-            icon: CheckCircle2,
-            color: 'text-success',
-            iconBg: 'bg-success/10 text-success',
-        },
-        {
-            title: t('dashboard.stats.espacos_ativos'),
-            value: statusDasReservas.total_espacos,
-            description: t('espacos.titulo'),
-            icon: Building2,
-            color: 'text-primary',
-            iconBg: 'bg-primary/10 text-primary',
-        },
-    ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('dashboard.gestor_title')} />
@@ -175,30 +138,6 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
                     </div>
                 </div>
 
-                {/* Grid de Indicadores de KPIs */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {kpiCards.map((kpi) => {
-                        const Icon = kpi.icon;
-                        return (
-                            <Card
-                                key={kpi.title}
-                                className="border-border/70 bg-card hover:border-primary/40 transition-all duration-200 hover:shadow-xs"
-                            >
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5 pb-2">
-                                    <CardTitle className="text-muted-foreground text-sm font-medium">{kpi.title}</CardTitle>
-                                    <div className={`rounded-xl p-2.5 ${kpi.iconBg}`}>
-                                        <Icon className="h-4 w-4" />
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="px-5 pt-0 pb-5">
-                                    <div className="text-foreground text-3xl font-bold tracking-tight">{kpi.value}</div>
-                                    <p className="text-muted-foreground mt-1 text-xs">{kpi.description}</p>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-
                 {/* Atalhos Operacionais do Gestor */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     {atalhos.map(({ label, descricao, Icone, href, badge, highlight }) => (
@@ -218,16 +157,16 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
                                 highlight ? 'hover:border-primary/60 border-primary/30 bg-primary/5' : 'hover:border-primary/50'
                             }`}
                         >
-                            <CardContent className="flex items-center justify-between p-5">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground rounded-xl p-3 transition-colors">
+                            <CardContent className="flex items-center justify-between gap-3 overflow-hidden p-5">
+                                <div className="flex min-w-0 flex-1 items-center gap-3">
+                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground shrink-0 rounded-xl p-3 transition-colors">
                                         <Icone className="h-5 w-5" />
                                     </div>
-                                    <div className="min-w-0">
+                                    <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-foreground text-sm font-semibold sm:text-base">{label}</p>
+                                            <p className="text-foreground truncate text-sm font-semibold sm:text-base">{label}</p>
                                             {badge && (
-                                                <Badge variant="secondary" className="bg-primary/15 text-primary text-xs font-semibold">
+                                                <Badge variant="secondary" className="shrink-0 bg-primary/15 text-primary text-xs font-semibold">
                                                     {badge}
                                                 </Badge>
                                             )}
@@ -241,59 +180,6 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
                     ))}
                 </div>
 
-                {/* Solicitações Prioritárias Pendentes */}
-                {reservasPendentes.length > 0 && (
-                    <Card className="border-border/70">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5">
-                            <div>
-                                <CardTitle className="text-base font-semibold">{t('reservas.gestor_titulo')}</CardTitle>
-                                <CardDescription className="text-xs">{t('reservas.gestor_subtitulo')}</CardDescription>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                    router.get(route('gestor.reservas.index'));
-                                }}
-                                className="text-primary hover:text-primary"
-                            >
-                                {t('common.actions.viewDetails')} ({String(statusDasReservas.pendentes)})
-                                <ArrowRight className="ml-1.5 h-4 w-4" />
-                            </Button>
-                        </CardHeader>
-                        <CardContent className="px-5 pt-0 pb-5">
-                            <div className="divide-border/60 divide-y">
-                                {reservasPendentes.map((reserva) => (
-                                    <div
-                                        key={reserva.id}
-                                        className="flex flex-col gap-2 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
-                                    >
-                                        <div className="min-w-0 space-y-1">
-                                            <p className="text-foreground truncate text-sm font-medium">{reserva.titulo}</p>
-                                            <p className="text-muted-foreground text-xs">
-                                                {t('reservas.tabela.solicitante')}: {reserva.user?.name ?? 'Usuário'}{' '}
-                                                {reserva.user?.setor ? `• ${reserva.user.setor.nome}` : ''}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <SituacaoBadge situacao={reserva.situacao} />
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => {
-                                                    router.get(route('gestor.reservas.index', { reserva: reserva.id }));
-                                                }}
-                                                className="h-8 text-xs"
-                                            >
-                                                {t('reservas.acoes.avaliar')}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
 
                 {/* Visão Geral com Gráfico Carregado Sob Demanda */}
                 {podeVerRelatorios && (
