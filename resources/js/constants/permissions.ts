@@ -31,6 +31,12 @@ export const PERMISSION_RESERVAS_AVALIAR = 'reservas.avaliar';
 export const PERMISSION_CHAMADOS_LISTAR = 'chamados.listar';
 export const PERMISSION_CHAMADOS_TRIAR = 'chamados.triar';
 
+// Taxonomias de chamado (tipos e categorias)
+export const PERMISSION_TAXONOMIAS_CHAMADO_LISTAR = 'taxonomias-chamado.listar';
+export const PERMISSION_TAXONOMIAS_CHAMADO_CRIAR = 'taxonomias-chamado.criar';
+export const PERMISSION_TAXONOMIAS_CHAMADO_ATUALIZAR = 'taxonomias-chamado.atualizar';
+export const PERMISSION_TAXONOMIAS_CHAMADO_DELETAR = 'taxonomias-chamado.deletar';
+
 // Roles
 export const PERMISSION_ROLES_LISTAR = 'roles.listar';
 export const PERMISSION_ROLES_VISUALIZAR = 'roles.visualizar';
@@ -86,6 +92,7 @@ export const PERMISSION_SECAO_DASHBOARD_GESTOR = 'secao.dashboard-gestor';
 export const PERMISSION_SECAO_GESTAO_RESERVAS = 'secao.gestao-reservas';
 export const PERMISSION_SECAO_GESTAO_ESPACOS = 'secao.gestao-espacos';
 export const PERMISSION_SECAO_GESTAO_CHAMADOS = 'secao.gestao-chamados';
+export const PERMISSION_SECAO_GESTAO_TAXONOMIAS_CHAMADO = 'secao.gestao-taxonomias-chamado';
 export const PERMISSION_SECAO_GESTAO_USUARIOS = 'secao.gestao-usuarios';
 export const PERMISSION_SECAO_GESTAO_INSTITUICOES = 'secao.gestao-instituicoes';
 export const PERMISSION_SECAO_GESTAO_UNIDADES = 'secao.gestao-unidades';

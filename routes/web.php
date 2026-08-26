@@ -17,6 +17,7 @@ use App\Http\Controllers\Institucional\InstitucionalQrCodeController;
 use App\Http\Controllers\Institucional\InstitucionalRelatorioController;
 use App\Http\Controllers\Institucional\InstitucionalRoleController;
 use App\Http\Controllers\Institucional\InstitucionalSetorController;
+use App\Http\Controllers\Institucional\InstitucionalTaxonomiaChamadoController;
 use App\Http\Controllers\Institucional\InstitucionalUnidadeController;
 use App\Http\Controllers\Institucional\InstitucionalUsuarioController;
 use App\Http\Controllers\NotificationController;
@@ -144,6 +145,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('roles', InstitucionalRoleController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::put('roles/{role}/permissions', [InstitucionalRoleController::class, 'syncPermissions'])->name('roles.syncpermissions');
         Route::get('permissions', [InstitucionalPermissionController::class, 'index'])->name('permissions.index');
+    });
+
+    // Gestão das taxonomias de chamado (tipos e categorias)
+    Route::middleware(['permission:secao.gestao-taxonomias-chamado'])->prefix('institucional')->name('institucional.')->group(function () {
+        Route::get('taxonomias-chamado', [InstitucionalTaxonomiaChamadoController::class, 'index'])
+            ->name('taxonomias-chamado.index');
+
+        Route::post('taxonomias-chamado/tipos', [InstitucionalTaxonomiaChamadoController::class, 'storeTipo'])
+            ->name('taxonomias-chamado.tipos.store');
+        Route::put('taxonomias-chamado/tipos/{tipo}', [InstitucionalTaxonomiaChamadoController::class, 'updateTipo'])
+            ->name('taxonomias-chamado.tipos.update');
+        Route::delete('taxonomias-chamado/tipos/{tipo}', [InstitucionalTaxonomiaChamadoController::class, 'destroyTipo'])
+            ->name('taxonomias-chamado.tipos.destroy');
+
+        Route::post('taxonomias-chamado/categorias', [InstitucionalTaxonomiaChamadoController::class, 'storeCategoria'])
+            ->name('taxonomias-chamado.categorias.store');
+        Route::put('taxonomias-chamado/categorias/{categoria}', [InstitucionalTaxonomiaChamadoController::class, 'updateCategoria'])
+            ->name('taxonomias-chamado.categorias.update');
+        Route::delete('taxonomias-chamado/categorias/{categoria}', [InstitucionalTaxonomiaChamadoController::class, 'destroyCategoria'])
+            ->name('taxonomias-chamado.categorias.destroy');
     });
 
     // Gestão de Relatórios

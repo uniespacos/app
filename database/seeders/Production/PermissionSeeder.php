@@ -69,6 +69,11 @@ class PermissionSeeder extends Seeder
         // Chamados
         'chamados.listar',
         'chamados.triar',
+        // Taxonomias de chamado (tipos e categorias)
+        'taxonomias-chamado.listar',
+        'taxonomias-chamado.criar',
+        'taxonomias-chamado.atualizar',
+        'taxonomias-chamado.deletar',
         // Sistema
         'sistema.telescope',
         // Relatórios
@@ -88,6 +93,7 @@ class PermissionSeeder extends Seeder
         'secao.gestao-setores',
         'secao.gestao-roles',
         'secao.gestao-chamados',
+        'secao.gestao-taxonomias-chamado',
         'secao.relatorios',
     ];
 
