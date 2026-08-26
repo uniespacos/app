@@ -22,8 +22,8 @@ export default function CalendarShiftSection({
     alternarSelecaoSlot,
     slotsSolicitados,
 }: CalendarShiftSectionProps) {
-    const isSlotSelecionadoFn = isSlotSelecionado || (() => false);
-    const alternarSelecaoSlotFn = alternarSelecaoSlot || (() => {});
+    const isSlotSelecionadoFn = isSlotSelecionado ?? (() => false);
+    const alternarSelecaoSlotFn = alternarSelecaoSlot ?? (() => {});
 
     const derivados = useMemo(() => derivarSlotsDoTurno(agenda, diasSemana, slotsSolicitados), [agenda, diasSemana, slotsSolicitados]);
 

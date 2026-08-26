@@ -86,7 +86,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
                     isSlotSelecionado={isSlotSelecionado}
                     alternarSelecaoSlot={alternarSelecaoSlot}
                     semanaInicio={semanaVisivel}
-                    agendas={agendas || []}
+                    agendas={agendas ?? []}
                     slotsDaReserva={slotsSelecao}
                     isEditMode={isEditMode}
                 />

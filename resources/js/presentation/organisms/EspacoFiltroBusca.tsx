@@ -42,10 +42,10 @@ interface FiltroBuscaEspacosProps {
 export default function EspacoFiltroBusca({ route: targetRoute, filters, unidades, modulos, andares, capacidadeEspacos }: FiltroBuscaEspacosProps) {
     const { t } = useTranslation();
     const [localFilters, setLocalFilters] = useState({
-        unidade: filters.unidade || 'all',
-        modulo: filters.modulo || 'all',
-        andar: filters.andar || 'all',
-        capacidade: filters.capacidade || 'qualquer',
+        unidade: filters.unidade ?? 'all',
+        modulo: filters.modulo ?? 'all',
+        andar: filters.andar ?? 'all',
+        capacidade: filters.capacidade ?? 'qualquer',
     });
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -60,7 +60,7 @@ export default function EspacoFiltroBusca({ route: targetRoute, filters, unidade
 
     const { searchTerm, setSearchTerm } = useDebouncedSearch({
         routeName: targetRoute,
-        initialSearch: filters.search || '',
+        initialSearch: filters.search ?? '',
         extraParams,
         only: ['espacos', 'filters'],
     });

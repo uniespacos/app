@@ -40,7 +40,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     id="capacityPessoas"
                     type="number"
                     min={1}
-                    value={data.capacidade_pessoas || ''}
+                    value={data.capacidade_pessoas ?? ''}
                     onChange={(e) => {
                         setData((prevData: FormCadastroValues) => ({ ...prevData, capacidade_pessoas: e.target.valueAsNumber }));
                     }}

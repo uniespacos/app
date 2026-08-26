@@ -25,11 +25,11 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
     });
     const [selectedAgendaId, setSelectedAgendaId] = useState<string>('');
     const [unidades, setUnidades] = useState<Unidade[]>(
-        instituicoes.find((i) => i.id.toString() === localFilters.selectedInstituicao)?.unidades || [],
+        instituicoes.find((i) => i.id.toString() === localFilters.selectedInstituicao)?.unidades ?? [],
     );
-    const [modulos, setModulos] = useState<Modulo[]>(unidades.find((u) => u.id.toString() === localFilters.selectedUnidade)?.modulos || []);
-    const [andares, setAndares] = useState<Andar[]>(modulos.find((m) => m.id.toString() === localFilters.selectedModulo)?.andars || []);
-    const [espacos, setEspacos] = useState<Espaco[]>(andares.find((a) => a.id.toString() === localFilters.selectedAndar)?.espacos || []);
+    const [modulos, setModulos] = useState<Modulo[]>(unidades.find((u) => u.id.toString() === localFilters.selectedUnidade)?.modulos ?? []);
+    const [andares, setAndares] = useState<Andar[]>(modulos.find((m) => m.id.toString() === localFilters.selectedModulo)?.andars ?? []);
+    const [espacos, setEspacos] = useState<Espaco[]>(andares.find((a) => a.id.toString() === localFilters.selectedAndar)?.espacos ?? []);
 
     const handleFilterChange = (name: keyof typeof localFilters, value: string) => {
         setLocalFilters((prevFilters) => {
@@ -37,7 +37,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
 
             if (name === 'selectedInstituicao') {
                 newFilters.selectedUnidade = '';
-                setUnidades(instituicoes.find((i) => i.id.toString() === value)?.unidades || []);
+                setUnidades(instituicoes.find((i) => i.id.toString() === value)?.unidades ?? []);
                 newFilters.selectedModulo = '';
                 setModulos([]);
                 newFilters.selectedAndar = '';
@@ -47,7 +47,7 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
             }
             if (name === 'selectedUnidade') {
                 newFilters.selectedModulo = '';
-                setModulos(unidades.find((u) => u.id.toString() === value)?.modulos || []);
+                setModulos(unidades.find((u) => u.id.toString() === value)?.modulos ?? []);
                 newFilters.selectedAndar = '';
                 setAndares([]);
                 newFilters.selectedEspaco = '';
@@ -55,13 +55,13 @@ export default function FiltroBuscaPermission({ instituicoes, selectedAgendas, s
             }
             if (name === 'selectedModulo') {
                 newFilters.selectedAndar = '';
-                setAndares(modulos.find((m) => m.id.toString() === value)?.andars || []);
+                setAndares(modulos.find((m) => m.id.toString() === value)?.andars ?? []);
                 newFilters.selectedEspaco = '';
                 setEspacos([]);
             }
             if (name === 'selectedAndar') {
                 newFilters.selectedEspaco = '';
-                setEspacos(andares.find((a) => a.id.toString() === value)?.espacos || []);
+                setEspacos(andares.find((a) => a.id.toString() === value)?.espacos ?? []);
             }
 
             return newFilters;

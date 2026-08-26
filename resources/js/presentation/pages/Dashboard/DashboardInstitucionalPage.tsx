@@ -52,8 +52,8 @@ export default function DashboardInstitucionalPage({
         return espacosFavoritos.filter(
             (espaco) =>
                 espaco.nome.toLowerCase().includes(lowerSearchTerm) ||
-                espaco.andar?.nome.toLowerCase().includes(lowerSearchTerm) ||
-                espaco.andar?.modulo?.nome.toLowerCase().includes(lowerSearchTerm),
+                (espaco.andar?.nome ?? '').toLowerCase().includes(lowerSearchTerm) ||
+                (espaco.andar?.modulo?.nome ?? '').toLowerCase().includes(lowerSearchTerm),
         );
     }, [espacosFavoritos, searchTerm]);
 

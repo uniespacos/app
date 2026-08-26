@@ -8,7 +8,7 @@ export function useFiltros(instituicao: Instituicao, unidades: Unidade[], setore
     const [filteredUnidades, setFilteredUnidades] = useState<Unidade[]>(unidades);
 
     useEffect(() => {
-        const newFilteredUnidades = instituicao.unidades || [];
+        const newFilteredUnidades = instituicao.unidades ?? [];
         setFilteredUnidades(newFilteredUnidades);
         if (selectedUnidade !== 'all' && !newFilteredUnidades.find((u) => u.id.toString() === selectedUnidade)) {
             setSelectedUnidade('all');

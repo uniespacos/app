@@ -47,7 +47,7 @@ export function ExportarRelatorio({ onExport, estaGerando, disabled, className, 
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="outline"
-                    disabled={disabled || estaGerando}
+                    disabled={(disabled ?? false) || estaGerando}
                     className={cn('gap-2 shadow-xs transition-all', className)}
                     data-testid="exportar-relatorio-trigger"
                 >

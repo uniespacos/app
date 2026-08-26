@@ -38,5 +38,5 @@ export function gerarOpcoesAndares(): AndarOption[] {
 
 export function getAndarLabelByValue(value: string): string {
     const opcoes = gerarOpcoesAndares();
-    return opcoes.find((opcao) => opcao.value === value)?.label || value;
+    return opcoes.find((opcao) => opcao.value === value)?.label ?? value;
 }

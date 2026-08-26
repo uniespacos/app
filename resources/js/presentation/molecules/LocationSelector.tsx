@@ -35,7 +35,7 @@ export function LocationSelector({
     processing,
     errors,
 }: LocationSelectorProps) {
-    const tiposDeAcessoDoAndar = andares.find((andar) => andar.id == andarSelecionado)?.tipo_acesso || [];
+    const tiposDeAcessoDoAndar = andares.find((andar) => andar.id == andarSelecionado)?.tipo_acesso ?? [];
 
     return (
         <>

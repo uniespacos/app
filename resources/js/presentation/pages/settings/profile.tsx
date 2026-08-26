@@ -53,9 +53,9 @@ export default function Profile({
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
-        phone: auth.user.telefone || '',
+        phone: auth.user.telefone,
         instituicao_id: '',
-        setor_id: auth.user.setor_id?.toString() || '',
+        setor_id: auth.user.setor_id?.toString() ?? '',
         photo: null,
         remove_photo: false,
         _method: 'patch',
@@ -153,7 +153,7 @@ export default function Profile({
                         </div>
                     </div>
 
-                    {(previewUser.profile_pic || auth.user.profile_pic) && !data.remove_photo && (
+                    {(previewUser.profile_pic ?? auth.user.profile_pic) && !data.remove_photo && (
                         <Button type="button" variant="ghost" size="sm" onClick={handleRemovePhoto}>
                             <Trash2 className="mr-1.5 h-4 w-4" />
                             {t('auth.profile.remove_photo')}

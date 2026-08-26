@@ -23,7 +23,7 @@ export function SeletorInstituicao({
 }: SeletorInstituicaoProps) {
     const [instituicaoId, setInstituicaoId] = useState<string>('');
     const [setores, setSetores] = useState<Setor[]>([]);
-    const [setorId, setSetorId] = useState<string>(initialSetorId || '');
+    const [setorId, setSetorId] = useState<string>(initialSetorId ?? '');
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export function SeletorInstituicao({
                 if (foundSetor) {
                     const instId = inst.id.toString();
                     setInstituicaoId(instId);
-                    setSetores(inst.setors || []);
+                    setSetores(inst.setors ?? []);
                     setSetorId(initialSetorId);
                     onInstituicaoChange?.(instId);
                     setIsInitialized(true);
@@ -46,7 +46,7 @@ export function SeletorInstituicao({
     const handleInstituicaoChange = (value: string) => {
         setInstituicaoId(value);
         const instituicao = instituicaos.find((i) => i.id.toString() === value);
-        setSetores(instituicao?.setors || []);
+        setSetores(instituicao?.setors ?? []);
         setSetorId('');
         onInstituicaoChange?.(value);
         onSetorChange('');
@@ -85,7 +85,7 @@ export function SeletorInstituicao({
                     <SelectContent>
                         {setores.map((setor) => (
                             <SelectItem key={setor.id} value={setor.id.toString()}>
-                                {`[${setor.unidade?.sigla || 'N/A'}] - ${setor.nome}`}
+                                {`[${setor.unidade?.sigla ?? 'N/A'}] - ${setor.nome}`}
                             </SelectItem>
                         ))}
                     </SelectContent>

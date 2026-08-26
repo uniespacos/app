@@ -22,8 +22,8 @@ export function transformModuloToFormData(modulo: Modulo): CadastrarModuloForm {
     }
 
     return {
-        nome: modulo.nome || '',
-        unidade_id: modulo.unidade?.id.toString() || '',
+        nome: modulo.nome ?? '',
+        unidade_id: modulo.unidade?.id.toString() ?? '',
         andares,
     };
 }

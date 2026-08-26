@@ -55,7 +55,7 @@ export default function GenericHeader({
             {canSeeButton && (
                 <Button className="flex items-center gap-2" onClick={handleOnClick}>
                     {ButtonIcon && <ButtonIcon className="h-4 w-4" />}
-                    {buttonText || 'N/A'}
+                    {buttonText ?? 'N/A'}
                 </Button>
             )}
         </header>
