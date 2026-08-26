@@ -185,14 +185,20 @@ export function useEspacoLiveUpdates(espacoId: number) {
 
 ## Validação Obrigatória ao Concluir
 
+Por tarefa, valide apenas o que sua mudança tocou — **não rode `npx jest` completo a cada tarefa**.
+Isso é responsabilidade do master, uma única vez, ao final de todo o plano.
+
 1. **Checagem de Tipagem:** `npx tsc --noEmit` (sem erros de tipos).
 2. **Linter com Tolerância Zero:** `npx eslint <arquivo(s)>` ou `npx eslint resources/js`.
    - É expressamente proibido introduzir novas supressões. Corrija a causa raiz do erro de tipagem ou estilo.
 3. **Testes Unitários / Componentes:**
-   - `npx jest <caminho>` primeiro para iterar.
-   - **Obrigatório:** `npx jest` completo para checar regressões cruzadas.
+   - `npx jest <caminho>` focado nos arquivos que você tocou — é o suficiente para declarar a tarefa pronta.
    - *Atenção ao React 19:* Em testes com mocks de `@inertiajs/react` (`Link`), garanta que props proprietárias (`preserveState`, `preserveScroll`, `only`) sejam desestruturadas para não vazarem atributos inválidos para o DOM.
 4. **Formatação:** `npx prettier --write <arquivo>` apenas nos arquivos que você de fato modificou.
+
+**Exceção — rode `npx jest` completo nesta própria tarefa:** só se o prompt exigir explicitamente
+(ex.: você mexeu em hook global, contexto compartilhado ou util usado por múltiplos componentes).
+Fora isso, pare na validação focada acima e devolva o controle ao master.
 
 ## Regras de Código
 - **Comentários:** Proibido comentários inline óbvios explicando "o quê" o código faz, código comentado ou divisores visuais decorativos.

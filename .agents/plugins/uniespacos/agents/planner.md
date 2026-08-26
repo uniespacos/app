@@ -30,7 +30,11 @@ git checkout -b <nome-da-feature> origin/develop
    - **Backend (Laravel 12):** Confirme a estrutura Controller fino → Service → Repository Interface + Eloquent no `AppServiceProvider`.
 3. **Decisões Críticas:** Se a decisão afetar schema de banco, contratos de API pública ou integridade de dados de usuário, explicite isso na tarefa.
 4. **Decomposição Atômica:** Quebre em tarefas verificáveis de forma independente. Se uma tarefa não tem critério de "pronto quando" claro, divida-a.
-5. **Raio de Impacto Amplo:** Se a tarefa mexer em código compartilhado (middleware, traits, helpers globais, factories), exija a execução da suíte completa de testes no "pronto quando".
+5. **Raio de Impacto Amplo:** Por padrão, o "pronto quando" de cada tarefa cobre apenas teste
+   focado + lint/tsc/eslint — a suíte completa roda uma única vez, pelo master, ao final de todo o
+   plano. Exceção: se a tarefa mexer em código compartilhado (middleware, traits, helpers globais,
+   factories), exija a execução da suíte completa de testes no "pronto quando" dessa tarefa
+   específica, além da rodada final do master.
 
 ## Formato de cada tarefa (obrigatório)
 

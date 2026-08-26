@@ -127,26 +127,30 @@ migration.
 
 ## Validação Obrigatória ao Concluir (Dentro do Container Docker)
 
-Execute todos os comandos dentro de `uniespacos-workspace-1`:
+Por tarefa, valide apenas o que sua mudança tocou — **não rode a suíte completa
+(`php artisan test` sem `--filter`) a cada tarefa**. Isso é responsabilidade do master, uma única
+vez, ao final de todo o plano. Execute os comandos dentro de `uniespacos-workspace-1`:
 
 ```bash
-# 1. Teste focado para iteração rápida
+# 1. Teste focado para iteração rápida e para confirmar a tarefa
 docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test --filter=NomeDoTeste
 
 # 1.1. Teste de contrato (obrigatório se a tarefa criou/alterou Enum exposto ao frontend)
 docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test --filter=ContractsSyncTest
 
-# 2. Suíte de testes completa (Obrigatório antes de declarar pronto)
-docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test
-
-# 3. Formatação PHP (Pint)
+# 2. Formatação PHP (Pint)
 docker exec uniespacos-workspace-1 vendor/bin/pint
 
-# 4. Análise Estática (PHPStan Nível 9)
+# 3. Análise Estática (PHPStan Nível 9)
 docker exec uniespacos-workspace-1 composer analyse
 ```
 
 > ⚠️ **PHPStan Baseline:** Código novo ou alterado não pode gerar novos erros. Se o PHPStan acusar caminho órfão no baseline (`phpstan-baseline.neon`), consulte a skill `known-pitfalls`.
+
+**Exceção — rode a suíte completa nesta própria tarefa:** só se o prompt exigir explicitamente
+(ex.: planner marcou "raio de impacto amplo" por você ter mexido em middleware, trait, helper
+global ou factory compartilhados). Fora isso, pare na validação focada acima e devolva o controle
+ao master.
 
 ## Regras de Qualidade
 - **Testes:** NUNCA masque falhas de teste com `skip()`, `markTestIncomplete()` ou blocos `try-catch` vazios.

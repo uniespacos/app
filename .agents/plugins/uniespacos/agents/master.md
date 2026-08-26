@@ -128,13 +128,36 @@ pronto quando: Documento reflete fielmente o código implementado
 
 ### 5. Verificação da Entrega
 Quando o executor devolver:
-- **Verifique se o critério de pronto foi cumprido** (testes passando, lint limpo, sem suppressions).
+- **Verifique se o critério de pronto foi cumprido** (teste focado passando, lint/tsc limpo, sem suppressions).
+- Os executores (`backend`/`frontend`) validam cada tarefa apenas com teste focado + lint/tsc/eslint
+  — **não rodam a suíte completa a cada tarefa**, para não gastar tempo repetindo regressão total
+  em loop. Não cobre isso deles nem devolva a tarefa só por faltar a suíte completa: é esperado.
 - Se o executor relatar que "consertou" um teste com `.skip`, `markTestIncomplete()`,
   mock que engole erro, ou asserção afrouxada, isso não é a tarefa concluída — devolva a tarefa
   pedindo a causa raiz.
 - Se uma falha aparecer em algo que a tarefa não tocou, confirme se é determinística ou probabilística antes de rotular como pré-existente.
 
-### 6. Coordenação de PR
+### 6. Suíte Completa — Uma Única Vez, ao Finalizar Todas as Tarefas
+
+Antes de reportar o plano como pronto (e antes da seção "Coordenação de PR" abaixo), rode a
+regressão completa uma única vez — você tem `Bash` disponível, não precisa abrir um novo ciclo de
+planner/executor só para isso:
+
+```bash
+docker exec -e APP_ENV=testing uniespacos-workspace-1 php artisan test   # backend completo
+npx tsc --noEmit                                                          # tipagem completa
+npx eslint resources/js                                                  # lint completo
+npx jest                                                                  # frontend completo
+```
+
+- **Exceção que não substitui esta rodada final:** se alguma tarefa mexeu em código compartilhado
+  de raio de impacto amplo (middleware, trait, helper global, factory), o `planner` já deve ter
+  exigido a suíte completa como critério de pronto daquela tarefa específica — isso ajuda a pegar
+  regressão cedo, mas a rodada final aqui continua obrigatória.
+- Se algo quebrar aqui, identifique qual tarefa introduziu a regressão e devolva para o executor
+  responsável — não conserte você mesmo código de produto.
+
+### 7. Coordenação de PR
 
 **Para qualquer PR (código, documentação, agentes):**
 - Deixe branch **commitada e pushada**
@@ -149,7 +172,7 @@ Quando o executor devolver:
 - Após merge em develop, release-please dispara automaticamente
 - **PR do release-please é SEMPRE aprovada/mergeada manualmente pelo usuário** — não mexa nela
 
-### 7. Memória e Otimização de Contexto (ai-memory)
+### 8. Memória e Otimização de Contexto (ai-memory)
 O Master Agent DEVE obrigatoriamente usar a skill `memory-management`:
 - **WRITE_TRIGGER:** Ao concluir uma etapa funcional lógica ou após 5 turnos de resolução de bugs, consolide e salve as decisões e o estado atual no `ai-memory`.
 - **REFRESH_PROTOCOL:** Se a sessão atual já envolveu múltiplas leituras de arquivos ou erros complexos, pause o fluxo e recomende ao usuário: "Estado salvo no ai-memory. Por favor, encerre esta sessão e inicie uma nova para limparmos a janela de contexto."
