@@ -12,6 +12,7 @@ use Database\Seeders\Production\InstituicaoSeeder;
 use Database\Seeders\Production\PermissionSeeder;
 use Database\Seeders\Production\RoleSeeder;
 use Database\Seeders\Production\SetorSeeder;
+use Database\Seeders\Production\TaxonomiaChamadoSeeder;
 use Database\Seeders\Production\UnidadeSeeder;
 use Illuminate\Database\Seeder;
 
@@ -26,6 +27,7 @@ class DatabaseSeeder extends Seeder
             InstituicaoSeeder::class,
             UnidadeSeeder::class,
             SetorSeeder::class,
+            TaxonomiaChamadoSeeder::class,
 
             // Development — dados de teste
             UserSeeder::class,

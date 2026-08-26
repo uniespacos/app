@@ -59,7 +59,6 @@ class ChamadoPolicyTest extends TestCase
 
     public function test_gestor_de_outro_espaco_nao_pode_triar(): void
     {
-        // Tem a permissao, mas nao administra nenhuma agenda deste espaco.
         $outroGestor = User::factory()->create(['setor_id' => $this->gestor->setor_id]);
         $outroGestor->assignRole('gestor');
 
@@ -77,7 +76,6 @@ class ChamadoPolicyTest extends TestCase
 
     public function test_chamado_nao_pode_ser_criado_pela_area_logada(): void
     {
-        // Chamados nascem da rota publica anonima, nunca de um usuario logado.
         $this->assertFalse($this->policy->create($this->gestor->fresh()));
     }
 
@@ -107,7 +105,6 @@ class ChamadoPolicyTest extends TestCase
 
         $this->assertTrue($this->policy->update($gestor, $chamado));
 
-        // Removido de todas as agendas do espaco.
         $this->espaco->agendas()->update(['user_id' => null]);
 
         $this->assertFalse($this->policy->update($gestor, $chamado->fresh()));

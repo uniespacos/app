@@ -6,6 +6,7 @@ namespace Tests;
 
 use Database\Seeders\Production\PermissionSeeder;
 use Database\Seeders\Production\RoleSeeder;
+use Database\Seeders\Production\TaxonomiaChamadoSeeder;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -27,6 +28,7 @@ abstract class TestCase extends BaseTestCase
         $this->seed([
             PermissionSeeder::class,
             RoleSeeder::class,
+            TaxonomiaChamadoSeeder::class,
         ]);
     }
 }

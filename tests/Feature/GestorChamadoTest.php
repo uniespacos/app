@@ -6,10 +6,12 @@ namespace Tests\Feature;
 
 use App\Enums\Chamado\StatusChamadoEnum;
 use App\Models\Andar;
+use App\Models\CategoriaChamado;
 use App\Models\Chamado;
 use App\Models\Espaco;
 use App\Models\Instituicao;
 use App\Models\Modulo;
+use App\Models\TipoChamado;
 use App\Models\Unidade;
 use App\Models\User;
 use App\Notifications\ChamadoOrfaoNotification;
@@ -35,18 +37,30 @@ class GestorChamadoTest extends TestCase
 
         $this->gestor = User::factory()->create(['setor_id' => $unidade->setors()->first()->id]);
 
-        // A EspacoFactory sorteia gestores da instituicao para as 3 agendas;
-        // com um unico usuario disponivel, ele assume todos os turnos.
         $this->espaco = Espaco::factory()->create();
         $this->gestor->refresh();
     }
 
-    private function chamado(array $attrs = []): Chamado
+    private function chamado(array $attrs = [], string $categoriaSlug = 'eletrica', string $tipoSlug = 'defeito'): Chamado
     {
         return Chamado::factory()
             ->paraEspaco($this->espaco)
-            ->categoria('eletrica')
+            ->categoria($categoriaSlug)
+            ->tipo($tipoSlug)
             ->create($attrs);
+    }
+
+    /**
+     * Ids do catalogo semeado pelo TaxonomiaChamadoSeeder.
+     */
+    private function tipoId(string $slug = 'defeito'): int
+    {
+        return TipoChamado::query()->where('slug', $slug)->value('id');
+    }
+
+    private function categoriaId(string $slug): int
+    {
+        return CategoriaChamado::query()->where('slug', $slug)->value('id');
     }
 
     public function test_gestor_ve_chamados_dos_espacos_que_administra(): void
@@ -76,7 +90,6 @@ class GestorChamadoTest extends TestCase
 
     public function test_fila_nao_mostra_chamado_de_espaco_de_outro_gestor(): void
     {
-        // Espaco de outra instituicao, com gestor proprio.
         $outraInstituicao = Instituicao::factory()->create();
         $outraUnidade = Unidade::factory()->create(['instituicao_id' => $outraInstituicao->id]);
         $outraUnidade->refresh();
@@ -87,7 +100,7 @@ class GestorChamadoTest extends TestCase
             ])->id,
         ]);
 
-        Chamado::factory()->paraEspaco($espacoAlheio)->categoria('ti')->create();
+        Chamado::factory()->paraEspaco($espacoAlheio)->categoria('ti')->tipo('defeito')->create();
 
         $this->assertNotNull($outroGestor);
 
@@ -147,7 +160,8 @@ class GestorChamadoTest extends TestCase
         Notification::fake();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $this->espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'O ar-condicionado da sala parou de funcionar.',
         ]);
 
@@ -224,7 +238,8 @@ class GestorChamadoTest extends TestCase
         $this->espaco->agendas()->update(['user_id' => null]);
 
         $this->post(route('chamados.reportar.store', ['espaco' => $this->espaco->public_id]), [
-            'categoria' => 'outros',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('outros'),
             'descricao' => 'Problema em espaco que ficou sem gestor atribuido.',
         ])->assertRedirect();
 
@@ -242,7 +257,8 @@ class GestorChamadoTest extends TestCase
         $this->espaco->agendas()->update(['user_id' => null]);
 
         $this->post(route('chamados.reportar.store', ['espaco' => $this->espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'Problema em espaco sem nenhum gestor atribuido.',
         ]);
 
@@ -254,20 +270,16 @@ class GestorChamadoTest extends TestCase
         $institucional = User::factory()->create(['setor_id' => $this->gestor->setor_id]);
         $institucional->givePermissionTo('secao.gestao-espacos');
 
-        // Chamado em espaco COM gestor: nao deve aparecer no painel de orfaos.
         $this->chamado();
 
-        // Chamado em espaco SEM gestor: deve aparecer.
         $this->espaco->agendas()->update(['user_id' => null]);
-        $orfao = $this->chamado(['categoria' => 'hidraulica']);
+        $orfao = $this->chamado([], 'hidraulica');
 
         $this->actingAs($institucional)
             ->get(route('institucional.chamados.index'))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Institucional/ChamadosOrfaosPage')
-                // Ambos os chamados apontam para o mesmo espaco, que agora
-                // esta sem gestor — logo os dois sao orfaos.
                 ->where('totalOrfaos', 2)
                 ->where('chamados.data.0.protocolo', $orfao->protocolo)
             );
@@ -297,19 +309,32 @@ class GestorChamadoTest extends TestCase
     public function test_tela_do_espaco_alerta_sobre_chamados_abertos(): void
     {
         $this->chamado();
-        $this->chamado(['categoria' => 'ti']);
-        $this->chamado(['categoria' => 'ti']);
+        $this->chamado([], 'ti');
+        $this->chamado([], 'ti');
 
         $this->actingAs($this->gestor)
             ->get(route('espacos.show', ['espaco' => $this->espaco->id]))
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('chamadosAbertos.total', 3)
-                // Ordenado por quantidade: Informatica (2) antes de Eletrica (1).
                 ->where('chamadosAbertos.categorias.0.label', 'Informática')
                 ->where('chamadosAbertos.categorias.0.total', 2)
                 ->where('chamadosAbertos.categorias.1.label', 'Elétrica')
                 ->where('chamadosAbertos.categorias.1.total', 1)
+            );
+    }
+
+    public function test_alerta_conta_apenas_tipos_marcados_para_exibicao(): void
+    {
+        $this->chamado();
+        $this->chamado([], 'outros', 'sugestao');
+        $this->chamado([], 'outros', 'reclamacao');
+
+        $this->actingAs($this->gestor)
+            ->get(route('espacos.show', ['espaco' => $this->espaco->id]))
+            ->assertInertia(fn ($page) => $page
+                ->where('chamadosAbertos.total', 1)
+                ->where('chamadosAbertos.categorias.0.label', 'Elétrica')
             );
     }
 
@@ -322,7 +347,6 @@ class GestorChamadoTest extends TestCase
         $this->actingAs($this->gestor)
             ->get(route('espacos.show', ['espaco' => $this->espaco->id]))
             ->assertInertia(fn ($page) => $page
-                // Apenas o "em andamento" conta: ainda e um problema vigente.
                 ->where('chamadosAbertos.total', 1)
             );
     }
@@ -341,8 +365,6 @@ class GestorChamadoTest extends TestCase
     {
         $this->chamado();
 
-        // O alerta e informativo: a tela responde normalmente, sem redirect
-        // nem erro, mesmo com problema reportado em aberto.
         $this->actingAs($this->gestor)
             ->get(route('espacos.show', ['espaco' => $this->espaco->id]))
             ->assertOk()
@@ -352,7 +374,8 @@ class GestorChamadoTest extends TestCase
     public function test_report_publico_continua_anonimo_e_alimenta_a_fila(): void
     {
         $this->post(route('chamados.reportar.store', ['espaco' => $this->espaco->public_id]), [
-            'categoria' => 'limpeza',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('limpeza'),
             'descricao' => 'A sala esta com lixo acumulado desde ontem.',
         ]);
 

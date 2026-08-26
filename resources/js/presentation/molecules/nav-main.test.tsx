@@ -78,6 +78,40 @@ describe('NavMain', () => {
         expect(screen.getByRole('link', { name: 'Espaços sem Responsável' })).toHaveAttribute('href', '/institucional/chamados');
     });
 
+    it('lista taxonomias como subitem do grupo de chamados quando ele e informado', () => {
+        renderNav([
+            {
+                title: 'Chamados',
+                href: '/gestor/chamados',
+                items: [
+                    { title: 'Fila de Chamados', href: '/gestor/chamados' },
+                    { title: 'Tipos e Categorias', href: '/institucional/taxonomias-chamado' },
+                ],
+            },
+        ]);
+
+        fireEvent.click(screen.getByRole('button', { name: /Chamados/ }));
+
+        expect(screen.getByRole('link', { name: 'Tipos e Categorias' })).toHaveAttribute('href', '/institucional/taxonomias-chamado');
+    });
+
+    it('nao exibe taxonomias quando o subitem nao e informado', () => {
+        renderNav([
+            {
+                title: 'Chamados',
+                href: '/gestor/chamados',
+                items: [
+                    { title: 'Fila de Chamados', href: '/gestor/chamados' },
+                    { title: 'Espaços sem Responsável', href: '/institucional/chamados' },
+                ],
+            },
+        ]);
+
+        fireEvent.click(screen.getByRole('button', { name: /Chamados/ }));
+
+        expect(screen.queryByRole('link', { name: 'Tipos e Categorias' })).not.toBeInTheDocument();
+    });
+
     it('abre o grupo e marca o subitem ativo quando a url atual e de um subitem', () => {
         renderNav(
             [

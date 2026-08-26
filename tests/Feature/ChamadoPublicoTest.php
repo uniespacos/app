@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Enums\Chamado\StatusChamadoEnum;
-use App\Enums\Chamado\TipoChamadoEnum;
+use App\Models\CategoriaChamado;
 use App\Models\Chamado;
 use App\Models\Espaco;
 use App\Models\Instituicao;
+use App\Models\TipoChamado;
 use App\Models\Unidade;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Honeypot\Honeypot;
 use Tests\TestCase;
 
@@ -22,9 +24,6 @@ class ChamadoPublicoTest extends TestCase
     {
         parent::setUp();
 
-        // EspacoFactory depende da cadeia Instituicao > Unidade > Modulo > Andar
-        // e, no afterCreating, de ao menos um User da mesma instituicao para
-        // assumir as agendas dos tres turnos.
         $instituicao = Instituicao::factory()->create();
         $unidade = Unidade::factory()->create(['instituicao_id' => $instituicao->id]);
         $unidade->refresh();
@@ -35,6 +34,19 @@ class ChamadoPublicoTest extends TestCase
     private function espaco(): Espaco
     {
         return Espaco::factory()->create();
+    }
+
+    /**
+     * Ids do catalogo semeado pelo TaxonomiaChamadoSeeder.
+     */
+    private function tipoId(string $slug = 'defeito'): int
+    {
+        return TipoChamado::query()->where('slug', $slug)->value('id');
+    }
+
+    private function categoriaId(string $slug): int
+    {
+        return CategoriaChamado::query()->where('slug', $slug)->value('id');
     }
 
     public function test_espaco_recebe_public_id_automaticamente(): void
@@ -56,6 +68,23 @@ class ChamadoPublicoTest extends TestCase
                 ->where('espaco.nome', $espaco->nome)
                 ->where('auth.user', null)
                 ->has('categorias', 6)
+                ->has('tipos', 3)
+                ->where('catalogoVazio', false)
+            );
+    }
+
+    public function test_formulario_avisa_quando_o_catalogo_esta_vazio(): void
+    {
+        $espaco = $this->espaco();
+
+        CategoriaChamado::query()->delete();
+
+        $this->get(route('chamados.reportar', ['espaco' => $espaco->public_id]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Chamados/ReportarPage')
+                ->where('catalogoVazio', true)
+                ->has('categorias', 0)
             );
     }
 
@@ -69,7 +98,6 @@ class ChamadoPublicoTest extends TestCase
     {
         $espaco = $this->espaco();
 
-        // O binding e escopado por public_id: passar o id numerico nao resolve.
         $this->get('/reportar/'.$espaco->id)->assertNotFound();
     }
 
@@ -78,7 +106,8 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
 
         $response = $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'A lampada do fundo da sala esta queimada ha uma semana.',
         ]);
 
@@ -90,8 +119,8 @@ class ChamadoPublicoTest extends TestCase
         $this->assertDatabaseHas('chamados', [
             'reportable_type' => Espaco::class,
             'reportable_id' => $espaco->id,
-            'categoria' => 'eletrica',
-            'tipo' => TipoChamadoEnum::DEFEITO->value,
+            'categoria_id' => $this->categoriaId('eletrica'),
+            'tipo_id' => $this->tipoId(),
             'status' => StatusChamadoEnum::ABERTO->value,
         ]);
 
@@ -99,12 +128,37 @@ class ChamadoPublicoTest extends TestCase
         $this->assertNull($chamado->contato_email);
     }
 
+    /**
+     * @return list<array{0: string}>
+     */
+    public static function tiposDisponiveis(): array
+    {
+        return [['defeito'], ['reclamacao'], ['sugestao']];
+    }
+
+    #[DataProvider('tiposDisponiveis')]
+    public function test_reportante_escolhe_o_tipo_do_registro(string $slug): void
+    {
+        $espaco = $this->espaco();
+
+        $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
+            'tipo_id' => $this->tipoId($slug),
+            'categoria_id' => $this->categoriaId('outros'),
+            'descricao' => 'Registro de teste com descricao suficientemente longa.',
+        ]);
+
+        $this->assertDatabaseHas('chamados', [
+            'tipo_id' => $this->tipoId($slug),
+        ]);
+    }
+
     public function test_contato_e_opcional_mas_persistido_quando_informado(): void
     {
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'ti',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('ti'),
             'descricao' => 'O projetor da sala nao liga de jeito nenhum.',
             'contato_nome' => 'Maria da Silva',
             'contato_email' => 'maria@uesb.edu.br',
@@ -116,14 +170,31 @@ class ChamadoPublicoTest extends TestCase
         ]);
     }
 
-    public function test_rejeita_categoria_fora_do_enum(): void
+    public function test_rejeita_categoria_inexistente(): void
     {
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'inexistente',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => 999999,
             'descricao' => 'Descricao suficientemente longa para passar na validacao.',
-        ])->assertSessionHasErrors('categoria');
+        ])->assertSessionHasErrors('categoria_id');
+
+        $this->assertDatabaseCount('chamados', 0);
+    }
+
+    public function test_rejeita_categoria_excluida(): void
+    {
+        $espaco = $this->espaco();
+        $categoriaId = $this->categoriaId('limpeza');
+
+        CategoriaChamado::query()->whereKey($categoriaId)->delete();
+
+        $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $categoriaId,
+            'descricao' => 'Descricao suficientemente longa para passar na validacao.',
+        ])->assertSessionHasErrors('categoria_id');
 
         $this->assertDatabaseCount('chamados', 0);
     }
@@ -133,7 +204,8 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'limpeza',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('limpeza'),
             'descricao' => 'curto',
             'contato_email' => 'nao-e-email',
         ])->assertSessionHasErrors(['descricao', 'contato_email']);
@@ -147,7 +219,8 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'mobiliario',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('mobiliario'),
             'descricao' => 'A porta da sala esta com a fechadura quebrada.',
             'fotos' => [UploadedFile::fake()->image('problema.jpg')],
         ]);
@@ -163,7 +236,8 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'hidraulica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('hidraulica'),
             'descricao' => 'A torneira do banheiro nao fecha e esta desperdicando agua.',
         ]);
 
@@ -174,9 +248,33 @@ class ChamadoPublicoTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('Chamados/ReportarSucessoPage')
                 ->where('chamado.protocolo', $chamado->protocolo)
+                ->where('chamado.tipo', 'Defeito')
                 ->where('chamado.categoria', 'Hidráulica')
                 ->where('chamado.status', 'Aberto')
                 ->where('chamado.espaco', $espaco->nome)
+            );
+    }
+
+    public function test_chamado_historico_mantem_o_rotulo_apos_a_taxonomia_ser_excluida(): void
+    {
+        $espaco = $this->espaco();
+
+        $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('hidraulica'),
+            'descricao' => 'A torneira do banheiro nao fecha e esta desperdicando agua.',
+        ]);
+
+        $chamado = Chamado::first();
+
+        TipoChamado::query()->whereKey($this->tipoId())->delete();
+        CategoriaChamado::query()->whereKey($this->categoriaId('hidraulica'))->delete();
+
+        $this->get(route('chamados.reportar.sucesso', ['chamado' => $chamado->protocolo]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('chamado.tipo', 'Defeito')
+                ->where('chamado.categoria', 'Hidráulica')
             );
     }
 
@@ -199,9 +297,9 @@ class ChamadoPublicoTest extends TestCase
         $honeypot = app(Honeypot::class);
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'Spam gerado automaticamente por um bot qualquer.',
-            // Humano nunca vê este campo; bot preenche tudo que encontra.
             $honeypot->nameFieldName() => 'http://spam.example.com',
             $honeypot->validFromFieldName() => $honeypot->encryptedValidFrom(),
         ]);
@@ -214,9 +312,9 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
         $honeypot = app(Honeypot::class);
 
-        // Timestamp no futuro: o formulario "ainda nao pode" ser enviado.
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'Envio instantaneo, mais rapido do que qualquer pessoa digitaria.',
             $honeypot->nameFieldName() => '',
             $honeypot->validFromFieldName() => encrypt(now()->addMinute()->timestamp),
@@ -231,7 +329,8 @@ class ChamadoPublicoTest extends TestCase
         $honeypot = app(Honeypot::class);
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'Report legitimo de uma pessoa que preencheu o formulario.',
             $honeypot->nameFieldName() => '',
             $honeypot->validFromFieldName() => encrypt(now()->subMinute()->timestamp),
@@ -245,11 +344,26 @@ class ChamadoPublicoTest extends TestCase
         $espaco = $this->espaco();
 
         $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
-            'categoria' => 'eletrica',
+            'tipo_id' => $this->tipoId(),
+            'categoria_id' => $this->categoriaId('eletrica'),
             'descricao' => 'O ar-condicionado da sala parou de gelar.',
         ]);
 
         $this->get(route('chamados.reportar', ['espaco' => $espaco->public_id]))
             ->assertInertia(fn ($page) => $page->where('espaco.chamados_abertos', 1));
+    }
+
+    public function test_contador_ignora_tipos_fora_do_alerta(): void
+    {
+        $espaco = $this->espaco();
+
+        $this->post(route('chamados.reportar.store', ['espaco' => $espaco->public_id]), [
+            'tipo_id' => $this->tipoId('sugestao'),
+            'categoria_id' => $this->categoriaId('outros'),
+            'descricao' => 'Seria bom ter mais tomadas perto das carteiras do fundo.',
+        ]);
+
+        $this->get(route('chamados.reportar', ['espaco' => $espaco->public_id]))
+            ->assertInertia(fn ($page) => $page->where('espaco.chamados_abertos', 0));
     }
 }
