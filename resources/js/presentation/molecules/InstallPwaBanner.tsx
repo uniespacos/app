@@ -26,7 +26,7 @@ export const InstallPwaBanner: React.FC = () => {
                 <Button size="sm" onClick={() => void promptInstall()} className="h-8 text-xs font-medium">
                     Instalar
                 </Button>
-                <Button size="icon" variant="ghost" onClick={dismissPrompt} className="text-muted-foreground hover:text-foreground h-8 w-8">
+                <Button size="icon" variant="ghost" onClick={dismissPrompt} className="text-muted-foreground hover:text-foreground min-h-11 min-w-11">
                     <X className="h-4 w-4" />
                 </Button>
             </div>
