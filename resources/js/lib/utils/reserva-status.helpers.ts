@@ -1,3 +1,4 @@
+import { assertNever } from '@/lib/utils/exhaustive';
 import { Horario, SituacaoReserva, SlotCalendario } from '@/types';
 
 export function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCalendario['status'] {
@@ -8,8 +9,10 @@ export function mapearStatusBackendParaSlot(status: Horario['situacao']): SlotCa
             return 'deferida';
         case 'indeferida':
             return 'indeferida';
-        default:
+        case 'inativa':
             return 'reservado';
+        default:
+            return assertNever(status);
     }
 }
 
