@@ -12,11 +12,17 @@ description: Convenções de frontend do UniEspaços (atomic design, modais ergo
 - `atoms/` — elementos visuais primitivos e sem estado de domínio (`SituacaoBadge`, `UserAvatar`, `input-error`, `text-link`).
 - `molecules/` — composição pequena e reutilizável entre páginas (`ResponsiveModal`, `Modal`, `FormField`, `DatePicker`, `DataTable`, `ComboboxFiltro`, `delete-item`, `PaginacaoListas`).
 - `organisms/` — composição com lógica de domínio complexa, geralmente amarrada a um recurso (`GestoresEspaco`, `EspacoCard`, `MobileBottomBar`, `SetorForm`, `GerenciarGestoresModal`).
-- `templates/` — estruturas de layout que envolvem páginas (`AppLayout`, `AppSidebarLayout`, `AuthLayout`).
+- `templates/` — estruturas de layout que envolvem páginas (`AppLayout`, `AppSidebarLayout`, `AuthSplitLayout`). `AuthLayout` ainda existe como wrapper fino de compatibilidade que delega para `AuthSplitLayout` — em código novo, use `AuthSplitLayout` diretamente.
 - `pages/` — pontos de entrada renderizados pelo Inertia (`Administrativo/Usuarios/Usuarios.tsx`, `Espacos/VisualizarEspacoPage.tsx`).
 
 `resources/js/components/ui/` é a cópia local do shadcn (`dialog.tsx`, `drawer.tsx`, `button.tsx`, `select.tsx`).
 Só mexe se o motivo for consertar o primitivo em si para todo mundo — não para uma tela específica.
+
+Fora de `presentation/`, três diretórios canônicos que toda tela nova deve considerar antes de escrever tipo, string ou assinatura de canal do zero:
+
+- `resources/js/contracts/` — SSOT de tipos/enums de domínio (`situacao-reserva.contract.ts`, `roles.contract.ts`, etc.). Nunca duplicar union type localmente.
+- `resources/js/i18n/` — motor de i18n próprio (`useTranslation()`, dicionários em `locales/pt-BR.ts` e derivados). Zero string hardcoded em PT-BR num componente.
+- `resources/js/lib/auth-can.tsx` (PBAC: `<Can>`, `useCan()`) e `resources/js/lib/echo-channel-registry.ts` (registry de canais Reverb com reference-counting: `acquirePrivateChannel`/`releasePrivateChannel`).
 
 ## Modais e Diálogos: Padrão Ergonômico `<ResponsiveModal>`
 
@@ -74,6 +80,7 @@ A estilização utiliza o **Tailwind v4 (CSS-First)** com a diretiva `@theme` e 
   - `bg-destructive`, `text-destructive-foreground`
   - `bg-card`, `text-card-foreground`
   - `border-border`, `ring-ring`, `bg-success`
+  - Sufixos de intensidade por status (`success`, `warning`, `destructive`, `info`, `neutral`): `-subtle` (fundo neutro/baixo contraste, ex.: `bg-success-subtle`) e `-accent` (destaque de maior contraste, ex.: `text-success-accent`, `bg-warning-accent`) — definidos em `resources/css/app.css`.
 
 ## Datas e Horários: Padrão `date-fns ^4.4.0`
 
