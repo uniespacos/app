@@ -119,7 +119,10 @@ Siga rigorosamente as diretrizes e regras invioláveis definidas em @docs/REGRAS
 
 ### 4.1 Tolerância Zero a Suppressions no Linter
 
-- O arquivo `eslint-suppressions.json` está 100% purgado.
+- Nenhum `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore` é permitido em novo código.
+  Débito técnico existente (95 supressões em 45 arquivos, documentado em `docs/auditoria-sincronizacao-agentes/`)
+  será quitado via refatoração gradual. Para validar o state real:
+  `npx eslint resources/js --suppressions-location <(echo '{}')`.
 - **PROIBIDO:** Introduzir `any`, `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore`.
 - Código novo ou alterado deve satisfazer o ESLint 9 (`strict-type-checked`) e TypeScript 5.8 em modo estrito.
 

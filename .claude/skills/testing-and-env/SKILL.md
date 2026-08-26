@@ -67,9 +67,8 @@ npx prettier --write <arquivo>
 ## Linter TypeScript/React: Tolerância Zero a Suppressions
 
 O frontend opera sob o **ESLint 9 Flat Config** com `typescript-eslint` em modo `strict-type-checked` e `stylistic-type-checked`.
-- **Zero Suppressions:** O arquivo `eslint-suppressions.json` está 100% purgado.
 - **Regra de Qualidade:** Código novo ou modificado não pode introduzir nenhuma nova supressão. Qualquer erro de linting ou tipagem deve ser resolvido na causa raiz do código.
-- **Bypass Pontual Estritamente Justificado:** Se uma regra conflitar comprovadamente com contratos externos do Inertia/React 19 (ex.: tipagem de formulário `useForm<T>`), utilize `// eslint-disable-next-line <regra> -- justificativa_tecnica` na linha exata.
+- **Regra de Ouro:** Zero suppressões inline. Se uma regra conflita com código externo, o problema é na tipagem — não suprimindo. Relatar ao time de arquitetura para investigar.
 
 ---
 

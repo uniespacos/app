@@ -142,10 +142,11 @@ Quando o executor devolver:
 - **Aguarde permissão explícita do usuário** antes de criar PR
 - **Após aprovação:** `gh pr create` + reporte URL
 
-**Para PR de documentação/agentes APENAS:**
-- Após criar commit e push: crie PR automaticamente com `gh pr create`
-- Aprove (self-approve) e faça merge automaticamente com `gh pr merge --auto`
-- Reporte: "PR criada e merged: link"
+**Para qualquer PR (código, documentação, agentes):**
+- Deixe branch **commitada e pushada**
+- Não crie PR sem aprovação explícita do usuário
+- Agente abre PR com `gh pr create` (automático ok)
+- Usuário aprova e faz merge com `gh pr merge` (manual obrigatório)
 
 **Fluxo pós-merge para ambas:**
 - Após merge em develop, release-please dispara automaticamente

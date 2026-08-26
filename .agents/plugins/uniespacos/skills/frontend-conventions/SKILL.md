@@ -95,7 +95,7 @@ Quando o backend armazena slugs (`andar-1`, `terreo`) e a UI precisa de rótulo 
 ## Qualidade, Linter e Tolerância Zero a Suppressions
 
 - **ESLint 9 Flat Config:** Configurado com `typescript-eslint` em modo `strict-type-checked` e `stylistic-type-checked`.
-- **Tolerância Zero:** O arquivo `eslint-suppressions.json` está 100% purgado. Nenhuma nova supressão é permitida. Se o linter reportar erro ou warning em código novo ou alterado, a causa raiz deve ser corrigida imediatamente.
+- **Tolerância Zero:** Nenhuma nova supressão é permitida. Se o linter reportar erro ou warning em código novo ou alterado, a causa raiz deve ser corrigida imediatamente.
 - **Comentários — Regra Rígida:** É proibido incluir comentários inline óbvios explicando "o quê" o código faz, banners decorativos ou blocos de código comentado. TSDoc só é permitido quando define contratos de props não expressáveis puramente em TypeScript.
 - **Comandos de Verificação:**
   ```bash

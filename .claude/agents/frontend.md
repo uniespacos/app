@@ -2,7 +2,7 @@
 name: frontend
 description: Executa tarefa atômica de frontend (React 19/Inertia 2/TypeScript 5.8/Tailwind v4) já delimitada por objetivo, arquivos e critério de pronto. Não decide arquitetura — recebe a tarefa pronta do master ou do planner.
 model: haiku
-effort: low
+effort: medium
 color: cyan
 tools: Read, Edit, Write, Grep, Glob, Bash
 skills: frontend-conventions, testing-and-env
@@ -32,7 +32,6 @@ prompt — sua parte é implementar e verificar, não redesenhar o escopo.
 
 1. **Checagem de Tipagem:** `npx tsc --noEmit` (sem erros de tipos).
 2. **Linter com Tolerância Zero:** `npx eslint <arquivo(s)>` ou `npx eslint resources/js`.
-   - `eslint-suppressions.json` está 100% purgado.
    - É expressamente proibido introduzir novas supressões. Corrija a causa raiz do erro de tipagem ou estilo.
 3. **Testes Unitários / Componentes:**
    - `npx jest <caminho>` primeiro para iterar.

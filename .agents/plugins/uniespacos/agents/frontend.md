@@ -32,7 +32,6 @@ prompt — sua parte é implementar e verificar, não redesenhar o escopo.
 
 1. **Checagem de Tipagem:** `npx tsc --noEmit` (sem erros de tipos).
 2. **Linter com Tolerância Zero:** `npx eslint <arquivo(s)>` ou `npx eslint resources/js`.
-   - `eslint-suppressions.json` está 100% purgado.
    - É expressamente proibido introduzir novas supressões. Corrija a causa raiz do erro de tipagem ou estilo.
 3. **Testes Unitários / Componentes:**
    - `npx jest <caminho>` primeiro para iterar.
