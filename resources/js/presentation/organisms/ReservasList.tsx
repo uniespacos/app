@@ -143,7 +143,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 {(canEdit || canCancel) && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="min-h-11 min-w-11">
                                 <MoreHorizontal className="h-4 w-4" />
                                 <span className="sr-only">{t('reservas.tabela.acoes')}</span>
                             </Button>
