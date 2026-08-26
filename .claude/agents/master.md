@@ -108,6 +108,9 @@ Após a conclusão de tarefas de código (`backend` ou `frontend`), avalie se pr
 | Ajuste em auto-aprovação de reserva | `auto-approval-rule.md` |
 | Ajuste em arquivamento / soft-delete | `archive-soft-delete-flow.md` |
 | Novo envelope de erro ou logging | `error-handling-and-logging.md` |
+| Novo contrato SSOT (`@/contracts`) | `models-business-rules.md` ou documento de arquitetura frontend |
+| Nova chave/namespace de i18n | (avaliar se há documento de i18n; se não, não criar novo) |
+| Nova permission PBAC | `authorization-policies.md` |
 
 Ao delegar para `docs`, forneça o contexto estruturado:
 ```
