@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\CategoriaChamado;
 use App\Models\Chamado;
 use App\Models\Instituicao;
 use App\Models\Modulo;
 use App\Models\Reserva;
 use App\Models\Role;
 use App\Models\Setor;
+use App\Models\TipoChamado;
 use App\Models\Unidade;
 use App\Policies\ChamadoPolicy;
 use App\Policies\InstituicaoPolicy;
@@ -17,11 +19,16 @@ use App\Policies\ModuloPolicy;
 use App\Policies\ReservaPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SetorPolicy;
+use App\Policies\TaxonomiaChamadoPolicy;
 use App\Policies\UnidadePolicy;
 use App\Repositories\AgendaRepositoryEloquent;
 use App\Repositories\AgendaRepositoryInterface;
 use App\Repositories\AndarRepositoryEloquent;
 use App\Repositories\AndarRepositoryInterface;
+use App\Repositories\CategoriaChamadoRepositoryEloquent;
+use App\Repositories\CategoriaChamadoRepositoryInterface;
+use App\Repositories\ChamadoRepositoryEloquent;
+use App\Repositories\ChamadoRepositoryInterface;
 use App\Repositories\EspacoRepositoryEloquent;
 use App\Repositories\EspacoRepositoryInterface;
 use App\Repositories\HorarioRepositoryEloquent;
@@ -30,8 +37,6 @@ use App\Repositories\InstituicaoRepositoryEloquent;
 use App\Repositories\InstituicaoRepositoryInterface;
 use App\Repositories\ModuloRepositoryEloquent;
 use App\Repositories\ModuloRepositoryInterface;
-use App\Repositories\ChamadoRepositoryEloquent;
-use App\Repositories\ChamadoRepositoryInterface;
 use App\Repositories\PermissionRepositoryEloquent;
 use App\Repositories\PermissionRepositoryInterface;
 use App\Repositories\ReservaRepositoryEloquent;
@@ -40,6 +45,8 @@ use App\Repositories\RoleRepositoryEloquent;
 use App\Repositories\RoleRepositoryInterface;
 use App\Repositories\SetorRepositoryEloquent;
 use App\Repositories\SetorRepositoryInterface;
+use App\Repositories\TipoChamadoRepositoryEloquent;
+use App\Repositories\TipoChamadoRepositoryInterface;
 use App\Repositories\UnidadeRepositoryEloquent;
 use App\Repositories\UnidadeRepositoryInterface;
 use App\Repositories\UserRepositoryEloquent;
@@ -74,6 +81,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UnidadeRepositoryInterface::class, UnidadeRepositoryEloquent::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepositoryEloquent::class);
         $this->app->bind(ChamadoRepositoryInterface::class, ChamadoRepositoryEloquent::class);
+        $this->app->bind(TipoChamadoRepositoryInterface::class, TipoChamadoRepositoryEloquent::class);
+        $this->app->bind(CategoriaChamadoRepositoryInterface::class, CategoriaChamadoRepositoryEloquent::class);
 
         if ($this->app->environment('development') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -93,6 +102,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Modulo::class, ModuloPolicy::class);
         Gate::policy(Setor::class, SetorPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(TipoChamado::class, TaxonomiaChamadoPolicy::class);
+        Gate::policy(CategoriaChamado::class, TaxonomiaChamadoPolicy::class);
 
         // Report publico de chamados: rota anonima, protegida por IP.
         RateLimiter::for('chamados-publico', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
