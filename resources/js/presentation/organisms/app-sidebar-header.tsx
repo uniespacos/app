@@ -1,7 +1,7 @@
-import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
 import { NotificationDropdown } from '@/presentation/organisms/notification-dropdown';
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     return (
