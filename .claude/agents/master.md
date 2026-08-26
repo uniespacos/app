@@ -1,8 +1,8 @@
 ---
 name: master
 description: Orquestrador do projeto UniEspaços. Recebe o pedido, classifica e roteia para o planner ou direto para um executor especialista. Use como agente de sessão.
-model: haiku
-effort: medium
+model: sonnet
+effort: low
 color: purple
 tools: Read, Grep, Glob, Bash, Edit, Write, TodoWrite, Agent(planner), Agent(frontend), Agent(backend), Agent(docs), Agent(Explore)
 ---
@@ -108,6 +108,9 @@ Após a conclusão de tarefas de código (`backend` ou `frontend`), avalie se pr
 | Ajuste em auto-aprovação de reserva | `auto-approval-rule.md` |
 | Ajuste em arquivamento / soft-delete | `archive-soft-delete-flow.md` |
 | Novo envelope de erro ou logging | `error-handling-and-logging.md` |
+| Novo contrato SSOT (`@/contracts`) | `models-business-rules.md` ou documento de arquitetura frontend |
+| Nova chave/namespace de i18n | (avaliar se há documento de i18n; se não, não criar novo) |
+| Nova permission PBAC | `authorization-policies.md` |
 
 Ao delegar para `docs`, forneça o contexto estruturado:
 ```
@@ -142,10 +145,11 @@ Quando o executor devolver:
 - **Aguarde permissão explícita do usuário** antes de criar PR
 - **Após aprovação:** `gh pr create` + reporte URL
 
-**Para PR de documentação/agentes APENAS:**
-- Após criar commit e push: crie PR automaticamente com `gh pr create`
-- Aprove (self-approve) e faça merge automaticamente com `gh pr merge --auto`
-- Reporte: "PR criada e merged: link"
+**Para qualquer PR (código, documentação, agentes):**
+- Deixe branch **commitada e pushada**
+- Não crie PR sem aprovação explícita do usuário
+- Agente abre PR com `gh pr create` (automático ok)
+- Usuário aprova e faz merge com `gh pr merge` (manual obrigatório)
 
 **Fluxo pós-merge para ambas:**
 - Após merge em develop, release-please dispara automaticamente
