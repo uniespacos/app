@@ -1,4 +1,6 @@
 import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
+import { Turno, TurnoType } from '@/contracts/turnos.contract';
+import { assertNever } from '@/lib/utils/exhaustive';
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
 import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
@@ -75,16 +77,18 @@ export const getStatusReservaColor = (situacao: SituacaoReserva) => ESTILO_SITUA
 /** Rótulo da situação. Idem — inclusive os acentos, que aqui faltavam. */
 export const getStatusReservaText = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao].label ?? 'Desconhecido';
 
-export const getTurnoText = (turno: 'manha' | 'tarde' | 'noite' | undefined) => {
+export const getTurnoText = (turno: TurnoType | undefined) => {
     switch (turno) {
-        case 'manha':
+        case Turno.MANHA:
             return 'Manhã';
-        case 'tarde':
+        case Turno.TARDE:
             return 'Tarde';
-        case 'noite':
+        case Turno.NOITE:
             return 'Noite';
-        default:
+        case undefined:
             return 'Desconhecido';
+        default:
+            return assertNever(turno);
     }
 };
 export function useDebounce(value: string, delay: number) {

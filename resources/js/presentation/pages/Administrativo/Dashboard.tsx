@@ -29,7 +29,7 @@ export default function Home() {
                         <CardDescription className="text-xs">Gerencie os setores das unidades organizacionais</CardDescription>
                     </CardHeader>
                     <CardContent className="p-6 pt-0">
-                        <Link href={route('institucional.setores.index')} className="block w-full">
+                        <Link href={route('institucional.setors.index')} className="block w-full">
                             <Button className="w-full justify-between">
                                 <span>Acessar Setores</span>
                                 <ArrowRight className="h-4 w-4" />
