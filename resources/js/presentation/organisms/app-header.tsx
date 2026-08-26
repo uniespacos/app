@@ -1,18 +1,18 @@
-import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
-import { Icon } from '@/presentation/atoms/icon';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserMenuContent } from '@/presentation/molecules/user-menu-content';
-import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { cn } from '@/lib/utils';
+import AppLogo from '@/presentation/atoms/app-logo';
+import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
+import { Icon } from '@/presentation/atoms/icon';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
+import { Breadcrumbs } from '@/presentation/molecules/breadcrumbs';
+import { UserMenuContent } from '@/presentation/molecules/user-menu-content';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
-import AppLogo from '@/presentation/atoms/app-logo';
-import AppLogoIcon from '@/presentation/atoms/app-logo-icon';
 
 const mainNavItems: NavItem[] = [
     {

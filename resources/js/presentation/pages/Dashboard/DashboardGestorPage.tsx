@@ -1,15 +1,15 @@
-import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
-import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
+import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
+import EspacoCard from '@/presentation/organisms/EspacoCard';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle, Clock, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import EspacoCard from '@/presentation/organisms/EspacoCard';
-import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Painel Inicial',

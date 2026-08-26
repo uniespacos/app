@@ -3,10 +3,10 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
 import AuthLayout from '@/presentation/templates/auth-layout';
 
 export default function ConfirmPassword() {

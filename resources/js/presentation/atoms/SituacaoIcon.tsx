@@ -1,5 +1,5 @@
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { SituacaoReserva } from '@/types';
+import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 
 interface SituacaoIconProps {
     situacao: SituacaoReserva | string;

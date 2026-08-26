@@ -1,8 +1,8 @@
+import { useAgnosticForm } from '@/hooks/use-agnostic-form';
+import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import { useAgnosticForm } from '@/hooks/use-agnostic-form';
 
 export interface EditarInstituicaoForm extends Record<string, unknown> {
     nome: string;

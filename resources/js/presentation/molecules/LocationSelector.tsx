@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
-import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
 import { Andar, Modulo, Unidade } from '@/types';
 
@@ -42,9 +42,7 @@ export function LocationSelector({
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Seleção de Unidade */}
                 <div className="space-y-2">
-                    <Label htmlFor="unidade_id">
-                        Unidade
-                    </Label>
+                    <Label htmlFor="unidade_id">Unidade</Label>
                     <SelectUI
                         value={unidadeSelecionada?.toString()}
                         onValueChange={(value) => setUnidadeSelecionada(parseInt(value))}
@@ -66,9 +64,7 @@ export function LocationSelector({
 
                 {/* Seleção de Módulo */}
                 <div className="space-y-2">
-                    <Label htmlFor="module_id">
-                        Módulo
-                    </Label>
+                    <Label htmlFor="module_id">Módulo</Label>
                     <SelectUI
                         value={moduloSelecionado?.toString()}
                         onValueChange={(value) => handleModuloChange(parseInt(value))}
@@ -94,9 +90,7 @@ export function LocationSelector({
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Seleção de Andar */}
                 <div className="space-y-2">
-                    <Label htmlFor="andar_id">
-                        Andar
-                    </Label>
+                    <Label htmlFor="andar_id">Andar</Label>
                     <div className="flex gap-2">
                         <SelectUI value={andarSelecionado?.toString()} onValueChange={handleAndarChange} disabled={!moduloSelecionado || processing}>
                             <SelectTrigger>

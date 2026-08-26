@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { IReservasRepository } from '../ports/reservas-repository.interface';
 import { useDebounce } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useEffect, useRef, useState } from 'react';
+import { IReservasRepository } from '../ports/reservas-repository.interface';
 
 interface UseReservasListUseCaseProps {
     repository: IReservasRepository;
@@ -9,17 +9,11 @@ interface UseReservasListUseCaseProps {
     initialSemana: { referencia: string };
 }
 
-export function useReservasListUseCase({
-    repository,
-    initialFilters,
-    initialSemana,
-}: UseReservasListUseCaseProps) {
+export function useReservasListUseCase({ repository, initialFilters, initialSemana }: UseReservasListUseCaseProps) {
     const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
     const [selectedSituacao, setSelectedSituacao] = useState(initialFilters.situacao || '');
     const [selectedArquivo, setSelectedArquivo] = useState(initialFilters.arquivo || 'ativas');
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-        new Date(initialSemana.referencia + 'T12:00:00')
-    );
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(initialSemana.referencia + 'T12:00:00'));
     const debouncedSearch = useDebounce(searchTerm, 500);
     const isInitialMount = useRef(true);
 

@@ -8,12 +8,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { opcoesRecorrencia } from '@/constants/recorrencia';
 import { cn } from '@/lib/utils';
 import { Espaco, ReservaFormData, SlotCalendario } from '@/types';
 import { addMonths, addWeeks, format, isBefore, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AlertCircle, Calendar, FileText, Info, Repeat, Type } from 'lucide-react';
-import { opcoesRecorrencia } from '@/constants/recorrencia';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 // Tipagem das props foi atualizada
@@ -46,8 +46,6 @@ export default function AgendaDialogReserva({
 }: AgendaDialogReservaProps) {
     const [showRecurrenceAlert, setShowRecurrenceAlert] = useState(false);
     const [datasComConflito, setDatasComConflito] = useState<string[]>([]);
-
-
 
     const verificarConflitos = useCallback(
         (horarios: any[]) => {
@@ -122,15 +120,7 @@ export default function AgendaDialogReserva({
 
             setFormData(key, value);
         },
-        [
-            formData.data_inicial,
-            formData.horarios_solicitados,
-            formData.recorrencia,
-            setFormData,
-            setSlotsSelecao,
-            slotsSelecao,
-            verificarConflitos,
-        ],
+        [formData.data_inicial, formData.horarios_solicitados, formData.recorrencia, setFormData, setSlotsSelecao, slotsSelecao, verificarConflitos],
     );
 
     useEffect(() => {

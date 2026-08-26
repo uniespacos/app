@@ -1,9 +1,9 @@
-import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
-import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Espaco, Reserva, Unidade, User, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';

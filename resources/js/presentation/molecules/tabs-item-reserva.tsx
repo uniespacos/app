@@ -1,9 +1,9 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { router } from '@inertiajs/react';
 import { CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
     return (

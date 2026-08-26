@@ -8,7 +8,7 @@ interface UserAvatarProps {
     fallbackClassName?: string;
 }
 
-export function UserAvatar({ user, className = "h-8 w-8", fallbackClassName }: UserAvatarProps) {
+export function UserAvatar({ user, className = 'h-8 w-8', fallbackClassName }: UserAvatarProps) {
     const getInitials = useInitials();
     const profilePic = user.profile_pic || ('avatar' in user ? String(user.avatar) : undefined);
 

@@ -1,5 +1,5 @@
-import { InertiaEspacosRepository } from './inertia-espacos-repository';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
+import { InertiaEspacosRepository } from './inertia-espacos-repository';
 
 describe('InertiaEspacosRepository', () => {
     let repository: InertiaEspacosRepository;
@@ -11,7 +11,7 @@ describe('InertiaEspacosRepository', () => {
             post: jest.fn().mockResolvedValue({}),
             put: jest.fn(),
             patch: jest.fn(),
-            delete: jest.fn().mockResolvedValue({})
+            delete: jest.fn().mockResolvedValue({}),
         } as unknown as jest.Mocked<IHttpGateway>;
 
         (globalThis as unknown as { route: jest.Mock }).route = jest.fn((name) => name);

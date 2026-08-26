@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { renderHook, act } from '@testing-library/react';
-import { useState, useCallback } from 'react';
-import { useAgendaSelectionUseCase } from './use-agenda-selection-usecase';
-import { useForm } from '@inertiajs/react';
 import { Espaco, Reserva } from '@/types';
+import { useForm } from '@inertiajs/react';
+import { act, renderHook } from '@testing-library/react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { useAgendaSelectionUseCase } from './use-agenda-selection-usecase';
 
 jest.mock('@inertiajs/react', () => ({
     useForm: jest.fn(),
@@ -95,7 +95,7 @@ describe('useAgendaSelectionUseCase', () => {
                 reserva: mockReserva,
                 isEditMode: true,
                 semanaVisivel: new Date('2026-06-01'),
-            })
+            }),
         );
 
         expect(useForm).toHaveBeenCalledWith(
@@ -103,7 +103,7 @@ describe('useAgendaSelectionUseCase', () => {
                 titulo: 'Reserva Antiga',
                 descricao: 'Desc Antiga',
                 recorrencia: 'unica',
-            })
+            }),
         );
 
         expect(result.current.slotsSelecao).toHaveLength(1);
@@ -116,7 +116,7 @@ describe('useAgendaSelectionUseCase', () => {
                 espaco: mockEspaco,
                 isEditMode: false,
                 semanaVisivel: new Date('2026-06-01'),
-            })
+            }),
         );
 
         const e = { preventDefault: jest.fn() } as any;
@@ -134,7 +134,7 @@ describe('useAgendaSelectionUseCase', () => {
                 espaco: mockEspaco,
                 isEditMode: false,
                 semanaVisivel: new Date('2026-06-01'),
-            })
+            }),
         );
 
         const slot = {

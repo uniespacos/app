@@ -7,10 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GenericHeader from '@/presentation/molecules/generic-header';
 import AppLayout from '@/presentation/templates/app-layout';
+import type { Permission, Role } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import type { Permission, Role } from '@/types';
 
 import { DeleteRoleConfirmation } from '@/presentation/molecules/DeleteRoleConfirmation';
 import { RoleFormModal } from '@/presentation/molecules/RoleFormModal';
@@ -80,10 +80,7 @@ export default function RolesPage() {
             <Head title="Gerenciar Papéis" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="container mx-auto space-y-6 p-6">
-                    <GenericHeader
-                        titulo="Gestão de Papéis"
-                        descricao="Crie, edite e gerencie os papéis e suas permissões."
-                    />
+                    <GenericHeader titulo="Gestão de Papéis" descricao="Crie, edite e gerencie os papéis e suas permissões." />
 
                     <Card>
                         <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-end">
@@ -98,10 +95,7 @@ export default function RolesPage() {
 
                             <div className="space-y-2">
                                 <Label>Tipo</Label>
-                                <Select
-                                    value={typeFilter}
-                                    onValueChange={(v) => setTypeFilter(v as 'all' | 'system' | 'custom')}
-                                >
+                                <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as 'all' | 'system' | 'custom')}>
                                     <SelectTrigger className="w-full sm:w-[180px]">
                                         <SelectValue />
                                     </SelectTrigger>
@@ -124,7 +118,7 @@ export default function RolesPage() {
                         {filteredRoles.length === 0 ? (
                             <Card>
                                 <CardContent className="p-6">
-                                    <p className="text-center text-muted-foreground">Nenhum papel encontrado.</p>
+                                    <p className="text-muted-foreground text-center">Nenhum papel encontrado.</p>
                                 </CardContent>
                             </Card>
                         ) : (
@@ -137,17 +131,13 @@ export default function RolesPage() {
                                                     <h3 className="text-lg font-semibold">{role.name}</h3>
                                                     {role.is_system && <Badge variant="secondary">Sistema</Badge>}
                                                 </div>
-                                                {role.description && (
-                                                    <p className="mt-1 text-sm text-muted-foreground">{role.description}</p>
-                                                )}
-                                                <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+                                                {role.description && <p className="text-muted-foreground mt-1 text-sm">{role.description}</p>}
+                                                <div className="text-muted-foreground mt-2 flex gap-4 text-xs">
                                                     <span>
-                                                        <strong className="text-foreground">{role.permissions_count ?? 0}</strong>{' '}
-                                                        permissões
+                                                        <strong className="text-foreground">{role.permissions_count ?? 0}</strong> permissões
                                                     </span>
                                                     <span>
-                                                        <strong className="text-foreground">{role.users_count ?? 0}</strong>{' '}
-                                                        usuário(s)
+                                                        <strong className="text-foreground">{role.users_count ?? 0}</strong> usuário(s)
                                                     </span>
                                                 </div>
                                             </div>
@@ -164,10 +154,7 @@ export default function RolesPage() {
                                                         Editar
                                                     </DropdownMenuItem>
                                                     {!role.is_system && (
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleDelete(role)}
-                                                            className="text-red-600"
-                                                        >
+                                                        <DropdownMenuItem onClick={() => handleDelete(role)} className="text-red-600">
                                                             <Trash2 className="mr-2 h-4 w-4" />
                                                             Deletar
                                                         </DropdownMenuItem>

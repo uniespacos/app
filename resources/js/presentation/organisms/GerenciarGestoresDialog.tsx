@@ -2,9 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { TURNO_LABEL, TURNOS_ORDENADOS } from '@/constants/turnos';
+import { UserSearchCombobox } from '@/presentation/molecules/UserSearchComboBox';
 import type { Espaco, User } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { UserSearchCombobox } from '@/presentation/molecules/UserSearchComboBox';
 
 interface GerenciarGestoresDialogProps {
     espaco: Espaco | null;

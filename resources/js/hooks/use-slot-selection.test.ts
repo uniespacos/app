@@ -1,8 +1,8 @@
-import { renderHook, act } from '@testing-library/react';
-import { useSlotSelection } from './use-slot-selection';
 import { SlotCalendario } from '@/types';
+import { act, renderHook } from '@testing-library/react';
+import { addWeeks, format, parseISO } from 'date-fns';
 import { toast } from 'sonner';
-import { parseISO, addWeeks, format } from 'date-fns';
+import { useSlotSelection } from './use-slot-selection';
 
 jest.mock('sonner', () => ({
     toast: {
@@ -32,9 +32,7 @@ describe('useSlotSelection', () => {
         expect(result.current.slotsSelecao).toEqual([]);
 
         const initialSlot = createSlot('1', '2026-06-03');
-        const { result: resultWithInit } = renderHook(() =>
-            useSlotSelection({ hoje, slotsIniciais: [initialSlot] })
-        );
+        const { result: resultWithInit } = renderHook(() => useSlotSelection({ hoje, slotsIniciais: [initialSlot] }));
 
         expect(resultWithInit.current.slotsSelecao).toEqual([initialSlot]);
     });
@@ -77,9 +75,7 @@ describe('useSlotSelection', () => {
         expect(result.current.slotsSelecao).toHaveLength(1);
         expect(result.current.slotsSelecao[0].id).toBe(expectedId);
         expect(result.current.slotsSelecao[0].data).toEqual(expectedDate);
-        expect(toast.info).toHaveBeenCalledWith(
-            expect.stringContaining('foi movido para o dia')
-        );
+        expect(toast.info).toHaveBeenCalledWith(expect.stringContaining('foi movido para o dia'));
     });
 
     it('should not alter selection if slot is already reserved', () => {
@@ -95,9 +91,7 @@ describe('useSlotSelection', () => {
 
     it('should clear selection', () => {
         const slot = createSlot('1', '2026-06-03');
-        const { result } = renderHook(() =>
-            useSlotSelection({ hoje, slotsIniciais: [slot] })
-        );
+        const { result } = renderHook(() => useSlotSelection({ hoje, slotsIniciais: [slot] }));
 
         expect(result.current.slotsSelecao).toHaveLength(1);
 

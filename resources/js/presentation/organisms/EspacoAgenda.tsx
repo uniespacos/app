@@ -1,16 +1,16 @@
+import { useAgendaSelectionUseCase } from '@/application/espacos/use-cases/use-agenda-selection-usecase';
 import { Button } from '@/components/ui/button';
+import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { diasDaSemana } from '@/lib/utils';
-import { Espaco, Reserva } from '@/types';
-import { Loader2 } from 'lucide-react';
-import { useMemo } from 'react';
-import AgendaCalendario from '@/presentation/organisms/AgendaCalendario';
-import AgendaDialogReserva from '@/presentation/organisms/AgendaDialogReserva';
 import AgendaEditModeAlert from '@/presentation/molecules/AgendaEditModeAlert';
 import AgendaHeader from '@/presentation/molecules/AgendaHeader';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
-import { useAgendaSelectionUseCase } from '@/application/espacos/use-cases/use-agenda-selection-usecase';
-import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
+import AgendaCalendario from '@/presentation/organisms/AgendaCalendario';
+import AgendaDialogReserva from '@/presentation/organisms/AgendaDialogReserva';
+import { Espaco, Reserva } from '@/types';
 import { parseISO } from 'date-fns';
+import { Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
 
 type AgendaEspacoProps = {
     isEditMode?: boolean;
@@ -27,13 +27,7 @@ export default function AgendaEspaço({ isEditMode = false, espaco, reserva, sem
     const routeName = isEditMode ? 'reservas.edit' : 'espacos.show';
     const routeParams = useMemo(() => (isEditMode ? { reserva: reserva!.id } : { espaco: espaco.id }), [isEditMode, reserva, espaco.id]);
 
-    const {
-        semanaVisivel,
-        isLoading,
-        irParaSemanaAnterior,
-        irParaProximaSemana,
-        irParaSemanaAtual,
-    } = useAgendaNavigation({
+    const { semanaVisivel, isLoading, irParaSemanaAnterior, irParaProximaSemana, irParaSemanaAtual } = useAgendaNavigation({
         semanaInicial,
         routeName,
         routeParams,

@@ -12,8 +12,8 @@ import {
     proximoNivelSubsolo,
     proximoNivelSuperior,
 } from '@/lib/utils/andars/AndarHelpers';
-import { ArrowDown, ArrowUp, Building, Info } from 'lucide-react';
 import AndarCard, { AndarFormData } from '@/presentation/organisms/AndarFormCard';
+import { ArrowDown, ArrowUp, Building, Info } from 'lucide-react';
 
 interface AndaresManagerProps {
     andares: AndarFormData[];

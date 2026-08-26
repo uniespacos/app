@@ -1,13 +1,13 @@
-import { renderHook, act } from '@testing-library/react';
-import { useFavoritarEspacoUseCase } from './use-favoritar-espaco-usecase';
-import { IEspacosRepository } from '../ports/espacos-repository.interface';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
+import { act, renderHook } from '@testing-library/react';
+import { IEspacosRepository } from '../ports/espacos-repository.interface';
+import { useFavoritarEspacoUseCase } from './use-favoritar-espaco-usecase';
 
 jest.mock('@inertiajs/react', () => ({
     router: {
-        reload: jest.fn()
-    }
+        reload: jest.fn(),
+    },
 }));
 
 describe('useFavoritarEspacoUseCase', () => {
@@ -17,7 +17,7 @@ describe('useFavoritarEspacoUseCase', () => {
     beforeEach(() => {
         mockRepo = {
             favoritar: jest.fn().mockResolvedValue(undefined),
-            desfavoritar: jest.fn().mockResolvedValue(undefined)
+            desfavoritar: jest.fn().mockResolvedValue(undefined),
         };
         mockEspaco = {
             id: 123,
@@ -26,7 +26,7 @@ describe('useFavoritarEspacoUseCase', () => {
             descricao: 'descricao',
             imagens: [],
             main_image_index: null,
-            is_favorited_by_user: false
+            is_favorited_by_user: false,
         };
         jest.clearAllMocks();
     });

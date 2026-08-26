@@ -1,25 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Paginacao } from '@/presentation/molecules/Paginacao';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { Paginacao } from '@/presentation/molecules/Paginacao';
 import { ColunaRelatorio } from '@/types';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 const OPCOES_POR_PAGINA = [10, 25, 50, 100];
 
@@ -62,13 +49,7 @@ function valorOrdenavel(valor: unknown): number | string {
     const data = DATA_BR.exec(texto);
     if (data) {
         const [, dia, mes, ano, hora = '00', minuto = '00'] = data;
-        return new Date(
-            Number(ano),
-            Number(mes) - 1,
-            Number(dia),
-            Number(hora),
-            Number(minuto)
-        ).getTime();
+        return new Date(Number(ano), Number(mes) - 1, Number(dia), Number(hora), Number(minuto)).getTime();
     }
 
     const numerico = texto.replace('%', '').replace(',', '.').trim();
@@ -79,12 +60,7 @@ function valorOrdenavel(valor: unknown): number | string {
     return texto.toLocaleLowerCase('pt-BR');
 }
 
-export function TabelaDetalhamento({
-    titulo = 'Detalhamento',
-    colunas,
-    linhas,
-    itemsPerPage = 10,
-}: Props) {
+export function TabelaDetalhamento({ titulo = 'Detalhamento', colunas, linhas, itemsPerPage = 10 }: Props) {
     const [pagina, setPagina] = useState(1);
     const [porPagina, setPorPagina] = useState(itemsPerPage);
     const [ordenacao, setOrdenacao] = useState<Ordenacao | undefined>();
@@ -135,10 +111,7 @@ export function TabelaDetalhamento({
                     <Label htmlFor="registros-por-pagina" className="text-muted-foreground text-sm">
                         Por página
                     </Label>
-                    <Select
-                        value={String(porPagina)}
-                        onValueChange={(valor) => setPorPagina(Number(valor))}
-                    >
+                    <Select value={String(porPagina)} onValueChange={(valor) => setPorPagina(Number(valor))}>
                         <SelectTrigger id="registros-por-pagina" className="h-8 w-[80px]">
                             <SelectValue />
                         </SelectTrigger>
@@ -159,11 +132,7 @@ export function TabelaDetalhamento({
                             <TableRow>
                                 {colunas.map((coluna) => {
                                     const ativa = ordenacao?.chave === coluna.chave;
-                                    const Icone = !ativa
-                                        ? ChevronsUpDown
-                                        : ordenacao.direcao === 'asc'
-                                          ? ArrowUp
-                                          : ArrowDown;
+                                    const Icone = !ativa ? ChevronsUpDown : ordenacao.direcao === 'asc' ? ArrowUp : ArrowDown;
 
                                     return (
                                         <TableHead key={coluna.chave} className="p-0">
@@ -174,12 +143,7 @@ export function TabelaDetalhamento({
                                                 className="hover:text-foreground flex w-full items-center gap-1 px-4 py-3 text-left font-medium"
                                             >
                                                 {coluna.rotulo}
-                                                <Icone
-                                                    className={cn(
-                                                        'h-3.5 w-3.5 shrink-0',
-                                                        ativa ? 'opacity-100' : 'opacity-40'
-                                                    )}
-                                                />
+                                                <Icone className={cn('h-3.5 w-3.5 shrink-0', ativa ? 'opacity-100' : 'opacity-40')} />
                                             </button>
                                         </TableHead>
                                     );
@@ -190,21 +154,14 @@ export function TabelaDetalhamento({
                             {linhasPagina.map((linha, index) => (
                                 <TableRow key={inicio + index}>
                                     {colunas.map((coluna) => (
-                                        <TableCell key={coluna.chave}>
-                                            {String(linha[coluna.chave] ?? '')}
-                                        </TableCell>
+                                        <TableCell key={coluna.chave}>{String(linha[coluna.chave] ?? '')}</TableCell>
                                     ))}
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </div>
-                <Paginacao
-                    totalItems={linhasOrdenadas.length}
-                    itemsPerPage={porPagina}
-                    currentPage={pagina}
-                    onPageChange={setPagina}
-                />
+                <Paginacao totalItems={linhasOrdenadas.length} itemsPerPage={porPagina} currentPage={pagina} onPageChange={setPagina} />
             </CardContent>
         </Card>
     );

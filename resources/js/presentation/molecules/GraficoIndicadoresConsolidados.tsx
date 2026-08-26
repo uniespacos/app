@@ -1,27 +1,14 @@
-import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts';
-import { Building, CalendarCheck, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
-    ChartTooltip,
-    ChartTooltipContent,
-} from '@/components/ui/chart';
+import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { DadosRelatorio } from '@/types';
+import { Building, CalendarCheck, Users } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts';
 
 interface Props {
     dados: DadosRelatorio;
 }
 
-const CORES = [
-    'var(--chart-1)',
-    'var(--chart-2)',
-    'var(--chart-3)',
-    'var(--chart-4)',
-    'var(--chart-5)',
-];
+const CORES = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 const situacoesConfig = {
     total: {
@@ -42,9 +29,7 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                     <CardTitle>{dados.titulo}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">
-                        Nenhum indicador para os filtros selecionados.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Nenhum indicador para os filtros selecionados.</p>
                 </CardContent>
             </Card>
         );
@@ -57,25 +42,16 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
             total: numero(linha.valor),
         }));
 
-    const inicioTopEspacos = dados.linhas.findIndex(
-        (linha) => linha.metrica === '— Top 5 Espaços —'
-    );
-    const inicioTopSetores = dados.linhas.findIndex(
-        (linha) => linha.metrica === '— Top 5 Setores —'
-    );
+    const inicioTopEspacos = dados.linhas.findIndex((linha) => linha.metrica === '— Top 5 Espaços —');
+    const inicioTopSetores = dados.linhas.findIndex((linha) => linha.metrica === '— Top 5 Setores —');
 
     const topEspacos =
         inicioTopEspacos === -1
             ? []
-            : dados.linhas
-                  .slice(
-                      inicioTopEspacos + 1,
-                      inicioTopSetores === -1 ? undefined : inicioTopSetores
-                  )
-                  .map((linha) => ({
-                      nome: String(linha.metrica ?? ''),
-                      count: numero(linha.valor),
-                  }));
+            : dados.linhas.slice(inicioTopEspacos + 1, inicioTopSetores === -1 ? undefined : inicioTopSetores).map((linha) => ({
+                  nome: String(linha.metrica ?? ''),
+                  count: numero(linha.valor),
+              }));
 
     return (
         <div className="space-y-4">
@@ -86,9 +62,7 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                         <Building className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {numero(dados.sumario['Total de Espaços'])}
-                        </div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Espaços'])}</div>
                         <p className="text-muted-foreground text-xs">Espaços cadastrados</p>
                     </CardContent>
                 </Card>
@@ -99,9 +73,7 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                         <Users className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {numero(dados.sumario['Total de Gestores'])}
-                        </div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Gestores'])}</div>
                         <p className="text-muted-foreground text-xs">Gestores delegados</p>
                     </CardContent>
                 </Card>
@@ -112,9 +84,7 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                         <CalendarCheck className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {numero(dados.sumario['Total de Reservas'])}
-                        </div>
+                        <div className="text-2xl font-bold">{numero(dados.sumario['Total de Reservas'])}</div>
                         <p className="text-muted-foreground text-xs">Total de reservas</p>
                     </CardContent>
                 </Card>
@@ -126,21 +96,13 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                         <CardTitle>Distribuição de Situações</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ChartContainer
-                            config={situacoesConfig}
-                            className="aspect-auto h-[260px] w-full"
-                        >
+                        <ChartContainer config={situacoesConfig} className="aspect-auto h-[260px] w-full">
                             <BarChart accessibilityLayer data={situacoes}>
                                 <CartesianGrid vertical={false} />
                                 <XAxis dataKey="situacao" tickLine={false} axisLine={false} />
                                 <YAxis />
                                 <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar
-                                    dataKey="total"
-                                    fill="var(--color-total)"
-                                    radius={4}
-                                    maxBarSize={64}
-                                />
+                                <Bar dataKey="total" fill="var(--color-total)" radius={4} maxBarSize={64} />
                             </BarChart>
                         </ChartContainer>
                     </CardContent>
@@ -157,18 +119,10 @@ function GraficoIndicadoresConsolidados({ dados }: Props) {
                                 return acc;
                             }, {} as ChartConfig);
                             return (
-                                <ChartContainer
-                                    config={chartConfig}
-                                    className="aspect-auto h-[260px] w-full"
-                                >
+                                <ChartContainer config={chartConfig} className="aspect-auto h-[260px] w-full">
                                     <PieChart accessibilityLayer>
                                         <ChartTooltip content={<ChartTooltipContent nameKey="nome" />} />
-                                        <Pie
-                                            data={topEspacos}
-                                            dataKey="count"
-                                            nameKey="nome"
-                                            innerRadius={60}
-                                        >
+                                        <Pie data={topEspacos} dataKey="count" nameKey="nome" innerRadius={60}>
                                             {topEspacos.map((espaco, index) => (
                                                 <Cell key={espaco.nome} fill={CORES[index % CORES.length]} />
                                             ))}

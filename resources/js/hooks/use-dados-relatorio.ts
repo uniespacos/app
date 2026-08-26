@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
 import { DadosRelatorio, FiltrosRelatorio, TipoRelatorio } from '@/types';
+import { useEffect, useState } from 'react';
 
 export type StatusDadosRelatorio = 'idle' | 'loading' | 'success' | 'error' | 'empty';
 
 const DEBOUNCE_MS = 350;
 
-export function useDadosRelatorio(
-    endpoint: string,
-    tipo: TipoRelatorio | undefined,
-    filtros: FiltrosRelatorio | undefined
-) {
+export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefined, filtros: FiltrosRelatorio | undefined) {
     const [dados, setDados] = useState<DadosRelatorio | null>(null);
     const [status, setStatus] = useState<StatusDadosRelatorio>('idle');
     const [erro, setErro] = useState<string | null>(null);
@@ -36,7 +32,7 @@ export function useDadosRelatorio(
                 document.cookie
                     .split('; ')
                     .find((r) => r.startsWith('XSRF-TOKEN='))
-                    ?.split('=')[1] ?? ''
+                    ?.split('=')[1] ?? '',
             );
 
             const headers: Record<string, string> = {

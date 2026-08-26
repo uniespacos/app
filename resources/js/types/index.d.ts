@@ -391,11 +391,7 @@ interface ReservaAvaliadaNotificationPayload {
     url: string;
 }
 
-export type TipoRelatorio =
-    | 'reservas_periodo'
-    | 'ocupacao_espacos'
-    | 'inventario_espacos'
-    | 'indicadores_consolidados';
+export type TipoRelatorio = 'reservas_periodo' | 'ocupacao_espacos' | 'inventario_espacos' | 'indicadores_consolidados';
 
 export type FormatoRelatorio = 'pdf' | 'csv' | 'xlsx';
 

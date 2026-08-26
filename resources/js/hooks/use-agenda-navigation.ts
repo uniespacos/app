@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
 import { router } from '@inertiajs/react';
-import { format, addWeeks, subWeeks, startOfWeek, endOfWeek, isAfter, isBefore } from 'date-fns';
+import { addWeeks, endOfWeek, format, isAfter, isBefore, startOfWeek, subWeeks } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 
 interface UseAgendaNavigationProps {
     semanaInicial: Date;
@@ -10,13 +10,7 @@ interface UseAgendaNavigationProps {
     dataFinal?: Date;
 }
 
-export function useAgendaNavigation({
-    semanaInicial,
-    routeName,
-    routeParams = {},
-    dataInicial,
-    dataFinal,
-}: UseAgendaNavigationProps) {
+export function useAgendaNavigation({ semanaInicial, routeName, routeParams = {}, dataInicial, dataFinal }: UseAgendaNavigationProps) {
     const [semanaVisivel, setSemanaVisivel] = useState<Date>(semanaInicial);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 

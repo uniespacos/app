@@ -1,7 +1,7 @@
-import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
 type CalendarReservationDetailsProps = {

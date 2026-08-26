@@ -1,11 +1,11 @@
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/presentation/atoms/input-error';
+import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import type { Instituicao } from '@/types';
 import { LoaderCircle } from 'lucide-react';
 import type React from 'react';
-import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 
 interface FormRegistroUsuarioProps {
     data: {
@@ -38,7 +38,6 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         } else {
             return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
         }
-    
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {

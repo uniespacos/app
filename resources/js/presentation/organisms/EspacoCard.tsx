@@ -3,14 +3,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { hasPermission } from '@/lib/auth';
 import { PERMISSION_ESPACOS_ATUALIZAR } from '@/constants/permissions';
+import { hasPermission } from '@/lib/auth';
 import type { Espaco, User } from '@/types';
 import { Building2, Calendar, Edit, Heart, MapPin, Trash2, Users } from 'lucide-react';
 
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
-import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
 import { useFavoritarEspacoUseCase } from '@/application/espacos/use-cases/use-favoritar-espaco-usecase';
+import { InertiaEspacosRepository } from '@/infrastructure/espacos/inertia-espacos-repository';
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 
 const httpGateway = new InertiaHttpGateway();
 const espacosRepository = new InertiaEspacosRepository(httpGateway);

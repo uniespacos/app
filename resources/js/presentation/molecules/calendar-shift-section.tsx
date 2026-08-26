@@ -1,8 +1,8 @@
+import { HORARIOS_PADRAO } from '@/constants/turnos';
+import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
 import { Agenda, AgendaDiasSemanaType, Horario, SlotCalendario } from '@/types';
 import { format } from 'date-fns';
 import { useMemo } from 'react';
-import { HORARIOS_PADRAO } from '@/constants/turnos';
-import CalendarSlotCell from '@/presentation/molecules/calendar-slot-cell';
 
 type CalendarShiftSectionProps = {
     titulo: string;

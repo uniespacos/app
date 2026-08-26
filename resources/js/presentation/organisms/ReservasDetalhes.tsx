@@ -3,15 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { diasDaSemana, formatDate } from '@/lib/utils';
+import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
+import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
 import { Agenda, Horario, Reserva, SlotCalendario } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { addDays, endOfWeek, format, isAfter, isBefore, parseISO, startOfWeek, subDays } from 'date-fns';
 import { CalendarDays, Clock, Edit, FileText, Home, Loader2, User, XCircle } from 'lucide-react'; // Adicionado Loader2
 import { useMemo, useState } from 'react';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
-import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
-import { SituacaoIndicator } from '@/presentation/atoms/SituacaoIndicator';
 type ReservaDetalhesProps = {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;

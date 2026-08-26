@@ -1,7 +1,7 @@
-import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
 import { Card } from '@/components/ui/card';
 import { TURNOS_ORDENADOS } from '@/constants/turnos';
 import { cn } from '@/lib/utils';
+import CalendarShiftSection from '@/presentation/molecules/calendar-shift-section'; // Importa o componente que corrigimos
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 
 type AgendaCalendarioProps = {
@@ -22,9 +22,7 @@ export default function AgendaCalendario({
     slotsDaReserva, // Recebe a nova prop
 }: AgendaCalendarioProps) {
     // Ordena as agendas por turno para uma exibição consistente
-    const agendasOrdenadas = [...agendas].sort(
-        (a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno),
-    );
+    const agendasOrdenadas = [...agendas].sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno));
 
     return (
         <Card className="p-0">

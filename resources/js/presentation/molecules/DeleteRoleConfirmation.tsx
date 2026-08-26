@@ -46,7 +46,8 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                                     <div className="mt-2 rounded border border-amber-200 bg-amber-50 p-2 text-sm">
                                         <strong>{role?.users_count}</strong> usuário(s) será(ão) movido(s) para o papel 'comum'.
                                     </div>
-                                )} Esta ação não pode ser desfeita.
+                                )}{' '}
+                                Esta ação não pode ser desfeita.
                             </>
                         )}
                     </AlertDialogDescription>
@@ -58,7 +59,7 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                             <AlertDialogAction
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="bg-destructive text-white hover:bg-destructive/90"
+                                className="bg-destructive hover:bg-destructive/90 text-white"
                             >
                                 {isDeleting ? 'Deletando...' : 'Deletar'}
                             </AlertDialogAction>

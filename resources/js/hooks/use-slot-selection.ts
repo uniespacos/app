@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
 import { SlotCalendario } from '@/types';
 import { addWeeks, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface UseSlotSelectionProps {
@@ -15,7 +15,8 @@ export function useSlotSelection({ hoje, slotsIniciais = [] }: UseSlotSelectionP
     const lastInitialSlotsRef = useRef(slotsIniciais);
 
     useEffect(() => {
-        const hasChanged = slotsIniciais.length !== lastInitialSlotsRef.current.length ||
+        const hasChanged =
+            slotsIniciais.length !== lastInitialSlotsRef.current.length ||
             slotsIniciais.some((slot, idx) => {
                 const prev = lastInitialSlotsRef.current[idx];
                 return !prev || slot.id !== prev.id || slot.status !== prev.status;

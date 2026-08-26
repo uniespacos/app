@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
@@ -8,6 +7,7 @@ import { FiltrosRelatorio, SituacaoReserva } from '@/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     filtros: Partial<FiltrosRelatorio>;
@@ -15,12 +15,8 @@ interface Props {
 }
 
 export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
-    const [dataInicio, setDataInicio] = useState<Date | undefined>(
-        filtros.data_inicio ? new Date(filtros.data_inicio) : undefined
-    );
-    const [dataFim, setDataFim] = useState<Date | undefined>(
-        filtros.data_fim ? new Date(filtros.data_fim) : undefined
-    );
+    const [dataInicio, setDataInicio] = useState<Date | undefined>(filtros.data_inicio ? new Date(filtros.data_inicio) : undefined);
+    const [dataFim, setDataFim] = useState<Date | undefined>(filtros.data_fim ? new Date(filtros.data_fim) : undefined);
 
     const situacoes: Array<{ value: SituacaoReserva; label: string }> = [
         { value: 'em_analise', label: 'Em Análise' },
@@ -85,14 +81,12 @@ export function FiltrosReservasPeriodo({ filtros, onChange }: Props) {
                 </div>
             </div>
 
-            <div className="pt-2 space-y-2">
+            <div className="space-y-2 pt-2">
                 <FiltroChips
                     label="Situações"
                     opcoes={situacoes}
                     selecionados={filtros.situacoes ?? []}
-                    onChange={(valores) =>
-                        onChange({ ...filtros, situacoes: valores as SituacaoReserva[] })
-                    }
+                    onChange={(valores) => onChange({ ...filtros, situacoes: valores as SituacaoReserva[] })}
                 />
 
                 <FiltroChips

@@ -1,5 +1,5 @@
-import { Icon } from '@/presentation/atoms/icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Icon } from '@/presentation/atoms/icon';
 import { type NavItem } from '@/types';
 import { type ComponentPropsWithoutRef } from 'react';
 

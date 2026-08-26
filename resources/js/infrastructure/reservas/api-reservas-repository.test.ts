@@ -1,6 +1,6 @@
-import { ApiReservasRepository } from './api-reservas-repository';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
 import { FormAvaliacaoPayload } from '../../application/reservas/ports/reservas-repository.interface';
+import { ApiReservasRepository } from './api-reservas-repository';
 
 describe('ApiReservasRepository', () => {
     let repository: ApiReservasRepository;
@@ -12,7 +12,7 @@ describe('ApiReservasRepository', () => {
             post: jest.fn(),
             put: jest.fn(),
             patch: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
         } as unknown as jest.Mocked<IHttpGateway>;
 
         repository = new ApiReservasRepository(mockGateway);
@@ -39,7 +39,7 @@ describe('ApiReservasRepository', () => {
             motivo: 'motivo',
             observacao: 'obs',
             horarios_avaliados: [],
-            evaluation_scope: 'single'
+            evaluation_scope: 'single',
         };
         await repository.avaliarReserva(456, payload);
         expect(mockGateway.patch).toHaveBeenCalledWith('/gestor/reservas/456', payload);

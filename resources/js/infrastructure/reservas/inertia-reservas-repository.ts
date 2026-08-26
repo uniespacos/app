@@ -1,6 +1,6 @@
 import { Paginator, Reserva } from '@/types';
-import { IReservasRepository, FormAvaliacaoPayload } from '../../application/reservas/ports/reservas-repository.interface';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
+import { FormAvaliacaoPayload, IReservasRepository } from '../../application/reservas/ports/reservas-repository.interface';
 
 declare function route(name: string, params?: unknown): string;
 

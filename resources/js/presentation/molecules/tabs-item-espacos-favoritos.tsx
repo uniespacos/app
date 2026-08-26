@@ -1,9 +1,9 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import EspacoCard from '@/presentation/organisms/EspacoCard';
 import { Espaco, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 export default function TabsItemEspacosFavoritos({
     espacosFiltrados,
@@ -36,12 +36,7 @@ export default function TabsItemEspacosFavoritos({
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {espacosFiltrados.map((espaco) => (
-                        <EspacoCard
-                            key={espaco.id}
-                            espaco={espaco}
-                            user={user}
-                            handleSolicitarReserva={() => router.get(`/espacos/${espaco.id}`)}
-                        />
+                        <EspacoCard key={espaco.id} espaco={espaco} user={user} handleSolicitarReserva={() => router.get(`/espacos/${espaco.id}`)} />
                     ))}
                 </div>
             </CardContent>

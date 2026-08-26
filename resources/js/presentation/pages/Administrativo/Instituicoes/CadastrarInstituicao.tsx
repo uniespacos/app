@@ -1,9 +1,9 @@
+import { useAgnosticForm } from '@/hooks/use-agnostic-form';
 import GenericHeader from '@/presentation/molecules/generic-header';
+import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
-import InstituicaoForm from '@/presentation/organisms/InstituicaoForm';
-import { useAgnosticForm } from '@/hooks/use-agnostic-form';
 
 const breadcrumbs = [
     {

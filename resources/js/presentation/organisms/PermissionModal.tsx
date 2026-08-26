@@ -1,21 +1,21 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Badge } from '@/components/ui/badge';
-import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL, PERMISSION_USUARIOS_GERENCIAR_PERMISSOES_DIRETAS } from '@/constants/permissions';
 import { getGroupLabel, getPermissionLabel } from '@/constants/permission-labels';
-import { Agenda, Instituicao, Permission, SelectedAgenda, User } from '@/types';
-import { useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { usePage } from '@inertiajs/react';
+import { PERMISSION_USUARIOS_GERENCIAR_PERMISSOES_DIRETAS, ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
 import { hasPermission } from '@/lib/auth';
 import FiltroBuscaPermission from '@/presentation/organisms/FiltroBuscaPermission';
+import { Agenda, Instituicao, Permission, SelectedAgenda, User } from '@/types';
+import { usePage } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const ROLE_OPTIONS = [
     { value: ROLE_INSTITUCIONAL, label: 'Institucional' },
@@ -65,11 +65,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
     }, [user]);
 
     const handleTogglePermission = (permissionName: string) => {
-        setDirectPermissions((prev) =>
-            prev.includes(permissionName)
-                ? prev.filter((p) => p !== permissionName)
-                : [...prev, permissionName]
-        );
+        setDirectPermissions((prev) => (prev.includes(permissionName) ? prev.filter((p) => p !== permissionName) : [...prev, permissionName]));
     };
 
     const handleSubmit = () => {
@@ -96,7 +92,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                         {canManageDirectPermissions && <TabsTrigger value="permissions">Permissões Diretas</TabsTrigger>}
                     </TabsList>
 
-                    <TabsContent value="role" className="space-y-6 mt-6">
+                    <TabsContent value="role" className="mt-6 space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="permission-type">Papel do usuário</Label>
                             <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -132,11 +128,11 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                     </TabsContent>
 
                     {canManageDirectPermissions && (
-                        <TabsContent value="permissions" className="space-y-6 mt-6">
-                            <div className="flex items-center justify-between mb-3">
+                        <TabsContent value="permissions" className="mt-6 space-y-6">
+                            <div className="mb-3 flex items-center justify-between">
                                 <div>
                                     <Label className="text-base">Permissões Diretas</Label>
-                                    <p className="text-xs text-muted-foreground mt-1">
+                                    <p className="text-muted-foreground mt-1 text-xs">
                                         Permissões herdadas via papel aparecem desabilitadas. Marque para conceder permissões extras.
                                     </p>
                                 </div>
@@ -156,7 +152,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                             onOpenChange={(o) => setOpenGroups((prev) => ({ ...prev, [group]: o }))}
                                             className="rounded-md border"
                                         >
-                                            <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 hover:bg-muted/50 text-left">
+                                            <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center gap-2 p-3 text-left">
                                                 <span className="font-medium">{getGroupLabel(group)}</span>
                                                 <Badge variant={directInGroup > 0 ? 'default' : 'outline'} className="text-xs">
                                                     {directInGroup} direta{directInGroup !== 1 ? 's' : ''}
@@ -166,13 +162,11 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                                         {inheritedInGroup} herdada{inheritedInGroup !== 1 ? 's' : ''}
                                                     </Badge>
                                                 )}
-                                                <ChevronDown
-                                                    className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                                                />
+                                                <ChevronDown className={`ml-auto h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                                             </CollapsibleTrigger>
 
                                             <CollapsibleContent>
-                                                <div className="border-t bg-muted/20 p-3 space-y-2">
+                                                <div className="bg-muted/20 space-y-2 border-t p-3">
                                                     {perms.map((perm) => {
                                                         const isInherited = inheritedPermissions.includes(perm.name);
                                                         const isDirect = directPermissions.includes(perm.name);
@@ -180,7 +174,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                                         return (
                                                             <Label
                                                                 key={perm.name}
-                                                                className={`flex items-start gap-3 p-2 rounded ${isInherited ? 'opacity-60' : 'hover:bg-background cursor-pointer'} text-foreground font-normal leading-normal select-none`}
+                                                                className={`flex items-start gap-3 rounded p-2 ${isInherited ? 'opacity-60' : 'hover:bg-background cursor-pointer'} text-foreground leading-normal font-normal select-none`}
                                                             >
                                                                 <Checkbox
                                                                     checked={isInherited || isDirect}
@@ -188,14 +182,16 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                                                     onCheckedChange={() => !isInherited && handleTogglePermission(perm.name)}
                                                                     className="mt-0.5"
                                                                 />
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="text-sm flex items-center gap-2">
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="flex items-center gap-2 text-sm">
                                                                         {getPermissionLabel(perm.name)}
                                                                         {isInherited && (
-                                                                            <Badge variant="secondary" className="text-xs">herdada</Badge>
+                                                                            <Badge variant="secondary" className="text-xs">
+                                                                                herdada
+                                                                            </Badge>
                                                                         )}
                                                                     </div>
-                                                                    <div className="text-xs text-muted-foreground font-mono">{perm.name}</div>
+                                                                    <div className="text-muted-foreground font-mono text-xs">{perm.name}</div>
                                                                 </div>
                                                             </Label>
                                                         );
@@ -207,7 +203,7 @@ export function PermissionModal({ user, isOpen, onClose, onUpdate, instituicoes,
                                 })}
                             </div>
 
-                            <div className="flex justify-end space-x-2 pt-4 border-t">
+                            <div className="flex justify-end space-x-2 border-t pt-4">
                                 <Button variant="outline" onClick={onClose}>
                                     Cancelar
                                 </Button>

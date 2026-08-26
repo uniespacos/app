@@ -1,17 +1,17 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDate } from '@/lib/utils';
+import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import { LocalReserva } from '@/presentation/molecules/LocalReserva';
+import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
+import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { Paginator, Reserva, User as UserType } from '@/types';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Edit, FileText, XCircle } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
-import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
-import { LocalReserva } from '@/presentation/molecules/LocalReserva';
-import PaginacaoListas from '@/presentation/molecules/paginacao-listas';
 
 import { sortReservasForGestor, sortReservasForUser } from '@/application/reservas/helpers/reserva-helpers';
 
@@ -28,9 +28,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     const { data: reservas, links } = paginator;
     const [selectedReserva, setSelectedReserva] = useState<Reserva | undefined>(undefined);
     const [removerReserva, setRemoverReserva] = useState<Reserva | null>(null);
-    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(
-        isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
-    );
+    const [reservasFiltradas, setReservasFiltradas] = useState<Reserva[]>(isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas));
 
     useEffect(() => {
         if (reservaToShow) {
@@ -41,9 +39,7 @@ export function ReservasList({ paginator, fallback, isGestor, user, reservaToSho
     }, [reservaToShow]);
 
     useEffect(() => {
-        setReservasFiltradas(
-            isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas)
-        );
+        setReservasFiltradas(isGestor ? sortReservasForGestor(reservas) : sortReservasForUser(reservas));
     }, [isGestor, reservas, user?.id]);
 
     if (reservas.length === 0) {

@@ -1,7 +1,7 @@
-import { renderHook, act } from '@testing-library/react';
-import { useAgendaNavigation } from './use-agenda-navigation';
 import { router } from '@inertiajs/react';
-import { parseISO, subWeeks, addWeeks, format } from 'date-fns';
+import { act, renderHook } from '@testing-library/react';
+import { addWeeks, format, parseISO, subWeeks } from 'date-fns';
+import { useAgendaNavigation } from './use-agenda-navigation';
 
 jest.mock('@inertiajs/react', () => ({
     router: {
@@ -29,7 +29,7 @@ describe('useAgendaNavigation', () => {
                 semanaInicial,
                 routeName,
                 routeParams,
-            })
+            }),
         );
 
         expect(result.current.semanaVisivel).toEqual(semanaInicial);
@@ -46,7 +46,7 @@ describe('useAgendaNavigation', () => {
                     routeName,
                     routeParams,
                 }),
-            { initialProps: { week: semanaInicial } }
+            { initialProps: { week: semanaInicial } },
         );
 
         const newWeek = parseISO('2026-06-08');
@@ -61,7 +61,7 @@ describe('useAgendaNavigation', () => {
                 semanaInicial,
                 routeName,
                 routeParams,
-            })
+            }),
         );
 
         act(() => {
@@ -69,11 +69,7 @@ describe('useAgendaNavigation', () => {
         });
 
         const expectedDate = subWeeks(semanaInicial, 1);
-        expect(router.get).toHaveBeenCalledWith(
-            expect.any(String),
-            { semana: format(expectedDate, 'yyyy-MM-dd') },
-            expect.any(Object)
-        );
+        expect(router.get).toHaveBeenCalledWith(expect.any(String), { semana: format(expectedDate, 'yyyy-MM-dd') }, expect.any(Object));
     });
 
     it('should navigate to the next week', () => {
@@ -82,7 +78,7 @@ describe('useAgendaNavigation', () => {
                 semanaInicial,
                 routeName,
                 routeParams,
-            })
+            }),
         );
 
         act(() => {
@@ -90,11 +86,7 @@ describe('useAgendaNavigation', () => {
         });
 
         const expectedDate = addWeeks(semanaInicial, 1);
-        expect(router.get).toHaveBeenCalledWith(
-            expect.any(String),
-            { semana: format(expectedDate, 'yyyy-MM-dd') },
-            expect.any(Object)
-        );
+        expect(router.get).toHaveBeenCalledWith(expect.any(String), { semana: format(expectedDate, 'yyyy-MM-dd') }, expect.any(Object));
     });
 
     it('should not navigate to the previous week if podeVoltar is false', () => {
@@ -106,7 +98,7 @@ describe('useAgendaNavigation', () => {
                 routeName,
                 routeParams,
                 dataInicial,
-            })
+            }),
         );
 
         expect(result.current.podeVoltar).toBe(false);
@@ -127,7 +119,7 @@ describe('useAgendaNavigation', () => {
                 routeName,
                 routeParams,
                 dataFinal,
-            })
+            }),
         );
 
         expect(result.current.podeAvancar).toBe(false);
@@ -145,17 +137,13 @@ describe('useAgendaNavigation', () => {
                 semanaInicial,
                 routeName,
                 routeParams,
-            })
+            }),
         );
 
         act(() => {
             result.current.irParaSemanaAtual();
         });
 
-        expect(router.get).toHaveBeenCalledWith(
-            expect.any(String),
-            { semana: format(new Date(), 'yyyy-MM-dd') },
-            expect.any(Object)
-        );
+        expect(router.get).toHaveBeenCalledWith(expect.any(String), { semana: format(new Date(), 'yyyy-MM-dd') }, expect.any(Object));
     });
 });

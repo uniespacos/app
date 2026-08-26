@@ -1,13 +1,13 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import { Paginacao } from '@/presentation/molecules/Paginacao';
+import { FiltrosEspacos } from '@/presentation/organisms/FiltrosEspacos';
+import { GerenciarGestoresDialog } from '@/presentation/organisms/GerenciarGestoresDialog';
+import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, FiltrosEspacosType, Modulo, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { FiltrosEspacos } from '@/presentation/organisms/FiltrosEspacos';
-import { GerenciarGestoresDialog } from '@/presentation/organisms/GerenciarGestoresDialog';
-import { Paginacao } from '@/presentation/molecules/Paginacao';
-import { TabelaEspacos } from '@/presentation/organisms/TabelaEspacos';
 const breadcrumbs = [
     {
         title: 'Gerenciar Espaços',

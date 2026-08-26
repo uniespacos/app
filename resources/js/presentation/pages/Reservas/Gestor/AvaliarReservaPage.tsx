@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from '@/components/ui/badge';
+import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
+import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
 import { useReservationSlots } from '@/application/reservas/use-reservation-slots';
-import AppLayout from '@/presentation/templates/app-layout';
+import { Badge } from '@/components/ui/badge';
+import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
 import { diasDaSemana, getStatusReservaColor, getStatusReservaText } from '@/lib/utils';
+import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
+import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
+import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
+import EvaluationForm from '@/presentation/organisms/EvaluationForm';
+import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
+import AppLayout from '@/presentation/templates/app-layout';
 import { Agenda, BreadcrumbItem, Reserva, SituacaoReserva, User as UserType } from '@/types';
 import { Head } from '@inertiajs/react';
+import { format, parse, parseISO } from 'date-fns';
 import { Clock, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
-import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacaoGestor';
-import { useAvaliarReservaUseCase } from '@/application/reservas/use-cases/use-avaliar-reserva-usecase';
-import EvaluationForm from '@/presentation/organisms/EvaluationForm';
-import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
-import { verificarStatusReserva } from '@/application/reservas/helpers/reserva-status.helpers';
-import { useAgendaNavigation } from '@/hooks/use-agenda-navigation';
-import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
-import { parseISO, format, parse } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Gerenciar Reservas', href: '/gestor/reservas' },
@@ -55,14 +55,7 @@ export default function AvaliarReserva({
     const dataInicialReserva = useMemo(() => new Date(reserva.data_inicial), [reserva.data_inicial]);
     const dataFinalReserva = useMemo(() => new Date(reserva.data_final), [reserva.data_final]);
 
-    const {
-        semanaVisivel,
-        isLoading,
-        podeVoltar,
-        podeAvancar,
-        irParaSemanaAnterior,
-        irParaProximaSemana,
-    } = useAgendaNavigation({
+    const { semanaVisivel, isLoading, podeVoltar, podeAvancar, irParaSemanaAnterior, irParaProximaSemana } = useAgendaNavigation({
         semanaInicial,
         routeName: 'gestor.reservas.show',
         routeParams: useMemo(() => ({ reserva: reserva.id }), [reserva.id]),

@@ -1,9 +1,9 @@
+import { IFormHandler } from '@/application/ports/form-handler.interface';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CadastrarInstituicaoForm } from '@/presentation/pages/Administrativo/Instituicoes/CadastrarInstituicao';
-import { IFormHandler } from '@/application/ports/form-handler.interface';
 
 type InstituicaoFormProps = {
     data: CadastrarInstituicaoForm;
@@ -27,30 +27,25 @@ export default function InstituicaoForm({ data, setData, submit, errors, process
                     <div className="space-y-2">
                         <Label htmlFor="nome">Nome da Instituição</Label>
                         <Input
-                             id="nome"
-                             value={data.nome}
-                             onChange={(e) => setData('nome', e.target.value)}
-                             placeholder="Ex: Universidade Federal da Bahia"
+                            id="nome"
+                            value={data.nome}
+                            onChange={(e) => setData('nome', e.target.value)}
+                            placeholder="Ex: Universidade Federal da Bahia"
                         />
                         {errors.nome && <p className="mt-1 text-sm text-red-500">{errors.nome}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sigla">Sigla</Label>
-                        <Input
-                             id="sigla"
-                             value={data.sigla}
-                             onChange={(e) => setData('sigla', e.target.value)}
-                             placeholder="Ex: UFBA"
-                        />
+                        <Input id="sigla" value={data.sigla} onChange={(e) => setData('sigla', e.target.value)} placeholder="Ex: UFBA" />
                         {errors.sigla && <p className="mt-1 text-sm text-red-500">{errors.sigla}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="endereco">Endereço</Label>
                         <Input
-                             id="endereco"
-                             value={data.endereco}
-                             onChange={(e) => setData('endereco', e.target.value)}
-                             placeholder="Ex: Rua Barão de Jeremoabo, s/n"
+                            id="endereco"
+                            value={data.endereco}
+                            onChange={(e) => setData('endereco', e.target.value)}
+                            placeholder="Ex: Rua Barão de Jeremoabo, s/n"
                         />
                         {errors.endereco && <p className="mt-1 text-sm text-red-500">{errors.endereco}</p>}
                     </div>

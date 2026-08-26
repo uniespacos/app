@@ -24,7 +24,7 @@ export function sortReservasForGestor(reservas: Reserva[]): Reserva[] {
         ...reserva,
         situacao: calculateGestorStatus(reserva),
     }));
-    
+
     return [...list].sort((a, b) => {
         if (a.situacao === 'em_analise' && b.situacao !== 'em_analise') return -1;
         if (b.situacao === 'em_analise' && a.situacao !== 'em_analise') return 1;

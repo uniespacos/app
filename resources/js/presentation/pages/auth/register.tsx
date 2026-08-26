@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { ModalNovaInstituicao } from '@/presentation/molecules/ModalNovaInstituicao';
+import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
 import { Instituicao } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
-import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
-import { ModalNovaInstituicao } from '@/presentation/molecules/ModalNovaInstituicao';
 
 export default function Register() {
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;

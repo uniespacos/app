@@ -1,9 +1,9 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
+import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
 import { Espaco, Reserva, User } from '@/types';
 import { TabsProps } from '@radix-ui/react-tabs';
 import { useEffect, useState } from 'react';
-import TabsItemEspacosFavoritos from '@/presentation/molecules/tabs-item-espacos-favoritos';
-import TabsItemReserva from '@/presentation/molecules/tabs-item-reserva';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export type TabsItens = {
     tabHeader: {

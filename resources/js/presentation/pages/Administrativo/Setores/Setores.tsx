@@ -1,14 +1,14 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { useFiltros } from '@/hooks/use-filtros';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import { ModaisSetor } from '@/presentation/molecules/ModaisSetors';
+import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
+import { SetorFormData } from '@/presentation/organisms/SetorForm';
+import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Setor, Unidade, User } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
-import { FiltrosSetor } from '@/presentation/organisms/FiltrosSetor';
-import { ModaisSetor } from '@/presentation/molecules/ModaisSetors';
-import { SetorFormData } from '@/presentation/organisms/SetorForm';
-import { TabelaSetores } from '@/presentation/organisms/TabelaSetores';
 
 const breadcrumbs = [
     {

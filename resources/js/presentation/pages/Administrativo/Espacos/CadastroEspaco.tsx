@@ -1,17 +1,17 @@
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
+import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
+import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
+import { LocationSelector } from '@/presentation/molecules/LocationSelector';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { AddAndarDialog } from '@/presentation/molecules/AddAndarDialog';
-import { LocationSelector } from '@/presentation/molecules/LocationSelector';
-import { EspacoFormFields } from '@/presentation/molecules/EspacoFormFields';
-import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 
 const breadcrumbs = [
     { title: 'Espaço', href: '/institucional/espacos' },

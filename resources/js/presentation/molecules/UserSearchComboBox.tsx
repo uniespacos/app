@@ -2,12 +2,12 @@
 
 import type React from 'react';
 
-import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { UserAvatar } from '@/presentation/atoms/UserAvatar';
 import type { User } from '@/types';
 import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';

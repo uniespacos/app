@@ -1,9 +1,9 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import EspacoCard from '@/presentation/organisms/EspacoCard';
+import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Andar, Espaco, Modulo, Unidade, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import EspacoCard from '@/presentation/organisms/EspacoCard';
-import EspacoFiltroBusca from '@/presentation/organisms/EspacoFiltroBusca';
 const breadcrumbs = [
     {
         title: 'Consultar Espaços',
@@ -68,12 +68,7 @@ export default function EspacosPage() {
                             />
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                                 {espacos.map((espaco) => (
-                                    <EspacoCard
-                                        key={espaco.id}
-                                        espaco={espaco}
-                                        user={user}
-                                        handleSolicitarReserva={handleSolicitarReserva}
-                                    />
+                                    <EspacoCard key={espaco.id} espaco={espaco} user={user} handleSolicitarReserva={handleSolicitarReserva} />
                                 ))}
                             </div>
                         </div>

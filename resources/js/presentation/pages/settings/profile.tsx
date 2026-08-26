@@ -3,15 +3,15 @@ import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
-import DeleteUser from '@/presentation/molecules/delete-user';
-import HeadingSmall from '@/presentation/atoms/heading-small';
-import InputError from '@/presentation/atoms/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import HeadingSmall from '@/presentation/atoms/heading-small';
+import InputError from '@/presentation/atoms/input-error';
+import DeleteUser from '@/presentation/molecules/delete-user';
+import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 import AppLayout from '@/presentation/templates/app-layout';
 import SettingsLayout from '@/presentation/templates/settings/layout';
-import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,7 +36,7 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
     instituicaos: Instituicao[];
-    }) {
+}) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({

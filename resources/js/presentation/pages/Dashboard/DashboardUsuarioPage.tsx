@@ -1,6 +1,6 @@
-import TabsContentDashboard, { TabsItens } from '@/presentation/molecules/tabs-contents-dashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import TabsContentDashboard, { TabsItens } from '@/presentation/molecules/tabs-contents-dashboard';
 import AppLayout from '@/presentation/templates/app-layout';
 import { DashboardStatusReservasType, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';

@@ -1,8 +1,8 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import EspacoCard from '@/presentation/organisms/EspacoCard'; // Caminho ajustado para o seu EspacoCard
 import AppLayout from '@/presentation/templates/app-layout';
 import { Espaco, User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import EspacoCard from '@/presentation/organisms/EspacoCard'; // Caminho ajustado para o seu EspacoCard
 
 const breadcrumbs = [
     {
@@ -45,12 +45,7 @@ export default function FavoritosPage() {
                         {espacosFavoritos.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                                 {espacosFavoritos.map((espaco) => (
-                                    <EspacoCard
-                                        key={espaco.id}
-                                        espaco={espaco}
-                                        user={user}
-                                        handleSolicitarReserva={handleSolicitarReserva}
-                                    />
+                                    <EspacoCard key={espaco.id} espaco={espaco} user={user} handleSolicitarReserva={handleSolicitarReserva} />
                                 ))}
                             </div>
                         ) : (

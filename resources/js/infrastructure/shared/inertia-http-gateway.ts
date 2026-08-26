@@ -13,7 +13,7 @@ export class InertiaHttpGateway implements IHttpGateway {
                 },
                 onError: (errors) => {
                     reject(errors);
-                }
+                },
             });
         });
     }
@@ -27,7 +27,7 @@ export class InertiaHttpGateway implements IHttpGateway {
                 },
                 onError: (errors) => {
                     reject(errors);
-                }
+                },
             });
         });
     }
@@ -41,7 +41,7 @@ export class InertiaHttpGateway implements IHttpGateway {
                 },
                 onError: (errors) => {
                     reject(errors);
-                }
+                },
             });
         });
     }
@@ -55,7 +55,7 @@ export class InertiaHttpGateway implements IHttpGateway {
                 },
                 onError: (errors) => {
                     reject(errors);
-                }
+                },
             });
         });
     }
@@ -69,7 +69,7 @@ export class InertiaHttpGateway implements IHttpGateway {
                 },
                 onError: (errors) => {
                     reject(errors);
-                }
+                },
             });
         });
     }

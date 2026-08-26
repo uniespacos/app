@@ -1,12 +1,12 @@
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { User } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { Bell } from 'lucide-react'; // Ícones, instale lucide-react: npm install lucide-react
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 
 interface NotificationData {
     titulo: string;

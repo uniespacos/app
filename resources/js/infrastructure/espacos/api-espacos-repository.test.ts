@@ -1,5 +1,5 @@
-import { ApiEspacosRepository } from './api-espacos-repository';
 import { IHttpGateway } from '../../application/ports/http-gateway.interface';
+import { ApiEspacosRepository } from './api-espacos-repository';
 
 describe('ApiEspacosRepository', () => {
     let repository: ApiEspacosRepository;
@@ -11,7 +11,7 @@ describe('ApiEspacosRepository', () => {
             post: jest.fn().mockResolvedValue({}),
             put: jest.fn(),
             patch: jest.fn(),
-            delete: jest.fn().mockResolvedValue({})
+            delete: jest.fn().mockResolvedValue({}),
         } as unknown as jest.Mocked<IHttpGateway>;
 
         repository = new ApiEspacosRepository(mockGateway);

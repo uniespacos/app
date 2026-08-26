@@ -1,16 +1,16 @@
 import GenericHeader from '@/presentation/molecules/generic-header';
+import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
+import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
+import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
+import { ReservasList } from '@/presentation/organisms/ReservasList';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Paginator, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Suspense } from 'react';
-import { ReservasEmpty } from '@/presentation/molecules/ReservasEmpty';
-import { ReservasFilters } from '@/presentation/molecules/ReservasFilters';
-import { ReservasList } from '@/presentation/organisms/ReservasList';
-import { ReservasLoading } from '@/presentation/molecules/ReservasLoading';
 
-import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
-import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
 import { useReservasGestorUseCase } from '@/application/reservas/use-cases/use-reservas-gestor-usecase';
+import { InertiaReservasRepository } from '@/infrastructure/reservas/inertia-reservas-repository';
+import { InertiaHttpGateway } from '@/infrastructure/shared/inertia-http-gateway';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,20 +35,12 @@ export default function MinhasReservas({
     reservaToShow?: Reserva;
     semana: { referencia: string };
 }) {
-    const {
-        searchTerm,
-        setSearchTerm,
-        selectedSituacao,
-        setSelectedSituacao,
-        selectedArquivo,
-        setSelectedArquivo,
-        selectedDate,
-        setSelectedDate,
-    } = useReservasGestorUseCase({
-        repository: reservasRepository,
-        initialFilters: filters,
-        initialSemana: semana,
-    });
+    const { searchTerm, setSearchTerm, selectedSituacao, setSelectedSituacao, selectedArquivo, setSelectedArquivo, selectedDate, setSelectedDate } =
+        useReservasGestorUseCase({
+            repository: reservasRepository,
+            initialFilters: filters,
+            initialSemana: semana,
+        });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

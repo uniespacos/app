@@ -1,15 +1,15 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
 import { Espaco } from '@/types';
 import { router } from '@inertiajs/react';
 import { Edit, MoreHorizontal, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import { GestoresEspaco } from '@/presentation/molecules/GestoresEspaco';
 
 interface TabelaEspacosProps {
     espacos: Espaco[]; // Agora recebe os espaços já filtrados e paginados

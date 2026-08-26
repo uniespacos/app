@@ -1,9 +1,9 @@
 'use client';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Instituicao, Setor, Unidade, User } from '@/types';
 import { SetorForm, SetorFormData } from '@/presentation/organisms/SetorForm';
 import { UsuariosSetor } from '@/presentation/organisms/UsuariosSetor';
+import { Instituicao, Setor, Unidade, User } from '@/types';
 
 interface Props {
     // Modal de criação

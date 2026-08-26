@@ -12,12 +12,12 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Edit, Settings, Shield, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import DeleteItem from '@/presentation/molecules/delete-item';
-import GenericHeader from '@/presentation/molecules/generic-header';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AppLayout from '@/presentation/templates/app-layout';
 import { ROLE_COMUM, ROLE_GESTOR, ROLE_INSTITUCIONAL } from '@/constants/permissions';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Permission, Setor, User } from '@/types';
 import { toast } from 'sonner';
 const breadcrumbs = [
@@ -110,9 +110,7 @@ export default function UsuariosPage() {
             onSuccess: () => {
                 setUsers(
                     users.map((user) =>
-                        user.id === userId
-                            ? { ...user, roles: [roleName], direct_permissions: directPermissions ?? user.direct_permissions }
-                            : user,
+                        user.id === userId ? { ...user, roles: [roleName], direct_permissions: directPermissions ?? user.direct_permissions } : user,
                     ),
                 );
                 setIsModalOpen(false);

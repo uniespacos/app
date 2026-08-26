@@ -1,15 +1,15 @@
-import DeleteItem from '@/presentation/molecules/delete-item';
-import GenericHeader from '@/presentation/molecules/generic-header';
-import Paginacao from '@/presentation/molecules/paginacao-listas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DeleteItem from '@/presentation/molecules/delete-item';
+import GenericHeader from '@/presentation/molecules/generic-header';
+import Paginacao from '@/presentation/molecules/paginacao-listas';
+import { UnidadeFilters } from '@/presentation/molecules/UnidadeFilters';
 import AppLayout from '@/presentation/templates/app-layout';
 import { Instituicao, Unidade } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FilePenLine, PlusCircle, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { UnidadeFilters } from '@/presentation/molecules/UnidadeFilters';
 const breadcrumbs = [
     {
         title: 'Gerenciar Unidades',

@@ -1,23 +1,17 @@
-import { lazy, Suspense, useState } from 'react';
-import AppLayout from '@/presentation/templates/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FiltrosReservasPeriodo } from '@/presentation/molecules/FiltrosReservasPeriodo';
-import { FiltrosOcupacaoEspacos } from '@/presentation/molecules/FiltrosOcupacaoEspacos';
-import { FiltrosInventarioEspacos } from '@/presentation/molecules/FiltrosInventarioEspacos';
-import { ExportarRelatorio } from '@/presentation/molecules/ExportarRelatorio';
-import { useGerarRelatorio } from '@/hooks/use-gerar-relatorio';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
-import {
-    FormatoRelatorio,
-    FiltrosRelatorio,
-    OpcoesInventario,
-    TipoRelatorio,
-    TipoRelatorioOption,
-} from '@/types';
+import { useGerarRelatorio } from '@/hooks/use-gerar-relatorio';
+import { ExportarRelatorio } from '@/presentation/molecules/ExportarRelatorio';
+import { FiltrosInventarioEspacos } from '@/presentation/molecules/FiltrosInventarioEspacos';
+import { FiltrosOcupacaoEspacos } from '@/presentation/molecules/FiltrosOcupacaoEspacos';
+import { FiltrosReservasPeriodo } from '@/presentation/molecules/FiltrosReservasPeriodo';
+import AppLayout from '@/presentation/templates/app-layout';
+import { FiltrosRelatorio, FormatoRelatorio, OpcoesInventario, TipoRelatorio, TipoRelatorioOption } from '@/types';
 import { BarChart3 } from 'lucide-react';
+import { lazy, Suspense, useState } from 'react';
 
 const GraficoReservasPeriodo = lazy(() => import('@/presentation/molecules/GraficoReservasPeriodo'));
 const GraficoOcupacaoEspacos = lazy(() => import('@/presentation/molecules/GraficoOcupacaoEspacos'));
@@ -28,19 +22,12 @@ interface Props {
     opcoes_inventario: OpcoesInventario;
 }
 
-export default function RelatoriosGestorPage({
-    tipos_disponiveis,
-    opcoes_inventario,
-}: Props) {
+export default function RelatoriosGestorPage({ tipos_disponiveis, opcoes_inventario }: Props) {
     const [tipoSelecionado, setTipoSelecionado] = useState<TipoRelatorio | undefined>();
     const [filtros, setFiltros] = useState<Partial<FiltrosRelatorio>>({});
 
     const { gerar, estaGerando } = useGerarRelatorio('/gestor/relatorios/gerar');
-    const { dados, status, erro } = useDadosRelatorio(
-        '/gestor/relatorios/dados',
-        tipoSelecionado,
-        filtros
-    );
+    const { dados, status, erro } = useDadosRelatorio('/gestor/relatorios/dados', tipoSelecionado, filtros);
 
     const handleExport = (formato: FormatoRelatorio) => {
         if (!tipoSelecionado) return;
@@ -54,21 +41,12 @@ export default function RelatoriosGestorPage({
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Relatórios</h1>
-                            <p className="text-muted-foreground">
-                                Acompanhe os espaços que você gerencia e exporte quando precisar.
-                            </p>
+                            <p className="text-muted-foreground">Acompanhe os espaços que você gerencia e exporte quando precisar.</p>
                         </div>
-                        <ExportarRelatorio
-                            onExport={handleExport}
-                            estaGerando={estaGerando}
-                            disabled={!tipoSelecionado}
-                        />
+                        <ExportarRelatorio onExport={handleExport} estaGerando={estaGerando} disabled={!tipoSelecionado} />
                     </div>
 
-                    <Tabs
-                        value={tipoSelecionado}
-                        onValueChange={(value) => setTipoSelecionado(value as TipoRelatorio)}
-                    >
+                    <Tabs value={tipoSelecionado} onValueChange={(value) => setTipoSelecionado(value as TipoRelatorio)}>
                         <TabsList className="flex h-auto flex-wrap justify-start gap-1">
                             {tipos_disponiveis.map((tipo) => (
                                 <TabsTrigger key={tipo.value} value={tipo.value}>
@@ -82,9 +60,7 @@ export default function RelatoriosGestorPage({
                         <Card className="border-dashed">
                             <CardContent className="flex flex-col items-center justify-center gap-2 py-16 text-center">
                                 <BarChart3 className="text-muted-foreground h-8 w-8" />
-                                <p className="text-muted-foreground text-sm">
-                                    Selecione um tipo de relatório para visualizar os dados.
-                                </p>
+                                <p className="text-muted-foreground text-sm">Selecione um tipo de relatório para visualizar os dados.</p>
                             </CardContent>
                         </Card>
                     )}
@@ -96,18 +72,10 @@ export default function RelatoriosGestorPage({
                                     <CardTitle className="text-base">Filtros</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    {tipoSelecionado === 'reservas_periodo' && (
-                                        <FiltrosReservasPeriodo filtros={filtros} onChange={setFiltros} />
-                                    )}
-                                    {tipoSelecionado === 'ocupacao_espacos' && (
-                                        <FiltrosOcupacaoEspacos filtros={filtros} onChange={setFiltros} />
-                                    )}
+                                    {tipoSelecionado === 'reservas_periodo' && <FiltrosReservasPeriodo filtros={filtros} onChange={setFiltros} />}
+                                    {tipoSelecionado === 'ocupacao_espacos' && <FiltrosOcupacaoEspacos filtros={filtros} onChange={setFiltros} />}
                                     {tipoSelecionado === 'inventario_espacos' && (
-                                        <FiltrosInventarioEspacos
-                                            filtros={filtros}
-                                            opcoes={opcoes_inventario}
-                                            onChange={setFiltros}
-                                        />
+                                        <FiltrosInventarioEspacos filtros={filtros} opcoes={opcoes_inventario} onChange={setFiltros} />
                                     )}
                                 </CardContent>
                             </Card>
@@ -140,15 +108,9 @@ export default function RelatoriosGestorPage({
 
                                 {status === 'success' && dados && (
                                     <Suspense fallback={<Skeleton className="h-[320px] w-full" />}>
-                                        {tipoSelecionado === 'reservas_periodo' && (
-                                            <GraficoReservasPeriodo dados={dados} />
-                                        )}
-                                        {tipoSelecionado === 'ocupacao_espacos' && (
-                                            <GraficoOcupacaoEspacos dados={dados} />
-                                        )}
-                                        {tipoSelecionado === 'inventario_espacos' && (
-                                            <GraficoInventarioEspacos dados={dados} />
-                                        )}
+                                        {tipoSelecionado === 'reservas_periodo' && <GraficoReservasPeriodo dados={dados} />}
+                                        {tipoSelecionado === 'ocupacao_espacos' && <GraficoOcupacaoEspacos dados={dados} />}
+                                        {tipoSelecionado === 'inventario_espacos' && <GraficoInventarioEspacos dados={dados} />}
                                     </Suspense>
                                 )}
                             </div>

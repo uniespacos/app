@@ -1,6 +1,6 @@
-import AppLayout from '@/presentation/templates/app-layout';
-import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
 import ChamadosAbertosAlerta, { type ChamadosAbertos } from '@/presentation/molecules/ChamadosAbertosAlerta';
+import AgendaEspaço from '@/presentation/organisms/EspacoAgenda';
+import AppLayout from '@/presentation/templates/app-layout';
 import { BreadcrumbItem, Espaco, Reserva } from '@/types';
 import { Head } from '@inertiajs/react';
 
