@@ -5,11 +5,6 @@ export interface ChamadosAbertos {
     categorias: { label: string; total: number }[];
 }
 
-/**
- * Aviso informativo exibido a quem está prestes a reservar um espaço que tem
- * problemas reportados em aberto. Não bloqueia a reserva — a decisão continua
- * sendo de quem reserva.
- */
 export default function ChamadosAbertosAlerta({ chamadosAbertos }: { chamadosAbertos?: ChamadosAbertos }) {
     if (!chamadosAbertos || chamadosAbertos.total === 0) {
         return null;
@@ -39,9 +34,7 @@ export default function ChamadosAbertosAlerta({ chamadosAbertos }: { chamadosAbe
                         ))}
                     </p>
                 )}
-                <p className="text-sm opacity-90">
-                    A gestão do espaço já foi avisada. Você pode reservar normalmente — este é apenas um aviso.
-                </p>
+                <p className="text-sm opacity-90">A gestão do espaço já foi avisada. Você pode reservar normalmente — este é apenas um aviso.</p>
             </div>
         </div>
     );
