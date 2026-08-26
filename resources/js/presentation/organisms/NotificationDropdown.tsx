@@ -109,7 +109,7 @@ export function NotificationDropdown() {
     const triggerButton = (
         <Button
             variant="ghost"
-            className="relative min-h-11 min-w-11 p-0"
+            className="relative h-11 w-11 p-0 md:h-8 md:w-8"
             aria-label="Visualizar Notificações"
             data-testid="notification-trigger"
         >
