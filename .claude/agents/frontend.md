@@ -86,8 +86,8 @@ function ReservaForm() {
 
     return (
         <form>
-            <label>{t('reservas.fields.titulo')}</label>
-            <button>{t('common.actions.salvar')}</button>
+            <label>{t('reservas.titulo')}</label>
+            <button>{t('common.actions.save')}</button>
         </form>
     );
 }
@@ -95,7 +95,7 @@ function ReservaForm() {
 
 **Interpolação** (placeholders `{{param}}` no valor do dicionário):
 ```typescript
-t('errors.validation.min_length', { min: 5 })
+t('dashboard.welcome', { name: 'João' })
 ```
 
 **Se a Chave Não Existir:**
