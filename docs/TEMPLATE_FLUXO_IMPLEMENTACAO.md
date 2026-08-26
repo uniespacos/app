@@ -1,7 +1,7 @@
 # Template Mestre: Fluxo de Trabalho e Prompts de Implementação — UniEspaços
 
 > **Documento de Referência:** Template padronizado de prompts e metodologia para condução de auditorias, planejamento mestre, execuções atômicas em sessões isoladas e relatórios de homologação técnica no ecossistema **UniEspaços**.  
-> **Baseado nas Metodologias:** `docs/auditoria-design-2/`, `docs/plano-execucao-design-2/` e `docs/update-uniespacos/`.
+> **Baseado nas Metodologias:** `docs/auditoria-design-2/`, `docs/plano-execucao-design-2/` e `docs/plano-update-app/`.
 
 ---
 
