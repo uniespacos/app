@@ -3,7 +3,8 @@ import { CheckCircle2, MapPin } from 'lucide-react';
 
 interface ChamadoSucesso {
     protocolo: string;
-    categoria: string;
+    tipo: string | null;
+    categoria: string | null;
     status: string;
     criado_em: string | null;
     tem_contato: boolean;
@@ -14,12 +15,12 @@ interface ChamadoSucesso {
 export default function ReportarSucessoPage({ chamado }: { chamado: ChamadoSucesso }) {
     return (
         <div className="bg-background flex min-h-svh flex-col items-center justify-center p-4 md:p-10">
-            <Head title="Report registrado" />
+            <Head title="Registro enviado" />
 
             <div className="w-full max-w-lg space-y-6">
                 <header className="space-y-3 text-center">
                     <CheckCircle2 className="mx-auto h-12 w-12 text-green-600 dark:text-green-500" />
-                    <h1 className="text-2xl font-semibold">Report registrado</h1>
+                    <h1 className="text-2xl font-semibold">Registro enviado</h1>
                     <p className="text-muted-foreground text-sm">
                         A gestão do espaço foi avisada. Obrigado por ajudar a manter o campus funcionando.
                     </p>
@@ -31,10 +32,14 @@ export default function ReportarSucessoPage({ chamado }: { chamado: ChamadoSuces
                         <p className="font-mono text-sm break-all">{chamado.protocolo}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                    <div className="grid grid-cols-3 gap-4 border-t pt-4">
                         <div>
                             <p className="text-muted-foreground text-xs tracking-wide uppercase">Tipo</p>
-                            <p className="text-sm">{chamado.categoria}</p>
+                            <p className="text-sm">{chamado.tipo ?? '—'}</p>
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground text-xs tracking-wide uppercase">Assunto</p>
+                            <p className="text-sm">{chamado.categoria ?? '—'}</p>
                         </div>
                         <div>
                             <p className="text-muted-foreground text-xs tracking-wide uppercase">Situação</p>
@@ -52,15 +57,13 @@ export default function ReportarSucessoPage({ chamado }: { chamado: ChamadoSuces
                         </div>
                     )}
 
-                    {chamado.criado_em && (
-                        <p className="text-muted-foreground border-t pt-4 text-sm">Registrado em {chamado.criado_em}</p>
-                    )}
+                    {chamado.criado_em && <p className="text-muted-foreground border-t pt-4 text-sm">Registrado em {chamado.criado_em}</p>}
                 </div>
 
                 <p className="text-muted-foreground text-center text-sm">
                     {chamado.tem_contato
-                        ? 'Você receberá um e-mail quando o chamado for resolvido.'
-                        : 'Guarde o número do protocolo caso precise se referir a este report.'}
+                        ? 'Você receberá um e-mail quando o chamado for encerrado.'
+                        : 'Guarde o número do protocolo caso precise se referir a este registro.'}
                 </p>
             </div>
         </div>

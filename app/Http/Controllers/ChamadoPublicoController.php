@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Enums\Chamado\StatusChamadoEnum;
 use App\Http\Requests\StoreChamadoPublicoRequest;
 use App\Models\Chamado;
@@ -28,10 +27,14 @@ class ChamadoPublicoController extends Controller
      */
     public function create(Espaco $espaco, Honeypot $honeypot): Response
     {
+        $tipos = $this->service->tiposParaSelect();
+        $categorias = $this->service->categoriasParaSelect();
+
         return Inertia::render('Chamados/ReportarPage', [
             'espaco' => $this->service->getDadosDoEspacoParaReport($espaco),
-            'categorias' => CategoriaChamadoEnum::paraSelect(),
-            // Campos anti-spam: invisiveis ao usuario, preenchidos por bots.
+            'tipos' => $tipos,
+            'categorias' => $categorias,
+            'catalogoVazio' => $tipos === [] || $categorias === [],
             'honeypot' => $honeypot->toArray(),
         ]);
     }
@@ -63,18 +66,17 @@ class ChamadoPublicoController extends Controller
      */
     public function sucesso(Chamado $chamado): Response
     {
-        $chamado->loadMissing(['reportable' => fn ($q) => $q->morphWith([
+        $chamado->loadMissing(['tipo', 'categoria', 'reportable' => fn ($q) => $q->morphWith([
             Espaco::class => ['andar.modulo.unidade'],
         ])]);
 
-        // O morph so aponta para Espaco nesta entrega, mas o tipo estatico e Model:
-        // a checagem mantem a tela correta quando Equipamento entrar como alvo.
         $alvo = $chamado->reportable;
 
         return Inertia::render('Chamados/ReportarSucessoPage', [
             'chamado' => [
                 'protocolo' => $chamado->protocolo,
-                'categoria' => CategoriaChamadoEnum::labelDe($chamado->categoria),
+                'tipo' => $chamado->tipo?->nome,
+                'categoria' => $chamado->categoria?->nome,
                 'status' => StatusChamadoEnum::labelDe($chamado->status),
                 'criado_em' => $chamado->created_at?->format('d/m/Y H:i'),
                 'tem_contato' => filled($chamado->contato_email),

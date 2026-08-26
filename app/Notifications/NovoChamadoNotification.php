@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Models\Chamado;
 use App\Models\Espaco;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -21,8 +20,9 @@ class NovoChamadoNotification extends BaseNotification
         parent::__construct(
             'Novo Chamado Aberto',
             sprintf(
-                'Um problema de %s foi reportado em %s.',
-                mb_strtolower(CategoriaChamadoEnum::labelDe($chamado->categoria)),
+                '%s de %s foi reportado em %s.',
+                $chamado->tipo->nome,
+                mb_strtolower($chamado->categoria->nome),
                 $espaco
             ),
             route('gestor.chamados.index')
@@ -39,11 +39,12 @@ class NovoChamadoNotification extends BaseNotification
         $alvo = $this->chamado->reportable;
 
         return (new MailMessage)
-            ->subject('Novo chamado: '.CategoriaChamadoEnum::labelDe($this->chamado->categoria))
+            ->subject('Novo chamado: '.$this->chamado->tipo->nome.' — '.$this->chamado->categoria->nome)
             ->view('emails.chamados.novo_chamado', [
                 'chamado' => $this->chamado,
                 'espaco' => $alvo instanceof Espaco ? $alvo : null,
-                'categoria' => CategoriaChamadoEnum::labelDe($this->chamado->categoria),
+                'tipo' => $this->chamado->tipo?->nome,
+                'categoria' => $this->chamado->categoria?->nome,
                 'url' => $this->url,
             ]);
     }

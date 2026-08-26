@@ -16,8 +16,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface Chamado {
     id: number;
     protocolo: string;
-    categoria: string;
-    categoria_valor: string;
+    tipo: string | null;
+    tipo_valor: number;
+    categoria: string | null;
+    categoria_valor: number;
     status: string;
     status_valor: string;
     descricao: string;
@@ -34,14 +36,21 @@ interface Opcao {
     label: string;
 }
 
+interface OpcaoTaxonomia {
+    value: number;
+    label: string;
+    descricao: string | null;
+}
+
 interface Props {
     chamados: {
         data: Chamado[];
         links: { url: string | null; label: string; active: boolean }[];
         total: number;
     };
-    filters: { status?: string; categoria?: string };
-    categorias: (Opcao & { descricao: string })[];
+    filters: { status?: string; tipo_id?: string; categoria_id?: string };
+    tipos: OpcaoTaxonomia[];
+    categorias: OpcaoTaxonomia[];
     statusDisponiveis: Opcao[];
     totalAbertos: number;
 }
@@ -53,8 +62,8 @@ const CORES_STATUS: Record<string, string> = {
     cancelado: 'bg-muted text-muted-foreground',
 };
 
-export default function ChamadosPage({ chamados, filters, categorias, statusDisponiveis, totalAbertos }: Props) {
-    const filtrar = (campo: 'status' | 'categoria', valor: string) => {
+export default function ChamadosPage({ chamados, filters, tipos, categorias, statusDisponiveis, totalAbertos }: Props) {
+    const filtrar = (campo: 'status' | 'tipo_id' | 'categoria_id', valor: string) => {
         const novos = { ...filters, [campo]: valor || undefined };
         router.get(route('gestor.chamados.index'), novos, { preserveState: true, replace: true });
     };
@@ -71,9 +80,7 @@ export default function ChamadosPage({ chamados, filters, categorias, statusDisp
                 <header className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-semibold">Fila de Chamados</h1>
-                        <p className="text-muted-foreground text-sm">
-                            Problemas reportados nos espaços sob sua responsabilidade.
-                        </p>
+                        <p className="text-muted-foreground text-sm">Registros feitos nos espaços sob sua responsabilidade.</p>
                     </div>
                     {totalAbertos > 0 && (
                         <Badge variant="secondary" className="gap-1.5">
@@ -98,11 +105,24 @@ export default function ChamadosPage({ chamados, filters, categorias, statusDisp
                     </select>
 
                     <select
-                        value={filters.categoria ?? ''}
-                        onChange={(e) => filtrar('categoria', e.target.value)}
+                        value={filters.tipo_id ?? ''}
+                        onChange={(e) => filtrar('tipo_id', e.target.value)}
                         className="border-input bg-background h-9 rounded-md border px-3 text-sm"
                     >
                         <option value="">Todos os tipos</option>
+                        {tipos.map((t) => (
+                            <option key={t.value} value={t.value}>
+                                {t.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={filters.categoria_id ?? ''}
+                        onChange={(e) => filtrar('categoria_id', e.target.value)}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                    >
+                        <option value="">Todos os assuntos</option>
                         {categorias.map((c) => (
                             <option key={c.value} value={c.value}>
                                 {c.label}
@@ -115,10 +135,7 @@ export default function ChamadosPage({ chamados, filters, categorias, statusDisp
                     <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
                         <AlertCircle className="mx-auto mb-3 h-8 w-8 opacity-50" />
                         <p>Nenhum chamado por aqui.</p>
-                        <p className="text-sm">
-                            Os problemas reportados via QR Code nos espaços sob sua responsabilidade aparecem nesta
-                            lista.
-                        </p>
+                        <p className="text-sm">Os problemas reportados via QR Code nos espaços sob sua responsabilidade aparecem nesta lista.</p>
                     </div>
                 ) : (
                     <div className="space-y-3">
@@ -128,12 +145,13 @@ export default function ChamadosPage({ chamados, filters, categorias, statusDisp
                                     <div className="min-w-0 space-y-1">
                                         <div className="flex flex-wrap items-center gap-2">
                                             <Badge className={CORES_STATUS[chamado.status_valor] ?? ''}>{chamado.status}</Badge>
-                                            <Badge variant="outline">{chamado.categoria}</Badge>
+                                            {chamado.tipo && <Badge variant="secondary">{chamado.tipo}</Badge>}
+                                            {chamado.categoria && <Badge variant="outline">{chamado.categoria}</Badge>}
                                             <span className="text-muted-foreground text-xs">{chamado.criado_em}</span>
                                         </div>
                                         <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
                                             <MapPin className="h-3.5 w-3.5 shrink-0" />
-                                            <span className="font-medium text-foreground">{chamado.espaco}</span>
+                                            <span className="text-foreground font-medium">{chamado.espaco}</span>
                                             <span className="truncate">· {chamado.localizacao}</span>
                                         </div>
                                     </div>

@@ -16,23 +16,18 @@ return new class extends Migration
         Schema::create('chamados', function (Blueprint $table) {
             $table->id()->autoIncrement();
 
-            // Protocolo publico: e o que o reportante anonimo recebe na tela de sucesso.
             $table->ulid('protocolo')->unique();
 
-            // Alvo polimorfico. Nesta entrega apenas Espaco e usado;
-            // Equipamento entra quando o modulo de inventario existir.
             $table->morphs('reportable');
 
-            $table->enum('tipo', ['defeito', 'reclamacao', 'sugestao'])->default('defeito');
-            $table->enum('categoria', ['eletrica', 'hidraulica', 'mobiliario', 'ti', 'limpeza', 'outros']);
+            $table->foreignId('tipo_id')->constrained('tipos_chamado')->restrictOnDelete();
+            $table->foreignId('categoria_id')->constrained('categorias_chamado')->restrictOnDelete();
             $table->text('descricao');
             $table->enum('status', ['aberto', 'em_andamento', 'resolvido', 'cancelado'])->default('aberto');
 
-            // Contato opcional do reportante anonimo.
             $table->string('contato_nome')->nullable();
             $table->string('contato_email')->nullable();
 
-            // Fotos do problema (paths no disco public).
             $table->json('fotos')->nullable();
 
             $table->foreignId('resolvido_por')->nullable()->constrained('users')->onDelete('set null');
@@ -42,6 +37,7 @@ return new class extends Migration
 
             $table->index('status');
             $table->index('created_at');
+            $table->index('tipo_id');
         });
     }
 

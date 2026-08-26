@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +24,8 @@ class StoreChamadoPublicoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'categoria' => ['required', 'string', Rule::in(CategoriaChamadoEnum::values())],
+            'tipo_id' => ['required', 'integer', Rule::exists('tipos_chamado', 'id')->whereNull('deleted_at')],
+            'categoria_id' => ['required', 'integer', Rule::exists('categorias_chamado', 'id')->whereNull('deleted_at')],
             'descricao' => ['required', 'string', 'min:10', 'max:2000'],
             'contato_nome' => ['nullable', 'string', 'max:255'],
             'contato_email' => ['nullable', 'email', 'max:255'],
@@ -40,10 +40,12 @@ class StoreChamadoPublicoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'categoria.required' => 'Selecione o tipo de problema.',
-            'categoria.in' => 'O tipo de problema selecionado é inválido.',
-            'descricao.required' => 'Descreva o problema encontrado.',
-            'descricao.min' => 'Descreva o problema com um pouco mais de detalhe (mínimo :min caracteres).',
+            'tipo_id.required' => 'Selecione o que você quer registrar.',
+            'tipo_id.exists' => 'A opção selecionada não está mais disponível.',
+            'categoria_id.required' => 'Selecione o assunto do registro.',
+            'categoria_id.exists' => 'O assunto selecionado não está mais disponível.',
+            'descricao.required' => 'Descreva o que você encontrou.',
+            'descricao.min' => 'Descreva com um pouco mais de detalhe (mínimo :min caracteres).',
             'descricao.max' => 'A descrição pode ter no máximo :max caracteres.',
             'contato_email.email' => 'Informe um e-mail válido para receber retorno.',
             'fotos.max' => 'Você pode enviar no máximo :max fotos.',

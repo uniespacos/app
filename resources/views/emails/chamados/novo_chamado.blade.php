@@ -9,7 +9,8 @@
             <li><strong>Espaço:</strong> {{ $espaco->nome }}</li>
             <li><strong>Localização:</strong> {{ $espaco->localizacao_completa }}</li>
         @endif
-        <li><strong>Tipo do problema:</strong> {{ $categoria }}</li>
+        <li><strong>Tipo:</strong> {{ $tipo }}</li>
+        <li><strong>Assunto:</strong> {{ $categoria }}</li>
         <li><strong>Protocolo:</strong> {{ $chamado->protocolo }}</li>
         <li><strong>Registrado em:</strong> {{ $chamado->created_at?->format('d/m/Y H:i') }}</li>
         @if($chamado->contato_nome || $chamado->contato_email)

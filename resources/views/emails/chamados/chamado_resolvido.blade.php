@@ -10,7 +10,8 @@
             <li><strong>Espaço:</strong> {{ $espaco->nome }}</li>
             <li><strong>Localização:</strong> {{ $espaco->localizacao_completa }}</li>
         @endif
-        <li><strong>Tipo do problema:</strong> {{ $categoria }}</li>
+        <li><strong>Tipo:</strong> {{ $tipo }}</li>
+        <li><strong>Assunto:</strong> {{ $categoria }}</li>
         <li><strong>Protocolo:</strong> {{ $chamado->protocolo }}</li>
         <li><strong>Reportado em:</strong> {{ $chamado->created_at?->format('d/m/Y H:i') }}</li>
         @if($chamado->resolvido_em)

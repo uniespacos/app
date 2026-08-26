@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Models\Chamado;
 use App\Models\Espaco;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -46,7 +45,8 @@ class ChamadoOrfaoNotification extends BaseNotification
             ->view('emails.chamados.chamado_orfao', [
                 'chamado' => $this->chamado,
                 'espaco' => $alvo instanceof Espaco ? $alvo : null,
-                'categoria' => CategoriaChamadoEnum::labelDe($this->chamado->categoria),
+                'tipo' => $this->chamado->tipo?->nome,
+                'categoria' => $this->chamado->categoria?->nome,
                 'url' => $this->url,
             ]);
     }

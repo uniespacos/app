@@ -31,7 +31,7 @@ class GestorChamadoController extends Controller
     {
         $this->authorize('viewAny', Chamado::class);
 
-        $filters = $request->only(['status', 'categoria']);
+        $filters = $request->only(['status', 'tipo_id', 'categoria_id']);
 
         return Inertia::render('Gestor/ChamadosPage', $this->service->getListagemParaGestor(
             Auth::user(),
@@ -44,8 +44,6 @@ class GestorChamadoController extends Controller
      */
     public function update(TriarChamadoRequest $request, Chamado $chamado): RedirectResponse
     {
-        // A policy checa a permissao E se o gestor administra o espaco alvo,
-        // impedindo que um gestor tria o chamado da fila de outro.
         $this->authorize('update', $chamado);
 
         try {

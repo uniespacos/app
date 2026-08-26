@@ -20,8 +20,8 @@ class Chamado extends Model
         'protocolo',
         'reportable_type',
         'reportable_id',
-        'tipo',
-        'categoria',
+        'tipo_id',
+        'categoria_id',
         'descricao',
         'status',
         'contato_nome',
@@ -39,10 +39,6 @@ class Chamado extends Model
         'resolvido_em' => 'datetime',
     ];
 
-    /**
-     * Garante que todo chamado nasca com um protocolo publico,
-     * independente de quem o criou.
-     */
     protected static function booted(): void
     {
         static::creating(function (Chamado $chamado) {
@@ -53,9 +49,6 @@ class Chamado extends Model
     }
 
     /**
-     * Alvo do chamado. Nesta entrega sempre um Espaco;
-     * Equipamento entra quando o modulo de inventario existir.
-     *
      * @return MorphTo<Model, $this>
      */
     public function reportable(): MorphTo
@@ -64,12 +57,26 @@ class Chamado extends Model
     }
 
     /**
-     * Gestor que registrou a resolucao do chamado.
-     *
      * @return BelongsTo<User, $this>
      */
     public function resolvidoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'resolvido_por');
+    }
+
+    /**
+     * @return BelongsTo<TipoChamado, $this>
+     */
+    public function tipo(): BelongsTo
+    {
+        return $this->belongsTo(TipoChamado::class, 'tipo_id')->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo<CategoriaChamado, $this>
+     */
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(CategoriaChamado::class, 'categoria_id')->withTrashed();
     }
 }

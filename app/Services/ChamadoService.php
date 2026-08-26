@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Enums\Chamado\StatusChamadoEnum;
-use App\Enums\Chamado\TipoChamadoEnum;
+use App\Models\CategoriaChamado;
 use App\Models\Chamado;
 use App\Models\Espaco;
+use App\Models\TipoChamado;
 use App\Models\User;
 use App\Notifications\ChamadoOrfaoNotification;
 use App\Notifications\ChamadoResolvidoNotification;
 use App\Notifications\NovoChamadoNotification;
+use App\Repositories\CategoriaChamadoRepositoryInterface;
 use App\Repositories\ChamadoRepositoryInterface;
 use App\Repositories\EspacoRepositoryInterface;
+use App\Repositories\TipoChamadoRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,8 @@ class ChamadoService
         protected ChamadoRepositoryInterface $repoChamado,
         protected EspacoRepositoryInterface $repoEspaco,
         protected UserRepositoryInterface $repoUser,
+        protected TipoChamadoRepositoryInterface $repoTipo,
+        protected CategoriaChamadoRepositoryInterface $repoCategoria,
     ) {}
 
     /**
@@ -48,8 +52,8 @@ class ChamadoService
             return $this->repoChamado->store([
                 'reportable_type' => Espaco::class,
                 'reportable_id' => $espaco->id,
-                'tipo' => TipoChamadoEnum::DEFEITO->value,
-                'categoria' => $data['categoria'],
+                'tipo_id' => $data['tipo_id'],
+                'categoria_id' => $data['categoria_id'],
                 'descricao' => $data['descricao'],
                 'status' => StatusChamadoEnum::ABERTO->value,
                 'contato_nome' => $data['contato_nome'] ?? null,
@@ -64,11 +68,7 @@ class ChamadoService
     }
 
     /**
-     * Avisa todos os gestores do espaco — uniao distinct dos responsaveis
-     * pelas agendas dos tres turnos. Quem assumir primeiro fica responsavel.
-     *
-     * A falha do envio nao pode derrubar o report: quem escaneou o QR ja
-     * cumpriu seu papel e o chamado esta gravado.
+     * Avisa todos os gestores do espaco, ou o pessoal institucional quando nao houver nenhum.
      */
     private function notificarGestores(Espaco $espaco, Chamado $chamado): void
     {
@@ -97,9 +97,6 @@ class ChamadoService
     /**
      * Fila de chamados dos espacos que o gestor administra.
      *
-     * O vinculo gestor-espaco passa pela Agenda (um gestor por turno), entao
-     * um chamado chega a todos os gestores do espaco, de qualquer turno.
-     *
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
@@ -115,8 +112,10 @@ class ChamadoService
             return [
                 'id' => $chamado->id,
                 'protocolo' => $chamado->protocolo,
-                'categoria' => CategoriaChamadoEnum::labelDe($chamado->categoria),
-                'categoria_valor' => $chamado->categoria,
+                'tipo' => $chamado->tipo?->nome,
+                'tipo_valor' => $chamado->tipo_id,
+                'categoria' => $chamado->categoria?->nome,
+                'categoria_valor' => $chamado->categoria_id,
                 'status' => StatusChamadoEnum::labelDe($chamado->status),
                 'status_valor' => $chamado->status,
                 'descricao' => $chamado->descricao,
@@ -135,7 +134,8 @@ class ChamadoService
         return [
             'chamados' => $chamados,
             'filters' => $filters,
-            'categorias' => CategoriaChamadoEnum::paraSelect(),
+            'tipos' => $this->tiposParaSelect(),
+            'categorias' => $this->categoriasParaSelect(),
             'statusDisponiveis' => array_map(
                 fn (StatusChamadoEnum $caso): array => ['value' => $caso->value, 'label' => $caso->label()],
                 StatusChamadoEnum::cases()
@@ -175,8 +175,7 @@ class ChamadoService
     }
 
     /**
-     * Espaco sem gestor: avisa quem pode resolver a causa — o pessoal
-     * institucional, que tem permissao para atribuir gestor ao espaco.
+     * Avisa o pessoal institucional sobre um chamado aberto em espaco sem gestor.
      */
     private function notificarInstitucionaisSobreOrfao(Chamado $chamado): void
     {
@@ -190,11 +189,8 @@ class ChamadoService
     }
 
     /**
-     * Avisa por e-mail quem deixou contato no formulario publico.
-     *
-     * O reportante nao tem conta, entao usa-se on-demand notification.
-     * So dispara quando o chamado e efetivamente encerrado e o status mudou,
-     * para nao reenviar e-mail a cada re-salvamento.
+     * Avisa por e-mail quem deixou contato no formulario publico, uma unica
+     * vez, quando o chamado passa a encerrado.
      */
     private function notificarReportante(Chamado $chamado, string $statusAnterior): void
     {
@@ -218,9 +214,6 @@ class ChamadoService
     /**
      * Fila de chamados orfaos: espacos sem gestor em nenhuma agenda.
      *
-     * Vai para o pessoal institucional, que e quem pode atribuir gestor —
-     * atacando a causa, nao so o sintoma.
-     *
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
@@ -234,7 +227,8 @@ class ChamadoService
             return [
                 'id' => $chamado->id,
                 'protocolo' => $chamado->protocolo,
-                'categoria' => CategoriaChamadoEnum::labelDe($chamado->categoria),
+                'tipo' => $chamado->tipo?->nome,
+                'categoria' => $chamado->categoria?->nome,
                 'status' => StatusChamadoEnum::labelDe($chamado->status),
                 'descricao' => $chamado->descricao,
                 'fotos' => array_map(
@@ -251,7 +245,8 @@ class ChamadoService
         return [
             'chamados' => $chamados,
             'filters' => $filters,
-            'categorias' => CategoriaChamadoEnum::paraSelect(),
+            'tipos' => $this->tiposParaSelect(),
+            'categorias' => $this->categoriasParaSelect(),
             'totalOrfaos' => $this->repoChamado->countOrfaos(),
         ];
     }
@@ -259,9 +254,6 @@ class ChamadoService
     /**
      * Resumo dos chamados em aberto de um espaco, para o alerta informativo
      * exibido a quem esta prestes a reservar.
-     *
-     * Nao bloqueia a reserva: apenas informa. A decisao de reservar mesmo
-     * assim continua sendo de quem reserva.
      *
      * @return array{total: int, categorias: list<array{label: string, total: int}>}
      */
@@ -273,7 +265,7 @@ class ChamadoService
 
         foreach ($porCategoria as $categoria => $total) {
             $categorias[] = [
-                'label' => CategoriaChamadoEnum::labelDe((string) $categoria),
+                'label' => (string) $categoria,
                 'total' => (int) $total,
             ];
         }
@@ -284,6 +276,38 @@ class ChamadoService
             'total' => array_sum($porCategoria),
             'categorias' => $categorias,
         ];
+    }
+
+    /**
+     * Tipos disponiveis para escolha no formulario publico e nos filtros.
+     *
+     * @return list<array{value: int, label: string, descricao: ?string}>
+     */
+    public function tiposParaSelect(): array
+    {
+        return $this->repoTipo->getList()
+            ->map(fn (TipoChamado $tipo): array => [
+                'value' => $tipo->id,
+                'label' => $tipo->nome,
+                'descricao' => $tipo->descricao,
+            ])
+            ->all();
+    }
+
+    /**
+     * Categorias disponiveis para escolha no formulario publico e nos filtros.
+     *
+     * @return list<array{value: int, label: string, descricao: ?string}>
+     */
+    public function categoriasParaSelect(): array
+    {
+        return $this->repoCategoria->getList()
+            ->map(fn (CategoriaChamado $categoria): array => [
+                'value' => $categoria->id,
+                'label' => $categoria->nome,
+                'descricao' => $categoria->descricao,
+            ])
+            ->all();
     }
 
     /**

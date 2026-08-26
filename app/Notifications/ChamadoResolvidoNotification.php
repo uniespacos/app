@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Enums\Chamado\StatusChamadoEnum;
 use App\Models\Chamado;
 use App\Models\Espaco;
@@ -45,7 +44,8 @@ class ChamadoResolvidoNotification extends Notification implements ShouldQueue
             ->view('emails.chamados.chamado_resolvido', [
                 'chamado' => $this->chamado,
                 'espaco' => $alvo instanceof Espaco ? $alvo : null,
-                'categoria' => CategoriaChamadoEnum::labelDe($this->chamado->categoria),
+                'tipo' => $this->chamado->tipo?->nome,
+                'categoria' => $this->chamado->categoria?->nome,
                 'status' => StatusChamadoEnum::labelDe($this->chamado->status),
             ]);
     }

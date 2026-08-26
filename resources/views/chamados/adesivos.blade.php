@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Adesivos QR Code — Reportar problema</title>
+    <title>Adesivos QR Code — Fale sobre este espaço</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -92,8 +92,8 @@
     <div class="folha">
         @forelse ($adesivos as $adesivo)
             <div class="adesivo">
-                <div class="chamada">Algum problema nesta sala?</div>
-                <div class="instrucao">Aponte a câmera do celular para o código<br>e conte o que está errado. Não precisa de login.</div>
+                <div class="chamada">Algo a dizer sobre esta sala?</div>
+                <div class="instrucao">Aponte a câmera do celular para o código e registre<br>um defeito, uma reclamação ou uma sugestão. Não precisa de login.</div>
                 {!! $adesivo['svg'] !!}
                 <div class="espaco">{{ $adesivo['nome'] }}</div>
                 <div class="local">{{ $adesivo['localizacao'] }}</div>

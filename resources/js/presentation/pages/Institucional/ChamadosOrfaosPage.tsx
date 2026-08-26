@@ -16,7 +16,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ChamadoOrfao {
     id: number;
     protocolo: string;
-    categoria: string;
+    tipo: string | null;
+    categoria: string | null;
     status: string;
     descricao: string;
     fotos: string[];
@@ -32,14 +33,16 @@ interface Props {
         links: { url: string | null; label: string; active: boolean }[];
         total: number;
     };
-    filters: { categoria?: string };
-    categorias: { value: string; label: string; descricao: string }[];
+    filters: { tipo_id?: string; categoria_id?: string };
+    tipos: { value: number; label: string; descricao: string | null }[];
+    categorias: { value: number; label: string; descricao: string | null }[];
     totalOrfaos: number;
 }
 
-export default function ChamadosOrfaosPage({ chamados, filters, categorias, totalOrfaos }: Props) {
-    const filtrar = (valor: string) => {
-        router.get(route('institucional.chamados.index'), { categoria: valor || undefined }, { preserveState: true, replace: true });
+export default function ChamadosOrfaosPage({ chamados, filters, tipos, categorias, totalOrfaos }: Props) {
+    const filtrar = (campo: 'tipo_id' | 'categoria_id', valor: string) => {
+        const novos = { ...filters, [campo]: valor || undefined };
+        router.get(route('institucional.chamados.index'), novos, { preserveState: true, replace: true });
     };
 
     return (
@@ -50,8 +53,8 @@ export default function ChamadosOrfaosPage({ chamados, filters, categorias, tota
                 <header className="space-y-1">
                     <h1 className="text-2xl font-semibold">Espaços sem responsável</h1>
                     <p className="text-muted-foreground text-sm">
-                        Problemas reportados em espaços que não têm ninguém atribuído em nenhum turno — por isso não
-                        chegam a nenhuma fila de atendimento.
+                        Problemas reportados em espaços que não têm ninguém atribuído em nenhum turno — por isso não chegam a nenhuma fila de
+                        atendimento.
                     </p>
                 </header>
 
@@ -62,31 +65,43 @@ export default function ChamadosOrfaosPage({ chamados, filters, categorias, tota
                             <strong>
                                 {totalOrfaos} chamado{totalOrfaos > 1 ? 's' : ''} aguardando responsável.
                             </strong>{' '}
-                            Atribuir alguém às agendas do espaço faz com que os próximos reports cheguem direto a quem
-                            atende.
+                            Atribuir alguém às agendas do espaço faz com que os próximos reports cheguem direto a quem atende.
                         </p>
                     </div>
                 )}
 
-                <select
-                    value={filters.categoria ?? ''}
-                    onChange={(e) => filtrar(e.target.value)}
-                    className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-                >
-                    <option value="">Todos os tipos</option>
-                    {categorias.map((c) => (
-                        <option key={c.value} value={c.value}>
-                            {c.label}
-                        </option>
-                    ))}
-                </select>
+                <div className="flex flex-wrap gap-3">
+                    <select
+                        value={filters.tipo_id ?? ''}
+                        onChange={(e) => filtrar('tipo_id', e.target.value)}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                    >
+                        <option value="">Todos os tipos</option>
+                        {tipos.map((t) => (
+                            <option key={t.value} value={t.value}>
+                                {t.label}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={filters.categoria_id ?? ''}
+                        onChange={(e) => filtrar('categoria_id', e.target.value)}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                    >
+                        <option value="">Todos os assuntos</option>
+                        {categorias.map((c) => (
+                            <option key={c.value} value={c.value}>
+                                {c.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
                 {chamados.data.length === 0 ? (
                     <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
                         <p>Nenhum chamado sem responsável.</p>
-                        <p className="text-sm">
-                            Todos os espaços com problemas reportados já têm alguém atribuído para atender.
-                        </p>
+                        <p className="text-sm">Todos os espaços com problemas reportados já têm alguém atribuído para atender.</p>
                     </div>
                 ) : (
                     <div className="space-y-3">
@@ -95,7 +110,8 @@ export default function ChamadosOrfaosPage({ chamados, filters, categorias, tota
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div className="min-w-0 space-y-1">
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <Badge variant="outline">{chamado.categoria}</Badge>
+                                            {chamado.tipo && <Badge variant="outline">{chamado.tipo}</Badge>}
+                                            {chamado.categoria && <Badge variant="outline">{chamado.categoria}</Badge>}
                                             <Badge variant="secondary">{chamado.status}</Badge>
                                             <span className="text-muted-foreground text-xs">{chamado.criado_em}</span>
                                         </div>
@@ -129,9 +145,7 @@ export default function ChamadosOrfaosPage({ chamados, filters, categorias, tota
                                     </div>
                                 )}
 
-                                <footer className="text-muted-foreground border-t pt-3 font-mono text-xs">
-                                    {chamado.protocolo}
-                                </footer>
+                                <footer className="text-muted-foreground border-t pt-3 font-mono text-xs">{chamado.protocolo}</footer>
                             </article>
                         ))}
                     </div>

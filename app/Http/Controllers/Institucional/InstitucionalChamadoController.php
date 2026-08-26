@@ -21,14 +21,13 @@ class InstitucionalChamadoController extends Controller
     ) {}
 
     /**
-     * Fila de chamados orfaos: reports em espacos que nao tem gestor
-     * atribuido em nenhuma agenda, e que portanto nao chegam a ninguem.
+     * Fila de chamados orfaos: reports em espacos sem gestor atribuido.
      */
     public function index(Request $request): Response
     {
         $this->authorize('viewOrfaos', Chamado::class);
 
-        $filters = array_filter($request->only(['categoria']));
+        $filters = array_filter($request->only(['tipo_id', 'categoria_id']));
 
         return Inertia::render('Institucional/ChamadosOrfaosPage', $this->service->getListagemOrfaos($filters));
     }

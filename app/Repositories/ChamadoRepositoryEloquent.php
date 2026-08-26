@@ -27,8 +27,7 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
     }
 
     /**
-     * Returns a paginated list of Chamado targeting the given Espaco ids,
-     * used by the manager queue.
+     * Returns a paginated list of Chamado targeting the given Espaco ids.
      *
      * @param  list<int>  $espacoIds
      * @param  array<string, mixed>  $filters
@@ -39,14 +38,15 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
             ->where('reportable_type', Espaco::class)
             ->whereIn('reportable_id', $espacoIds)
             ->when($filters['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
-            ->when($filters['categoria'] ?? null, fn ($q, $categoria) => $q->where('categoria', $categoria))
+            ->when($filters['tipo_id'] ?? null, fn ($q, $tipoId) => $q->where('tipo_id', $tipoId))
+            ->when($filters['categoria_id'] ?? null, fn ($q, $categoriaId) => $q->where('categoria_id', $categoriaId))
             ->with([
+                'tipo',
+                'categoria',
                 'reportable' => fn ($q) => $q->morphWith([
                     Espaco::class => ['andar.modulo.unidade'],
                 ]),
             ])
-            // Desempate por id: varios chamados podem cair no mesmo segundo,
-            // e sem isso a ordem da pagina fica indefinida.
             ->latest()
             ->latest('id')
             ->paginate($perPage);
@@ -71,26 +71,27 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
             ->where('reportable_type', Espaco::class)
             ->whereIn('reportable_id', $espacoIds)
             ->whereIn('status', [StatusChamadoEnum::ABERTO->value, StatusChamadoEnum::EM_ANDAMENTO->value])
+            ->whereHas('tipo', fn ($q) => $q->where('exibe_alerta_espaco', true))
             ->count();
     }
 
     /**
-     * Returns a paginated list of open Chamados whose target Espaco has no
-     * manager assigned to any of its agendas — the orphan queue.
+     * Returns a paginated list of open Chamados whose target Espaco has no manager.
      *
      * @param  array<string, mixed>  $filters
      */
     public function getPaginatedOrfaos(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return $this->queryOrfaos()
-            ->when($filters['categoria'] ?? null, fn ($q, $categoria) => $q->where('categoria', $categoria))
+            ->when($filters['tipo_id'] ?? null, fn ($q, $tipoId) => $q->where('tipo_id', $tipoId))
+            ->when($filters['categoria_id'] ?? null, fn ($q, $categoriaId) => $q->where('categoria_id', $categoriaId))
             ->with([
+                'tipo',
+                'categoria',
                 'reportable' => fn ($q) => $q->morphWith([
                     Espaco::class => ['andar.modulo.unidade'],
                 ]),
             ])
-            // Desempate por id: varios chamados podem cair no mesmo segundo,
-            // e sem isso a ordem da pagina fica indefinida.
             ->latest()
             ->latest('id')
             ->paginate($perPage);
@@ -105,8 +106,7 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
     }
 
     /**
-     * Base query of the orphan queue: chamados em aberto cujo Espaco alvo
-     * nao tem gestor em nenhuma das agendas.
+     * Base query of the orphan queue.
      *
      * @return Builder<Chamado>
      */
@@ -121,10 +121,9 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
     }
 
     /**
-     * Returns the open Chamados of an Espaco grouped by category,
-     * used by the reservation alert.
+     * Returns the open Chamados of an Espaco grouped by category.
      *
-     * @return array<string, int> categoria => quantidade
+     * @return array<string, int> nome da categoria => quantidade
      */
     public function categoriasAbertasParaEspaco(int $espacoId): array
     {
@@ -133,9 +132,11 @@ class ChamadoRepositoryEloquent implements ChamadoRepositoryInterface
             ->where('reportable_type', Espaco::class)
             ->where('reportable_id', $espacoId)
             ->whereIn('status', [StatusChamadoEnum::ABERTO->value, StatusChamadoEnum::EM_ANDAMENTO->value])
-            ->selectRaw('categoria, count(*) as total')
-            ->groupBy('categoria')
-            ->pluck('total', 'categoria')
+            ->whereHas('tipo', fn ($q) => $q->where('exibe_alerta_espaco', true))
+            ->join('categorias_chamado', 'categorias_chamado.id', '=', 'chamados.categoria_id')
+            ->selectRaw('categorias_chamado.nome as nome, count(*) as total')
+            ->groupBy('categorias_chamado.nome')
+            ->pluck('total', 'nome')
             ->all();
     }
 }

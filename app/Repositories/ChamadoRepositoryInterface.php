@@ -19,8 +19,7 @@ interface ChamadoRepositoryInterface
     public function store(array $data): Chamado;
 
     /**
-     * Returns a paginated list of Chamado targeting the given Espaco ids,
-     * used by the manager queue.
+     * Returns a paginated list of Chamado targeting the given Espaco ids.
      *
      * @param  list<int>  $espacoIds
      * @param  array<string, mixed>  $filters
@@ -40,16 +39,14 @@ interface ChamadoRepositoryInterface
     public function countAbertosParaEspacos(array $espacoIds): int;
 
     /**
-     * Returns the open Chamados of an Espaco grouped by category,
-     * used by the reservation alert.
+     * Returns the open Chamados of an Espaco grouped by category name.
      *
-     * @return array<string, int> categoria => quantidade
+     * @return array<string, int> nome da categoria => quantidade
      */
     public function categoriasAbertasParaEspaco(int $espacoId): array;
 
     /**
-     * Returns a paginated list of open Chamados whose target Espaco has no
-     * manager assigned to any of its agendas — the orphan queue.
+     * Returns a paginated list of open Chamados whose target Espaco has no manager.
      *
      * @param  array<string, mixed>  $filters
      */

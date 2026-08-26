@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\Chamado\CategoriaChamadoEnum;
 use App\Enums\Chamado\StatusChamadoEnum;
-use App\Enums\Chamado\TipoChamadoEnum;
+use App\Models\CategoriaChamado;
 use App\Models\Chamado;
 use App\Models\Espaco;
+use App\Models\TipoChamado;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,12 +25,12 @@ class ChamadoFactory extends Factory
     public function definition(): array
     {
         return [
-            // Nesta entrega o morph so aponta para Espaco; Equipamento entra
-            // quando o modulo de inventario existir.
             'reportable_type' => Espaco::class,
             'reportable_id' => Espaco::factory(),
-            'tipo' => TipoChamadoEnum::DEFEITO->value,
-            'categoria' => $this->faker->randomElement(CategoriaChamadoEnum::values()),
+            'tipo_id' => fn (): int => TipoChamado::query()->where('slug', 'defeito')->value('id')
+                ?? TipoChamado::factory()->comAlerta()->create()->id,
+            'categoria_id' => fn (): int => CategoriaChamado::query()->inRandomOrder()->value('id')
+                ?? CategoriaChamado::factory()->create()->id,
             'descricao' => $this->faker->text(150),
             'status' => StatusChamadoEnum::ABERTO->value,
             'contato_nome' => null,
@@ -53,12 +53,24 @@ class ChamadoFactory extends Factory
     }
 
     /**
-     * Chamado de uma categoria especifica.
+     * Chamado de uma categoria especifica, identificada pelo slug do catalogo.
      */
-    public function categoria(CategoriaChamadoEnum|string $categoria): static
+    public function categoria(string $slug): static
     {
         return $this->state(fn (array $attributes): array => [
-            'categoria' => $categoria instanceof CategoriaChamadoEnum ? $categoria->value : $categoria,
+            'categoria_id' => CategoriaChamado::query()->where('slug', $slug)->value('id')
+                ?? CategoriaChamado::factory()->create(['slug' => $slug])->id,
+        ]);
+    }
+
+    /**
+     * Chamado de um tipo especifico, identificado pelo slug do catalogo.
+     */
+    public function tipo(string $slug): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'tipo_id' => TipoChamado::query()->where('slug', $slug)->value('id')
+                ?? TipoChamado::factory()->create(['slug' => $slug])->id,
         ]);
     }
 
