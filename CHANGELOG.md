@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.69](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.68...v1.3.0-rc.69) (2026-08-26)
+
+
+### Bug Fixes
+
+* **agentes:** corrigir estrutura de i18n ficticia e ambiguidade de PR em planner/frontend/master ([#395](https://github.com/uniespacos/uniespacos/issues/395)) ([f5b8fce](https://github.com/uniespacos/uniespacos/commit/f5b8fce28729ce6f73fcef66008d23b4915ff418))
+
 ## [1.3.0-rc.68](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.67...v1.3.0-rc.68) (2026-08-26)
 
 
