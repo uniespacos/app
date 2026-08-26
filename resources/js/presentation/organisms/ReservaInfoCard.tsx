@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { formatDate } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 import { Reserva } from '@/types';
 import { CalendarDays, FileText, User } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -11,6 +11,8 @@ interface ReservaInfoCardProps {
 }
 
 export function ReservaInfoCard({ reserva, children }: ReservaInfoCardProps) {
+    const { formatDate } = useTranslation();
+
     return (
         <Card>
             <CardHeader>
