@@ -81,6 +81,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
                     <Input
                         id="edit-user-name"
                         value={data.name}
+                        maxLength={255}
                         onChange={(e) => {
                             setData('name', e.target.value);
                         }}
@@ -93,6 +94,7 @@ export function EditUserModal({ user, isOpen, onClose }: EditUserModalProps) {
                         id="edit-user-email"
                         type="email"
                         value={data.email}
+                        maxLength={255}
                         onChange={(e) => {
                             setData('email', e.target.value);
                         }}

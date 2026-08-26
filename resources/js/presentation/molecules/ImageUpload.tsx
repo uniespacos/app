@@ -24,6 +24,9 @@ interface ImageUploadProps {
     setData: ReturnType<typeof useForm<FormCadastroValues>>['setData'];
 }
 
+const MAX_IMAGENS = 5;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 export function ImageUpload({
     imagesWithPreviews,
     setImagesWithPreviews,
@@ -40,18 +43,24 @@ export function ImageUpload({
 
         const newImagePreviews: ImageWithPreview[] = [];
         const newImageFiles: File[] = [];
+        let vagasRestantes = MAX_IMAGENS - imagesWithPreviews.length;
 
         Array.from(files).forEach((file) => {
-            if (!file.type.startsWith('image/')) {
-                toast.warning(`Arquivo ${file.name} não é uma imagem.`);
+            if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+                toast.warning(`Arquivo ${file.name} não é um tipo de imagem aceito (use JPEG, PNG ou WEBP).`);
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
                 toast.warning(`Arquivo ${file.name} excede o limite de 5MB.`);
                 return;
             }
+            if (vagasRestantes <= 0) {
+                toast.warning(`Você pode enviar no máximo ${String(MAX_IMAGENS)} imagens.`);
+                return;
+            }
             newImagePreviews.push({ file, preview: URL.createObjectURL(file) });
             newImageFiles.push(file);
+            vagasRestantes -= 1;
         });
 
         setImagesWithPreviews((prev) => {
@@ -86,7 +95,14 @@ export function ImageUpload({
         <div className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="images">Imagens do Espaço</Label>
-                <Input id="images" type="file" accept="image/*" multiple onChange={handleImagesUpload} disabled={processing} />
+                <Input
+                    id="images"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onChange={handleImagesUpload}
+                    disabled={processing || imagesWithPreviews.length >= MAX_IMAGENS}
+                />
                 {errors.imagens && <p className="text-destructive mt-1 text-sm">{errors.imagens}</p>}
             </div>
 
@@ -101,7 +117,7 @@ export function ImageUpload({
                                         mainImageIndex === index ? 'ring-primary border-primary ring-2' : 'bg-muted/50'
                                     }`}
                                 >
-                                    <img src={img.preview || Image} alt={`Imagem ${index + 1}`} className="h-full w-full object-cover" />
+                                    <img src={img.preview || Image} alt={`Imagem ${String(index + 1)}`} className="h-full w-full object-cover" />
                                     {mainImageIndex === index && (
                                         <div className="bg-primary text-primary-foreground absolute top-0 left-0 rounded-br px-1.5 py-0.5 text-xs">
                                             Principal
