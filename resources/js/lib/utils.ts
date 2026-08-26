@@ -3,7 +3,7 @@ import { Turno, TurnoType } from '@/contracts/turnos.contract';
 import { assertNever } from '@/lib/utils/exhaustive';
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
-import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
+import { addDays, format, isSameDay, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -50,24 +50,6 @@ export function pegarUltimoHorario(horarios: Horario[]) {
 
     return horario_tmp;
 }
-
-export const formatDate = (dateString: string | Date) => {
-    if (!dateString) return 'Data inválida';
-    try {
-        const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
-        return format(date, 'dd/MM/yyyy', { locale: ptBR });
-    } catch (error) {
-        console.error('Erro ao formatar data:', dateString, error);
-        return 'Data inválida';
-    }
-};
-
-export const formatDateTime = (dateString: string | Date) => {
-    if (typeof dateString === 'string') {
-        return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR });
-    }
-    return format(dateString, "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR });
-};
 
 export const diasSemanaParser = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 

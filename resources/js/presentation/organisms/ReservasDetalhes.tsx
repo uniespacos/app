@@ -4,7 +4,7 @@ import { opcoesRecorrencia } from '@/constants/recorrencia';
 import { SituacaoReserva } from '@/contracts';
 import { useTranslation } from '@/i18n';
 import { Can } from '@/lib/auth-can';
-import { diasDaSemana, formatDate } from '@/lib/utils';
+import { diasDaSemana } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { mapearStatusBackendParaSlot } from '@/lib/utils/reserva-status.helpers';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
@@ -53,7 +53,7 @@ export default function ReservaDetalhes({
     setRemoverReserva,
     routeName,
 }: ReservaDetalhesProps) {
-    const { t } = useTranslation();
+    const { t, formatDate } = useTranslation();
     const { semana } = usePage<{ semana?: { referencia: string } }>().props;
 
     const [isLoading, setIsLoading] = useState(false);
