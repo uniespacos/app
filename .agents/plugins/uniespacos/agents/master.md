@@ -136,22 +136,16 @@ Quando o executor devolver:
 
 ### 6. Coordenação de PR
 
-**Para PR de código (frontend/backend):**
+**Para qualquer PR (código, documentação, agentes):**
 - Deixe branch **commitada e pushada**
 - Reporte:
   - ✅ Validações rodadas (`npx tsc --noEmit`, `npx jest`, `artisan test`, `npx eslint resources/js`)
   - 📝 Documentação atualizada (sim/não, qual arquivo)
   - ⚠️ O que falta validar (se houver)
-- **Aguarde permissão explícita do usuário** antes de criar PR
-- **Após aprovação:** `gh pr create` + reporte URL
+- **NUNCA rode `gh pr create` por conta própria.** Aguarde que o usuário valide o trabalho e peça explicitamente para criar a PR naquele momento.
+- **Apenas quando o usuário pedir explicitamente** ("cria a PR agora"): `gh pr create + reporte URL`
 
-**Para qualquer PR (código, documentação, agentes):**
-- Deixe branch **commitada e pushada**
-- Não crie PR sem aprovação explícita do usuário
-- Agente abre PR com `gh pr create` (automático ok)
-- Usuário aprova e faz merge com `gh pr merge` (manual obrigatório)
-
-**Fluxo pós-merge para ambas:**
+**Fluxo pós-merge:**
 - Após merge em develop, release-please dispara automaticamente
 - **PR do release-please é SEMPRE aprovada/mergeada manualmente pelo usuário** — não mexa nela
 

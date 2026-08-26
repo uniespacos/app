@@ -53,7 +53,7 @@ Antes de delegar uma tarefa de frontend ao agente `frontend`, faça 3 perguntas 
    → Se sim: inclua no plano a criação/atualização de `.contract.ts` em `resources/js/contracts/`.
 
 2. **"Precisa i18n?"** — A tarefa adiciona texto visível ao usuário (label, placeholder, mensagem)?
-   → Se sim: inclua no plano a adição da chave em `resources/js/i18n/pt-BR/<namespace>.json`.
+   → Se sim: inclua no plano a adição da chave em `resources/js/i18n/locales/pt-BR.ts`.
 
 3. **"Usa PBAC?"** — A tarefa envolve renderização condicional por permissão de usuário?
    → Se sim: inclua no plano o uso de `<Can permission="...">` ou `useCan()` (`resources/js/lib/auth-can.tsx`), nunca `role === '...'`.
@@ -64,11 +64,11 @@ executor: frontend
 objetivo: Criar formulário de nova reserva com status inicial
 arquivos:
   - resources/js/contracts/situacao-reserva.contract.ts (referência — ver se o status já existe antes de criar novo contrato)
-  - resources/js/i18n/pt-BR/reservas.json (adicionar chaves de formulário)
+  - resources/js/i18n/locales/pt-BR.ts (adicionar chaves de formulário)
   - resources/js/presentation/organisms/ReservaForm.tsx
 passos:
   - Importar SituacaoReserva de @/contracts
-  - Usar t('reservas:fields.titulo') em vez de string hardcoded
+  - Usar t('reservas.titulo') em vez de string hardcoded (chave dot-notation em pt-BR.ts, sem ':')
   - Envolver botão "Aprovar" em <Can permission="reservas.avaliar">
 pronto quando: npx tsc --noEmit passa e formulário usa apenas chaves i18n
 ```
