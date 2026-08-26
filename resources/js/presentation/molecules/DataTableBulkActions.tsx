@@ -82,7 +82,7 @@ export function DataTableBulkActions<T>({ selectedCount, actions, selectedItems,
                         variant="ghost"
                         size="icon"
                         onClick={onClearSelection}
-                        className="text-muted-foreground hover:text-foreground min-h-11 min-w-11"
+                        className="text-muted-foreground hover:text-foreground h-11 w-11 md:h-7 md:w-7"
                         aria-label="Limpar seleção"
                     >
                         <X className="h-3.5 w-3.5" />
