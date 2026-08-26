@@ -79,11 +79,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/ImageUpload.tsx": {
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/molecules/LocationSelector.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
