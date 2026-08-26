@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.68](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.67...v1.3.0-rc.68) (2026-08-26)
+
+
+### Bug Fixes
+
+* **ui:** padronizar layouts, espaçamentos, regras pbac e dashboard do gestor ([#392](https://github.com/uniespacos/uniespacos/issues/392)) ([8449c2b](https://github.com/uniespacos/uniespacos/commit/8449c2b0d8e6775e87fd4a076f3fc869ae4fce63))
+
 ## [1.3.0-rc.67](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.66...v1.3.0-rc.67) (2026-08-25)
 
 
