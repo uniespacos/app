@@ -1,7 +1,10 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { SelectContent, SelectItem, SelectTrigger, Select as SelectUI, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { nivelParaLabel, nomeParaNivel } from '@/lib/utils/andars/AndarHelpers';
+import { Plus } from 'lucide-react';
 import { Andar, Modulo, Unidade } from '@/types';
 
 interface LocationSelectorProps {
@@ -107,6 +110,16 @@ export function LocationSelector({
                                     ))}
                             </SelectContent>
                         </SelectUI>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button type="button" variant="outline" size="icon" disabled aria-disabled="true">
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Cadastro de andar temporariamente indisponível</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                     {errors.andar_id && <p className="text-destructive mt-1 text-sm">{errors.andar_id}</p>}
                 </div>
