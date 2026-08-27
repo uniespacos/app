@@ -4,7 +4,7 @@ import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
 import { SituacaoReserva } from '@/contracts';
 import { useTranslation } from '@/i18n';
 import { useCan } from '@/lib/auth-can';
-import { cn, formatDate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
@@ -20,7 +20,7 @@ interface ReservaCardMobileProps {
 }
 
 export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
-    const { t } = useTranslation();
+    const { t, formatDate } = useTranslation();
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;
     const andar = espaco?.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : undefined;

@@ -1,7 +1,9 @@
 import { ESTILO_SITUACAO } from '@/constants/situacao-reserva';
+import { Turno, TurnoType } from '@/contracts/turnos.contract';
+import { assertNever } from '@/lib/utils/exhaustive';
 import { Horario, SituacaoReserva } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
-import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns';
+import { addDays, format, isSameDay, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -49,24 +51,6 @@ export function pegarUltimoHorario(horarios: Horario[]) {
     return horario_tmp;
 }
 
-export const formatDate = (dateString: string | Date) => {
-    if (!dateString) return 'Data inválida';
-    try {
-        const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
-        return format(date, 'dd/MM/yyyy', { locale: ptBR });
-    } catch (error) {
-        console.error('Erro ao formatar data:', dateString, error);
-        return 'Data inválida';
-    }
-};
-
-export const formatDateTime = (dateString: string | Date) => {
-    if (typeof dateString === 'string') {
-        return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR });
-    }
-    return format(dateString, "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR });
-};
-
 export const diasSemanaParser = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
 /** Tom sólido da situação. A definição vive em ESTILO_SITUACAO. */
@@ -75,16 +59,18 @@ export const getStatusReservaColor = (situacao: SituacaoReserva) => ESTILO_SITUA
 /** Rótulo da situação. Idem — inclusive os acentos, que aqui faltavam. */
 export const getStatusReservaText = (situacao: SituacaoReserva) => ESTILO_SITUACAO[situacao].label ?? 'Desconhecido';
 
-export const getTurnoText = (turno: 'manha' | 'tarde' | 'noite' | undefined) => {
+export const getTurnoText = (turno: TurnoType | undefined) => {
     switch (turno) {
-        case 'manha':
+        case Turno.MANHA:
             return 'Manhã';
-        case 'tarde':
+        case Turno.TARDE:
             return 'Tarde';
-        case 'noite':
+        case Turno.NOITE:
             return 'Noite';
-        default:
+        case undefined:
             return 'Desconhecido';
+        default:
+            return assertNever(turno);
     }
 };
 export function useDebounce(value: string, delay: number) {

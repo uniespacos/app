@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDate } from '@/i18n/formatters';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
@@ -28,7 +29,7 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                         {espaco?.nome} - {espaco?.andar?.nome ? getAndarLabelByValue(espaco.andar.nome) : null},{' '}
                                         {espaco?.andar?.modulo?.nome}
                                     </p>
-                                    <p className="text-muted-foreground text-xs">{new Date(reserva.data_inicial).toLocaleDateString('pt-BR')}</p>
+                                    <p className="text-muted-foreground text-xs">{formatDate(reserva.data_inicial)}</p>
                                 </div>
                                 <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start">
                                     <SituacaoBadge situacao={reserva.situacao} />

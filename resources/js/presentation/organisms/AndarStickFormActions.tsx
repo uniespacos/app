@@ -31,7 +31,7 @@ export default function AndarStickFormActions({ onScrollToTop, andaresCount }: A
     if (!isVisible) return null;
 
     return (
-        <div className="fixed right-4 bottom-4 z-50">
+        <div className="fixed right-4 bottom-20 left-4 z-30 md:right-4 md:bottom-4 md:left-auto md:z-50">
             <Card className="border-2 shadow-lg">
                 <CardContent className="p-3">
                     <div className="flex items-center gap-2">

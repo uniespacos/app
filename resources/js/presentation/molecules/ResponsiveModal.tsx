@@ -73,7 +73,7 @@ export function ResponsiveModal({
                             {description && <DrawerDescription>{description}</DrawerDescription>}
                         </DrawerHeader>
                     )}
-                    <div className="pb-safe max-h-[75vh] overflow-x-hidden overflow-y-auto pt-1">{children}</div>
+                    <div className="max-h-[75vh] overflow-x-hidden overflow-y-auto pt-1 pb-[env(safe-area-inset-bottom)]">{children}</div>
                     {footer && <DrawerFooter className="px-0 pt-3">{footer}</DrawerFooter>}
                 </DrawerContent>
             </Drawer>

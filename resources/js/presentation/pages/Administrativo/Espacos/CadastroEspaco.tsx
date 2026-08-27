@@ -3,7 +3,6 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import GenericHeader from '@/presentation/molecules/GenericHeader';
 import { ImageUpload, ImageWithPreview } from '@/presentation/molecules/ImageUpload';
 import { LocationSelector } from '@/presentation/molecules/LocationSelector';
-import { AddAndarDialog } from '@/presentation/organisms/AddAndarDialog';
 import { EspacoFormFields } from '@/presentation/organisms/EspacoFormFields';
 import AppLayout from '@/presentation/templates/AppLayout';
 import { Andar, Espaco, Modulo, Unidade } from '@/types';
@@ -49,7 +48,6 @@ export default function CadastroEspacoPage() {
             path: imgPath,
         }));
     });
-    const [isAddAndarDialogOpen, setIsAddAndarDialogOpen] = useState(false);
 
     const { data, setData, post, patch, processing, errors, reset } = useForm<FormCadastroValues>({
         nome: espaco?.nome ?? '',
@@ -154,13 +152,6 @@ export default function CadastroEspacoPage() {
                                 </form>
                             </CardContent>
                         </Card>
-                        {data.modulo_id && (
-                            <AddAndarDialog
-                                open={isAddAndarDialogOpen}
-                                moduloSelecionado={data.modulo_id}
-                                setIsDialogOpen={setIsAddAndarDialogOpen}
-                            />
-                        )}
                     </>
                 </div>
             </div>

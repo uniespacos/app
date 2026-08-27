@@ -26,6 +26,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     id="name"
                     placeholder="Ex: Sala 101, Laboratório de Informática"
                     value={data.nome}
+                    maxLength={255}
                     onChange={(e) => {
                         setData((prevData: FormCadastroValues) => ({ ...prevData, nome: e.target.value }));
                     }}
@@ -40,6 +41,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     id="capacityPessoas"
                     type="number"
                     min={1}
+                    required
                     value={data.capacidade_pessoas || ''}
                     onChange={(e) => {
                         setData((prevData: FormCadastroValues) => ({ ...prevData, capacidade_pessoas: e.target.valueAsNumber }));

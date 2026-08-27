@@ -6,7 +6,6 @@ import { SituacaoReserva } from '@/contracts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from '@/i18n';
 import { Can } from '@/lib/auth-can';
-import { formatDate } from '@/lib/utils';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
@@ -31,7 +30,7 @@ interface ReservasListProps {
 }
 
 export function ReservasList({ paginator, fallback, isGestor, reservaToShow, routeName, viewMode: controlledViewMode }: ReservasListProps) {
-    const { t } = useTranslation();
+    const { t, formatDate } = useTranslation();
     const { data: reservas, links } = paginator;
     const isMobile = useIsMobile();
     const [internalViewMode] = useState<ViewMode>(isMobile ? 'grid' : 'table');
@@ -143,7 +142,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                 {(canEdit || canCancel) && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-11 w-11 md:h-8 md:w-8">
                                 <MoreHorizontal className="h-4 w-4" />
                                 <span className="sr-only">{t('reservas.tabela.acoes')}</span>
                             </Button>
