@@ -101,14 +101,14 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                     </Button>
                                 )}
                                 <Button
-                                    variant="destructive"
+                                    variant="outline"
                                     size="sm"
-                                    className="min-h-[44px] min-w-[100px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                    className="min-h-[44px] min-w-[100px] flex-1 text-xs font-medium text-destructive-accent transition-transform hover:text-destructive-accent active:scale-[0.98]"
                                     onClick={() => {
                                         onCancelar(reserva);
                                     }}
                                 >
-                                    <XCircle className="mr-1.5 h-4 w-4" />
+                                    <XCircle className="mr-1.5 h-4 w-4 text-destructive-accent" />
                                     {t('reservas.acoes.cancelar')}
                                 </Button>
                             </>
