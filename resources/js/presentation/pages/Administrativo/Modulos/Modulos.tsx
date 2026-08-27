@@ -318,14 +318,14 @@ export default function Modulos() {
                                 </Button>
                             </Link>
                             <Button
-                                variant="destructive"
+                                variant="outline"
                                 size="sm"
                                 onClick={() => {
                                     setRemoverModulo(modulo);
                                 }}
-                                className="gap-1 text-xs"
+                                className="gap-1 text-xs text-destructive-accent hover:text-destructive-accent"
                             >
-                                <Trash2 className="h-3 w-3" />
+                                <Trash2 className="h-3 w-3 text-destructive-accent" />
                                 {t('common.actions.delete')}
                             </Button>
                         </div>

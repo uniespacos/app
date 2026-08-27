@@ -137,15 +137,15 @@ export function ImageUpload({
                                     </Button>
                                     <Button
                                         type="button"
-                                        variant="destructive"
+                                        variant="outline"
                                         size="icon"
-                                        className="h-6 w-6 rounded-full opacity-90 shadow-md"
+                                        className="h-6 w-6 rounded-full opacity-90 shadow-md text-destructive-accent hover:text-destructive-accent"
                                         onClick={() => {
                                             handleRemoveImage(index);
                                         }}
                                         disabled={processing}
                                     >
-                                        <X className="h-3 w-3" />
+                                        <X className="h-3 w-3 text-destructive-accent" />
                                     </Button>
                                 </div>
                             </div>

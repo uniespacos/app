@@ -73,8 +73,9 @@ export default function InstituicoesPage() {
                                 </Button>
                             </Link>
                             <Button
-                                variant="destructive"
+                                variant="outline"
                                 size="icon"
+                                className="text-destructive-accent hover:text-destructive-accent"
                                 onClick={() => {
                                     setRemoverInstituicao(instituicao);
                                 }}
