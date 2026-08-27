@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.71](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.70...v1.3.0-rc.71) (2026-08-27)
+
+
+### Bug Fixes
+
+* consolida melhorias pendentes das fases 00-05 (frontend) ([#401](https://github.com/uniespacos/uniespacos/issues/401)) ([d3749a7](https://github.com/uniespacos/uniespacos/commit/d3749a750c70ce62ff24422dd93ea4bf7af043a8))
+
 ## [1.3.0-rc.70](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.69...v1.3.0-rc.70) (2026-08-27)
 
 
