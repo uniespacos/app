@@ -23,24 +23,24 @@ trabalho, está no `.gitignore`). Consolidado de 5 rodadas: **43 decisões fecha
 |---|---|
 | `README.md` (documento base norteador) | ✅ |
 | `_PROGRESSO-GERACAO.md` (este arquivo) | ✅ |
-| `00-visao-geral/01-escopo-e-objetivos.md` | ⬜ |
-| `00-visao-geral/02-atores-e-papeis.md` | ⬜ |
-| `00-visao-geral/03-decisoes-consolidadas.md` | ⬜ |
-| `00-visao-geral/04-regras-invioaveis.md` | ⬜ |
-| `00-visao-geral/05-glossario.md` | ⬜ |
-| `01-casos-de-uso/README.md` | ⬜ |
-| `01-casos-de-uso/01-casos-existentes.md` | ⬜ |
-| `01-casos-de-uso/02-casos-novos.md` | ⬜ |
-| `02-fluxos-e-diagramas/01-fluxos-por-ator.md` | ⬜ |
-| `02-fluxos-e-diagramas/02-fluxos-de-tela.md` | ⬜ |
-| `02-fluxos-e-diagramas/03-diagramas-de-sequencia.md` | ⬜ |
-| `02-fluxos-e-diagramas/04-modelo-de-dados.md` | ⬜ |
-| `03-arquitetura/01-backend.md` | ⬜ |
-| `03-arquitetura/02-frontend.md` | ⬜ |
-| `03-arquitetura/03-matriz-de-permissions.md` | ⬜ |
-| `03-arquitetura/04-migrations.md` | ⬜ |
-| `04-roadmap/README.md` | ⬜ |
-| `04-roadmap/matriz-rastreabilidade.md` | ⬜ |
+| `00-visao-geral/01-escopo-e-objetivos.md` | ✅ |
+| `00-visao-geral/02-atores-e-papeis.md` | ✅ |
+| `00-visao-geral/03-decisoes-consolidadas.md` | ✅ |
+| `00-visao-geral/04-regras-invioaveis.md` | ✅ |
+| `00-visao-geral/05-glossario.md` | ✅ |
+| `01-casos-de-uso/README.md` | ✅ |
+| `01-casos-de-uso/01-casos-existentes.md` | ✅ |
+| `01-casos-de-uso/02-casos-novos.md` | ✅ |
+| `02-fluxos-e-diagramas/01-fluxos-por-ator.md` | ✅ |
+| `02-fluxos-e-diagramas/02-fluxos-de-tela.md` | ✅ |
+| `02-fluxos-e-diagramas/03-diagramas-de-sequencia.md` | ✅ |
+| `02-fluxos-e-diagramas/04-modelo-de-dados.md` | ✅ |
+| `03-arquitetura/01-backend.md` | ✅ |
+| `03-arquitetura/02-frontend.md` | ✅ |
+| `03-arquitetura/03-matriz-de-permissions.md` | ✅ |
+| `03-arquitetura/04-migrations.md` | ✅ |
+| `04-roadmap/README.md` | ✅ |
+| `04-roadmap/matriz-rastreabilidade.md` | ⬜ (gerar após os BACKLOGs dos sprints, para referenciar IDs de task reais) |
 | `observacoes/README.md` | ⬜ |
 | `observacoes/PROBLEMAS-IDENTIFICADOS.md` | ⬜ |
 | `observacoes/DESVIOS-E-DECISOES.md` | ⬜ |
