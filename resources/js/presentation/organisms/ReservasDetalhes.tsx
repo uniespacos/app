@@ -217,14 +217,14 @@ export default function ReservaDetalhes({
                             {selectedReserva.situacao !== SituacaoReserva.INATIVA && (
                                 <Button
                                     type="button"
-                                    variant="destructive"
+                                    variant="outline"
                                     size="default"
-                                    className="min-h-[44px] flex-1 gap-1.5 text-xs font-semibold sm:flex-initial"
+                                    className="min-h-[44px] flex-1 gap-1.5 text-xs font-semibold text-destructive-accent hover:text-destructive-accent sm:flex-initial"
                                     onClick={() => {
                                         setRemoverReserva(selectedReserva);
                                     }}
                                 >
-                                    <XCircle className="h-4 w-4" />
+                                    <XCircle className="h-4 w-4 text-destructive-accent" />
                                     {t('reservas.acoes.cancelar')}
                                 </Button>
                             )}
