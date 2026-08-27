@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.70](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.69...v1.3.0-rc.70) (2026-08-27)
+
+
+### Bug Fixes
+
+* rebalancear hierarquia visual de ações destrutivas (Fases 1+2) ([#399](https://github.com/uniespacos/uniespacos/issues/399)) ([cf7b7b7](https://github.com/uniespacos/uniespacos/commit/cf7b7b769fd94eb091fd9622cb4041289e249153))
+
 ## [1.3.0-rc.69](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.68...v1.3.0-rc.69) (2026-08-26)
 
 
