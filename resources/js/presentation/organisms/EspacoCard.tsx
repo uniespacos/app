@@ -215,8 +215,8 @@ export default function EspacoCard({
                         <Edit className="mr-1.5 h-3.5 w-3.5" />
                         {t('common.actions.edit')}
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
-                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                    <Button variant="outline" size="sm" className="text-destructive-accent hover:text-destructive-accent" onClick={() => handleExcluirEspaco?.(String(espaco.id))}>
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5 text-destructive-accent" />
                         {t('common.actions.delete')}
                     </Button>
                 </CardFooter>

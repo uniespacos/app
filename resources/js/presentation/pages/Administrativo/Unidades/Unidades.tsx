@@ -74,14 +74,15 @@ export default function UnidadesPage() {
                                 </Button>
                             </Link>
                             <Button
-                                variant="destructive"
+                                variant="outline"
                                 size="icon"
+                                className="text-destructive-accent hover:text-destructive-accent"
                                 onClick={() => {
                                     setRemoverUnidade(unidade);
                                 }}
                                 aria-label={t('common.actions.delete')}
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 text-destructive-accent" />
                             </Button>
                         </div>
                     )}

@@ -129,14 +129,15 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                         <Edit className="h-4 w-4" />
                     </Button>
                     <Button
-                        variant="destructive"
+                        variant="outline"
                         size="sm"
+                        className="text-destructive-accent hover:text-destructive-accent"
                         onClick={() => {
                             setRemoverSetor(setor);
                         }}
                         aria-label="Excluir setor"
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-destructive-accent" />
                     </Button>
                 </div>
             </CardContent>
@@ -174,14 +175,15 @@ export function TabelaSetores({ setores, usuarios, pagination, onEdit, onViewUsu
                             <Edit className="h-4 w-4" />
                         </Button>
                         <Button
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
+                            className="text-destructive-accent hover:text-destructive-accent"
                             onClick={() => {
                                 setRemoverSetor(setor);
                             }}
                             aria-label="Excluir setor"
                         >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-destructive-accent" />
                         </Button>
                     </div>
                 )}
