@@ -82,6 +82,21 @@ A estilização utiliza o **Tailwind v4 (CSS-First)** com a diretiva `@theme` e 
   - `border-border`, `ring-ring`, `bg-success`
   - Sufixos de intensidade por status (`success`, `warning`, `destructive`, `info`, `neutral`): `-subtle` (fundo neutro/baixo contraste, ex.: `bg-success-subtle`) e `-accent` (destaque de maior contraste, ex.: `text-success-accent`, `bg-warning-accent`) — definidos em `resources/css/app.css`.
 
+### Hierarquia de Botões de Ação: Destrutivo vs. Principal
+
+- **A Regra:** Nunca usar `variant="destructive"` preenchido para o botão de **GATILHO** de uma ação irreversível (ex.: "Cancelar reserva", "Excluir espaço") quando ele competir visualmente com uma ação principal mais frequente na mesma tela (ex.: "Ver detalhes", "Editar", "Solicitar reserva"). Usar `variant="outline"` + `text-destructive-accent` no ícone e no texto do botão (não `text-destructive` puro — ver nota de acessibilidade abaixo).
+
+- **A Exceção:** `variant="destructive"` preenchido continua correto e obrigatório no botão de **CONFIRMAÇÃO FINAL** de diálogos dedicados de exclusão/cancelamento (padrão `DeleteItem.tsx`/`ConfirmDeleteDialog`), onde a decisão destrutiva é o único propósito da tela — não há ação principal concorrente.
+
+- **Exemplos Reais no Projeto (já implementados):**
+  - **Fase 1:** `ReservaCardMobile.tsx`, `ReservasDetalhes.tsx` — botão "Cancelar" usa `variant="outline"` + `text-destructive-accent`.
+  - **Fase 2:** `EspacoCard.tsx`, `TabelaSetores.tsx`, `Unidades.tsx`, `Instituicoes.tsx`, `Modulos.tsx`, `ImageUpload.tsx` — padrão exato: `variant="outline"` + classes `text-destructive-accent hover:text-destructive-accent` no `Button`, e `text-destructive-accent` também no ícone (ex.: `Trash2`, `XCircle`, `X`).
+
+- **Nota de Acessibilidade e Racional Técnico:**
+  - **WCAG 1.4.1 (Use of Color):** Ícone + texto explícito sempre, nunca só cor. Ambas as indicações visuais devem ser claras.
+  - **Contraste WCAG 1.4.3:** `text-destructive` sobre o fundo da variante `outline` FALHA no tema escuro (Frappé: 3.52:1 < 4.5:1 exigido). `text-destructive-accent` é o token semântico de maior contraste que passa em ambos os temas: Latte 8.57:1, Frappé 6.15:1 — ambos ≥ 4.5:1.
+  - **Racional de Design:** Baseado em Material Design 3 (uma ação de alta ênfase/preenchida por tela), Apple HIG (cor semântica reservada ao seu papel), Nielsen Norman Group (confirmação protege a ação, não o gatilho) e Fitts's Law (tamanho de alvo de toque `min-h-[44px]` preservado independente da cor). Referência completa: `docs/auditoria-ux-hierarquia-visual/03-benchmark-padroes-externos.md`, seção 7.
+
 ## Datas e Horários: Padrão `date-fns ^4.4.0`
 
 Com o `date-fns` v4, as importações de formatação e localidade em português seguem o padrão estrito:
