@@ -40,24 +40,24 @@ trabalho, está no `.gitignore`). Consolidado de 5 rodadas: **43 decisões fecha
 | `03-arquitetura/03-matriz-de-permissions.md` | ✅ |
 | `03-arquitetura/04-migrations.md` | ✅ |
 | `04-roadmap/README.md` | ✅ |
-| `04-roadmap/matriz-rastreabilidade.md` | ⬜ (gerar após os BACKLOGs dos sprints, para referenciar IDs de task reais) |
-| `observacoes/README.md` | ⬜ |
-| `observacoes/PROBLEMAS-IDENTIFICADOS.md` | ⬜ |
-| `observacoes/DESVIOS-E-DECISOES.md` | ⬜ |
-| `observacoes/REVISAO-PERIODICA.md` | ⬜ |
+| `04-roadmap/matriz-rastreabilidade.md` | ⬜ (em geração — último arquivo do manifesto) |
+| `observacoes/README.md` | ✅ |
+| `observacoes/PROBLEMAS-IDENTIFICADOS.md` | ✅ |
+| `observacoes/DESVIOS-E-DECISOES.md` | ✅ |
+| `observacoes/REVISAO-PERIODICA.md` | ✅ |
 
 ### Sprints (cada um: `README.md` + `backend/BACKLOG.md` + `frontend/BACKLOG.md` + `integracao/BACKLOG.md`)
 
 | Sprint | Entrega | Status |
 |---|---|---|
-| `sprint-00-preparacao` | Dívida técnica: bug R-12, permissions órfãs de Andar | ⬜ |
-| `sprint-01-gestor-unidade` | ⚠️ **bloco atômico R-18** — role, pivot, policies escopadas, CRUD, atribuição | ⬜ |
-| `sprint-02-gestor-espaco` | Pivots módulo/espaço, precedência, atribuição, painel de órfãos | ⬜ |
-| `sprint-03-dashboard-composto` | `HomeController`/`HomeService` de cascata → aditivo | ⬜ |
-| `sprint-04-setor-expediente` | Responsável, expediente, exceções, auditoria | ⬜ |
-| `sprint-05-aprovacao-urgencia` | `tipo_vinculo`, Fluxos A e B, busca por e-mail | ⬜ |
-| `sprint-06-qrcode-chamados` | Reconciliação com PR #397, tutorial | ⬜ |
-| `sprint-07-consolidacao-retroativa` | Rename `/institucional/` → `/administrativo/` | ⬜ |
+| `sprint-00-preparacao` | Dívida técnica: bug R-12, permissions órfãs de Andar | ✅ |
+| `sprint-01-gestor-unidade` | ⚠️ **bloco atômico R-18** — role, pivot, policies escopadas, CRUD, atribuição | ✅ |
+| `sprint-02-gestor-espaco` | Pivots módulo/espaço, precedência, atribuição, painel de órfãos | ✅ |
+| `sprint-03-dashboard-composto` | `HomeController`/`HomeService` de cascata → aditivo | ✅ |
+| `sprint-04-setor-expediente` | Responsável, expediente, exceções, auditoria | ✅ |
+| `sprint-05-aprovacao-urgencia` | `tipo_vinculo`, Fluxos A e B, busca por e-mail | ✅ |
+| `sprint-06-qrcode-chamados` | Reconciliação com PR #397, tutorial | ✅ |
+| `sprint-07-consolidacao-retroativa` | Rename `/institucional/` → `/administrativo/` | ✅ |
 
 ## Plano de Tasks (esboço já definido, a detalhar nos BACKLOGs)
 
