@@ -72,6 +72,8 @@ class PermissionSeeder extends Seeder
         'relatorios.ocupacao-espacos',
         'relatorios.inventario-espacos',
         'relatorios.indicadores-consolidados',
+        'relatorios.escopo-instituicao',
+        'relatorios.escopo-agendas',
         // Seções (UI access control)
         'secao.dashboard-institucional',
         'secao.dashboard-gestor',

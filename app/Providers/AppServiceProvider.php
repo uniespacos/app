@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Policies\EspacoPolicy;
 use App\Policies\InstituicaoPolicy;
 use App\Policies\ModuloPolicy;
+use App\Policies\RelatorioPolicy;
 use App\Policies\ReservaPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SetorPolicy;
@@ -90,6 +91,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Espaco::class, EspacoPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+
+        Gate::define('aplicarEscopoParaUsuario', function (User $user): array {
+            return app(RelatorioPolicy::class)->aplicarEscopoParaUsuario($user);
+        });
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
