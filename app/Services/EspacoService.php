@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\Relatorio\TipoRelatorioEnum;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\User;
@@ -14,6 +15,7 @@ use App\Repositories\EspacoRepositoryInterface;
 use App\Repositories\ModuloRepositoryInterface;
 use App\Repositories\UnidadeRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use App\Services\Relatorio\RelatorioService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,13 +26,18 @@ use Illuminate\Support\Facades\Storage;
 
 class EspacoService
 {
+    protected RelatorioService $relatorioService;
+
     public function __construct(
         protected EspacoRepositoryInterface $repoEspaco,
         protected AndarRepositoryInterface $repoAndar,
         protected ModuloRepositoryInterface $repoModulo,
         protected UnidadeRepositoryInterface $repoUnidade,
         protected UserRepositoryInterface $repoUser,
-    ) {}
+        ?RelatorioService $relatorioService = null,
+    ) {
+        $this->relatorioService = $relatorioService ?? app(RelatorioService::class);
+    }
 
     /**
      * Returns a paginated list of spaces for the public listing with optional filters.
@@ -195,7 +202,7 @@ class EspacoService
      */
     public function store(array $data, array $files = []): Espaco
     {
-        return DB::transaction(function () use ($data, $files) {
+        $espaco = DB::transaction(function () use ($data, $files) {
             $storedPaths = [];
             $mainImagePath = null;
 
@@ -229,6 +236,10 @@ class EspacoService
 
             return $espaco;
         });
+
+        $this->relatorioService->invalidarCacheDoTipo(TipoRelatorioEnum::INVENTARIO_ESPACOS);
+
+        return $espaco;
     }
 
     /**
@@ -241,7 +252,7 @@ class EspacoService
      */
     public function update(Espaco $espaco, array $data, array $newFiles = [], array $pathsToDelete = []): Espaco
     {
-        return DB::transaction(function () use ($espaco, $data, $newFiles, $pathsToDelete) {
+        $updatedEspaco = DB::transaction(function () use ($espaco, $data, $newFiles, $pathsToDelete) {
             $currentPaths = $espaco->imagens ?? [];
 
             if (! empty($pathsToDelete)) {
@@ -293,6 +304,10 @@ class EspacoService
 
             return $espaco;
         });
+
+        $this->relatorioService->invalidarCacheDoTipo(TipoRelatorioEnum::INVENTARIO_ESPACOS);
+
+        return $updatedEspaco;
     }
 
     /**
@@ -356,6 +371,8 @@ class EspacoService
                 }
             }
         });
+
+        $this->relatorioService->invalidarCacheDoTipo(TipoRelatorioEnum::INVENTARIO_ESPACOS);
     }
 
     /**
@@ -363,7 +380,13 @@ class EspacoService
      */
     public function delete(Espaco $espaco): bool
     {
-        return $this->repoEspaco->destroy($espaco->id);
+        $destroyed = $this->repoEspaco->destroy($espaco->id);
+
+        if ($destroyed) {
+            $this->relatorioService->invalidarCacheDoTipo(TipoRelatorioEnum::INVENTARIO_ESPACOS);
+        }
+
+        return $destroyed;
     }
 
     /**
