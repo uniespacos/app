@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Jobs\AvaliarReservaJob;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
 use App\Services\ConflictDetectionService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
 class AvaliarReservaJobTest extends TestCase
@@ -292,5 +294,115 @@ class AvaliarReservaJobTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Authorization failed: one or more horarios do not belong to managed agendas.');
         $job->handle(new ConflictDetectionService);
+    }
+
+    public function test_avaliar_reserva_triggers_conflict_revalidation_for_em_analise_reservas(): void
+    {
+        // Arrange: Preparar duas reservas que compartilham slot
+        Bus::fake();
+
+        $gestor = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $gestor->id]);
+
+        // Reserva A (será aprovada)
+        $reservaA = Reserva::factory()->create(['situacao' => 'em_analise']);
+        $horarioA = Horario::factory()->create([
+            'reserva_id' => $reservaA->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'em_analise',
+            'data' => now()->addDay()->toDateString(),
+            'horario_inicio' => '10:00:00',
+            'horario_fim' => '11:00:00',
+        ]);
+
+        // Reserva B (está em análise, compartilha slot com A)
+        $reservaB = Reserva::factory()->create([
+            'situacao' => 'em_analise',
+            'validation_status' => 'completed',
+        ]);
+        $horarioB = Horario::factory()->create([
+            'reserva_id' => $reservaB->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'em_analise',
+            'data' => $horarioA->data,
+            'horario_inicio' => $horarioA->horario_inicio,
+            'horario_fim' => $horarioA->horario_fim,
+        ]);
+
+        // Act: Avaliar e aprovar horário de A
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [
+                ['id' => $horarioA->id, 'status' => 'deferida'],
+            ],
+            'observacao' => null,
+        ];
+
+        $job = new AvaliarReservaJob($reservaA, $validatedData, $gestor);
+        $job->handle(new ConflictDetectionService);
+
+        // Assert: ValidateReservationConflictsJob deve ter sido despachado para B
+        Bus::assertDispatched(ValidateReservationConflictsJob::class, function ($job) use ($reservaB) {
+            return $job->reserva->id === $reservaB->id;
+        });
+    }
+
+    public function test_avaliar_reserva_triggers_conflict_revalidation_for_parcialmente_deferida_reservas(): void
+    {
+        // Arrange: Reserva B está parcialmente deferida (alguns horários aprovados, outros pendentes)
+        Bus::fake();
+
+        $gestor = User::factory()->create();
+        $agenda = Agenda::factory()->create(['user_id' => $gestor->id]);
+
+        // Reserva A (será aprovada)
+        $reservaA = Reserva::factory()->create(['situacao' => 'em_analise']);
+        $horarioA = Horario::factory()->create([
+            'reserva_id' => $reservaA->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'em_analise',
+            'data' => now()->addDay()->toDateString(),
+            'horario_inicio' => '10:00:00',
+            'horario_fim' => '11:00:00',
+        ]);
+
+        // Reserva B (parcialmente deferida: um horário aprovado, outro em análise no mesmo slot de A)
+        $reservaB = Reserva::factory()->create([
+            'situacao' => 'parcialmente_deferida',
+            'validation_status' => 'completed',
+        ]);
+        Horario::factory()->create([
+            'reserva_id' => $reservaB->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'deferida',
+            'data' => now()->addDay()->toDateString(),
+            'horario_inicio' => '08:00:00',
+            'horario_fim' => '09:00:00',
+        ]);
+        Horario::factory()->create([
+            'reserva_id' => $reservaB->id,
+            'agenda_id' => $agenda->id,
+            'situacao' => 'em_analise',
+            'data' => $horarioA->data,
+            'horario_inicio' => $horarioA->horario_inicio,
+            'horario_fim' => $horarioA->horario_fim,
+        ]);
+
+        // Act
+        $validatedData = [
+            'evaluation_scope' => 'single',
+            'motivo' => null,
+            'horarios_avaliados' => [['id' => $horarioA->id, 'status' => 'deferida']],
+            'observacao' => null,
+        ];
+
+        $job = new AvaliarReservaJob($reservaA, $validatedData, $gestor);
+        $job->handle(new ConflictDetectionService);
+
+        // Assert: ValidateReservationConflictsJob deve ter sido despachado para B (que está parcialmente_deferida)
+        Bus::assertDispatched(ValidateReservationConflictsJob::class, function ($job) use ($reservaB) {
+            return $job->reserva->id === $reservaB->id;
+        });
     }
 }

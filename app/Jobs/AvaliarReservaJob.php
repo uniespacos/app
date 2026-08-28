@@ -240,7 +240,10 @@ class AvaliarReservaJob implements ShouldQueue
         $reservasParaRevalidar = Reserva::query()
             ->where('id', '!=', $this->reserva->id)
             ->where('validation_status', 'completed')
-            ->where('situacao', SituacaoReservaEnum::EM_ANALISE->value)
+            ->whereIn('situacao', [
+                SituacaoReservaEnum::EM_ANALISE->value,
+                SituacaoReservaEnum::PARCIALMENTE_DEFERIDA->value,
+            ])
             ->whereHas('horarios', function ($query) use ($slotsOcupados) {
                 $query->where(function ($q) use ($slotsOcupados) {
                     foreach ($slotsOcupados as $slot) {
