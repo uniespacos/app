@@ -67,16 +67,15 @@ final class RelatorioService
      * Invalida cache de relatórios quando dados mudam.
      *
      * Estratégia de versionamento monótono: incrementa versão por tipo ou tipo+usuarioId.
-     * Chaves antigas se tornam órfãs e expiram por TTL.
+     * Versões são persistentes (nunca expiram), garantindo que cache-busting sempre funcione
+     * independentemente do TTL dos dados agregados.
      */
     public function invalidarCacheDoTipo(TipoRelatorioEnum $tipo, ?int $usuarioId = null): void
     {
-        $ttl = (int) config('relatorios.cache_ttl', 1800);
-
         if ($usuarioId !== null) {
             $versionKey = "relatorio_version:{$tipo->value}:{$usuarioId}";
             $novaVersao = ((int) (Cache::get($versionKey) ?? 1)) + 1;
-            Cache::put($versionKey, $novaVersao, $ttl);
+            Cache::forever($versionKey, $novaVersao);
 
             Log::info('Cache de relatório invalidado (usuário específico)', [
                 'tipo' => $tipo->value,
@@ -86,7 +85,7 @@ final class RelatorioService
         } else {
             $versionKey = "relatorio_version:{$tipo->value}";
             $novaVersao = ((int) (Cache::get($versionKey) ?? 1)) + 1;
-            Cache::put($versionKey, $novaVersao, $ttl);
+            Cache::forever($versionKey, $novaVersao);
 
             Log::info('Cache de relatório invalidado (global)', [
                 'tipo' => $tipo->value,
