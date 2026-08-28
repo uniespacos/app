@@ -17,6 +17,7 @@ return [
     'limites' => [
         'max_linhas_csv_xlsx' => 10_000,
     ],
+    'cache_ttl' => (int) env('RELATORIOS_CACHE_TTL', 1800),
     'pdf' => [
         'orientacao_padrao' => 'portrait',
         'tamanho' => 'A4',

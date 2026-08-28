@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\ReservaEvent;
+use App\Listeners\InvalidarCacheRelatoriosAoAtualizarReserva;
 use App\Models\Espaco;
 use App\Models\Instituicao;
 use App\Models\Modulo;
@@ -46,6 +48,7 @@ use App\Repositories\UnidadeRepositoryInterface;
 use App\Repositories\UserRepositoryEloquent;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -95,6 +98,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('aplicarEscopoParaUsuario', function (User $user): array {
             return app(RelatorioPolicy::class)->aplicarEscopoParaUsuario($user);
         });
+
+        Event::listen(ReservaEvent::class, InvalidarCacheRelatoriosAoAtualizarReserva::class);
 
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
