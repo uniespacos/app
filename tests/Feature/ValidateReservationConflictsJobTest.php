@@ -12,8 +12,10 @@ use App\Models\Horario;
 use App\Models\Reserva;
 use App\Models\User;
 use App\Services\ConflictDetectionService;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -61,29 +63,26 @@ class ValidateReservationConflictsJobTest extends TestCase
 
     public function test_validate_reservation_conflicts_job_implements_should_be_unique(): void
     {
-        // Arrange
-        Bus::fake();
         $user = User::factory()->create();
         $reserva = Reserva::factory()->create([
             'user_id' => $user->id,
             'validation_status' => 'completed',
         ]);
 
-        // Act: Dispatch o mesmo job 2 vezes para a mesma reserva
-        ValidateReservationConflictsJob::dispatch($reserva);
-        ValidateReservationConflictsJob::dispatch($reserva);
-
-        // Assert: Bus::fake() registra os dispatches
-        Bus::assertDispatched(ValidateReservationConflictsJob::class);
-
-        // Validação adicional: uniqueId() e uniqueFor() funcionam
         $job = new ValidateReservationConflictsJob($reserva);
         $this->assertInstanceOf(ShouldBeUnique::class, $job);
         $this->assertEquals("validate-conflicts-{$reserva->id}", $job->uniqueId());
         $this->assertEquals(3600, $job->uniqueFor());
+
+        $lock = new UniqueLock(Cache::driver());
+
+        $this->assertTrue($lock->acquire($job), 'Primeiro dispatch deve adquirir o lock');
+        $this->assertFalse($lock->acquire($job), 'Segundo dispatch deve ser bloqueado pela deduplicação');
+
+        $lock->release($job);
     }
 
-    public function test_validate_reservation_conflicts_job_handles_concurrent_execution_with_should_be_unique(): void
+    public function test_avaliacao_dispara_revalidacao_para_reserva_concorrente(): void
     {
         // Arrange: Simular aprovação que dispara revalidação
         Bus::fake();
