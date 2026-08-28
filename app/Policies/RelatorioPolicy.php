@@ -9,21 +9,6 @@ use App\Models\User;
 class RelatorioPolicy
 {
     /**
-     * Determina se o usuário pode acessar relatórios (verificação genérica de permissão).
-     * A validação de tipo específico ocorre em RelatorioService::agregar().
-     */
-    public function viewAny(User $user): bool
-    {
-        return $user->hasAnyPermission([
-            'relatorios.reservas-periodo',
-            'relatorios.ocupacao-espacos',
-            'relatorios.inventario-espacos',
-            'relatorios.indicadores-consolidados',
-            'secao.relatorios',
-        ]);
-    }
-
-    /**
      * Retorna os filtros de escopo aplicáveis ao usuário baseado em suas permissões.
      *
      * @return array{

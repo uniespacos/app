@@ -11,34 +11,11 @@ use App\Models\Role;
 use App\Models\Setor;
 use App\Models\Unidade;
 use App\Models\User;
-use App\Policies\RelatorioPolicy;
 use Illuminate\Support\Facades\Gate;
 use Tests\TestCase;
 
 final class RelatorioPolicyTest extends TestCase
 {
-    public function test_view_any_permite_institucional_e_gestor_mas_nega_comum(): void
-    {
-        $instituicao = Instituicao::factory()->create();
-        $unidade = Unidade::factory()->create(['instituicao_id' => $instituicao->id]);
-        $setor = Setor::factory()->create(['unidade_id' => $unidade->id]);
-
-        $institucional = User::factory()->create(['setor_id' => $setor->id]);
-        $institucional->assignRole('institucional');
-
-        $gestor = User::factory()->create(['setor_id' => $setor->id]);
-        $gestor->assignRole('gestor');
-
-        $comum = User::factory()->create(['setor_id' => $setor->id]);
-        $comum->assignRole('comum');
-
-        $policy = app(RelatorioPolicy::class);
-
-        $this->assertTrue($policy->viewAny($institucional));
-        $this->assertTrue($policy->viewAny($gestor));
-        $this->assertFalse($policy->viewAny($comum));
-    }
-
     public function test_gate_retorna_escopo_institucional_para_usuario_institucional(): void
     {
         $instituicao = Instituicao::factory()->create();
