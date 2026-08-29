@@ -85,3 +85,19 @@ usar sempre o modelo mais leve).
   commit que introduziu o código. Para broadcast, `docker logs uniespacos-reverb-1 | grep
 "Broadcasting To"` mostra se o evento chegou ao Reverb, separando problema de backend de
   problema de frontend.
+- **Ambiente local muito lento (requisições 1-8s, "Queued" minutos no Network tab).** Causas conjugadas:
+  (1) Xdebug em modo pesado (`coverage`+`profile`) em toda requisição real — diagnóstico:
+  `docker exec uniespacos-app-1 php -i | grep xdebug.mode` (esperado: `develop,debug` apenas);
+  fix permanente: rebuild da imagem (já corrigido em `docker/development/php-fpm/Dockerfile`, ARG
+  `XDEBUG_MODE` e `clear_env=no` adicionado). (2) Pool PHP-FPM subdimensionado (`pm.max_children=5`
+  em máquina de 12 núcleos) — diagnóstico: `docker exec uniespacos-app-1 grep -nE "^pm"
+/usr/local/etc/php-fpm.d/www.conf`; fix permanente: rebuild (já corrigido, `pm.max_children`
+  5→20, `pm.start_servers` 2→4, `pm.min_spare_servers` 1→2, `pm.max_spare_servers` 3→8).
+  (3) Telescope vazado em `reverb-1` e `queue-worker-1` mesmo com `TELESCOPE_ENABLED=false` — eles
+  carregam config ao boot e mantêm em memória; diagnóstico: `docker exec uniespacos-workspace-1
+tail -f storage/logs/laravel.log | grep telescope_entries`; fix ao vivo: `docker restart
+  uniespacos-queue-worker-1 uniespacos-reverb-1`. (4) Cold-start pesado (`entrypoint.sh` faz
+  `chown -R /var/www` e `*:clear` em cada boot, bind mount Windows↔WSL2 é lento) — esperado após
+  restart: 8s → 6s → 3s → 0.25s conforme OPcache aquece; não é regressão. (5) **Regra prática no
+  frontend:** `prefetch={['mount', 'hover']}` em `<Link>` dentro de `.map()` dispara visita
+  completa de página em background pra cada item da lista; use `prefetch="hover"` nesses casos.

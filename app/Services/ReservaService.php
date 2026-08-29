@@ -11,6 +11,7 @@ use App\Events\ReservaEvent;
 use App\Jobs\AvaliarReservaJob;
 use App\Jobs\ProcessarCriacaoReserva;
 use App\Jobs\UpdateReservaJob;
+use App\Jobs\ValidateReservationConflictsJob;
 use App\Models\Espaco;
 use App\Models\Reserva;
 use App\Models\User;
@@ -19,6 +20,7 @@ use App\Repositories\AgendaRepositoryInterface;
 use App\Repositories\ReservaRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -209,6 +211,8 @@ class ReservaService
 
         $agendaIds = $reserva->horarios->pluck('agenda_id')->unique()->values()->all();
 
+        $horariosParaLibertar = $reserva->horarios()->get(['id', 'data', 'agenda_id']);
+
         DB::transaction(function () use ($reserva) {
             $reserva->horarios()->update(['situacao' => 'inativa']);
             $reserva->update(['situacao' => 'inativa']);
@@ -231,9 +235,50 @@ class ReservaService
             }
         }
 
+        $this->revalidateConflictedReservations($horariosParaLibertar);
+
         $espacoId = $reserva->horarios()->with('agenda.espaco')->first()?->agenda->espaco_id ?? 0;
         $horariosCount = $reserva->horarios()->count();
         ReservaEvent::dispatch('canceled', $reserva->id, $espacoId, $horariosCount);
+    }
+
+    /**
+     * Dispara revalidação para reservas que possuem horários nos slots liberados.
+     *
+     * @param  Collection<int, mixed>  $horariosLiberados
+     */
+    private function revalidateConflictedReservations(Collection $horariosLiberados): void
+    {
+        $slotsLiberados = $horariosLiberados
+            ->map(fn ($h) => ['data' => $h->data, 'agenda_id' => $h->agenda_id])
+            ->unique(fn ($item) => $item['data'].$item['agenda_id']);
+
+        if ($slotsLiberados->isEmpty()) {
+            return;
+        }
+
+        $reservasParaRevalidar = Reserva::query()
+            ->where('validation_status', 'completed')
+            ->where('situacao', SituacaoReservaEnum::INDEFERIDA->value)
+            ->whereHas('horarios', function ($query) use ($slotsLiberados) {
+                $query->where(function ($q) use ($slotsLiberados) {
+                    foreach ($slotsLiberados as $slot) {
+                        $q->orWhere(function ($orQ) use ($slot) {
+                            $orQ->where('data', $slot['data'])
+                                ->where('agenda_id', $slot['agenda_id']);
+                        });
+                    }
+                });
+            })
+            ->select('id')
+            ->get();
+
+        foreach ($reservasParaRevalidar as $reserva) {
+            Log::info('Disparando revalidação por cancelamento de reserva', [
+                'reserva_id' => $reserva->id,
+            ]);
+            ValidateReservationConflictsJob::dispatch($reserva);
+        }
     }
 
     /**

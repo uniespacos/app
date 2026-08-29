@@ -224,7 +224,7 @@ export default function EspacoCard({
                 <CardFooter className="border-border/40 text-primary flex items-center justify-between border-t p-4 pt-2 text-xs font-medium">
                     <Link
                         href={`/espacos/${String(espaco.id)}`}
-                        prefetch={['mount', 'hover']}
+                        prefetch="hover"
                         className="text-primary flex w-full items-center justify-between group-hover:underline"
                         onClick={(e) => {
                             if (handleSolicitarReserva) {

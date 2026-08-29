@@ -51,6 +51,7 @@ class RoleSeeder extends Seeder
             'relatorios.reservas-periodo',
             'relatorios.ocupacao-espacos',
             'relatorios.inventario-espacos',
+            'relatorios.escopo-agendas',
             'secao.relatorios',
         ]);
     }
