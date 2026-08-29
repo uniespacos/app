@@ -96,12 +96,29 @@ class UpdateReservaJob implements ShouldQueue
                         'data_final' => $dataFinal,
                     ]);
                 } else {
+                    // Adquirir lock pessimista sobre horarios da faixa de datas (escopo recurring)
+                    $agendasAfetadas = $horariosSolicitados
+                        ->pluck('agenda_id')
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->sort()
+                        ->all();
+
+                    $dataInicial = Carbon::parse($this->validatedData['data_inicial'])->toDateString();
+                    $dataFinal = Carbon::parse($this->validatedData['data_final'])->toDateString();
+
+                    Horario::whereIn('agenda_id', $agendasAfetadas)
+                        ->whereBetween('data', [$dataInicial, $dataFinal])
+                        ->lockForUpdate()
+                        ->get();
+
                     $this->reserva->update([
                         'data_inicial' => $this->validatedData['data_inicial'],
                         'data_final' => $this->validatedData['data_final'],
                     ]);
                     $agendasMap = Agenda::with('user')
-                        ->whereIn('id', $horariosSolicitados->pluck('agenda_id')->unique()->filter()->all())
+                        ->whereIn('id', $agendasAfetadas)
                         ->get()
                         ->keyBy('id');
 

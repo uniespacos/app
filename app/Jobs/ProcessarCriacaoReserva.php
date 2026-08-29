@@ -83,6 +83,23 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     'situacao' => SituacaoReservaEnum::EM_ANALISE->value,
                 ]);
 
+                // Adquirir lock pessimista sobre horarios da faixa de datas
+                $agendasAfetadas = collect($horariosData)
+                    ->pluck('agenda_id')
+                    ->unique()
+                    ->filter()
+                    ->values()
+                    ->sort()
+                    ->all();
+
+                $dataInicial = Carbon::parse($reserva->data_inicial)->toDateString();
+                $dataFinal = Carbon::parse($reserva->data_final)->toDateString();
+
+                Horario::whereIn('agenda_id', $agendasAfetadas)
+                    ->whereBetween('data', [$dataInicial, $dataFinal])
+                    ->lockForUpdate()
+                    ->get();
+
                 [$linhas, $agendasUsadas] = $expansao->montar(
                     $horariosData,
                     $agendasMap,
@@ -93,6 +110,20 @@ class ProcessarCriacaoReserva implements ShouldQueue
                         ? SituacaoReservaEnum::DEFERIDA->value
                         : SituacaoReservaEnum::EM_ANALISE->value,
                 );
+
+                // Revalidar conflitos sob lock, antes de inserir
+                foreach ($linhas as $novaLinha) {
+                    $conflito = Horario::where('agenda_id', $novaLinha['agenda_id'])
+                        ->where('data', $novaLinha['data'])
+                        ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
+                        ->where('horario_inicio', '<', $novaLinha['horario_fim'])
+                        ->where('horario_fim', '>', $novaLinha['horario_inicio'])
+                        ->exists();
+
+                    if ($conflito) {
+                        throw new Exception("Conflito detectado sob lock para agenda {$novaLinha['agenda_id']} em {$novaLinha['data']}. Outra reserva pode ter sido criada simultaneamente.");
+                    }
+                }
 
                 if ($linhas !== []) {
                     Horario::insert($linhas);
