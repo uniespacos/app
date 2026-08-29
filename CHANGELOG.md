@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.72](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.71...v1.3.0-rc.72) (2026-08-29)
+
+
+### Miscellaneous Chores
+
+* backfill de changelog para mudanças escondidas em squash refactor ([#403](https://github.com/uniespacos/uniespacos/issues/403)) ([#404](https://github.com/uniespacos/uniespacos/issues/404)) ([9d79f9d](https://github.com/uniespacos/uniespacos/commit/9d79f9d4db64454c4f13014cc3c7813dc25ac412))
+
 ## [1.3.0-rc.71](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.70...v1.3.0-rc.71) (2026-08-27)
 
 
