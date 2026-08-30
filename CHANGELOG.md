@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.73](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.72...v1.3.0-rc.73) (2026-08-30)
+
+
+### Bug Fixes
+
+* reforca validacao de conflitos, lock de concorrencia e datas em reservas ([#406](https://github.com/uniespacos/uniespacos/issues/406)) ([96f8dc1](https://github.com/uniespacos/uniespacos/commit/96f8dc1c742b2abcd1d0f1ec612de1411d4f108f))
+
 ## [1.3.0-rc.72](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.71...v1.3.0-rc.72) (2026-08-29)
 
 
