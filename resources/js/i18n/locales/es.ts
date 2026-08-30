@@ -552,6 +552,7 @@ export const es = {
         todos_setores: 'Todos los sectores',
         nenhum_usuario: 'Ningún usuario encontrado',
         ajustar_busca: 'Intente ajustar su búsqueda o los filtros seleccionados.',
+        sem_setor_vinculado: 'Sin sector vinculado',
         roles: {
             institucional: 'Institucional / Administrador',
             gestor: 'Gestor de Espacio',

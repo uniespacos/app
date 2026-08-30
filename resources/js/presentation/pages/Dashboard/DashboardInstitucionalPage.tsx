@@ -256,15 +256,15 @@ export default function DashboardInstitucionalPage({
                                             <CardContent className="space-y-3 p-4">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center justify-between">
-                                                        <h4 className="truncate text-sm font-semibold">{gestor.name}</h4>
-                                                        <Badge variant="secondary" className="text-[10px]">
+                                                        <h4 className="min-w-0 truncate text-sm font-semibold">{gestor.name}</h4>
+                                                        <Badge variant="secondary" className="shrink-0 text-[10px]">
                                                             <UserCheck className="mr-1 h-3 w-3" />
                                                             {t('usuarios.roles.gestor')}
                                                         </Badge>
                                                     </div>
                                                     <p className="text-muted-foreground truncate text-xs">{gestor.email}</p>
                                                     <p className="text-muted-foreground truncate text-[11px]">
-                                                        {gestor.setor?.nome ?? 'Sem setor vinculado'}
+                                                        {gestor.setor?.nome ?? t('usuarios.sem_setor_vinculado')}
                                                     </p>
                                                 </div>
                                                 <Button

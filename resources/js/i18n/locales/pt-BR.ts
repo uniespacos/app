@@ -550,6 +550,7 @@ export const ptBR = {
         todos_setores: 'Todos os setores',
         nenhum_usuario: 'Nenhum usuário encontrado',
         ajustar_busca: 'Tente ajustar sua busca ou filtros selecionados.',
+        sem_setor_vinculado: 'Sem setor vinculado',
         roles: {
             institucional: 'Institucional / Administrador',
             gestor: 'Gestor de Espaço',

@@ -552,6 +552,7 @@ export const en = {
         todos_setores: 'All sectors',
         nenhum_usuario: 'No users found',
         ajustar_busca: 'Try adjusting your search or selected filters.',
+        sem_setor_vinculado: 'No department assigned',
         roles: {
             institucional: 'Institutional / Admin',
             gestor: 'Space Manager',

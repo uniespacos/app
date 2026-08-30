@@ -116,13 +116,13 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                             }}
                             className="border-border/70 group min-w-0 hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-sm"
                         >
-                            <CardContent className="flex items-center justify-between p-5">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground rounded-xl p-3 transition-colors">
+                            <CardContent className="flex items-center justify-between gap-3 overflow-hidden p-5">
+                                <div className="flex min-w-0 flex-1 items-center gap-3">
+                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground shrink-0 rounded-xl p-3 transition-colors">
                                         <Icone className="h-5 w-5" />
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-foreground text-sm font-semibold sm:text-base">{label}</p>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-foreground truncate text-sm font-semibold sm:text-base">{label}</p>
                                         <p className="text-muted-foreground truncate text-xs">{descricao}</p>
                                     </div>
                                 </div>
