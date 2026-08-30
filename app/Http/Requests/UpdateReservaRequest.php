@@ -40,7 +40,7 @@ class UpdateReservaRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:agendas,id',
-                new HorarioDisponivel,
+                new HorarioDisponivel($this->route('reserva')?->id),
             ],
         ];
     }
