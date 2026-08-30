@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.75](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.74...v1.3.0-rc.75) (2026-08-30)
+
+
+### Bug Fixes
+
+* sincroniza janela de semana no modal de detalhes de reserva ([#410](https://github.com/uniespacos/uniespacos/issues/410)) ([f2b5920](https://github.com/uniespacos/uniespacos/commit/f2b5920b36da6a13a438f0f785b8d91793cc2a0c))
+
 ## [1.3.0-rc.74](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.73...v1.3.0-rc.74) (2026-08-30)
 
 
