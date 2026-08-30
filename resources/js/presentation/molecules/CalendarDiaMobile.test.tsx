@@ -108,7 +108,7 @@ describe('CalendarDiaMobile', () => {
     });
 
     it('exibe agendas sem gestor quando exigirGestor={false}', () => {
-        const semGestor: Agenda = { id: 9, turno: 'noite', horarios: [] } as Agenda;
+        const semGestor: Agenda = { id: 9, turno: 'noite', horarios: [] };
 
         render(<CalendarDiaMobile {...props} agendas={[semGestor]} exigirGestor={false} />);
 
