@@ -107,6 +107,15 @@ describe('CalendarDiaMobile', () => {
         expect(screen.getByText(/Nenhum turno disponível/)).toBeInTheDocument();
     });
 
+    it('exibe agendas sem gestor quando exigirGestor={false}', () => {
+        const semGestor: Agenda = { id: 9, turno: 'noite', horarios: [] } as Agenda;
+
+        render(<CalendarDiaMobile {...props} agendas={[semGestor]} exigirGestor={false} />);
+
+        expect(screen.getByText('Noite')).toBeInTheDocument();
+        expect(screen.queryByText(/Nenhum turno disponível/)).not.toBeInTheDocument();
+    });
+
     it('nao quebra quando a semana vem vazia', () => {
         const { container } = render(<CalendarDiaMobile {...props} diasSemana={[]} />);
 

@@ -107,12 +107,12 @@ export default function CalendarDiaMobile({
     const agendasPorTurno = useMemo(() => {
         const mapa = new Map<string, Agenda>();
         agendasOrdenadas.forEach((agenda) => {
-            if (!mapa.has(agenda.turno) && agenda.user) {
+            if (!mapa.has(agenda.turno) && (!exigirGestor || agenda.user)) {
                 mapa.set(agenda.turno, agenda);
             }
         });
         return Array.from(mapa.values());
-    }, [agendasOrdenadas]);
+    }, [agendasOrdenadas, exigirGestor]);
 
     const indicadoresDias = useMemo(
         () => calcularIndicadoresDias(diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado),
