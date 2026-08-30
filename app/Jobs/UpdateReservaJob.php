@@ -12,6 +12,7 @@ use App\Models\Reserva;
 use App\Models\User;
 use App\Notifications\ReservationUpdatedNotification;
 use App\Notifications\ReservationUpdateFailedNotification;
+use App\Services\AutoAprovacaoService;
 use App\Services\ExpansaoHorariosService;
 use Carbon\Carbon;
 use Exception;
@@ -46,7 +47,7 @@ class UpdateReservaJob implements ShouldQueue
      * MIN/MAX dos horarios restantes apos a edicao, garantindo que nenhum horario
      * fique fora do range. No escopo 'recurring', as datas vem do validatedData.
      */
-    public function handle(ExpansaoHorariosService $expansao): void
+    public function handle(ExpansaoHorariosService $expansao, AutoAprovacaoService $autoAprovacao): void
     {
         Log::info('UpdateReservaJob started', [
             'reserva_id' => $this->reserva->id,
@@ -55,7 +56,7 @@ class UpdateReservaJob implements ShouldQueue
         ]);
 
         try {
-            DB::transaction(function () use ($expansao) {
+            DB::transaction(function () use ($expansao, $autoAprovacao) {
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
                     'descricao' => $this->validatedData['descricao'] ?? '',
@@ -127,9 +128,7 @@ class UpdateReservaJob implements ShouldQueue
                         // a agenda, o horario ja nasce deferido. Vale o dono, e
                         // nao quem edita — senao um gestor editando a reserva de
                         // outra pessoa a deferiria sem querer.
-                        fn (Agenda $agenda) => $agenda->user_id === $this->reserva->user_id
-                            ? SituacaoReservaEnum::DEFERIDA->value
-                            : SituacaoReservaEnum::EM_ANALISE->value,
+                        fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->reserva->user_id),
                     );
 
                     foreach ($linhas as $indice => $linha) {

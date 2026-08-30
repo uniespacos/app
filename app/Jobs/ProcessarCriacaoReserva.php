@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use App\Notifications\ReservationCreatedNotification;
 use App\Notifications\ReservationFailedNotification;
+use App\Services\AutoAprovacaoService;
 use App\Services\ExpansaoHorariosService;
 use Carbon\Carbon;
 use Exception;
@@ -55,7 +56,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
      * O servico e injetado aqui, e nao no construtor: o job e serializado para a
      * fila e so as propriedades do construtor viajam junto.
      */
-    public function handle(ExpansaoHorariosService $expansao): void
+    public function handle(ExpansaoHorariosService $expansao, AutoAprovacaoService $autoAprovacao): void
     {
         Log::info('ProcessarCriacaoReserva started', [
             'solicitante_id' => $this->solicitante->id,
@@ -72,7 +73,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 ->get()
                 ->keyBy('id');
 
-            [$reserva, $gestoresUnicos] = DB::transaction(function () use ($expansao, $agendasMap, $horariosData) {
+            [$reserva, $gestoresUnicos] = DB::transaction(function () use ($expansao, $autoAprovacao, $agendasMap, $horariosData) {
                 $reserva = Reserva::create([
                     'titulo' => $this->dadosRequisicao['titulo'],
                     'descricao' => $this->dadosRequisicao['descricao'] ?? '',
@@ -89,9 +90,7 @@ class ProcessarCriacaoReserva implements ShouldQueue
                     (string) $reserva->recorrencia,
                     Carbon::parse($reserva->data_final),
                     (int) $reserva->id,
-                    fn (Agenda $agenda) => $agenda->user && $agenda->user->id === $this->solicitante->id
-                        ? SituacaoReservaEnum::DEFERIDA->value
-                        : SituacaoReservaEnum::EM_ANALISE->value,
+                    fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->solicitante->id),
                 );
 
                 if ($linhas !== []) {
@@ -102,10 +101,9 @@ class ProcessarCriacaoReserva implements ShouldQueue
                 // o acesso direto a `$gestor->id` estourava nesse caso.
                 $gestoresUnicos = $agendasUsadas->map(fn (Agenda $a) => $a->user)->filter()->unique('id')->values();
 
-                if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
-                    $reserva->update(['situacao' => SituacaoReservaEnum::DEFERIDA->value]);
-                } elseif ($gestoresUnicos->contains(fn ($g) => $g->id === $this->solicitante->id)) {
-                    $reserva->update(['situacao' => SituacaoReservaEnum::PARCIALMENTE_DEFERIDA->value]);
+                $novaSituacao = $autoAprovacao->calcularSituacaoReserva($gestoresUnicos, $this->solicitante->id);
+                if ($novaSituacao !== null) {
+                    $reserva->update(['situacao' => $novaSituacao]);
                 }
 
                 Log::info('Reservation created', [
