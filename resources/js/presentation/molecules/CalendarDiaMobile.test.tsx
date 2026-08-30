@@ -183,16 +183,16 @@ describe('CalendarDiaMobile', () => {
         expect(dotsEmSeg).toHaveLength(0);
     });
 
-    it('aba ativa usa ring-2 ring-primary e bg-primary/10, nao bg-primary solido', () => {
+    it('aba ativa usa ring-2 ring-chart-5 e bg-chart-5/10, nao bg-chart-5 solido', () => {
         render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
 
         const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
         const circleAtivo = within(abaSeg).getByText(/^07$/);
 
         expect(circleAtivo).toHaveClass('ring-2');
-        expect(circleAtivo).toHaveClass('ring-primary');
-        expect(circleAtivo).toHaveClass('bg-primary/10');
-        expect(circleAtivo).not.toHaveClass('bg-primary');
+        expect(circleAtivo).toHaveClass('ring-chart-5');
+        expect(circleAtivo).toHaveClass('bg-chart-5/10');
+        expect(circleAtivo).not.toHaveClass('bg-chart-5');
     });
 
     it('indicador dot usa cor do status dominante do dia', () => {
