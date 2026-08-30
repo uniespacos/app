@@ -61,13 +61,14 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
 
     const handleAbrirDetalhes = (reserva: Reserva) => {
         setSelectedReserva(reserva);
+        const semanaAncora = reserva.horarios[0]?.data ?? String(reserva.data_inicial);
         router.get(
             route(routeName),
-            { reserva: reserva.id },
+            { reserva: reserva.id, semana: semanaAncora },
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ['reservaToShow', 'weekEvents'],
+                only: ['reservaToShow', 'semana'],
             },
         );
     };
@@ -80,7 +81,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
             {
                 preserveState: true,
                 preserveScroll: true,
-                only: ['reservaToShow', 'weekEvents'],
+                only: ['reservaToShow', 'semana'],
             },
         );
     };
