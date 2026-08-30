@@ -125,4 +125,94 @@ describe('CalendarDiaMobile', () => {
 
         expect(screen.getAllByRole('button').filter((b) => /\d{2}:\d{2} - \d{2}:\d{2}/.test(b.textContent ?? ''))).toHaveLength(6);
     });
+
+    it('mostra indicador dot no dia que possui slot na reserva', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaTerc = screen.getByRole('tab', { name: /terça-feira/i });
+        const dots = within(abaTerc).queryAllByText('');
+        expect(dots.some((d) => d.className.includes('rounded-full'))).toBe(true);
+    });
+
+    it('nao mostra indicador dot em dia sem slot da reserva', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
+        const dotsEmSeg = within(abaSeg).queryAllByRole('status').filter((d) => d.className.includes('rounded-full'));
+        expect(dotsEmSeg).toHaveLength(0);
+    });
+
+    it('aba ativa usa ring-2 ring-primary e bg-primary/10, nao bg-primary solido', () => {
+        render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
+
+        const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
+        const circleAtivo = within(abaSeg).getByText(/^07$/);
+
+        expect(circleAtivo).toHaveClass('ring-2');
+        expect(circleAtivo).toHaveClass('ring-primary');
+        expect(circleAtivo).toHaveClass('bg-primary/10');
+        expect(circleAtivo).not.toHaveClass('bg-primary');
+    });
+
+    it('indicador dot usa cor do status dominante do dia', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'indeferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaTerc = screen.getByRole('tab', { name: /terça-feira/i });
+        const botao = abaTerc as HTMLElement;
+        const spans = botao.querySelectorAll('span');
+        const indicador = Array.from(spans).find(
+            (s) => s.className.includes('rounded-full') && s.className.includes('bottom-1'),
+        );
+
+        expect(indicador).toBeTruthy();
+        expect(indicador).toHaveClass('bg-destructive');
+    });
 });
