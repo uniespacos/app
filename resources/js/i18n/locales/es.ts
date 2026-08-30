@@ -194,6 +194,7 @@ export const es = {
             data: 'Fecha',
             todas_datas: 'Todas las fechas',
             descricao_filtros: 'Aplique filtros para encontrar las reservas que busca.',
+            filtros_button: 'Filtros',
         },
         tabela: {
             espaco: 'Espacio',

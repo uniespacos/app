@@ -180,7 +180,7 @@ export function ReservasFilters({
                             <DrawerTrigger asChild>
                                 <Button variant="outline" className="relative flex items-center gap-2">
                                     <SlidersHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Filtros</span>
+                                    <span className="sr-only">{t('reservas.filtros.filtros_button')}</span>
                                     {quantidadeFiltrosAtivos > 0 && (
                                         <Badge className="bg-primary text-primary-foreground h-5 min-w-5 justify-center rounded-full px-1 text-xs">
                                             {quantidadeFiltrosAtivos}

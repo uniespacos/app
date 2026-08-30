@@ -192,6 +192,7 @@ export const ptBR = {
             data: 'Data',
             todas_datas: 'Todas as datas',
             descricao_filtros: 'Aplique filtros para encontrar as reservas que procura.',
+            filtros_button: 'Filtros',
         },
         tabela: {
             espaco: 'Espaço',

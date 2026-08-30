@@ -194,6 +194,7 @@ export const en = {
             data: 'Date',
             todas_datas: 'All dates',
             descricao_filtros: 'Apply filters to find the reservations you are looking for.',
+            filtros_button: 'Filters',
         },
         tabela: {
             espaco: 'Space',
