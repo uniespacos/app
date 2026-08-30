@@ -206,8 +206,7 @@ describe('CalendarDiaMobile', () => {
         );
 
         const abaTerc = screen.getByRole('tab', { name: /terça-feira/i });
-        const botao = abaTerc as HTMLElement;
-        const spans = botao.querySelectorAll('span');
+        const spans = abaTerc.querySelectorAll('span');
         const indicador = Array.from(spans).find(
             (s) => s.className.includes('rounded-full') && s.className.includes('bottom-1'),
         );

@@ -58,7 +58,7 @@
   },
   "resources/js/presentation/molecules/CalendarDiaMobile.tsx": {
     "@typescript-eslint/no-unnecessary-condition": {
-      "count": 3
+      "count": 2
     }
   },
   "resources/js/presentation/molecules/CalendarReservationDetails.tsx": {
