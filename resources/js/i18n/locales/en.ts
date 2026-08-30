@@ -131,6 +131,10 @@ export const en = {
             solicitacoes: 'My Requests',
             favoritos: 'Favorite Spaces',
         },
+        reservas_recentes: {
+            titulo: 'Recent Reservations',
+            descricao: 'Your latest reservation requests',
+        },
         empty: {
             no_reservas: 'You have no reservation requests yet.',
             no_favoritos: 'No spaces marked as favorite.',
@@ -193,6 +197,8 @@ export const en = {
             ordenar_por: 'Sort by',
             data: 'Date',
             todas_datas: 'All dates',
+            descricao_filtros: 'Apply filters to find the reservations you are looking for.',
+            filtros_button: 'Filters',
         },
         tabela: {
             espaco: 'Space',
@@ -546,6 +552,7 @@ export const en = {
         todos_setores: 'All sectors',
         nenhum_usuario: 'No users found',
         ajustar_busca: 'Try adjusting your search or selected filters.',
+        sem_setor_vinculado: 'No department assigned',
         roles: {
             institucional: 'Institutional / Admin',
             gestor: 'Space Manager',

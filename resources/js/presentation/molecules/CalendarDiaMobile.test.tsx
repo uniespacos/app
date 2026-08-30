@@ -125,4 +125,194 @@ describe('CalendarDiaMobile', () => {
 
         expect(screen.getAllByRole('button').filter((b) => /\d{2}:\d{2} - \d{2}:\d{2}/.test(b.textContent ?? ''))).toHaveLength(6);
     });
+
+    it('mostra indicador dot no dia que possui slot na reserva', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaTerc = screen.getByRole('tab', { name: /terça-feira/i });
+        const dots = within(abaTerc).queryAllByText('');
+        expect(dots.some((d) => d.className.includes('rounded-full'))).toBe(true);
+    });
+
+    it('nao mostra indicador dot em dia sem slot da reserva', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
+        const dotsEmSeg = within(abaSeg).queryAllByRole('status').filter((d) => d.className.includes('rounded-full'));
+        expect(dotsEmSeg).toHaveLength(0);
+    });
+
+    it('aba ativa usa ring-2 ring-primary e bg-primary/10, nao bg-primary solido', () => {
+        render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
+
+        const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
+        const circleAtivo = within(abaSeg).getByText(/^07$/);
+
+        expect(circleAtivo).toHaveClass('ring-2');
+        expect(circleAtivo).toHaveClass('ring-primary');
+        expect(circleAtivo).toHaveClass('bg-primary/10');
+        expect(circleAtivo).not.toHaveClass('bg-primary');
+    });
+
+    it('indicador dot usa cor do status dominante do dia', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-08|07:30:00',
+                status: 'indeferida' as const,
+                data: new Date('2026-09-08T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+            />,
+        );
+
+        const abaTerc = screen.getByRole('tab', { name: /terça-feira/i });
+        const spans = abaTerc.querySelectorAll('span');
+        const indicador = Array.from(spans).find(
+            (s) => s.className.includes('rounded-full') && s.className.includes('bottom-1'),
+        );
+
+        expect(indicador).toBeTruthy();
+        expect(indicador).toHaveClass('bg-destructive');
+    });
+
+    it('modo primeiroComReserva: aba ativa eh o primeiro dia da semana com slot da reserva', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-09|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-09T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        const diasComQuarta: AgendaDiasSemanaType[] = [
+            { data: new Date('2026-09-07T12:00:00'), nome: 'Segunda-feira', abreviado: 'seg.', diaMes: '07/09', valor: '2026-09-07', ehHoje: false },
+            { data: new Date('2026-09-08T12:00:00'), nome: 'Terça-feira', abreviado: 'ter.', diaMes: '08/09', valor: '2026-09-08', ehHoje: false },
+            { data: new Date('2026-09-09T12:00:00'), nome: 'Quarta-feira', abreviado: 'qua.', diaMes: '09/09', valor: '2026-09-09', ehHoje: false },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                diasSemana={diasComQuarta}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+                modoSelecaoInicial="primeiroComReserva"
+            />,
+        );
+
+        expect(screen.getByRole('tab', { name: /quarta-feira/i })).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByRole('tab', { name: /segunda-feira/i })).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('modo primeiroComReserva: fallback para hoje quando nao ha slots na semana', () => {
+        const slotsDaReserva = [
+            {
+                id: '2026-09-15|07:30:00',
+                status: 'deferida' as const,
+                data: new Date('2026-09-15T07:30:00'),
+                horario_inicio: '07:30:00',
+                horario_fim: '08:20:00',
+            },
+        ];
+
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                slotsDaReserva={slotsDaReserva}
+                modoSelecaoInicial="primeiroComReserva"
+            />,
+        );
+
+        expect(screen.getByRole('tab', { name: /segunda-feira/i })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('modo hoje: comportamento padrão preservado mesmo com modoSelecaoInicial explícito', () => {
+        render(
+            <CalendarDiaMobile
+                {...props}
+                agendas={[agenda('manha')]}
+                modoSelecaoInicial="hoje"
+            />,
+        );
+
+        expect(screen.getByRole('tab', { name: /segunda-feira/i })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('regressao: trocar de semana via key recomuta o indice ativo', () => {
+        const semana1: AgendaDiasSemanaType[] = [
+            { data: new Date('2026-09-07T12:00:00'), nome: 'Segunda-feira', abreviado: 'seg.', diaMes: '07/09', valor: '2026-09-07', ehHoje: true },
+            { data: new Date('2026-09-08T12:00:00'), nome: 'Terça-feira', abreviado: 'ter.', diaMes: '08/09', valor: '2026-09-08', ehHoje: false },
+        ];
+
+        const semana2: AgendaDiasSemanaType[] = [
+            { data: new Date('2026-09-14T12:00:00'), nome: 'Segunda-feira', abreviado: 'seg.', diaMes: '14/09', valor: '2026-09-14', ehHoje: false },
+            { data: new Date('2026-09-15T12:00:00'), nome: 'Terça-feira', abreviado: 'ter.', diaMes: '15/09', valor: '2026-09-15', ehHoje: false },
+        ];
+
+        const { rerender } = render(
+            <CalendarDiaMobile
+                key={semana1[0]?.valor}
+                {...props}
+                diasSemana={semana1}
+                agendas={[agenda('manha')]}
+            />,
+        );
+
+        expect(screen.getByRole('tab', { name: /segunda-feira, dia 07\/09/i })).toHaveAttribute('aria-selected', 'true');
+
+        rerender(
+            <CalendarDiaMobile
+                key={semana2[0]?.valor}
+                {...props}
+                diasSemana={semana2}
+                agendas={[agenda('manha')]}
+            />,
+        );
+
+        expect(screen.getByRole('tab', { name: /segunda-feira, dia 14\/09/i })).toHaveAttribute('aria-selected', 'true');
+        expect(screen.queryByRole('tab', { name: /segunda-feira, dia 07\/09/i })).not.toBeInTheDocument();
+    });
 });

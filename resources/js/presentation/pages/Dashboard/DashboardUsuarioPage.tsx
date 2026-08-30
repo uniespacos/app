@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from '@/i18n';
 import TabsItemEspacosFavoritos from '@/presentation/molecules/TabsItemEspacosFavoritos';
@@ -8,7 +8,7 @@ import TabsItemReserva from '@/presentation/molecules/TabsItemReserva';
 import AppLayout from '@/presentation/templates/AppLayout';
 import { Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { AlertCircle, ArrowRight, CalendarPlus, CheckCircle2, Clock, ListChecks, Sparkles, Star, XCircle } from 'lucide-react';
+import { ArrowRight, CalendarPlus, ListChecks, Sparkles, Star } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,12 +21,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface DashboardUsuarioProps {
     user?: User;
     espacosFavoritos?: Espaco[];
-    statusDasReservas?: {
-        em_analise: number;
-        parcialmente_deferida: number;
-        deferida: number;
-        indeferida: number;
-    };
     reservas?: Reserva[];
 }
 
@@ -35,12 +29,6 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
     const pageProps = usePage<{
         user: User;
         espacosFavoritos?: Espaco[];
-        statusDasReservas?: {
-            em_analise: number;
-            parcialmente_deferida: number;
-            deferida: number;
-            indeferida: number;
-        };
         reservas?: Reserva[];
     }>().props;
 
@@ -48,13 +36,6 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
     const rawFavoritos = props.espacosFavoritos ?? pageProps.espacosFavoritos;
     const espacosFavoritos = useMemo(() => rawFavoritos ?? [], [rawFavoritos]);
 
-    const statusDasReservas = props.statusDasReservas ??
-        pageProps.statusDasReservas ?? {
-            em_analise: 0,
-            parcialmente_deferida: 0,
-            deferida: 0,
-            indeferida: 0,
-        };
     const reservas = props.reservas ?? pageProps.reservas ?? [];
 
     const [searchTermFavoritos, setSearchTermFavoritos] = useState('');
@@ -64,41 +45,6 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
         const termo = searchTermFavoritos.toLowerCase();
         return espacosFavoritos.filter((e) => e.nome.toLowerCase().includes(termo) || e.andar?.modulo?.unidade?.nome.toLowerCase().includes(termo));
     }, [espacosFavoritos, searchTermFavoritos]);
-
-    const kpiCards = [
-        {
-            title: t('dashboard.stats.em_analise'),
-            value: statusDasReservas.em_analise,
-            description: t('reservas.situacao.em_analise'),
-            icon: Clock,
-            color: 'text-warning',
-            iconBg: 'bg-warning/10 text-warning',
-        },
-        {
-            title: t('dashboard.stats.deferida'),
-            value: statusDasReservas.deferida,
-            description: t('reservas.situacao.deferida'),
-            icon: CheckCircle2,
-            color: 'text-success',
-            iconBg: 'bg-success/10 text-success',
-        },
-        {
-            title: t('dashboard.stats.parcialmente_deferida'),
-            value: statusDasReservas.parcialmente_deferida,
-            description: t('reservas.situacao.parcialmente_deferida'),
-            icon: AlertCircle,
-            color: 'text-accent-foreground',
-            iconBg: 'bg-accent/20 text-accent-foreground',
-        },
-        {
-            title: t('dashboard.stats.indeferida'),
-            value: statusDasReservas.indeferida,
-            description: t('reservas.situacao.indeferida'),
-            icon: XCircle,
-            color: 'text-destructive',
-            iconBg: 'bg-destructive/10 text-destructive',
-        },
-    ];
 
     const atalhosSecundarios = [
         {
@@ -153,30 +99,6 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                     </div>
                 </div>
 
-                {/* Grid de Indicadores de KPIs */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {kpiCards.map((kpi) => {
-                        const Icon = kpi.icon;
-                        return (
-                            <Card
-                                key={kpi.title}
-                                className="border-border/70 bg-card hover:border-primary/40 transition-all duration-200 hover:shadow-xs"
-                            >
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 p-5 pb-2">
-                                    <CardTitle className="text-muted-foreground text-sm font-medium">{kpi.title}</CardTitle>
-                                    <div className={`rounded-xl p-2.5 ${kpi.iconBg}`}>
-                                        <Icon className="h-4 w-4" />
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="px-5 pt-0 pb-5">
-                                    <div className="text-foreground text-3xl font-bold tracking-tight">{kpi.value}</div>
-                                    <p className="text-muted-foreground mt-1 text-xs">{kpi.description}</p>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-
                 {/* Atalhos Rápidos */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {atalhosSecundarios.map(({ label, descricao, Icone, href }) => (
@@ -192,15 +114,15 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                                     router.get(href);
                                 }
                             }}
-                            className="border-border/70 group hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-sm"
+                            className="border-border/70 group min-w-0 hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-sm"
                         >
-                            <CardContent className="flex items-center justify-between p-5">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground rounded-xl p-3 transition-colors">
+                            <CardContent className="flex items-center justify-between gap-3 overflow-hidden p-5">
+                                <div className="flex min-w-0 flex-1 items-center gap-3">
+                                    <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground shrink-0 rounded-xl p-3 transition-colors">
                                         <Icone className="h-5 w-5" />
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-foreground text-sm font-semibold sm:text-base">{label}</p>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-foreground truncate text-sm font-semibold sm:text-base">{label}</p>
                                         <p className="text-muted-foreground truncate text-xs">{descricao}</p>
                                     </div>
                                 </div>

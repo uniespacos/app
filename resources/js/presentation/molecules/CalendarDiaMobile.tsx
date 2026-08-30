@@ -5,6 +5,65 @@ import { cn } from '@/lib/utils';
 import { Agenda, AgendaDiasSemanaType, SlotCalendario } from '@/types';
 import { useMemo, useState } from 'react';
 
+type StatusPriority = 'indeferida' | 'solicitado' | 'deferida' | 'selecionado' | 'reservado';
+
+function getPriorityValue(status: string): number {
+    const priorities: Partial<Record<StatusPriority, number>> = {
+        indeferida: 0,
+        solicitado: 1,
+        deferida: 2,
+        selecionado: 2,
+        reservado: 3,
+    };
+    return priorities[status as StatusPriority] ?? 999;
+}
+
+interface IndicadorDia {
+    temSlot: boolean;
+    statusDominante?: string;
+}
+
+function calcularIndicadoresDias(
+    diasSemana: AgendaDiasSemanaType[],
+    agendasPorTurno: Agenda[],
+    slotsDaReserva: SlotCalendario[] | undefined,
+    isSlotSelecionado: (slot: SlotCalendario) => boolean,
+): Map<string, IndicadorDia> {
+    const resultado = new Map<string, IndicadorDia>();
+
+    diasSemana.forEach((dia) => {
+        const statusDoDia = new Map<string, number>();
+
+        agendasPorTurno.forEach((agenda) => {
+            const slotsDia = derivarSlotsDoTurno(agenda, [dia], slotsDaReserva);
+
+            slotsDia.forEach(({ slot }) => {
+                const selecionado = isSlotSelecionado(slot);
+                const status = selecionado ? 'selecionado' : slot.status;
+                const temSlotNaReserva = slotsDaReserva?.some((s) => s.id === slot.id) ?? false;
+                const pertenceAReserva = temSlotNaReserva || selecionado;
+
+                if (pertenceAReserva) {
+                    const prioridade = getPriorityValue(status);
+                    const atual = statusDoDia.get(status) ?? prioridade;
+                    statusDoDia.set(status, Math.min(atual, prioridade));
+                }
+            });
+        });
+
+        if (statusDoDia.size === 0) {
+            resultado.set(dia.valor, { temSlot: false });
+        } else {
+            const statusDominante = Array.from(statusDoDia.entries()).sort(
+                ([, a], [, b]) => a - b,
+            )[0]?.[0];
+            resultado.set(dia.valor, { temSlot: true, statusDominante });
+        }
+    });
+
+    return resultado;
+}
+
 interface CalendarDiaMobileProps {
     diasSemana: AgendaDiasSemanaType[];
     agendas: Agenda[];
@@ -12,6 +71,22 @@ interface CalendarDiaMobileProps {
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     slotsDaReserva?: SlotCalendario[];
     exigirGestor?: boolean;
+    modoSelecaoInicial?: 'hoje' | 'primeiroComReserva';
+}
+
+function calcularIndiceInicial(
+    diasSemana: AgendaDiasSemanaType[],
+    modoSelecaoInicial: 'hoje' | 'primeiroComReserva',
+    indicadoresDias: Map<string, IndicadorDia>,
+): number {
+    const indiceHoje = Math.max(diasSemana.findIndex((dia) => dia.ehHoje), 0);
+
+    if (modoSelecaoInicial !== 'primeiroComReserva') {
+        return indiceHoje;
+    }
+
+    const indicePrimeiroComReserva = diasSemana.findIndex((dia) => indicadoresDias.get(dia.valor)?.temSlot);
+    return indicePrimeiroComReserva !== -1 ? indicePrimeiroComReserva : indiceHoje;
 }
 
 export default function CalendarDiaMobile({
@@ -21,15 +96,8 @@ export default function CalendarDiaMobile({
     alternarSelecaoSlot,
     slotsDaReserva,
     exigirGestor = true,
+    modoSelecaoInicial = 'hoje',
 }: CalendarDiaMobileProps) {
-    const indiceInicial = Math.max(
-        diasSemana.findIndex((dia) => dia.ehHoje),
-        0,
-    );
-    const [indiceDia, setIndiceDia] = useState(indiceInicial);
-
-    const diaVisivel = diasSemana[indiceDia];
-
     const agendasOrdenadas = useMemo(
         () =>
             [...agendas].filter((a) => !exigirGestor || a.user).sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
@@ -46,8 +114,19 @@ export default function CalendarDiaMobile({
         return Array.from(mapa.values());
     }, [agendasOrdenadas]);
 
+    const indicadoresDias = useMemo(
+        () => calcularIndicadoresDias(diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado),
+        [diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado],
+    );
+
+    const [indiceDia, setIndiceDia] = useState(() =>
+        calcularIndiceInicial(diasSemana, modoSelecaoInicial, indicadoresDias),
+    );
+
+    const diaVisivel = diasSemana[indiceDia];
+
     const slotsPorTurno = useMemo(() => {
-        if (!diaVisivel) {
+        if (diaVisivel === undefined) {
             return [] as { agendaId: number; turno: Turno; slots: SlotDerivado[] }[];
         }
 
@@ -58,7 +137,7 @@ export default function CalendarDiaMobile({
         }));
     }, [agendasPorTurno, diaVisivel, slotsDaReserva]);
 
-    if (!diaVisivel) {
+    if (diaVisivel === undefined) {
         return null;
     }
 
@@ -67,6 +146,13 @@ export default function CalendarDiaMobile({
             <div className="flex border-b" role="tablist" aria-label="Dia da semana">
                 {diasSemana.map((dia, indice) => {
                     const ativo = indice === indiceDia;
+                    const indicador = indicadoresDias.get(dia.valor);
+                    const temSlotNoDia = (indicador?.temSlot) ?? false;
+                    const statusDominante = indicador?.statusDominante;
+                    const corDoIndicador =
+                        statusDominante && (statusDominante in ESTILO_SLOT)
+                            ? ESTILO_SLOT[statusDominante as keyof typeof ESTILO_SLOT].solido
+                            : '';
 
                     return (
                         <button
@@ -88,14 +174,20 @@ export default function CalendarDiaMobile({
                             <span
                                 className={cn(
                                     'flex h-7 w-7 items-center justify-center rounded-full text-sm tabular-nums',
-                                    ativo && 'bg-primary text-primary-foreground font-semibold',
+                                    ativo && 'bg-primary/10 ring-2 ring-primary text-primary font-semibold',
+                                    !ativo && 'font-medium',
                                     !ativo && dia.ehHoje && 'text-primary font-semibold',
                                 )}
                             >
                                 {dia.diaMes.split('/')[0]}
                             </span>
 
-                            {dia.ehHoje && !ativo && <span className="bg-primary absolute bottom-1 h-1 w-1 rounded-full" />}
+                            {temSlotNoDia && !ativo && (
+                                <span className={cn('absolute bottom-1 h-1 w-1 rounded-full', corDoIndicador)} />
+                            )}
+                            {dia.ehHoje && !ativo && !temSlotNoDia && (
+                                <span className="bg-primary absolute bottom-1 h-1 w-1 rounded-full" />
+                            )}
                         </button>
                     );
                 })}
@@ -106,7 +198,7 @@ export default function CalendarDiaMobile({
             {slotsPorTurno.map(({ agendaId, turno, slots }) => (
                 <div key={agendaId}>
                     <div className="text-foreground bg-muted/40 px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase">
-                        {TURNO_LABEL[turno] ?? turno}
+                        {TURNO_LABEL[turno]}
                     </div>
 
                     {slots.map(({ horaLabel, slot }) => {

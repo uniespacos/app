@@ -45,6 +45,7 @@ export default function AgendaCalendario({
             <Card className="gap-0 p-0">
                 <AgendaLegenda isEditMode={isEditMode} />
                 <CalendarDiaMobile
+                    key={diasSemana[0]?.valor}
                     diasSemana={diasSemana}
                     agendas={agendas}
                     isSlotSelecionado={isSlotSelecionado}

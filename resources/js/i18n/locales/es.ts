@@ -131,6 +131,10 @@ export const es = {
             solicitacoes: 'Mis Solicitudes',
             favoritos: 'Espacios Favoritos',
         },
+        reservas_recentes: {
+            titulo: 'Reservas Recientes',
+            descricao: 'Sus últimas solicitudes de reserva',
+        },
         empty: {
             no_reservas: 'Aún no tiene solicitudes de reserva.',
             no_favoritos: 'Ningún espacio marcado como favorito.',
@@ -193,6 +197,8 @@ export const es = {
             ordenar_por: 'Ordenar por',
             data: 'Fecha',
             todas_datas: 'Todas las fechas',
+            descricao_filtros: 'Aplique filtros para encontrar las reservas que busca.',
+            filtros_button: 'Filtros',
         },
         tabela: {
             espaco: 'Espacio',
@@ -546,6 +552,7 @@ export const es = {
         todos_setores: 'Todos los sectores',
         nenhum_usuario: 'Ningún usuario encontrado',
         ajustar_busca: 'Intente ajustar su búsqueda o los filtros seleccionados.',
+        sem_setor_vinculado: 'Sin sector vinculado',
         roles: {
             institucional: 'Institucional / Administrador',
             gestor: 'Gestor de Espacio',

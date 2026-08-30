@@ -129,6 +129,10 @@ export const ptBR = {
             solicitacoes: 'Minhas Solicitações',
             favoritos: 'Espaços Favoritos',
         },
+        reservas_recentes: {
+            titulo: 'Reservas Recentes',
+            descricao: 'Suas últimas solicitações de reserva',
+        },
         empty: {
             no_reservas: 'Você ainda não possui solicitações de reserva.',
             no_favoritos: 'Nenhum espaço marcado como favorito.',
@@ -191,6 +195,8 @@ export const ptBR = {
             ordenar_por: 'Ordenar por',
             data: 'Data',
             todas_datas: 'Todas as datas',
+            descricao_filtros: 'Aplique filtros para encontrar as reservas que procura.',
+            filtros_button: 'Filtros',
         },
         tabela: {
             espaco: 'Espaço',
@@ -544,6 +550,7 @@ export const ptBR = {
         todos_setores: 'Todos os setores',
         nenhum_usuario: 'Nenhum usuário encontrado',
         ajustar_busca: 'Tente ajustar sua busca ou filtros selecionados.',
+        sem_setor_vinculado: 'Sem setor vinculado',
         roles: {
             institucional: 'Institucional / Administrador',
             gestor: 'Gestor de Espaço',

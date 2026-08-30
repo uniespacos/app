@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/i18n';
 import { formatDate } from '@/i18n/formatters';
 import { getAndarLabelByValue } from '@/lib/utils/andars/AndarOptions';
 import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
@@ -8,11 +9,12 @@ import { router } from '@inertiajs/react';
 import { FileText } from 'lucide-react';
 
 export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
+    const { t } = useTranslation();
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Reservas Recentes</CardTitle>
-                <CardDescription>Suas últimas solicitações de reserva</CardDescription>
+                <CardTitle>{t('dashboard.reservas_recentes.titulo')}</CardTitle>
+                <CardDescription>{t('dashboard.reservas_recentes.descricao')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
@@ -42,7 +44,7 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
                                         className="sm:mt-5"
                                     >
                                         <FileText className="mr-1 h-4 w-4" />
-                                        Ver detalhes
+                                        {t('reservas.acoes.ver_detalhes')}
                                     </Button>
                                 </div>
                             </div>
