@@ -83,7 +83,36 @@ class UpdateReservaJob implements ShouldQueue
                         }
                     }
 
+                    // Adquirir lock pessimista sobre horarios da semana afetada
+                    $agendasAfetodasSingle = $horariosSolicitados
+                        ->pluck('agenda_id')
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->sort()
+                        ->all();
+
+                    if ($agendasAfetodasSingle !== []) {
+                        Horario::whereIn('agenda_id', $agendasAfetodasSingle)
+                            ->whereBetween('data', [$inicioSemana, $fimSemana])
+                            ->lockForUpdate()
+                            ->get();
+                    }
+
                     foreach ($horariosSolicitados->whereNull('id') as $novoHorario) {
+                        // Revalidar conflito sob lock, antes de inserir
+                        $conflito = Horario::where('agenda_id', $novoHorario['agenda_id'])
+                            ->where('data', $novoHorario['data'])
+                            ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
+                            ->where('reserva_id', '!=', $this->reserva->id)
+                            ->where('horario_inicio', '<', $novoHorario['horario_fim'])
+                            ->where('horario_fim', '>', $novoHorario['horario_inicio'])
+                            ->exists();
+
+                        if ($conflito) {
+                            throw new Exception("Conflito detectado sob lock para agenda {$novoHorario['agenda_id']} em {$novoHorario['data']}. Outra reserva pode ter sido editada simultaneamente.");
+                        }
+
                         $this->reserva->horarios()->create($novoHorario);
                     }
 
@@ -147,6 +176,21 @@ class UpdateReservaJob implements ShouldQueue
                         // outra pessoa a deferiria sem querer.
                         fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->reserva->user_id),
                     );
+
+                    // Revalidar conflitos sob lock, antes de inserir
+                    foreach ($linhas as $novaLinha) {
+                        $conflito = Horario::where('agenda_id', $novaLinha['agenda_id'])
+                            ->where('data', $novaLinha['data'])
+                            ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
+                            ->where('reserva_id', '!=', $this->reserva->id)
+                            ->where('horario_inicio', '<', $novaLinha['horario_fim'])
+                            ->where('horario_fim', '>', $novaLinha['horario_inicio'])
+                            ->exists();
+
+                        if ($conflito) {
+                            throw new Exception("Conflito detectado sob lock para agenda {$novaLinha['agenda_id']} em {$novaLinha['data']}. Outra reserva pode ter sido editada simultaneamente.");
+                        }
+                    }
 
                     foreach ($linhas as $indice => $linha) {
                         $anterior = $avaliacoes->get(

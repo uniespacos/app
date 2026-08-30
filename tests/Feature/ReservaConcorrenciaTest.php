@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Jobs\ProcessarCriacaoReserva;
+use App\Jobs\UpdateReservaJob;
 use App\Models\Agenda;
 use App\Models\Horario;
 use App\Models\Reserva;
@@ -147,5 +148,220 @@ class ReservaConcorrenciaTest extends TestCase
         $horario2 = $reserva2->horarios->first();
         $this->assertEquals('11:00:00', $horario2->horario_inicio);
         $this->assertEquals('em_analise', $horario2->situacao);
+    }
+
+    /**
+     * Teste de revalidação de conflito em UpdateReservaJob escopo 'recurring':
+     * Editar uma reserva recorrente para um horário que colide com outra reserva já aprovada
+     * deve falhar (transação sofre rollback).
+     */
+    public function test_update_reserva_recurring_revalidacao_sob_lock_previne_double_booking(): void
+    {
+        Notification::fake();
+
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+
+        $agenda = Agenda::factory()->create(['user_id' => $userA->id]);
+
+        // Reserva 1 de UserA: horário 10:00-11:00 em uma agenda (deferida, pois userA é dono)
+        $payload1 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '10:00:00', '11:00:00'),
+        ], 'Reserva UserA');
+
+        $reservaA = $this->executar($payload1, $userA);
+        $this->assertNotNull($reservaA);
+        $this->assertCount(1, $reservaA->horarios);
+        $this->assertEquals('deferida', $reservaA->horarios->first()->situacao);
+
+        // Reserva 2 de UserB: horário 09:00-10:00 (não conflita inicialmente)
+        $payload2 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '09:00:00', '10:00:00'),
+        ], 'Reserva UserB');
+
+        $reservaB = $this->executar($payload2, $userB);
+        $this->assertNotNull($reservaB);
+        $this->assertCount(1, $reservaB->horarios);
+        $horarioBOriginal = $reservaB->horarios->first();
+        $this->assertEquals('09:00:00', $horarioBOriginal->horario_inicio);
+        $this->assertEquals('em_analise', $horarioBOriginal->situacao);
+
+        // Total de horários: 2
+        $this->assertCount(2, Horario::all());
+
+        // Agora UserB tenta editar sua reserva para o mesmo horário que UserA (10:00-11:00)
+        // A revalidação sob lock deve detectar o conflito e causar rollback da transação
+        $payloadUpdate = [
+            'titulo' => 'Reserva UserB Editada',
+            'descricao' => 'Descricao atualizada',
+            'data_inicial' => '2026-09-15',
+            'data_final' => '2026-09-15',
+            'recorrencia' => 'unica',
+            'edit_scope' => 'recurring',
+            'edited_week_date' => '2026-09-15',
+            'horarios_solicitados' => [
+                $this->slot($agenda->id, '2026-09-15', '10:00:00', '11:00:00'),
+            ],
+        ];
+
+        $job = new UpdateReservaJob($reservaB, $payloadUpdate, $userB);
+        app()->call([$job, 'handle']);
+
+        // Validações finais:
+        // Horário de UserB NÃO deve ter sido atualizado para 10:00-11:00
+        $reservaBFresh = $reservaB->fresh();
+        $this->assertCount(1, $reservaBFresh->horarios);
+        $horarioBAtual = $reservaBFresh->horarios->first();
+        $this->assertEquals('09:00:00', $horarioBAtual->horario_inicio, 'Horário de UserB não deve ter sido alterado');
+        $this->assertEquals($horarioBOriginal->id, $horarioBAtual->id, 'Horário de UserB deve manter o mesmo ID');
+
+        // Total de horários no banco deve continuar 2, sem duplicação
+        $this->assertCount(2, Horario::all(), '2 horários devem estar no banco (1 de UserA, 1 de UserB original)');
+    }
+
+    /**
+     * Teste de revalidação de conflito em UpdateReservaJob escopo 'single':
+     * Editar uma ocorrência específica de uma série para um horário que colide com outra reserva
+     * deve falhar (transação sofre rollback).
+     */
+    public function test_update_reserva_single_revalidacao_sob_lock_previne_double_booking(): void
+    {
+        Notification::fake();
+
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+
+        $agenda = Agenda::factory()->create(['user_id' => $userA->id]);
+
+        // Reserva 1 de UserA: horário 10:00-11:00 (deferida)
+        $payload1 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '10:00:00', '11:00:00'),
+        ], 'Reserva UserA');
+
+        $reservaA = $this->executar($payload1, $userA);
+        $this->assertNotNull($reservaA);
+        $this->assertCount(1, $reservaA->horarios);
+
+        // Reserva 2 de UserB: múltiplos horários em semanas diferentes
+        $payload2 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '09:00:00', '10:00:00'),
+            $this->slot($agenda->id, '2026-09-22', '09:00:00', '10:00:00'),
+        ], 'Reserva UserB');
+
+        $reservaB = $this->executar($payload2, $userB);
+        $this->assertNotNull($reservaB);
+        $this->assertCount(2, $reservaB->horarios);
+        $horarioBSemana15Original = $reservaB->horarios()
+            ->whereDate('data', '2026-09-15')
+            ->first();
+
+        // Total: 3 horários
+        $this->assertCount(3, Horario::all());
+
+        // Agora UserB tenta editar apenas o horário da semana 15 para colidir com UserA (10:00-11:00)
+        // edit_scope = 'single' indica edição de uma ocorrência específica
+        // A revalidação sob lock deve detectar o conflito e causar rollback
+        $payloadUpdateSingle = [
+            'titulo' => 'Reserva UserB Editada (Single)',
+            'descricao' => 'Editado em single',
+            'data_inicial' => '2026-09-15',
+            'data_final' => '2026-09-15',
+            'recorrencia' => 'unica',
+            'edit_scope' => 'single',
+            'edited_week_date' => '2026-09-15',
+            'horarios_solicitados' => [
+                // Horário novo que colide com UserA
+                [
+                    'data' => '2026-09-15',
+                    'horario_inicio' => '10:00:00',
+                    'horario_fim' => '11:00:00',
+                    'agenda_id' => $agenda->id,
+                ],
+            ],
+        ];
+
+        $job = new UpdateReservaJob($reservaB, $payloadUpdateSingle, $userB);
+        app()->call([$job, 'handle']);
+
+        // Validações finais:
+        $reservaBFresh = $reservaB->fresh();
+
+        // Horário de UserB na semana 15 NÃO deve ter sido atualizado
+        $horariosNaSemana15 = $reservaBFresh->horarios()
+            ->whereDate('data', '2026-09-15')
+            ->get();
+        $this->assertCount(1, $horariosNaSemana15);
+        $horarioBSemana15Atual = $horariosNaSemana15->first();
+        $this->assertEquals('09:00:00', $horarioBSemana15Atual->horario_inicio, 'Horário original não deve ter sido alterado');
+        $this->assertEquals($horarioBSemana15Original->id, $horarioBSemana15Atual->id, 'Horário deve manter o mesmo ID');
+
+        // Horário na semana 22 deve continuar intacto
+        $horariosNaSemana22 = $reservaBFresh->horarios()
+            ->whereDate('data', '2026-09-22')
+            ->get();
+        $this->assertCount(1, $horariosNaSemana22);
+        $this->assertEquals('09:00:00', $horariosNaSemana22->first()->horario_inicio);
+
+        // Total de horários: 3 (nenhum novo foi inserido, nenhum foi deletado)
+        $this->assertCount(3, Horario::all());
+    }
+
+    /**
+     * Teste de não-regressão: editar sem conflito continua funcionando normalmente
+     * em ambos os escopos (recurring e single).
+     */
+    public function test_update_reserva_sem_conflito_funciona_normalmente(): void
+    {
+        Notification::fake();
+
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+
+        $agenda = Agenda::factory()->create(['user_id' => $userA->id]);
+
+        // Reserva 1 de UserA: 10:00-11:00 (deferida)
+        $payload1 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '10:00:00', '11:00:00'),
+        ], 'Reserva UserA');
+
+        $reservaA = $this->executar($payload1, $userA);
+        $this->assertNotNull($reservaA);
+
+        // Reserva 2 de UserB: 14:00-15:00 (não conflita)
+        $payload2 = $this->dados([
+            $this->slot($agenda->id, '2026-09-15', '14:00:00', '15:00:00'),
+        ], 'Reserva UserB');
+
+        $reservaB = $this->executar($payload2, $userB);
+        $this->assertNotNull($reservaB);
+        $this->assertCount(1, $reservaB->horarios);
+
+        // Editar reserva de UserB para 15:00-16:00 (ainda sem conflito)
+        $payloadUpdate = [
+            'titulo' => 'Reserva UserB Editada',
+            'descricao' => 'Descricao atualizada',
+            'data_inicial' => '2026-09-15',
+            'data_final' => '2026-09-15',
+            'recorrencia' => 'unica',
+            'edit_scope' => 'recurring',
+            'edited_week_date' => '2026-09-15',
+            'horarios_solicitados' => [
+                $this->slot($agenda->id, '2026-09-15', '15:00:00', '16:00:00'),
+            ],
+        ];
+
+        // Deve funcionar sem exceção
+        $job = new UpdateReservaJob($reservaB, $payloadUpdate, $userB);
+        app()->call([$job, 'handle']);
+
+        $reservaBFresh = $reservaB->fresh();
+        $this->assertEquals('Reserva UserB Editada', $reservaBFresh->titulo);
+        $this->assertCount(1, $reservaBFresh->horarios);
+        $horario = $reservaBFresh->horarios->first();
+        $this->assertEquals('15:00:00', $horario->horario_inicio);
+        $this->assertEquals('16:00:00', $horario->horario_fim);
+
+        // Total de horários: 2 (um de cada usuário, sem duplicação)
+        $this->assertCount(2, Horario::all());
     }
 }

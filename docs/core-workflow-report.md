@@ -232,7 +232,9 @@ Para cobrir essa brecha, o job implementa uma defesa em duas etapas:
 
 2. **Revalidação de Conflito Sob Lock:** Depois que a expansão monta as linhas de horário a inserir, o job revalida cada linha nova contra horários já existentes e aprovados. Especificamente, para cada linha, verifica se existe um horário com mesma `agenda_id`, mesma `data`, `situacao = 'deferida'`, e cujo intervalo de horário se sobrepõe (`horario_inicio < novo.horario_fim AND horario_fim > novo.horario_inicio`). Se encontrar, lança uma `Exception` com mensagem descritiva, causando rollback automático da transação (desfeito inclusive o `Reserva::create` daquela tentativa). A exceção propaga para o `catch (Exception $e)` que envolve o `handle()`, é logada com `Log::error()`, e `$this->fail($e)` ativa o método `failed()` do job, que dispara `ReservationFailedNotification` ao solicitante.
 
-A mesma estratégia de lock (passo 1, sem revalidação) foi aplicada em `UpdateReservaJob.php` no escopo `edit_scope === 'recurring'`, posicionada antes da leitura de avaliações já feitas (`$avaliacoes`), de forma a proteger a atualização de reservas recorrentes contra o mesmo tipo de race condition.
+A mesma estratégia de lock e revalidação foi aplicada em `UpdateReservaJob.php` em ambos os escopos (`edit_scope === 'recurring'` e `edit_scope === 'single'`):
+- **Escopo `recurring`:** Lock adquirido sobre os horários das agendas afetadas dentro do intervalo `data_inicial`–`data_final`, posicionado antes da leitura de avaliações já feitas (`$avaliacoes`). A revalidação ocorre após a expansão montar as linhas, antes da inserção final. A verificação exclui horários da própria reserva sendo editada (`where('reserva_id', '!=', $this->reserva->id)`) para evitar falso conflito com horários antigos que já foram deletados.
+- **Escopo `single`:** Lock adquirido sobre os horários das agendas afetadas na semana sendo editada (entre `startOfWeek()` e `endOfWeek()`). A revalidação ocorre para cada novo horário a inserir, imediatamente antes do `create()`. Da mesma forma, exclui horários da própria reserva da verificação de conflito.
 
 ### 4.3 Pipeline de Validação de Conflitos
 
