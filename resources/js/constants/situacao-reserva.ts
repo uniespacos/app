@@ -58,7 +58,7 @@ export const ESTILO_SITUACAO: Record<SituacaoReservaType, EstiloSituacao> = {
  * situações de reserva nenhuma.
  */
 export const ESTILO_SLOT = {
-    livre: { label: 'Livre', solido: 'bg-muted-foreground', fundo: '' },
+    livre: { label: 'Livre', solido: 'bg-muted-foreground/25', fundo: '' },
     reservado: { label: 'Reservado', solido: 'bg-info', fundo: 'bg-info-subtle' },
     selecionado: { label: 'Selecionado', solido: 'bg-success', fundo: 'bg-success-subtle' },
     solicitado: { label: 'Em análise', solido: 'bg-warning', fundo: 'bg-warning-subtle' },
