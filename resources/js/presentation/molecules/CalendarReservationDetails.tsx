@@ -22,12 +22,14 @@ export default function CalendarReservationDetails({ diasSemana, agendas, slotsS
         return (
             <Card className="p-0">
                 <CalendarDiaMobile
+                    key={diasSemana[0]?.valor}
                     diasSemana={diasSemana}
                     agendas={agendas}
                     isSlotSelecionado={SEM_SELECAO}
                     alternarSelecaoSlot={alternarSelecaoSlotFn}
                     slotsDaReserva={slotsSolicitados}
                     exigirGestor={false}
+                    modoSelecaoInicial="primeiroComReserva"
                 />
             </Card>
         );

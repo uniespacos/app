@@ -71,6 +71,22 @@ interface CalendarDiaMobileProps {
     alternarSelecaoSlot: (slot: SlotCalendario) => void;
     slotsDaReserva?: SlotCalendario[];
     exigirGestor?: boolean;
+    modoSelecaoInicial?: 'hoje' | 'primeiroComReserva';
+}
+
+function calcularIndiceInicial(
+    diasSemana: AgendaDiasSemanaType[],
+    modoSelecaoInicial: 'hoje' | 'primeiroComReserva',
+    indicadoresDias: Map<string, IndicadorDia>,
+): number {
+    const indiceHoje = Math.max(diasSemana.findIndex((dia) => dia.ehHoje), 0);
+
+    if (modoSelecaoInicial !== 'primeiroComReserva') {
+        return indiceHoje;
+    }
+
+    const indicePrimeiroComReserva = diasSemana.findIndex((dia) => indicadoresDias.get(dia.valor)?.temSlot);
+    return indicePrimeiroComReserva !== -1 ? indicePrimeiroComReserva : indiceHoje;
 }
 
 export default function CalendarDiaMobile({
@@ -80,15 +96,8 @@ export default function CalendarDiaMobile({
     alternarSelecaoSlot,
     slotsDaReserva,
     exigirGestor = true,
+    modoSelecaoInicial = 'hoje',
 }: CalendarDiaMobileProps) {
-    const indiceInicial = Math.max(
-        diasSemana.findIndex((dia) => dia.ehHoje),
-        0,
-    );
-    const [indiceDia, setIndiceDia] = useState(indiceInicial);
-
-    const diaVisivel = diasSemana[indiceDia];
-
     const agendasOrdenadas = useMemo(
         () =>
             [...agendas].filter((a) => !exigirGestor || a.user).sort((a, b) => TURNOS_ORDENADOS.indexOf(a.turno) - TURNOS_ORDENADOS.indexOf(b.turno)),
@@ -109,6 +118,12 @@ export default function CalendarDiaMobile({
         () => calcularIndicadoresDias(diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado),
         [diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado],
     );
+
+    const [indiceDia, setIndiceDia] = useState(() =>
+        calcularIndiceInicial(diasSemana, modoSelecaoInicial, indicadoresDias),
+    );
+
+    const diaVisivel = diasSemana[indiceDia];
 
     const slotsPorTurno = useMemo(() => {
         if (diaVisivel === undefined) {
