@@ -114,7 +114,7 @@ export default function DashboardUsuarioPage(props: DashboardUsuarioProps) {
                                     router.get(href);
                                 }
                             }}
-                            className="border-border/70 group hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-sm"
+                            className="border-border/70 group min-w-0 hover:border-primary/50 cursor-pointer transition-all duration-200 hover:shadow-sm"
                         >
                             <CardContent className="flex items-center justify-between p-5">
                                 <div className="flex items-center gap-4">

@@ -129,6 +129,10 @@ export const ptBR = {
             solicitacoes: 'Minhas Solicitações',
             favoritos: 'Espaços Favoritos',
         },
+        reservas_recentes: {
+            titulo: 'Reservas Recentes',
+            descricao: 'Suas últimas solicitações de reserva',
+        },
         empty: {
             no_reservas: 'Você ainda não possui solicitações de reserva.',
             no_favoritos: 'Nenhum espaço marcado como favorito.',

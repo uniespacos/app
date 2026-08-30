@@ -131,6 +131,10 @@ export const en = {
             solicitacoes: 'My Requests',
             favoritos: 'Favorite Spaces',
         },
+        reservas_recentes: {
+            titulo: 'Recent Reservations',
+            descricao: 'Your latest reservation requests',
+        },
         empty: {
             no_reservas: 'You have no reservation requests yet.',
             no_favoritos: 'No spaces marked as favorite.',
