@@ -238,6 +238,11 @@ export const es = {
             escopo_todas: 'Todas las ocurrencias de la recurrencia',
             escopo_semana: 'Solo horarios de esta semana',
         },
+        gestor: {
+            conflicts_detected: 'Advertencia: {{count}} franja(s) horaria(s) de esta reserva se superpone(n) con otra(s) reserva(s).',
+            conflict_with_user: 'Solicitante: {{user}}',
+            conflicts_note: 'Puede optar por deferir incluso con conflictos. Considere analizar las reservas conflictivas antes de continuar.',
+        },
         stepper: {
             step1_title: 'Horarios y Recurrencia',
             step1_subtitle: 'Seleccione la fecha, turno y horarios deseados',
