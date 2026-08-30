@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.74](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.73...v1.3.0-rc.74) (2026-08-30)
+
+
+### Bug Fixes
+
+* escopa contagens de Horario por agenda em ReservaConcorrenciaTest ([#408](https://github.com/uniespacos/uniespacos/issues/408)) ([808c210](https://github.com/uniespacos/uniespacos/commit/808c2104fd012056957c3f34867f4b5339aa5e67))
+
 ## [1.3.0-rc.73](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.72...v1.3.0-rc.73) (2026-08-30)
 
 
