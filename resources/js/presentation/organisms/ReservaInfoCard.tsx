@@ -42,11 +42,6 @@ export function ReservaInfoCard({ reserva, children }: ReservaInfoCardProps) {
                 )}
             </CardHeader>
             <CardContent className="space-y-4">
-                <div>
-                    <h4 className="text-foreground mb-2 font-medium">Descrição</h4>
-                    <p className="bg-muted/50 text-foreground rounded-lg p-3">{reserva.descricao}</p>
-                </div>
-                <Separator />
                 <div className="flex items-center gap-2">
                     <CalendarDays className="text-muted-foreground h-4 w-4" />
                     <div>
@@ -55,6 +50,11 @@ export function ReservaInfoCard({ reserva, children }: ReservaInfoCardProps) {
                             {formatDate(reserva.data_inicial)} até {formatDate(reserva.data_final)}
                         </p>
                     </div>
+                </div>
+                <Separator />
+                <div>
+                    <h4 className="text-muted-foreground mb-2 font-medium text-sm">Descrição</h4>
+                    <p className="text-foreground text-sm">{reserva.descricao}</p>
                 </div>
                 {children && (
                     <>
