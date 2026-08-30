@@ -120,26 +120,28 @@ Total: 5 horários (expansão semanal até 01/out)
 
 ```
 Entrada:
-  data_inicial: 2026-05-01 (quinta-feira)
-  data_final: 2026-09-04 (sexta-feira) — aprox. 4 meses, definidos pelo usuário
+  data_inicial: 2026-08-20 (quinta-feira)
+  data_final: 2026-12-18 (quinta-feira) — aprox. 4 meses, definidos pelo usuário
   horarios_solicitados: [
-    { agenda_id: 5, data: 2026-05-01, horario_inicio: 09:00, horario_fim: 10:00 },  // Padrão 1: quinta
-    { agenda_id: 5, data: 2026-05-02, horario_inicio: 14:00, horario_fim: 15:00 },  // Padrão 2: sexta
+    { agenda_id: X, data: 2026-08-20, horario_inicio: HH:MM, horario_fim: HH:MM },  // Padrão 1
+    { agenda_id: Y, data: 2026-08-20, horario_inicio: HH:MM, horario_fim: HH:MM },  // Padrão 2
+    // ... (11 padrões distintos no total, combinando diferentes agenda_id + horario)
   ]
 
 Saída (horarios):
-  └─ Expande semanalmente por ~17 semanas (maio até setembro):
-     ├─ 2026-05-01 09:00-10:00 (quinta)
-     ├─ 2026-05-02 14:00-15:00 (sexta)
-     ├─ 2026-05-08 09:00-10:00 (quinta)
-     ├─ 2026-05-09 14:00-15:00 (sexta)
-     ├─ ... (repete até setembro)
-     └─ 2026-09-04 14:00-15:00 (sexta)
+  └─ Expande semanalmente por ~18 semanas (agosto até dezembro):
+     ├─ 2026-08-20 HH:MM (padrão 1)
+     ├─ 2026-08-20 HH:MM (padrão 2)
+     ├─ ... (todos os 11 padrões no primeiro dia)
+     ├─ 2026-08-27 HH:MM (padrão 1)
+     ├─ 2026-08-27 HH:MM (padrão 2)
+     ├─ ... (repete semanalmente até dezembro)
+     └─ 2026-12-18 HH:MM (último padrão)
 
-Total: **198 horários** (2 padrões × 99 ocorrências dentro do intervalo)
+Total: **198 horários** (11 padrões × ~18 semanas ≈ 198)
 ```
 
-**Por que 198?** Cada padrão (terça, quinta, sexta, etc.) se repete **semanalmente** dentro do período — o usuário definiu o período (maio até setembro ~4 meses), não a frequência (que é sempre semanal). 198 horários é comportamento esperado, não um bug.
+**Por que 198?** Cada padrão (combinação de agenda + dia da semana + faixa horária) se repete **semanalmente** dentro do período de ~18 semanas definido pelo usuário (agosto até dezembro). 11 padrões distintos × ~18 semanas = 198 horários. Este é o comportamento esperado, não um bug.
 
 ---
 
