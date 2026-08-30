@@ -10,37 +10,139 @@ Quando um solicitante é o **único gestor de TODAS as agendas** incluídas em s
 
 ## Localização no Código
 
-**Arquivo:** `app/Jobs/ProcessarCriacaoReserva.php`
+A regra de auto-aprovação foi extraída de lógica duplicada em dois jobs e consolidada em um serviço único:
 
-**Implementação em duas camadas:**
+**Arquivo Principal:** `app/Services/AutoAprovacaoService.php`
 
-### 1. Nível de Horário (linhas 90–92)
+A classe encapsula duas responsabilidades distintas em dois métodos públicos:
 
-Callback passado para `ExpansaoHorariosService::montar()`:
+### Métodos do Serviço
 
-```php
-fn (Agenda $agenda) => $agenda->user && $agenda->user->id === $this->solicitante->id
-    ? 'deferida'
-    : 'em_analise',
-```
-
-Cada `Horario` recebe `situacao='deferida'` se o solicitante é o gestor daquela agenda, ou `'em_analise'` caso contrário.
-
-### 2. Nível de Reserva (linhas 103–107)
-
-Após a criação dos horários, a `Reserva` tem sua `situacao` atualizada conforme:
+#### 1. `resolverSituacaoHorario(Agenda $agenda, int $proprietarioReservaId): string`
 
 ```php
-if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $this->solicitante->id) {
-    $reserva->update(['situacao' => 'deferida']);
-} elseif ($gestoresUnicos->contains(fn ($g) => $g->id === $this->solicitante->id)) {
-    $reserva->update(['situacao' => 'parcialmente_deferida']);
+/**
+ * Resolve a situacao inicial de um horario individual.
+ *
+ * Regra: se o dono da agenda (gestor) e o proprietario da reserva, o horario
+ * ja nasce deferido — o proprietario automaticamente tem permissao para usar
+ * seus proprios espacos. Caso contrario, fica em_analise aguardando avaliacao
+ * do gestor.
+ *
+ * @param  Agenda  $agenda  Agenda na qual o horario esta sendo solicitado.
+ * @param  int  $proprietarioReservaId  ID do user que criou/edita a reserva (solicitante ou dono).
+ * @return string Valor de SituacaoReservaEnum (deferida ou em_analise).
+ */
+public function resolverSituacaoHorario(Agenda $agenda, int $proprietarioReservaId): string
+{
+    return $agenda->user_id === $proprietarioReservaId
+        ? SituacaoReservaEnum::DEFERIDA->value
+        : SituacaoReservaEnum::EM_ANALISE->value;
 }
 ```
 
+**Decisão no nível individual:** Se o user que está criando/editando a reserva é o gestor daquela agenda, o horário nasce `deferida`. Caso contrário, `em_analise`.
+
+#### 2. `calcularSituacaoReserva(Collection $gestoresUnicos, int $solicitanteId): ?string`
+
+```php
+/**
+ * Calcula a situacao agregada da reserva baseado nos gestores unicos envolvidos.
+ *
+ * Regra: se ha apenas 1 gestor E esse gestor e o solicitante, a reserva toda
+ * e automaticamente deferida (o proprietario administra todos os espacos).
+ * Se ha multiplos gestores MAS o solicitante e um deles, a reserva e
+ * parcialmente_deferida (alguns horarios sua, alguns depende de outros gestores).
+ *
+ * Retorna null quando nenhuma condicao se aplica — a reserva permanece com a
+ * situacao que ja tinha (tipicamente em_analise setada na criacao).
+ *
+ * @param  Collection<int, User>  $gestoresUnicos  Users que gerenciam as agendas usadas.
+ * @param  int  $solicitanteId  ID do usuario que fez a solicitacao.
+ * @return ?string Nova situacao se aplicavel, ou null para preservar a situacao existente.
+ */
+public function calcularSituacaoReserva(Collection $gestoresUnicos, int $solicitanteId): ?string
+{
+    if ($gestoresUnicos->count() === 1 && $gestoresUnicos->first()->id === $solicitanteId) {
+        return SituacaoReservaEnum::DEFERIDA->value;
+    }
+
+    if ($gestoresUnicos->contains(fn ($g) => $g->id === $solicitanteId)) {
+        return SituacaoReservaEnum::PARCIALMENTE_DEFERIDA->value;
+    }
+
+    return null;
+}
+```
+
+**Decisão no nível agregado:** Após processar todos os horários, calcula se a reserva INTEIRA pode ser deferida, parcialmente deferida, ou permanece em análise. Retorna `null` para preservar a situação existente quando nenhuma condição aplica.
+
+---
+
+### Uso em Criação de Reserva
+
+**Arquivo:** `app/Jobs/ProcessarCriacaoReserva.php` (linhas 93–107)
+
+**Nível de Horário (linha 93):**
+```php
+$autoAprovacao = app(AutoAprovacaoService::class);
+// ...
+[$linhas, $agendasUsadas] = $expansao->montar(
+    $slots,
+    $agendasMap,
+    $recorrencia,
+    $dataFinal,
+    $reserva->id,
+    fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->solicitante->id)
+);
+```
+
+Cada horário recebe `situacao='deferida'` se o solicitante é o gestor daquela agenda, ou `'em_analise'` caso contrário.
+
+**Nível de Reserva (linhas 104–107):**
+```php
+// Agenda sem gestor atribuido nao entra na conta.
+$gestoresUnicos = $agendasUsadas->map(fn (Agenda $a) => $a->user)->filter()->unique('id')->values();
+$novaSituacao = $autoAprovacao->calcularSituacaoReserva($gestoresUnicos, $this->solicitante->id);
+
+if ($novaSituacao !== null) {
+    $reserva->update(['situacao' => $novaSituacao]);
+}
+```
+
+Após a criação dos horários, a `Reserva` tem sua `situacao` atualizada conforme:
 - **Deferida:** Um único gestor (de TODAS as agendas) e é o solicitante.
 - **Parcialmente deferida:** O solicitante é gestor de ALGUMAS agendas (mas não todas).
-- **Em análise:** O solicitante não é gestor de nenhuma agenda.
+- **Em análise:** Nenhuma condição aplica — a reserva permanece com a situação que já tinha.
+
+---
+
+### Uso em Edição de Reserva (Escopo `recurring`)
+
+**Arquivo:** `app/Jobs/UpdateReservaJob.php` (linha 131)
+
+```php
+$autoAprovacao = app(AutoAprovacaoService::class);
+// ...
+[$linhas, $agendasUsadas] = $expansao->montar(
+    $slots,
+    $agendasMap,
+    $recorrencia,
+    $dataFinal,
+    $this->reserva->id,
+    fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->reserva->user_id)
+);
+```
+
+**Diferença crítica em relação à criação:**
+
+Em uma edição (escopo `recurring`), o proprietário de referência é o **dono da reserva** (`$this->reserva->user_id`), **não** quem está editando (`$this->user->id`). Isso é intencional: um gestor editando a reserva de outra pessoa não pode auto-deferir por acidente.
+
+**Comportamento de agregação na edição:**
+
+`UpdateReservaJob` **NÃO recalcula** `calcularSituacaoReserva()` — não existe, e nunca existiu, recálculo da situação AGREGADA da reserva dentro deste job. Após uma edição (escopo `recurring`), a coluna `reservas.situacao` permanece com o valor que tinha antes da edição.
+
+**Nota:** O recálculo agregado da situação de uma reserva acontece em outro mecanismo completamente diferente: `AvaliarReservaJob::updateReservaOverallStatus()`, chamado quando um gestor avalia horários. Esse mecanismo está documentado em `docs/models-business-rules.md` (seção "Regras de Negócio — Cascata de Situação") e não é afetado por esta fase.
 
 ## Condição Requerida: "TODAS" as Agendas
 
