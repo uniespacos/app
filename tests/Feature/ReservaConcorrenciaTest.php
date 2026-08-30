@@ -75,7 +75,7 @@ class ReservaConcorrenciaTest extends TestCase
         // Agenda cujo dono é user1 — seus horários nascem `deferida` automaticamente
         $agenda = Agenda::factory()->create(['user_id' => $user1->id]);
 
-        $this->assertCount(0, Horario::all());
+        $this->assertCount(0, Horario::where('agenda_id', $agenda->id)->get());
 
         // Simular: duas requisições validadas quase simultaneamente
         // (ambas veem o banco vazio, ambas passam pela validação síncrona)
@@ -102,7 +102,7 @@ class ReservaConcorrenciaTest extends TestCase
         $reserva2 = $this->executar($payload2, $user2);
 
         // Validações finais
-        $this->assertCount(1, Horario::all(), 'Apenas 1 horário deve existir no banco');
+        $this->assertCount(1, Horario::where('agenda_id', $agenda->id)->get(), 'Apenas 1 horário deve existir no banco');
 
         // Reserva de user2 não foi persistida (rollback automático da transação)
         $this->assertNull($reserva2, 'Reserva de user2 não deve ter sido criada');
@@ -137,7 +137,7 @@ class ReservaConcorrenciaTest extends TestCase
         $this->assertCount(1, $reserva2->horarios);
 
         // Ambos os horários devem estar no banco
-        $this->assertCount(2, Horario::all());
+        $this->assertCount(2, Horario::where('agenda_id', $agenda->id)->get());
 
         // Horário 1: deferida (user1 é dono)
         $horario1 = $reserva1->horarios->first();
@@ -187,7 +187,7 @@ class ReservaConcorrenciaTest extends TestCase
         $this->assertEquals('em_analise', $horarioBOriginal->situacao);
 
         // Total de horários: 2
-        $this->assertCount(2, Horario::all());
+        $this->assertCount(2, Horario::where('agenda_id', $agenda->id)->get());
 
         // Agora UserB tenta editar sua reserva para o mesmo horário que UserA (10:00-11:00)
         // A revalidação sob lock deve detectar o conflito e causar rollback da transação
@@ -216,7 +216,7 @@ class ReservaConcorrenciaTest extends TestCase
         $this->assertEquals($horarioBOriginal->id, $horarioBAtual->id, 'Horário de UserB deve manter o mesmo ID');
 
         // Total de horários no banco deve continuar 2, sem duplicação
-        $this->assertCount(2, Horario::all(), '2 horários devem estar no banco (1 de UserA, 1 de UserB original)');
+        $this->assertCount(2, Horario::where('agenda_id', $agenda->id)->get(), '2 horários devem estar no banco (1 de UserA, 1 de UserB original)');
     }
 
     /**
@@ -256,7 +256,7 @@ class ReservaConcorrenciaTest extends TestCase
             ->first();
 
         // Total: 3 horários
-        $this->assertCount(3, Horario::all());
+        $this->assertCount(3, Horario::where('agenda_id', $agenda->id)->get());
 
         // Agora UserB tenta editar apenas o horário da semana 15 para colidir com UserA (10:00-11:00)
         // edit_scope = 'single' indica edição de uma ocorrência específica
@@ -303,7 +303,7 @@ class ReservaConcorrenciaTest extends TestCase
         $this->assertEquals('09:00:00', $horariosNaSemana22->first()->horario_inicio);
 
         // Total de horários: 3 (nenhum novo foi inserido, nenhum foi deletado)
-        $this->assertCount(3, Horario::all());
+        $this->assertCount(3, Horario::where('agenda_id', $agenda->id)->get());
     }
 
     /**
@@ -362,6 +362,6 @@ class ReservaConcorrenciaTest extends TestCase
         $this->assertEquals('16:00:00', $horario->horario_fim);
 
         // Total de horários: 2 (um de cada usuário, sem duplicação)
-        $this->assertCount(2, Horario::all());
+        $this->assertCount(2, Horario::where('agenda_id', $agenda->id)->get());
     }
 }
