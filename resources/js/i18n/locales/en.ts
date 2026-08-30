@@ -217,6 +217,8 @@ export const en = {
         detalhes: {
             titulo: 'Reservation Details',
             solicitante: 'Requester',
+            email: 'Email',
+            telefone: 'Phone',
             espaco: 'Space',
             setor: 'Sector',
             solicitado_em: 'Requested on',
