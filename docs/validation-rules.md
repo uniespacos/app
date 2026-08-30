@@ -240,11 +240,11 @@ public static function normalizarNome(string $nome): string
 |-------|-------|----------|
 | `titulo` | `required`, `string`, `max:255` | Título descritivo da reserva |
 | `descricao` | `nullable`, `string` | Justificativa (opcional) |
-| `data_inicial` | `required` | Início do período (fallback se sem horários) |
-| `data_final` | `required` | Término do período |
+| `data_inicial` | `required`, `date`, `after_or_equal:today` | Início do período (hoje ou futura) |
+| `data_final` | `required`, `date`, `after_or_equal:data_inicial` | Término do período (≥ data inicial) |
 | `recorrencia` | `required`, `in:unica,15dias,1mes,personalizado` | Padrão de repetição |
 | `horarios_solicitados` | `required`, `array`, `min:1`, **`HorariosMesmoEspaco`** | Array de time slots solicitados (validação de espaço único) |
-| `horarios_solicitados.*.data` | `required` | Data de cada horário |
+| `horarios_solicitados.*.data` | `required`, `date`, `after_or_equal:today` | Data de cada horário (hoje ou futura) |
 | `horarios_solicitados.*.horario_inicio` | `required`, `date_format:H:i:s` | Hora de início (HH:MM:SS) |
 | `horarios_solicitados.*.horario_fim` | `required`, `date_format:H:i:s` | Hora de término |
 | `horarios_solicitados.*.agenda_id` | `required`, `integer`, `exists:agendas,id`, **`HorarioDisponivel`** | Validação de disponibilidade |
@@ -265,13 +265,24 @@ public static function normalizarNome(string $nome): string
 
 | Campo | Rules | Propósito |
 |-------|-------|----------|
-| (idem StoreReservaRequest) | | |
+| `titulo` | `required`, `string`, `max:255` | Título descritivo da reserva |
+| `descricao` | `nullable`, `string` | Justificativa (opcional) |
+| `data_inicial` | `required`, `date` | Início do período (sem validação de data passada) |
+| `data_final` | `required`, `date`, `after_or_equal:data_inicial` | Término do período (≥ data inicial) |
+| `recorrencia` | `required`, `in:unica,15dias,1mes,personalizado` | Padrão de repetição |
+| `horarios_solicitados` | `present`, `array`, **`HorariosMesmoEspaco`** | Array de time slots (pode ser vazio, validação de espaço único) |
+| `horarios_solicitados.*.data` | `required`, `date` | Data de cada horário (sem validação de data passada) |
+| `horarios_solicitados.*.horario_inicio` | `required`, `date_format:H:i:s` | Hora de início (HH:MM:SS) |
+| `horarios_solicitados.*.horario_fim` | `required`, `date_format:H:i:s` | Hora de término |
+| `horarios_solicitados.*.agenda_id` | `required`, `integer`, `exists:agendas,id`, **`HorarioDisponivel`** | Validação de disponibilidade |
 | `edit_scope` | `required`, `Rule::in(['single', 'recurring'])` | Single: edita só essa ocorrência; Recurring: edita toda série |
 | `edited_week_date` | `required_if:edit_scope,single`, `nullable`, `date` | Data de referência para edição única |
 
-**Diferenças:**
-- `horarios_solicitados` é `present, array` (pode ser vazio) em vez de `required, array, min:1`
-- Adiciona campos de escopo de edição (single vs série inteira)
+**Diferenças Intencionais em Relação a `StoreReservaRequest`:**
+
+A validação de data em `data_inicial` e `horarios_solicitados.*.data` **não inclui** `after_or_equal:today` na edição, diferentemente da criação. Motivo: **Reservas recorrentes criadas no passado** (ex: `recorrencia=personalizado` iniciada há 2 meses, vigente até o próximo mês) precisam ser editáveis para manutenção de horários sem serem rejeitadas pelo backend. Se `UpdateReservaRequest` exigisse `after_or_equal:today` em `data_inicial`, qualquer alteração nessas reservas seria bloqueada.
+
+A regra "não pode criar reserva com data passada" vale **apenas na criação** (`StoreReservaRequest`). Alterações em reservas em andamento são permitidas; qualquer correção de data para trás é manual e autorizada pelo gestor/administrador.
 
 **Validação HorariosMesmoEspaco:** Mesmo comportamento que em `StoreReservaRequest` — valida que todos os horários estão no mesmo espaço
 
