@@ -57,7 +57,13 @@ export default function ReservaDetalhes({
     const { semana } = usePage<{ semana?: { referencia: string } }>().props;
 
     const [isLoading, setIsLoading] = useState(false);
-    const [semanaVisivel, setSemanaVisivel] = useState(semana?.referencia ? parseISO(semana.referencia) : new Date());
+    const [semanaVisivel, setSemanaVisivel] = useState(() => {
+        const primeiroHorarioData = selectedReserva.horarios[0]?.data;
+        if (primeiroHorarioData) {
+            return parseISO(primeiroHorarioData);
+        }
+        return semana?.referencia ? parseISO(semana.referencia) : new Date();
+    });
 
     const slotsSelecao = useMemo<SlotCalendario[]>(() => {
         return selectedReserva.horarios.map((horario) => ({

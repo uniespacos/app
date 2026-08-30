@@ -117,4 +117,31 @@ describe('ReservaDetalhes', () => {
         fireEvent.click(screen.getByRole('button', { name: /Cancelar/i }));
         expect(onRemover).toHaveBeenCalledWith(mockReserva);
     });
+
+    it('sincroniza a semana visível com o primeiro horário da reserva, não com a semana de hoje', () => {
+        const futuraReserva: Reserva = {
+            ...mockReserva,
+            data_inicial: new Date('2026-09-10T08:00:00Z'),
+            data_final: new Date('2026-09-10T12:00:00Z'),
+            horarios: [
+                {
+                    ...mockReserva.horarios[0],
+                    data: '2026-09-10',
+                },
+            ],
+        };
+
+        render(
+            <ReservaDetalhes
+                isOpen={true}
+                onOpenChange={jest.fn()}
+                selectedReserva={futuraReserva}
+                isGestor={false}
+                setRemoverReserva={jest.fn()}
+                routeName="reservas.index"
+            />,
+        );
+
+        expect(screen.getByText(/07\/09 - 13\/09\/2026/)).toBeInTheDocument();
+    });
 });
