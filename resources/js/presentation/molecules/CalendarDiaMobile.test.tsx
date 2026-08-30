@@ -107,6 +107,15 @@ describe('CalendarDiaMobile', () => {
         expect(screen.getByText(/Nenhum turno disponível/)).toBeInTheDocument();
     });
 
+    it('exibe agendas sem gestor quando exigirGestor={false}', () => {
+        const semGestor: Agenda = { id: 9, turno: 'noite', horarios: [] };
+
+        render(<CalendarDiaMobile {...props} agendas={[semGestor]} exigirGestor={false} />);
+
+        expect(screen.getByText('Noite')).toBeInTheDocument();
+        expect(screen.queryByText(/Nenhum turno disponível/)).not.toBeInTheDocument();
+    });
+
     it('nao quebra quando a semana vem vazia', () => {
         const { container } = render(<CalendarDiaMobile {...props} diasSemana={[]} />);
 
@@ -174,16 +183,16 @@ describe('CalendarDiaMobile', () => {
         expect(dotsEmSeg).toHaveLength(0);
     });
 
-    it('aba ativa usa ring-2 ring-primary e bg-primary/10, nao bg-primary solido', () => {
+    it('aba ativa usa ring-2 ring-muted-foreground e bg-muted-foreground/10, nao bg-muted-foreground solido', () => {
         render(<CalendarDiaMobile {...props} agendas={[agenda('manha')]} />);
 
         const abaSeg = screen.getByRole('tab', { name: /segunda-feira/i });
         const circleAtivo = within(abaSeg).getByText(/^07$/);
 
         expect(circleAtivo).toHaveClass('ring-2');
-        expect(circleAtivo).toHaveClass('ring-primary');
-        expect(circleAtivo).toHaveClass('bg-primary/10');
-        expect(circleAtivo).not.toHaveClass('bg-primary');
+        expect(circleAtivo).toHaveClass('ring-muted-foreground');
+        expect(circleAtivo).toHaveClass('bg-muted-foreground/10');
+        expect(circleAtivo).not.toHaveClass('bg-muted-foreground');
     });
 
     it('indicador dot usa cor do status dominante do dia', () => {

@@ -215,6 +215,8 @@ export const ptBR = {
         detalhes: {
             titulo: 'Detalhes da Reserva',
             solicitante: 'Solicitante',
+            email: 'E-mail',
+            telefone: 'Telefone',
             espaco: 'Espaço',
             setor: 'Setor',
             solicitado_em: 'Solicitado em',

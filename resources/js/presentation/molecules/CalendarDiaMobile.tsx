@@ -107,12 +107,12 @@ export default function CalendarDiaMobile({
     const agendasPorTurno = useMemo(() => {
         const mapa = new Map<string, Agenda>();
         agendasOrdenadas.forEach((agenda) => {
-            if (!mapa.has(agenda.turno) && agenda.user) {
+            if (!mapa.has(agenda.turno) && (!exigirGestor || agenda.user)) {
                 mapa.set(agenda.turno, agenda);
             }
         });
         return Array.from(mapa.values());
-    }, [agendasOrdenadas]);
+    }, [agendasOrdenadas, exigirGestor]);
 
     const indicadoresDias = useMemo(
         () => calcularIndicadoresDias(diasSemana, agendasPorTurno, slotsDaReserva, isSlotSelecionado),
@@ -167,14 +167,15 @@ export default function CalendarDiaMobile({
                             className={cn(
                                 'relative flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors',
                                 'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset',
-                                ativo ? 'text-primary' : 'text-muted-foreground hover:bg-muted/50',
+                                'text-muted-foreground',
+                                !ativo && 'hover:bg-muted/50',
                             )}
                         >
                             <span className="text-[11px] leading-none font-medium capitalize">{dia.abreviado}</span>
                             <span
                                 className={cn(
                                     'flex h-7 w-7 items-center justify-center rounded-full text-sm tabular-nums',
-                                    ativo && 'bg-primary/10 ring-2 ring-primary text-primary font-semibold',
+                                    ativo && 'bg-muted-foreground/10 ring-2 ring-muted-foreground text-muted-foreground font-semibold',
                                     !ativo && 'font-medium',
                                     !ativo && dia.ehHoje && 'text-primary font-semibold',
                                 )}
