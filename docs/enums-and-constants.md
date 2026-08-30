@@ -10,6 +10,7 @@ Este documento descreve todos os enums e constantes de domínio do UniEspaços, 
 - [AgendaEnum — Turnos de Gestão](#agendaenum--turnos-de-gestão)
 - [CampusEnum — Campi da Universidade](#campusenum--campi-da-universidade)
 - [DiasSemanaEnum — Dias da Semana](#diassemanadaenum--dias-da-semana)
+- [RecorrenciaReservaEnum — Tipos de Recorrência](#recorrenciareservaenum--tipos-de-recorrência)
 - [FormatoRelatorioEnum — Formatos de Exportação](#formatorelatoriouenum--formatos-de-exportação)
 - [TipoRelatorioEnum — Tipos de Relatório](#tiporelatorioenum--tipos-de-relatório)
 - [ErrorCode — Códigos de Erro HTTP](#errorcode--códigos-de-erro-http)
@@ -261,6 +262,34 @@ Dias da semana, usados em recorrências e calendários.
 ### Uso
 
 Usado para definir padrões de recorrência (ex: "toda segunda, quarta e sexta") e para exibições em calendários.
+
+---
+
+## RecorrenciaReservaEnum — Tipos de Recorrência
+
+**Localização:** `app/Enums/Reserva/RecorrenciaReservaEnum.php`
+
+**Tipo de dado:** string (enum)
+
+Define como um padrão de horários (agenda + dia da semana + faixa horária) se expande no tempo. Cada tipo tem semântica e comportamento distintos de expansão e edição de `data_final`.
+
+### Valores Possíveis
+
+| Valor | Tipo | `data_final` definido por | Expansão | `data_final` editável | Exemplo |
+|-------|------|--------------------------|----------|----------------------|---------|
+| `unica` | Ocorrência Única | Sistema (= `data_inicial`) | Nenhuma | Não | Uma aula única em 15/set |
+| `15dias` | Período Fixo (15 dias) | Sistema (= `data_inicial` + 15 dias) | Semanal até `data_final` | Não | Reuniões quinzenais por 2 meses |
+| `1mes` | Período Fixo (1 mês) | Sistema (= `data_inicial` + 1 mês) | Semanal até `data_final` | Não | Workshops mensais por 1 mês |
+| `personalizado` | Período Personalizado | **Usuário** | Semanal até `data_final` | **Sim** | Aulas em ter/qui por 3 meses (definidos pelo usuário) |
+
+### Comportamento de Expansão
+
+- **`unica`** → Gera exatamente N horários (um por slot selecionado), sem repetição.
+- **`15dias`, `1mes`, `personalizado`** → Cada padrão (agenda + dia da semana + horário) se repete **semanalmente** até `data_final`.
+
+### Por Que Consultar
+
+Para entender como uma reserva com `recorrencia='personalizado'` gera múltiplos horários, ou para compreender a diferença entre os tipos de recorrência suportados, consulte **`docs/recorrencia-semantica.md`** (documentação completa com exemplos reais, reclassificação de falsos positivos e justificativa de design).
 
 ---
 

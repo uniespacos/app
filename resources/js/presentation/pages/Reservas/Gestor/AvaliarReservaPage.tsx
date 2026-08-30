@@ -11,10 +11,11 @@ import { verificarStatusReserva } from '@/lib/utils/reserva-status.helpers';
 import { SituacaoIcon } from '@/presentation/atoms/SituacaoIcon';
 import AgendaNavegacao from '@/presentation/molecules/AgendaNavegacao';
 import CalendarReservationDetails from '@/presentation/molecules/CalendarReservationDetails';
+import { ConflictAlertBox } from '@/presentation/organisms/ConflictAlertBox';
 import EvaluationForm from '@/presentation/organisms/EvaluationForm';
 import { ReservaInfoCard } from '@/presentation/organisms/ReservaInfoCard';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Agenda, Reserva, type BreadcrumbItem } from '@/types';
+import { Agenda, Reserva, type BreadcrumbItem, type ConflictInfo } from '@/types';
 import { Head } from '@inertiajs/react';
 import { format, parse, parseISO } from 'date-fns';
 import { Clock, Loader2 } from 'lucide-react';
@@ -32,14 +33,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface ConflitoItem {
-    horario_checado_id: number;
-    conflito_reserva_id: number;
-    conflito_reserva_titulo: string;
-    conflito_user_name: string;
-    conflito_tipo: string;
-}
-
 interface AvaliarReservaPageProps {
     reserva: Reserva;
     semana: {
@@ -47,7 +40,7 @@ interface AvaliarReservaPageProps {
         fim?: string;
         referencia: string;
     };
-    todosOsConflitos?: Record<string, ConflitoItem>;
+    todosOsConflitos?: Record<string, ConflictInfo>;
 }
 
 export default function AvaliarReservaPage({ reserva, semana, todosOsConflitos = {} }: AvaliarReservaPageProps) {
@@ -217,6 +210,8 @@ export default function AvaliarReservaPage({ reserva, semana, todosOsConflitos =
                         </div>
                     </div>
                 </ReservaInfoCard>
+
+                <ConflictAlertBox conflictCache={todosOsConflitos} />
 
                 <EvaluationForm
                     isReavaliacao={isReavaliacao}

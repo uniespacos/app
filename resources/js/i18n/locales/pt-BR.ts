@@ -236,6 +236,11 @@ export const ptBR = {
             escopo_todas: 'Todas as ocorrências da recorrência',
             escopo_semana: 'Apenas horários desta semana',
         },
+        gestor: {
+            conflicts_detected: 'Atenção: {{count}} horário(s) desta reserva possui(em) sobreposição com outra(s) reserva(s).',
+            conflict_with_user: 'Solicitante: {{user}}',
+            conflicts_note: 'Você pode optar por deferir mesmo com conflitos. Considere analisar as reservas conflitantes antes de prosseguir.',
+        },
         stepper: {
             step1_title: 'Horários e Recorrência',
             step1_subtitle: 'Selecione a data, turno e horários desejados',

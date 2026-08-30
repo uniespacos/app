@@ -25,7 +25,7 @@ Este documento descreve os cinco models principais, seus comportamentos, scopes,
 | `situacao` | string | Estado agregado: `em_analise`, `deferida`, `indeferida`, `parcialmente_deferida`, `inativa` |
 | `data_inicial` | date | Data de início (usada como fallback quando sem horários) |
 | `data_final` | date | Data de término |
-| `recorrencia` | string \| null | Padrão de recorrência |
+| `recorrencia` | string \| null | Padrão de recorrência (ver [`docs/recorrencia-semantica.md`](./recorrencia-semantica.md) para detalhes completos) |
 | `observacao` | string \| null | Notas do gestor após avaliação |
 | `user_id` | int | FK para solicitante |
 | `validation_status` | string | `pending`, `completed`, etc. (estado do job de validação de conflitos) |
@@ -124,7 +124,7 @@ Caso contrário (mix de deferida/indeferida):
 
 2. **Inativa é arquivamento, não avaliação:** `inativa` não é resultado de uma decisão do gestor — é um marcador de "descarte/cancelamento". Nunca aparece como opção de aprovação/rejeição nos formulários de avaliação.
 
-3. **Auto-aprovação via unicidade de gestor:** Quando uma reserva é criada e existe apenas **um** gestor para **todos** os espaços solicitados, a reserva pode ser automaticamente aprovada (dependendo de política da aplicação).
+3. **Auto-aprovação via unicidade de gestor:** Quando uma reserva é **criada** e existe apenas **um** gestor para **todos** os espaços solicitados, a reserva é automaticamente deferida via `AutoAprovacaoService::calcularSituacaoReserva()`. Essa decisão é tomada **apenas no momento de criação**; edições subsequentes da reserva (escopo `recurring`) não recalculam a situação agregada. Ver [`docs/auto-approval-rule.md`](./auto-approval-rule.md) para detalhes completos.
 
 ---
 

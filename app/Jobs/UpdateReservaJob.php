@@ -12,6 +12,7 @@ use App\Models\Reserva;
 use App\Models\User;
 use App\Notifications\ReservationUpdatedNotification;
 use App\Notifications\ReservationUpdateFailedNotification;
+use App\Services\AutoAprovacaoService;
 use App\Services\ExpansaoHorariosService;
 use Carbon\Carbon;
 use Exception;
@@ -46,7 +47,7 @@ class UpdateReservaJob implements ShouldQueue
      * MIN/MAX dos horarios restantes apos a edicao, garantindo que nenhum horario
      * fique fora do range. No escopo 'recurring', as datas vem do validatedData.
      */
-    public function handle(ExpansaoHorariosService $expansao): void
+    public function handle(ExpansaoHorariosService $expansao, AutoAprovacaoService $autoAprovacao): void
     {
         Log::info('UpdateReservaJob started', [
             'reserva_id' => $this->reserva->id,
@@ -55,7 +56,7 @@ class UpdateReservaJob implements ShouldQueue
         ]);
 
         try {
-            DB::transaction(function () use ($expansao) {
+            DB::transaction(function () use ($expansao, $autoAprovacao) {
                 $this->reserva->update([
                     'titulo' => $this->validatedData['titulo'],
                     'descricao' => $this->validatedData['descricao'] ?? '',
@@ -82,7 +83,36 @@ class UpdateReservaJob implements ShouldQueue
                         }
                     }
 
+                    // Adquirir lock pessimista sobre horarios da semana afetada
+                    $agendasAfetodasSingle = $horariosSolicitados
+                        ->pluck('agenda_id')
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->sort()
+                        ->all();
+
+                    if ($agendasAfetodasSingle !== []) {
+                        Horario::whereIn('agenda_id', $agendasAfetodasSingle)
+                            ->whereBetween('data', [$inicioSemana, $fimSemana])
+                            ->lockForUpdate()
+                            ->get();
+                    }
+
                     foreach ($horariosSolicitados->whereNull('id') as $novoHorario) {
+                        // Revalidar conflito sob lock, antes de inserir
+                        $conflito = Horario::where('agenda_id', $novoHorario['agenda_id'])
+                            ->where('data', $novoHorario['data'])
+                            ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
+                            ->where('reserva_id', '!=', $this->reserva->id)
+                            ->where('horario_inicio', '<', $novoHorario['horario_fim'])
+                            ->where('horario_fim', '>', $novoHorario['horario_inicio'])
+                            ->exists();
+
+                        if ($conflito) {
+                            throw new Exception("Conflito detectado sob lock para agenda {$novoHorario['agenda_id']} em {$novoHorario['data']}. Outra reserva pode ter sido editada simultaneamente.");
+                        }
+
                         $this->reserva->horarios()->create($novoHorario);
                     }
 
@@ -96,12 +126,29 @@ class UpdateReservaJob implements ShouldQueue
                         'data_final' => $dataFinal,
                     ]);
                 } else {
+                    // Adquirir lock pessimista sobre horarios da faixa de datas (escopo recurring)
+                    $agendasAfetadas = $horariosSolicitados
+                        ->pluck('agenda_id')
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->sort()
+                        ->all();
+
+                    $dataInicial = Carbon::parse($this->validatedData['data_inicial'])->toDateString();
+                    $dataFinal = Carbon::parse($this->validatedData['data_final'])->toDateString();
+
+                    Horario::whereIn('agenda_id', $agendasAfetadas)
+                        ->whereBetween('data', [$dataInicial, $dataFinal])
+                        ->lockForUpdate()
+                        ->get();
+
                     $this->reserva->update([
                         'data_inicial' => $this->validatedData['data_inicial'],
                         'data_final' => $this->validatedData['data_final'],
                     ]);
                     $agendasMap = Agenda::with('user')
-                        ->whereIn('id', $horariosSolicitados->pluck('agenda_id')->unique()->filter()->all())
+                        ->whereIn('id', $agendasAfetadas)
                         ->get()
                         ->keyBy('id');
 
@@ -127,10 +174,23 @@ class UpdateReservaJob implements ShouldQueue
                         // a agenda, o horario ja nasce deferido. Vale o dono, e
                         // nao quem edita — senao um gestor editando a reserva de
                         // outra pessoa a deferiria sem querer.
-                        fn (Agenda $agenda) => $agenda->user_id === $this->reserva->user_id
-                            ? SituacaoReservaEnum::DEFERIDA->value
-                            : SituacaoReservaEnum::EM_ANALISE->value,
+                        fn (Agenda $agenda) => $autoAprovacao->resolverSituacaoHorario($agenda, $this->reserva->user_id),
                     );
+
+                    // Revalidar conflitos sob lock, antes de inserir
+                    foreach ($linhas as $novaLinha) {
+                        $conflito = Horario::where('agenda_id', $novaLinha['agenda_id'])
+                            ->where('data', $novaLinha['data'])
+                            ->where('situacao', SituacaoReservaEnum::DEFERIDA->value)
+                            ->where('reserva_id', '!=', $this->reserva->id)
+                            ->where('horario_inicio', '<', $novaLinha['horario_fim'])
+                            ->where('horario_fim', '>', $novaLinha['horario_inicio'])
+                            ->exists();
+
+                        if ($conflito) {
+                            throw new Exception("Conflito detectado sob lock para agenda {$novaLinha['agenda_id']} em {$novaLinha['data']}. Outra reserva pode ter sido editada simultaneamente.");
+                        }
+                    }
 
                     foreach ($linhas as $indice => $linha) {
                         $anterior = $avaliacoes->get(

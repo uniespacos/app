@@ -238,6 +238,11 @@ export const en = {
             escopo_todas: 'All recurrence occurrences',
             escopo_semana: 'Only slots of this week',
         },
+        gestor: {
+            conflicts_detected: 'Warning: {{count}} time slot(s) of this reservation overlap(s) with another reservation(s).',
+            conflict_with_user: 'Requester: {{user}}',
+            conflicts_note: 'You may choose to defer even with conflicts. Consider analyzing conflicting reservations before proceeding.',
+        },
         stepper: {
             step1_title: 'Times and Recurrence',
             step1_subtitle: 'Select the desired date, shift, and time slots',
