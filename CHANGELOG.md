@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0-rc.76](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.75...v1.3.0-rc.76) (2026-08-30)
+
+
+### Bug Fixes
+
+* horários no calendário mobile de avaliação + redesign de UX ([#414](https://github.com/uniespacos/uniespacos/issues/414)) ([caa87af](https://github.com/uniespacos/uniespacos/commit/caa87af64c449353b69aad9cce9c6f5b7c58ae4d))
+* melhorias de usabilidade e responsividade mobile ([#412](https://github.com/uniespacos/uniespacos/issues/412)) ([36dd2b6](https://github.com/uniespacos/uniespacos/commit/36dd2b633d1040adb078b1eac3ac57c434ad4708))
+
 ## [1.3.0-rc.75](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.74...v1.3.0-rc.75) (2026-08-30)
 
 
