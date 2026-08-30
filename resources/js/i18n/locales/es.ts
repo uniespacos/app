@@ -193,6 +193,7 @@ export const es = {
             ordenar_por: 'Ordenar por',
             data: 'Fecha',
             todas_datas: 'Todas las fechas',
+            descricao_filtros: 'Aplique filtros para encontrar las reservas que busca.',
         },
         tabela: {
             espaco: 'Espacio',

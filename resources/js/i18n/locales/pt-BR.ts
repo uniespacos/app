@@ -191,6 +191,7 @@ export const ptBR = {
             ordenar_por: 'Ordenar por',
             data: 'Data',
             todas_datas: 'Todas as datas',
+            descricao_filtros: 'Aplique filtros para encontrar as reservas que procura.',
         },
         tabela: {
             espaco: 'Espaço',
