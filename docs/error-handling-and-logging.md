@@ -208,6 +208,31 @@ public function handle(ExpansaoHorariosService $expansao): void
 - `Log::warning()` para notificação falha, `Log::error()` para falha crítica
 - `exception` adicionado ao contexto para rastreabilidade
 
+#### Novo Modo de Falha — Conflito Detectado Sob Lock
+
+Além de falhas de notificação, o `ProcessarCriacaoReserva` pode falhar por um conflito detectado **durante a transação**, entre a montagem das linhas de horário e a sua inserção no banco.
+
+**Onde ocorre:** Dentro da transação `DB::transaction()`, após `$expansao->montar()` ter gerado as linhas de horário e antes de `Horario::insert($linhas)`.
+
+**O que dispara:** Um loop de revalidação percorre cada linha de horário a inserir e verifica se existe um horário `deferida` (aprovado) na mesma `agenda_id`, mesma `data`, cujo intervalo de horário se sobrepõe ao novo (`horario_inicio < novo.horario_fim AND horario_fim > novo.horario_inicio`). Se encontrar, lança:
+
+```php
+throw new Exception("Conflito detectado sob lock para agenda {agenda_id} em {data}. Outra reserva pode ter sido criada simultaneamente.");
+```
+
+**Como se propaga:**
+
+1. A `Exception` é lançada dentro de `DB::transaction()`.
+2. Laravel **desfaz automaticamente** a transação (rollback), incluindo o `Reserva::create()` que foi feito antes da montagem.
+3. A exceção é capturada pelo `catch (Exception $e)` que envolve todo o `handle()`.
+4. `Log::error('ProcessarCriacaoReserva failed', [...])` registra o evento com a exceção completa.
+5. `$this->fail($e)` é chamado explicitamente dentro do próprio `catch` — isso é diferente de deixar a exceção se propagar naturalmente para fora de `handle()`. Quando o job chama `fail()` sobre si mesmo, o Laravel marca o job como falho, remove-o da fila e invoca o método `failed()` **imediatamente**, na primeira tentativa, sem aguardar esgotar os `$tries = 3` (esse contador de retries só se aplica quando a exceção escapa de `handle()` sem ser capturada; aqui ela é capturada e a falha é forçada de propósito).
+6. O método `failed()` do job é invocado de imediato, que dispara `ReservationFailedNotification` ao solicitante.
+
+**Reutilização do mecanismo de notificação:** Não há nenhuma notificação nova. O canal existente `ReservationFailedNotification`, já disparado pelo `failed()` do job para outros cenários de falha (exceção durante criação ou durante notificação aos gestores), cobre também esse novo modo de falha de conflito. O solicitante recebe uma notificação única avisando que a reserva não pôde ser processada, sem necessidade de distinguir o motivo específico.
+
+**Nota sobre testes:** quando o job é instanciado diretamente e `handle()` é chamado sem passar pela fila de verdade (padrão usado em `tests/Unit/Jobs/*` e `tests/Feature/ReservaConcorrenciaTest.php`, via `app()->call([$job, 'handle'])`), a propriedade interna do job que representa o "job de fila real" nunca é preenchida. Nesse cenário, `$this->fail($e)` é um no-op silencioso (`InteractsWithQueue::fail()` só age se esse job real existir) — o `failed()` não é chamado, e a exceção não escapa de `handle()`. Os testes desse cenário validam o efeito observável (rollback: nenhum horário conflitante persistido) em vez de tentar capturar a exceção.
+
 #### Em Controller — Logging de Operações
 
 ```php
