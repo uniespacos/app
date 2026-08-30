@@ -53,12 +53,25 @@ jest.mock('@/presentation/molecules/DeleteItem', () => ({
     default: (): ReactNode => React.createElement('div', { 'data-testid': 'delete-item' }),
 }));
 
+interface RouterGetPayload {
+    reserva?: number;
+    semana?: string;
+}
+
+interface RouterGetOptions {
+    preserveState?: boolean;
+    preserveScroll?: boolean;
+    only?: string[];
+}
+
 const setupMockRoute = (): void => {
-    (globalThis as unknown as Record<string, unknown>).route = (name: string): string => `route://${name}`;
+    (globalThis as typeof globalThis & { route: (name: string) => string }).route = (name: string): string => `route://${name}`;
 };
 
 const cleanupMockRoute = (): void => {
-    delete (globalThis as unknown as Record<string, unknown>).route;
+    (globalThis as typeof globalThis & { route: (name: string) => string }).route = (): string => {
+        throw new Error('route mock not set up');
+    };
 };
 
 const createMockReserva = (overrides?: Partial<Reserva>): Reserva => ({
@@ -223,7 +236,7 @@ describe('ReservasList - handleAbrirDetalhes', (): void => {
             detalhesButton.click();
         });
 
-        const calls = mockRouterGet.mock.calls as [string, Record<string, unknown>, Record<string, unknown>][];
+        const calls = mockRouterGet.mock.calls as [string, RouterGetPayload, RouterGetOptions][];
         const params = calls[0][1];
         expect(params.reserva).toBe(reserva.id);
         expect(typeof params.semana).toBe('string');
