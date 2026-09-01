@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.78](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.77...v1.3.0-rc.78) (2026-09-01)
+
+
+### Bug Fixes
+
+* reestiliza tela de login com logo oficial e tema light como padrão ([#417](https://github.com/uniespacos/uniespacos/issues/417)) ([d9fe992](https://github.com/uniespacos/uniespacos/commit/d9fe992ae08e2689b2212a2e155998bbcd314281))
+
 ## [1.3.0-rc.77](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.76...v1.3.0-rc.77) (2026-09-01)
 
 
