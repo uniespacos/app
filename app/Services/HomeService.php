@@ -117,7 +117,7 @@ class HomeService
      */
     private function buildRecentReservasQuery(User $user)
     {
-        return Reserva::select(['id', 'titulo', 'data_inicial', 'situacao', 'user_id'])
+        return Reserva::select(['id', 'titulo', 'data_inicial', 'data_final', 'situacao', 'user_id'])
             ->where('user_id', $user->id)
             ->where('situacao', '!=', 'inativa')
             ->with([
