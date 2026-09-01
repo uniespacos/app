@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => (request()->cookie('appearance', 'system')) == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => (request()->cookie('appearance', 'light')) == 'dark'])>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
@@ -17,9 +17,9 @@
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
-                const cookieAppearance = '{{ request()->cookie('appearance', 'system') }}';
+                const cookieAppearance = '{{ request()->cookie('appearance', 'light') }}';
                 const localAppearance = typeof localStorage !== 'undefined' ? localStorage.getItem('appearance') : null;
-                const appearance = localAppearance || cookieAppearance || 'system';
+                const appearance = localAppearance || cookieAppearance || 'light';
 
                 if (appearance === 'dark' || (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');

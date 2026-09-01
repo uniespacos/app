@@ -28,10 +28,10 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                 <div className="bg-info/10 pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full blur-3xl" />
 
                 {/* Bloco Centralizado: Logo + Conteúdo */}
-                <div className="relative z-20 flex flex-col items-center gap-6">
+                <div className="relative z-20 flex flex-col items-center gap-8">
                     {/* Logo */}
                     <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                        <div className="flex size-28 items-center justify-center rounded-xl bg-white p-2 shadow-lg">
+                        <div className="flex size-48 items-center justify-center rounded-xl bg-white p-4 shadow-lg lg:size-56 xl:size-64">
                             <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                         </div>
                     </Link>

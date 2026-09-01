@@ -3,12 +3,12 @@ import { useCallback, useEffect, useState } from 'react';
 export type Appearance = 'light' | 'dark' | 'system';
 
 function getInitialAppearance(): Appearance {
-    if (typeof window === 'undefined') return 'system';
+    if (typeof window === 'undefined') return 'light';
     const saved = localStorage.getItem('appearance');
     if (saved === 'light' || saved === 'dark' || saved === 'system') {
         return saved;
     }
-    return 'system';
+    return 'light';
 }
 
 export function updateThemeClass(appearance: Appearance) {
