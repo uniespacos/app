@@ -49,7 +49,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
         });
     };
 
-    const emailError = errors.email || clientEmailError || undefined;
+    const emailError = errors.email ?? clientEmailError ?? undefined;
 
     return (
         <AuthLayout title={t('auth.login.header_title')} description={t('auth.login.header_desc')} maxWidth="md">

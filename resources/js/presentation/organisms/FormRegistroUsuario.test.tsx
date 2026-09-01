@@ -59,20 +59,23 @@ describe('FormRegistroUsuario', () => {
     it('navigates through all steps and submits on last step', () => {
         const onSubmit = jest.fn();
         const { container } = render(<FormRegistroUsuario {...defaultProps} onSubmit={onSubmit} />);
-        const form = container.querySelector('form')!;
+        const form = container.querySelector('form');
+        expect(form).toBeInTheDocument();
 
-        // Step 1 -> Step 2
-        fireEvent.submit(form);
+        if (form) {
+            // Step 1 -> Step 2
+            fireEvent.submit(form);
 
-        // Step 2 -> Step 3
-        fireEvent.submit(form);
+            // Step 2 -> Step 3
+            fireEvent.submit(form);
 
-        // Step 3 should have finish button
-        const submitButton = screen.getByRole('button', { name: /concluir cadastro/i });
-        expect(submitButton).toBeInTheDocument();
+            // Step 3 should have finish button
+            const submitButton = screen.getByRole('button', { name: /concluir cadastro/i });
+            expect(submitButton).toBeInTheDocument();
 
-        fireEvent.submit(form);
-        expect(onSubmit).toHaveBeenCalledTimes(1);
+            fireEvent.submit(form);
+            expect(onSubmit).toHaveBeenCalledTimes(1);
+        }
     });
 
     it('automatically jumps back to step 1 (Personal Data) when errors.email is returned from backend', () => {
@@ -87,7 +90,12 @@ describe('FormRegistroUsuario', () => {
         expect(screen.getByRole('heading', { name: /credenciais de acesso/i })).toBeInTheDocument();
 
         // Backend returns error for duplicate email
-        rerender(<FormRegistroUsuario {...defaultProps} errors={{ email: 'O e-mail informado já está em uso.' }} />);
+        rerender(
+            <FormRegistroUsuario
+                {...defaultProps}
+                errors={{ email: 'O e-mail informado já está em uso.' }}
+            />
+        );
 
         // Should automatically jump back to step 1
         expect(screen.getByText('O e-mail informado já está em uso.')).toBeInTheDocument();

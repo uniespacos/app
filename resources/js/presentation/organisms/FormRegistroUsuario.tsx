@@ -7,7 +7,7 @@ import { RegisterStepInstitution } from '@/presentation/molecules/RegisterStepIn
 import { RegisterStepCredentials } from '@/presentation/molecules/RegisterStepCredentials';
 import type { Instituicao } from '@/types';
 import { ArrowLeft, ArrowRight, LoaderCircle } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 interface FormRegistroUsuarioProps {
     data: {
@@ -34,21 +34,24 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         totalSteps: TOTAL_STEPS,
     });
 
-    const stepHasError = (stepIndex: number): boolean => {
-        const errorKeys = Object.keys(errors);
-        if (errorKeys.length === 0) return false;
+    const stepHasError = useCallback(
+        (stepIndex: number): boolean => {
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length === 0) return false;
 
-        if (stepIndex === 0) {
-            return errorKeys.some((k) => ['name', 'email', 'phone'].includes(k));
-        }
-        if (stepIndex === 1) {
-            return errorKeys.some((k) => ['instituicao_id', 'setor_id', 'campus'].includes(k));
-        }
-        if (stepIndex === 2) {
-            return errorKeys.some((k) => ['password', 'password_confirmation'].includes(k));
-        }
-        return false;
-    };
+            if (stepIndex === 0) {
+                return errorKeys.some((k) => ['name', 'email', 'phone'].includes(k));
+            }
+            if (stepIndex === 1) {
+                return errorKeys.some((k) => ['instituicao_id', 'setor_id', 'campus'].includes(k));
+            }
+            if (stepIndex === 2) {
+                return errorKeys.some((k) => ['password', 'password_confirmation'].includes(k));
+            }
+            return false;
+        },
+        [errors]
+    );
 
     // Pula automaticamente para a primeira etapa com erro quando o backend retorna erros de validação
     useEffect(() => {
@@ -62,7 +65,7 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
         } else if (stepHasError(2)) {
             goToStep(2);
         }
-    }, [errors, goToStep]);
+    }, [errors, goToStep, stepHasError]);
 
     const steps = [
         { label: t('auth.register.step_personal_label'), hasError: stepHasError(0) },
@@ -87,7 +90,9 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
 
             {/* Step Content — com transição */}
             <div className="animate-fade-in-up min-h-[200px]" key={currentStep}>
-                {currentStep === 0 && <RegisterStepPersonal data={data} onInputChange={onInputChange} errors={errors} processing={processing} />}
+                {currentStep === 0 && (
+                    <RegisterStepPersonal data={data} onInputChange={onInputChange} errors={errors} processing={processing} />
+                )}
 
                 {currentStep === 1 && (
                     <RegisterStepInstitution
@@ -103,13 +108,21 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                     />
                 )}
 
-                {currentStep === 2 && <RegisterStepCredentials data={data} onInputChange={onInputChange} errors={errors} processing={processing} />}
+                {currentStep === 2 && (
+                    <RegisterStepCredentials data={data} onInputChange={onInputChange} errors={errors} processing={processing} />
+                )}
             </div>
 
             {/* Navigation Buttons */}
             <div className="flex items-center gap-3 pt-2">
                 {!isFirstStep && (
-                    <Button type="button" variant="outline" className="h-11 flex-1" onClick={prevStep} disabled={processing}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-11 flex-1"
+                        onClick={prevStep}
+                        disabled={processing}
+                    >
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         {t('auth.register.btn_back')}
                     </Button>
