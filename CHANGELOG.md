@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.77](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.76...v1.3.0-rc.77) (2026-09-01)
+
+
+### Bug Fixes
+
+* corrige drawer mobile e reusa card canônico de reserva no dashboard ([#415](https://github.com/uniespacos/uniespacos/issues/415)) ([8f6c7d5](https://github.com/uniespacos/uniespacos/commit/8f6c7d5fa634f2279ab845229f1e3560db5fdff3))
+
 ## [1.3.0-rc.76](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.75...v1.3.0-rc.76) (2026-08-30)
 
 
