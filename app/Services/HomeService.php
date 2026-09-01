@@ -59,7 +59,6 @@ class HomeService
      */
     private function getGestorData(User $user): array
     {
-        $reservas = $this->buildRecentReservasQuery($user)->get();
         $espacosFavoritos = $user->favoritos()->with('andar.modulo')->get();
         $agendas = Agenda::whereUserId($user->id)->with(['espaco.andar.modulo.unidade'])->get();
 
@@ -85,7 +84,7 @@ class HomeService
             'total_espacos' => Espaco::whereHas('agendas', fn ($q) => $q->where('user_id', $user->id))->count(),
         ];
 
-        return compact('user', 'reservas', 'espacosFavoritos', 'agendas', 'reservasPendentes', 'statusDasReservas');
+        return compact('user', 'espacosFavoritos', 'agendas', 'reservasPendentes', 'statusDasReservas');
     }
 
     /**
