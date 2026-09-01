@@ -21,30 +21,30 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
     return (
         <div className="bg-background relative grid min-h-dvh flex-col items-stretch justify-center lg:max-w-none lg:grid-cols-12">
             {/* Coluna Institucional UESB (Desktop) */}
-            <div className="bg-brand-blue-darkest dark:border-border relative hidden h-full flex-col justify-between overflow-hidden p-10 text-white lg:col-span-5 lg:flex xl:col-span-4 dark:border-r">
+            <div className="bg-brand-blue-darkest dark:border-border relative hidden h-full flex-col justify-center overflow-hidden p-10 text-white lg:col-span-5 lg:flex xl:col-span-4 dark:border-r">
                 {/* Efeito de iluminação suave em degradê */}
                 <div className="from-primary/20 pointer-events-none absolute inset-0 bg-gradient-to-b via-transparent to-black/40" />
                 <div className="bg-primary/15 pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full blur-3xl" />
                 <div className="bg-info/10 pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full blur-3xl" />
 
-                {/* Topo / Logo */}
-                <div className="relative z-20">
+                {/* Bloco Centralizado: Logo + Conteúdo */}
+                <div className="relative z-20 flex flex-col items-center gap-6">
+                    {/* Logo */}
                     <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                        <div className="flex size-20 items-center justify-center rounded-xl bg-white p-2 shadow-lg">
+                        <div className="flex size-28 items-center justify-center rounded-xl bg-white p-2 shadow-lg">
                             <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                         </div>
                     </Link>
-                </div>
 
-                {/* Bloco Central com Destaques da Plataforma */}
-                <div className="relative z-20 my-auto space-y-6 py-8">
-                    <div className="space-y-2">
+                    {/* Parágrafo Descritivo */}
+                    <div className="w-full space-y-2 text-center">
                         <p className="text-sm leading-relaxed text-white/80">
                             Agilize a solicitação e o acompanhamento de salas, auditórios, laboratórios e quadras em todos os campi da UESB.
                         </p>
                     </div>
 
-                    <div className="space-y-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
+                    {/* Card de Destaques */}
+                    <div className="w-full space-y-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
                         <div className="flex items-start gap-3 text-xs text-white/90">
                             <CalendarCheck className="text-success mt-0.5 size-4 shrink-0" />
                             <span>Grade de horários em tempo real e sem conflitos.</span>
@@ -63,7 +63,7 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                     {/* Header para Mobile */}
                     <div className="flex flex-col items-center justify-center gap-2 lg:hidden">
                         <Link href={route('home')} className="flex items-center gap-2.5">
-                            <div className="flex size-14 items-center justify-center rounded-xl bg-primary/10 p-1 ring-1 ring-primary/20">
+                            <div className="flex size-16 items-center justify-center rounded-xl bg-white p-1.5 shadow-md">
                                 <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                             </div>
                         </Link>
