@@ -193,7 +193,7 @@ export function ReservasFilters({
                                     <DrawerTitle>{t('common.actions.filter')}</DrawerTitle>
                                     <DrawerDescription>{t('reservas.filtros.descricao_filtros')}</DrawerDescription>
                                 </DrawerHeader>
-                                <div className="grid grid-cols-1 gap-3 p-4">{renderFilterControls()}</div>
+                                <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-y-auto p-4">{renderFilterControls()}</div>
                                 <DrawerFooter>
                                     <DrawerClose asChild>
                                         <Button className="w-full">{t('common.actions.filter')}</Button>

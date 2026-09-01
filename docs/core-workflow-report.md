@@ -630,7 +630,7 @@ graph TD
         M1["ResponsiveModal.tsx (Dialog/Drawer Híbrido)"]
         M2["DataTable.tsx, DatePicker.tsx, FormField.tsx"]
         M3["ComboboxFiltro.tsx, UserSearchComboBox.tsx"]
-        M4["ReservaCardMobile.tsx, FiltroChips.tsx, ConfirmDeleteDialog.tsx"]
+        M4["ReservaCard.tsx, FiltroChips.tsx, ConfirmDeleteDialog.tsx"]
     end
 
     subgraph "Organismos (resources/js/presentation/organisms/)"
@@ -686,7 +686,7 @@ graph TD
     subgraph "Molecules"
         RM["ResponsiveModal.tsx<br/>(Adaptativo Dialog/Drawer)"]
         DT["DataTable.tsx<br/>(Tabela com Paginação & Ordenação)"]
-        RCM["ReservaCardMobile.tsx<br/>(Card Otimizado para Mobile)"]
+        RCM["ReservaCard.tsx<br/>(Card Canônico de Reserva)"]
         RF["ReservasFilters.tsx<br/>(Filtros por Situação & Período)"]
         FC["FiltroChips.tsx<br/>(Chips Ativos Removíveis)"]
         DP["DatePicker.tsx<br/>(Seletor de Data pt-BR)"]
@@ -723,7 +723,7 @@ graph TD
 | `<DataTable>` | **Molécula**<br>`presentation/molecules/DataTable.tsx` | Abstração padronizada de tabelas de dados. Fornece cabeçalhos com ordenação interativa, estados vazios (`EmptyState`) ilustrados, skeleton de carregamento, paginação integrada via `<PaginacaoListas>` e seleção de linhas. |
 | `<ComboboxFiltro>` / `<UserSearchComboBox>` | **Molécula**<br>`presentation/molecules/ComboboxFiltro.tsx`<br>`presentation/molecules/UserSearchComboBox.tsx` | Seletores de busca assíncrona/debounced com navegação completa por teclado, realce de termos coincidentes e renderização otimizada para listas extensas de usuários, setores e espaços. |
 | `<EspacoCard>` | **Organismo**<br>`presentation/organisms/EspacoCard.tsx` | Card visual de apresentação de espaços no catálogo. Apresenta foto/fallback, tags de capacidade, andar, módulo e unidade, botão de favoritar com mutação otimista e acionamento de modal de detalhes em drawer/dialog. |
-| `<ReservaCardMobile>` | **Molécula**<br>`presentation/molecules/ReservaCardMobile.tsx` | Componente de card otimizado para dispositivos móveis na listagem de reservas. Exibe data, horário, espaço, solicitante, badge de situação semântico (`<SituacaoBadge>`) e menu de ações rápidas. |
+| `<ReservaCard>` | **Molécula**<br>`presentation/molecules/ReservaCard.tsx` | Componente de card canônico para exibição de reservas, utilizado tanto na listagem de reservas (em viewport mobile via `ReservasList.tsx`) quanto no bloco de reservas recentes do dashboard (em qualquer largura, em grid responsivo). Exibe data, horário, espaço, solicitante, badge de situação semântico (`<SituacaoBadge>`). As ações secundárias (`onAvaliar`, `onEditar`, `onCancelar`) são opcionais; quando não fornecidas, apenas o botão "Ver Detalhes" é renderizado. |
 | `<DatePicker>` | **Molécula**<br>`presentation/molecules/DatePicker.tsx` | Seletor de datas acessível integrado com `react-day-picker` v8, totalmente adaptado para React 19 e `date-fns` v4, com localização `pt-BR`, suporte a presets rápidos e bloqueio de dias indisponíveis. |
 | `<FiltroChips>` | **Molécula**<br>`presentation/molecules/FiltroChips.tsx` | Barra de chips semânticos que refletem os filtros atualmente aplicados na listagem (situação, data, setor), permitindo remoção individual com um clique ou limpeza geral. |
 | `<AgendaCalendario>` / `<EspacoAgenda>` | **Organismo**<br>`presentation/organisms/AgendaCalendario.tsx`<br>`presentation/organisms/EspacoAgenda.tsx` | Grid semanal responsivo dividido por turnos acadêmicos (Matutino, Vespertino, Noturno). Suporta seleção múltipla de slots, smart shift de horários anteriores e destaque visual em tempo real de conflitos. |

@@ -10,16 +10,16 @@ import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { Calendar, Edit, FileText, MapPin, XCircle } from 'lucide-react';
 
-interface ReservaCardMobileProps {
+interface ReservaCardProps {
     reserva: Reserva;
     isGestor?: boolean;
     onDetalhes: (reserva: Reserva) => void;
-    onAvaliar: (id: number) => void;
-    onEditar: (id: number) => void;
-    onCancelar: (reserva: Reserva) => void;
+    onAvaliar?: (id: number) => void;
+    onEditar?: (id: number) => void;
+    onCancelar?: (reserva: Reserva) => void;
 }
 
-export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
+export function ReservaCard({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardProps) {
     const { t, formatDate } = useTranslation();
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;
@@ -31,8 +31,7 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
 
     return (
         <div className="bg-card border-border/80 relative flex w-full min-w-0 overflow-hidden rounded-xl border shadow-xs transition-all duration-200 active:scale-[0.99]">
-            {/* Faixa Vertical Semântica */}
-            {estilo && <div className={cn('w-1.5 shrink-0', estilo.solido)} />}
+            <div className={cn('w-1.5 shrink-0', estilo.solido)} />
 
             <div className="min-w-0 flex-1 space-y-3 p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -72,22 +71,24 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
 
                     {reserva.situacao !== SituacaoReserva.INATIVA &&
                         (isModoGestor ? (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="min-h-[44px] min-w-[120px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
-                                onClick={() => {
-                                    onAvaliar(reserva.id);
-                                }}
-                            >
-                                <Edit className="mr-1.5 h-4 w-4" />
-                                {reserva.situacao === SituacaoReserva.EM_ANALISE
-                                    ? t('reservas.acoes.avaliar')
-                                    : t('reservas.avaliacao.reavaliacao_titulo')}
-                            </Button>
+                            onAvaliar ? (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="min-h-[44px] min-w-[120px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                    onClick={() => {
+                                        onAvaliar(reserva.id);
+                                    }}
+                                >
+                                    <Edit className="mr-1.5 h-4 w-4" />
+                                    {reserva.situacao === SituacaoReserva.EM_ANALISE
+                                        ? t('reservas.acoes.avaliar')
+                                        : t('reservas.avaliacao.reavaliacao_titulo')}
+                                </Button>
+                            ) : null
                         ) : (
                             <>
-                                {reserva.can_update && (
+                                {reserva.can_update && onEditar ? (
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -99,18 +100,20 @@ export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, on
                                         <Edit className="mr-1.5 h-4 w-4" />
                                         {t('reservas.acoes.editar')}
                                     </Button>
-                                )}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="min-h-[44px] min-w-[100px] flex-1 text-xs font-medium text-destructive-accent transition-transform hover:text-destructive-accent active:scale-[0.98]"
-                                    onClick={() => {
-                                        onCancelar(reserva);
-                                    }}
-                                >
-                                    <XCircle className="mr-1.5 h-4 w-4 text-destructive-accent" />
-                                    {t('reservas.acoes.cancelar')}
-                                </Button>
+                                ) : null}
+                                {onCancelar ? (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-destructive-accent hover:text-destructive-accent min-h-[44px] min-w-[100px] flex-1 text-xs font-medium transition-transform active:scale-[0.98]"
+                                        onClick={() => {
+                                            onCancelar(reserva);
+                                        }}
+                                    >
+                                        <XCircle className="text-destructive-accent mr-1.5 h-4 w-4" />
+                                        {t('reservas.acoes.cancelar')}
+                                    </Button>
+                                ) : null}
                             </>
                         ))}
                 </div>

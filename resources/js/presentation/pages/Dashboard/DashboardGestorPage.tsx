@@ -8,7 +8,7 @@ import { useDadosRelatorio } from '@/hooks/use-dados-relatorio';
 import { useTranslation } from '@/i18n';
 import { hasPermission } from '@/lib/auth';
 import AppLayout from '@/presentation/templates/AppLayout';
-import { Agenda, Espaco, Reserva, User, type BreadcrumbItem } from '@/types';
+import { Agenda, Espaco, User, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format, subDays } from 'date-fns';
 import { ArrowRight, BarChart3, CalendarSearch, Eye, ShieldCheck, Star } from 'lucide-react';
@@ -31,7 +31,6 @@ interface DashboardGestorProps {
     };
     agendas?: Agenda[];
     espacosFavoritos?: Espaco[];
-    reservas?: Reserva[];
 }
 
 export default function DashboardGestorPage(props: DashboardGestorProps) {
@@ -45,7 +44,6 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
         };
         agendas?: Agenda[];
         espacosFavoritos?: Espaco[];
-        reservas?: Reserva[];
     }>().props;
 
     const user = props.user ?? pageProps.user ?? pageProps.auth.user;

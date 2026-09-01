@@ -37,7 +37,7 @@ This document outlines the strategic development plan for UniEspaços, organized
     *   [x] **Mobile-First Ergonomics:**
         *   [x] Implemented `<ResponsiveModal>`: Adaptive component switching between Vaul Bottom Drawer (mobile `< 768px`) and Radix Dialog (desktop `>= 768px`).
         *   [x] Implemented `<MobileBottomBar>`: Floating thumb-friendly bottom dock navigation with reactive notification indicators.
-        *   [x] Implemented `<ReservaCardMobile>` and touch-friendly interactive lists.
+        *   [x] Implemented `<ReservaCard>` and touch-friendly interactive lists.
     *   [x] **Reservation Flow & Calendar UX:**
         *   [x] Fixed datepicker manual date selection and date-fns v4 localization (pt-BR).
         *   [x] Implemented "smart shift" for past slots and manual date adjustments.

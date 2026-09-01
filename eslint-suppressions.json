@@ -87,11 +87,6 @@
       "count": 1
     }
   },
-  "resources/js/presentation/molecules/ReservaCardMobile.tsx": {
-    "@typescript-eslint/no-unnecessary-condition": {
-      "count": 1
-    }
-  },
   "resources/js/presentation/molecules/SeletorInstituicao.tsx": {
     "@typescript-eslint/prefer-nullish-coalescing": {
       "count": 4
