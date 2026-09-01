@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.79](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.78...v1.3.0-rc.79) (2026-09-01)
+
+
+### Features
+
+* redesign completo de UX e acessibilidade nas telas de autenticação ([#419](https://github.com/uniespacos/uniespacos/issues/419)) ([8330208](https://github.com/uniespacos/uniespacos/commit/8330208138e28099a61d4fd0a151c0810021a55c))
+
 ## [1.3.0-rc.78](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.77...v1.3.0-rc.78) (2026-09-01)
 
 
