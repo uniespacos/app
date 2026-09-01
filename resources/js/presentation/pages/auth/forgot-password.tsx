@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, Mail } from 'lucide-react';
 import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -22,15 +22,20 @@ export default function ForgotPassword({ status }: { status?: string }) {
     };
 
     return (
-        <AuthLayout
-            title={t('auth.forgotPassword.header_title')}
-            description={t('auth.forgotPassword.header_desc')}
-            maxWidth="md"
-        >
+        <AuthLayout title={t('auth.forgotPassword.header_title')} description={t('auth.forgotPassword.header_desc')} maxWidth="md">
             <Head title={t('auth.forgotPassword.head_title')} />
 
+            <div className="flex justify-center sm:justify-start">
+                <div className="bg-primary/10 flex size-12 items-center justify-center rounded-xl">
+                    <Mail className="text-primary size-6" />
+                </div>
+            </div>
+
             {status && (
-                <div className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium">
+                <div
+                    role="status"
+                    className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium"
+                >
                     {status}
                 </div>
             )}
@@ -49,10 +54,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             setData('email', e.target.value);
                         }}
                         placeholder={t('auth.forgotPassword.email_placeholder')}
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? 'forgot-email-error' : undefined}
                         className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
                         disabled={processing}
                     />
-                    <InputError message={errors.email} />
+                    <InputError id="forgot-email-error" message={errors.email} />
                 </div>
 
                 <Button type="submit" className="h-11 w-full text-base font-medium" disabled={processing}>

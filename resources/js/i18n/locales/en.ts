@@ -297,7 +297,8 @@ export const en = {
             activity_data: 'Activity Data',
             reservation_slots: 'Reservation Slots',
             terms_title: 'Terms of Commitment and Responsibility',
-            terms_description: 'I declare that I am aware of the rules governing the use of {{institution_name}} physical spaces and commit to their care and preservation.',
+            terms_description:
+                'I declare that I am aware of the rules governing the use of {{institution_name}} physical spaces and commit to their care and preservation.',
         },
     },
     agenda: {
@@ -310,6 +311,9 @@ export const en = {
         hoje: 'Today',
     },
     auth: {
+        layout: {
+            mobile_tagline: 'Streamline space requests and tracking.',
+        },
         login: {
             title: 'Sign in to your account',
             subtitle: 'Enter your institutional credentials to access',
@@ -320,6 +324,7 @@ export const en = {
             email_institutional: 'Institutional Email',
             email_placeholder: 'user@example.com',
             password: 'Password',
+            email_invalid: 'Invalid institutional email format',
             password_label: 'Password',
             password_placeholder: 'Your password',
             hide_password: 'Hide password',
@@ -353,6 +358,22 @@ export const en = {
             has_account_text: 'Already have an institutional account?',
             do_login: 'Sign in',
             login_link: 'Sign in',
+            step_personal_label: 'Personal Data',
+            step_institution_label: 'Institutional Link',
+            step_credentials_label: 'Access Credentials',
+            step_personal_name_placeholder: 'Your full name',
+            step_personal_email_placeholder: 'user@example.com',
+            step_personal_phone_placeholder: 'Example: (77) 99999-9999',
+            step_institution_title: 'Institutional Link',
+            step_institution_desc: 'Select the institution and sector you are linked to',
+            step_credentials_title: 'Access Credentials',
+            step_credentials_desc: 'Create a secure password containing uppercase, lowercase, numbers, and symbols',
+            step_credentials_password_placeholder: 'Minimum 8 characters',
+            step_credentials_confirm_placeholder: 'Re-enter your password',
+            btn_back: 'Back',
+            btn_next: 'Next',
+            btn_finish: 'Complete Institutional Registration',
+            btn_submitting: 'Creating account...',
         },
         forgotPassword: {
             title: 'Forgot Password',
@@ -400,6 +421,7 @@ export const en = {
             sent_message: 'A new verification link has been sent to your institutional email address.',
             resend_button: 'Resend Verification Email',
             resending: 'Sending...',
+            resend_cooldown: 'Wait {{seconds}}s to resend',
             logout_link: 'Sign out',
         },
         profile: {
@@ -629,7 +651,8 @@ export const en = {
         unauthenticated_title: 'Unauthenticated',
         unauthenticated_desc: 'You must be signed in to access this resource.',
         forbidden_title: 'Access Denied',
-        forbidden_desc: 'You do not have permission to access this content. If you were attempting to edit a reservation, it may have already been evaluated.',
+        forbidden_desc:
+            'You do not have permission to access this content. If you were attempting to edit a reservation, it may have already been evaluated.',
         not_found_title: 'Page Not Found',
         not_found_desc: 'The requested address does not exist or the item has been removed.',
         method_not_allowed_title: 'Method Not Allowed',

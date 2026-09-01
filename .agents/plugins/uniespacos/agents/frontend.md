@@ -1,7 +1,7 @@
 ---
 name: frontend
 description: Executa tarefa atômica de frontend (React 19/Inertia 2/TypeScript 5.8/Tailwind v4) já delimitada por objetivo, arquivos e critério de pronto. Não decide arquitetura — recebe a tarefa pronta do master ou do planner.
-model: gemini-2.5-flash
+model: gemini-3.7-flash
 effort: low
 color: cyan
 tools: Read, Edit, Write, Grep, Glob, Bash

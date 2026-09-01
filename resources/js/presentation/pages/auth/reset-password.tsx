@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { KeyRound, LoaderCircle } from 'lucide-react';
 import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
+import { PasswordInput } from '@/presentation/atoms/PasswordInput';
 import { PasswordStrengthMeter } from '@/presentation/molecules/PasswordStrengthMeter';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 
@@ -41,12 +42,14 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     };
 
     return (
-        <AuthLayout
-            title={t('auth.resetPassword.title')}
-            description={t('auth.resetPassword.subtitle')}
-            maxWidth="md"
-        >
+        <AuthLayout title={t('auth.resetPassword.title')} description={t('auth.resetPassword.subtitle')} maxWidth="md">
             <Head title={t('auth.resetPassword.head_title')} />
+
+            <div className="flex justify-center sm:justify-start">
+                <div className="bg-primary/10 flex size-12 items-center justify-center rounded-xl">
+                    <KeyRound className="text-primary size-6" />
+                </div>
+            </div>
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-2">
@@ -61,14 +64,13 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         disabled
                         className="bg-muted text-muted-foreground"
                     />
-                    <InputError message={errors.email} />
+                    <InputError id="reset-email-error" message={errors.email} />
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="password">{t('auth.resetPassword.password')}</Label>
-                    <Input
+                    <PasswordInput
                         id="password"
-                        type="password"
                         name="password"
                         autoComplete="new-password"
                         value={data.password}
@@ -77,18 +79,19 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             setData('password', e.target.value);
                         }}
                         placeholder={t('auth.resetPassword.password_placeholder')}
-                        className={errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}
+                        hasError={!!errors.password}
+                        aria-invalid={!!errors.password}
+                        aria-describedby={errors.password ? 'reset-password-error' : undefined}
                         disabled={processing}
                     />
-                    <InputError message={errors.password} />
+                    <InputError id="reset-password-error" message={errors.password} />
                     <PasswordStrengthMeter password={data.password} className="mt-2" />
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="password_confirmation">{t('auth.resetPassword.password_confirmation')}</Label>
-                    <Input
+                    <PasswordInput
                         id="password_confirmation"
-                        type="password"
                         name="password_confirmation"
                         autoComplete="new-password"
                         value={data.password_confirmation}
@@ -96,10 +99,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             setData('password_confirmation', e.target.value);
                         }}
                         placeholder={t('auth.resetPassword.password_confirmation_placeholder')}
-                        className={errors.password_confirmation ? 'border-destructive focus-visible:ring-destructive' : ''}
+                        hasError={!!errors.password_confirmation}
+                        aria-invalid={!!errors.password_confirmation}
+                        aria-describedby={errors.password_confirmation ? 'reset-confirm-error' : undefined}
                         disabled={processing}
                     />
-                    <InputError message={errors.password_confirmation} />
+                    <InputError id="reset-confirm-error" message={errors.password_confirmation} />
                 </div>
 
                 <Button type="submit" className="h-11 w-full text-base font-medium" disabled={processing}>
