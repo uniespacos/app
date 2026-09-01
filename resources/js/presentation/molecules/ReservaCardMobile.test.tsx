@@ -119,4 +119,20 @@ describe('ReservaCardMobile', () => {
         fireEvent.click(screen.getByRole('button', { name: /Avaliar/i }));
         expect(onAvaliar).toHaveBeenCalledWith(42);
     });
+
+    it('renderiza apenas botão Ver Detalhes quando callbacks opcionais são omitidos', () => {
+        const onDetalhes = jest.fn();
+
+        render(<ReservaCardMobile reserva={mockReserva} isGestor={false} onDetalhes={onDetalhes} />);
+
+        const detalhesButton = screen.getByRole('button', { name: /Ver Detalhes/i });
+        expect(detalhesButton).toBeInTheDocument();
+
+        fireEvent.click(detalhesButton);
+        expect(onDetalhes).toHaveBeenCalledWith(mockReserva);
+
+        expect(screen.queryByRole('button', { name: /Avaliar/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Editar/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Cancelar/i })).not.toBeInTheDocument();
+    });
 });
