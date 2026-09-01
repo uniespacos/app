@@ -89,7 +89,7 @@ A estilização utiliza o **Tailwind v4 (CSS-First)** com a diretiva `@theme` e 
 - **A Exceção:** `variant="destructive"` preenchido continua correto e obrigatório no botão de **CONFIRMAÇÃO FINAL** de diálogos dedicados de exclusão/cancelamento (padrão `DeleteItem.tsx`/`ConfirmDeleteDialog`), onde a decisão destrutiva é o único propósito da tela — não há ação principal concorrente.
 
 - **Exemplos Reais no Projeto (já implementados):**
-  - **Fase 1:** `ReservaCardMobile.tsx`, `ReservasDetalhes.tsx` — botão "Cancelar" usa `variant="outline"` + `text-destructive-accent`.
+  - **Fase 1:** `ReservaCard.tsx`, `ReservasDetalhes.tsx` — botão "Cancelar" usa `variant="outline"` + `text-destructive-accent`.
   - **Fase 2:** `EspacoCard.tsx`, `TabelaSetores.tsx`, `Unidades.tsx`, `Instituicoes.tsx`, `Modulos.tsx`, `ImageUpload.tsx` — padrão exato: `variant="outline"` + classes `text-destructive-accent hover:text-destructive-accent` no `Button`, e `text-destructive-accent` também no ícone (ex.: `Trash2`, `XCircle`, `X`).
 
 - **Nota de Acessibilidade e Racional Técnico:**

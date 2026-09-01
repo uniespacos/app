@@ -10,7 +10,7 @@ import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { ColumnDef, DataTable } from '@/presentation/molecules/DataTable';
 import DeleteItem from '@/presentation/molecules/DeleteItem';
 import { LocalReserva } from '@/presentation/molecules/LocalReserva';
-import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
+import { ReservaCard } from '@/presentation/molecules/ReservaCard';
 import { ViewMode } from '@/presentation/molecules/ViewModeToggle';
 import ReservaDetalhes from '@/presentation/organisms/ReservasDetalhes';
 import { Paginator, Reserva, User as UserType } from '@/types';
@@ -225,7 +225,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
     ];
 
     const renderCard = (reserva: Reserva) => (
-        <ReservaCardMobile
+        <ReservaCard
             key={reserva.id}
             reserva={reserva}
             isGestor={isModoGestor}

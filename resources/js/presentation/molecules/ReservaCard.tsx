@@ -10,7 +10,7 @@ import { SituacaoBadge } from '@/presentation/atoms/SituacaoBadge';
 import { Reserva } from '@/types';
 import { Calendar, Edit, FileText, MapPin, XCircle } from 'lucide-react';
 
-interface ReservaCardMobileProps {
+interface ReservaCardProps {
     reserva: Reserva;
     isGestor?: boolean;
     onDetalhes: (reserva: Reserva) => void;
@@ -19,7 +19,7 @@ interface ReservaCardMobileProps {
     onCancelar?: (reserva: Reserva) => void;
 }
 
-export function ReservaCardMobile({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardMobileProps) {
+export function ReservaCard({ reserva, isGestor, onDetalhes, onAvaliar, onEditar, onCancelar }: ReservaCardProps) {
     const { t, formatDate } = useTranslation();
     const estilo = ESTILO_SITUACAO[reserva.situacao];
     const espaco = reserva.horarios[0]?.agenda?.espaco;

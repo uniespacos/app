@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/i18n';
-import { ReservaCardMobile } from '@/presentation/molecules/ReservaCardMobile';
+import { ReservaCard } from '@/presentation/molecules/ReservaCard';
 import { Reserva } from '@/types';
 import { router } from '@inertiajs/react';
 
@@ -15,7 +15,7 @@ export default function TabsItemReserva({ reservas }: { reservas: Reserva[] }) {
             <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {reservas.map((reserva) => (
-                        <ReservaCardMobile
+                        <ReservaCard
                             key={reserva.id}
                             reserva={reserva}
                             onDetalhes={(reservaSelecionada) => {

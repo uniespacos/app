@@ -1,6 +1,6 @@
 import type { Horario, Reserva } from '@/types';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { ReservaCardMobile } from './ReservaCardMobile';
+import { ReservaCard } from './ReservaCard';
 
 const mockReserva: Reserva = {
     id: 42,
@@ -54,10 +54,10 @@ const mockReserva: Reserva = {
     ],
 };
 
-describe('ReservaCardMobile', () => {
+describe('ReservaCard', () => {
     it('renderiza título, localização, datas e badge de situação', () => {
         render(
-            <ReservaCardMobile
+            <ReservaCard
                 reserva={mockReserva}
                 isGestor={false}
                 onDetalhes={jest.fn()}
@@ -78,7 +78,7 @@ describe('ReservaCardMobile', () => {
         const onCancelar = jest.fn();
 
         render(
-            <ReservaCardMobile
+            <ReservaCard
                 reserva={mockReserva}
                 isGestor={false}
                 onDetalhes={onDetalhes}
@@ -106,7 +106,7 @@ describe('ReservaCardMobile', () => {
         };
 
         render(
-            <ReservaCardMobile
+            <ReservaCard
                 reserva={reservaEmAnalise}
                 isGestor={true}
                 onDetalhes={jest.fn()}
@@ -123,7 +123,7 @@ describe('ReservaCardMobile', () => {
     it('renderiza apenas botão Ver Detalhes quando callbacks opcionais são omitidos', () => {
         const onDetalhes = jest.fn();
 
-        render(<ReservaCardMobile reserva={mockReserva} isGestor={false} onDetalhes={onDetalhes} />);
+        render(<ReservaCard reserva={mockReserva} isGestor={false} onDetalhes={onDetalhes} />);
 
         const detalhesButton = screen.getByRole('button', { name: /Ver Detalhes/i });
         expect(detalhesButton).toBeInTheDocument();
