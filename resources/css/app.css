@@ -79,6 +79,7 @@
     --color-sidebar-ring: var(--sidebar-ring);
 
     --color-brand-blue-darkest: var(--brand-blue-darkest);
+    --color-brand-surface: var(--brand-surface);
 }
 
 /*
@@ -164,6 +165,7 @@
     --sidebar-ring: oklch(0.54 0.22 260);
 
     --brand-blue-darkest: oklch(0.2 0.025 265);
+    --brand-surface: oklch(1 0 0);
 }
 
 .dark {
@@ -232,6 +234,7 @@
     --sidebar-ring: oklch(0.72 0.12 260);
 
     --brand-blue-darkest: oklch(0.2 0.025 265);
+    --brand-surface: oklch(1 0 0);
 }
 
 @layer base {

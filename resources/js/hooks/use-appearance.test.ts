@@ -22,9 +22,9 @@ describe('useAppearance', () => {
         });
     });
 
-    it('defaults to system when no preference stored', () => {
+    it('defaults to light when no preference stored', () => {
         const { result } = renderHook(() => useAppearance());
-        expect(result.current.appearance).toBe('system');
+        expect(result.current.appearance).toBe('light');
     });
 
     it('updates appearance to dark and applies dark class', () => {
