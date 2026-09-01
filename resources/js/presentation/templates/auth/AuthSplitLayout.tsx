@@ -1,7 +1,5 @@
-import AppLogoIcon from '@/presentation/atoms/AppLogoIcon';
-import { type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
-import { CalendarCheck, ShieldCheck, Sparkles } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { CalendarCheck, ShieldCheck } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -12,8 +10,6 @@ interface AuthLayoutProps {
 }
 
 export default function AuthSplitLayout({ children, title, description, maxWidth = 'md' }: PropsWithChildren<AuthLayoutProps>) {
-    const { name, quote } = usePage<SharedData>().props;
-
     const maxWidthClass = {
         sm: 'sm:max-w-sm',
         md: 'sm:max-w-md',
@@ -34,12 +30,8 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                 {/* Topo / Logo */}
                 <div className="relative z-20">
                     <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                        <div className="flex size-10 items-center justify-center rounded-xl bg-white/10 p-2 shadow-inner ring-1 ring-white/20 backdrop-blur-md">
-                            <AppLogoIcon className="size-full fill-current text-white" />
-                        </div>
-                        <div>
-                            <span className="text-xl font-bold tracking-tight text-white">{name ?? 'UniEspaços'}</span>
-                            <span className="block text-[11px] font-medium tracking-wide text-white/70 uppercase">UESB • Gestão Integrada</span>
+                        <div className="flex size-20 items-center justify-center rounded-xl bg-white p-2 shadow-lg">
+                            <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                         </div>
                     </Link>
                 </div>
@@ -47,11 +39,6 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                 {/* Bloco Central com Destaques da Plataforma */}
                 <div className="relative z-20 my-auto space-y-6 py-8">
                     <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/90 ring-1 ring-white/20 backdrop-blur-md">
-                            <Sparkles className="text-warning size-3.5" />
-                            <span>Ambiente Acadêmico Conectado</span>
-                        </div>
-                        <h2 className="text-2xl font-bold tracking-tight text-white xl:text-3xl">Reserva e Gestão Inteligente de Espaços</h2>
                         <p className="text-sm leading-relaxed text-white/80">
                             Agilize a solicitação e o acompanhamento de salas, auditórios, laboratórios e quadras em todos os campi da UESB.
                         </p>
@@ -68,17 +55,6 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                         </div>
                     </div>
                 </div>
-
-                {/* Rodapé / Citação */}
-                <div className="relative z-20 mt-auto border-t border-white/10 pt-6">
-                    <blockquote className="space-y-1.5">
-                        <p className="text-sm leading-relaxed text-white/90 italic">
-                            &ldquo;{quote?.message ?? 'A educação não transforma o mundo. Educação muda as pessoas. Pessoas transformam o mundo.'}
-                            &rdquo;
-                        </p>
-                        <footer className="text-xs font-medium text-white/60">— {quote?.author ?? 'Paulo Freire'}</footer>
-                    </blockquote>
-                </div>
             </div>
 
             {/* Coluna do Formulário */}
@@ -87,12 +63,8 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                     {/* Header para Mobile */}
                     <div className="flex flex-col items-center justify-center gap-2 lg:hidden">
                         <Link href={route('home')} className="flex items-center gap-2.5">
-                            <div className="bg-primary/10 text-primary ring-primary/20 flex size-11 items-center justify-center rounded-xl p-2 ring-1">
-                                <AppLogoIcon className="text-primary size-full fill-current" />
-                            </div>
-                            <div className="text-left">
-                                <span className="text-foreground text-lg font-bold tracking-tight">{name ?? 'UniEspaços'}</span>
-                                <span className="text-muted-foreground block text-[10px] font-medium uppercase">UESB</span>
+                            <div className="flex size-14 items-center justify-center rounded-xl bg-primary/10 p-1 ring-1 ring-primary/20">
+                                <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                             </div>
                         </Link>
                     </div>
