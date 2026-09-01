@@ -66,14 +66,14 @@ export function ResponsiveModal({
         return (
             <Drawer open={effectiveOpen} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-                <DrawerContent className={cn('px-4 pb-6', className)}>
+                <DrawerContent className={cn('flex min-h-0 flex-col px-4 pb-6', className)}>
                     {hasHeader && (
                         <DrawerHeader className="px-0 pt-2 pb-3 text-left">
                             {title && <DrawerTitle>{title}</DrawerTitle>}
                             {description && <DrawerDescription>{description}</DrawerDescription>}
                         </DrawerHeader>
                     )}
-                    <div className="max-h-[75vh] overflow-x-hidden overflow-y-auto pt-1 pb-[env(safe-area-inset-bottom)]">{children}</div>
+                    <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto pt-1 pb-[env(safe-area-inset-bottom)]">{children}</div>
                     {footer && <DrawerFooter className="px-0 pt-3">{footer}</DrawerFooter>}
                 </DrawerContent>
             </Drawer>
