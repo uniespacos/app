@@ -1,7 +1,7 @@
 ---
 name: master
 description: Orquestrador do projeto UniEspaços. Recebe o pedido, classifica e roteia para o planner ou direto para um executor especialista. Use como agente de sessão.
-model: gemini-2.5-flash
+model: gemini-3.7-flash
 effort: medium
 color: purple
 tools: Read, Grep, Glob, Bash, Edit, Write, TodoWrite, Agent(planner), Agent(frontend), Agent(backend), Agent(docs), Agent(Explore)

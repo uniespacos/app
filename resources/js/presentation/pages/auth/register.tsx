@@ -1,16 +1,13 @@
-import { ModalNovaInstituicao } from '@/presentation/organisms/ModalNovaInstituicao';
 import { FormRegistroUsuario } from '@/presentation/organisms/FormRegistroUsuario';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 import { Instituicao } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
 import type React from 'react';
 import { useTranslation } from '@/i18n';
 
 export default function Register() {
     const { t } = useTranslation();
     const { instituicaos } = usePage<{ instituicaos: Instituicao[] }>().props;
-    const [showModal, setShowModal] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -38,11 +35,7 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout
-            title={t('auth.register.header_title')}
-            description={t('auth.register.header_desc')}
-            maxWidth="2xl"
-        >
+        <AuthLayout title={t('auth.register.header_title')} description={t('auth.register.header_desc')} maxWidth="2xl">
             <Head title={t('auth.register.head_title')} />
 
             <FormRegistroUsuario
@@ -60,8 +53,6 @@ export default function Register() {
                     {t('auth.register.do_login')}
                 </Link>
             </div>
-
-            <ModalNovaInstituicao open={showModal} onOpenChange={setShowModal} />
         </AuthLayout>
     );
 }

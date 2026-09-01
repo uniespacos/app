@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FormField } from '@/presentation/molecules/FormField';
-import { PasswordStrengthMeter } from '@/presentation/molecules/PasswordStrengthMeter';
-import { SeletorInstituicao } from '@/presentation/molecules/SeletorInstituicao';
+import { useTranslation } from '@/i18n';
+import { useMultiStepForm } from '@/hooks/useMultiStepForm';
+import { StepIndicator } from '@/presentation/molecules/StepIndicator';
+import { RegisterStepPersonal } from '@/presentation/molecules/RegisterStepPersonal';
+import { RegisterStepInstitution } from '@/presentation/molecules/RegisterStepInstitution';
+import { RegisterStepCredentials } from '@/presentation/molecules/RegisterStepCredentials';
 import type { Instituicao } from '@/types';
-import { LoaderCircle } from 'lucide-react';
-import type React from 'react';
+import { ArrowLeft, ArrowRight, LoaderCircle } from 'lucide-react';
+import React, { useCallback, useEffect } from 'react';
 
 interface FormRegistroUsuarioProps {
     data: {
@@ -24,90 +26,76 @@ interface FormRegistroUsuarioProps {
     onSubmit: (e: React.SyntheticEvent) => void;
 }
 
-export function FormRegistroUsuario({ data, onInputChange, errors, processing, instituicaos, onSubmit }: FormRegistroUsuarioProps) {
-    const formatPhoneNumber = (value: string) => {
-        const cleaned = value.replace(/\D/g, '');
-        const limited = cleaned.slice(0, 11);
+const TOTAL_STEPS = 3;
 
-        if (limited.length <= 2) {
-            return `(${limited}`;
-        } else if (limited.length <= 6) {
-            return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
-        } else if (limited.length <= 10) {
-            return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6, 10)}`;
+export function FormRegistroUsuario({ data, onInputChange, errors, processing, instituicaos, onSubmit }: FormRegistroUsuarioProps) {
+    const { t } = useTranslation();
+    const { currentStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } = useMultiStepForm({
+        totalSteps: TOTAL_STEPS,
+    });
+
+    const stepHasError = useCallback(
+        (stepIndex: number): boolean => {
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length === 0) return false;
+
+            if (stepIndex === 0) {
+                return errorKeys.some((k) => ['name', 'email', 'phone'].includes(k));
+            }
+            if (stepIndex === 1) {
+                return errorKeys.some((k) => ['instituicao_id', 'setor_id', 'campus'].includes(k));
+            }
+            if (stepIndex === 2) {
+                return errorKeys.some((k) => ['password', 'password_confirmation'].includes(k));
+            }
+            return false;
+        },
+        [errors]
+    );
+
+    // Pula automaticamente para a primeira etapa com erro quando o backend retorna erros de validação
+    useEffect(() => {
+        const errorKeys = Object.keys(errors);
+        if (errorKeys.length === 0) return;
+
+        if (stepHasError(0)) {
+            goToStep(0);
+        } else if (stepHasError(1)) {
+            goToStep(1);
+        } else if (stepHasError(2)) {
+            goToStep(2);
+        }
+    }, [errors, goToStep, stepHasError]);
+
+    const steps = [
+        { label: t('auth.register.step_personal_label'), hasError: stepHasError(0) },
+        { label: t('auth.register.step_institution_label'), hasError: stepHasError(1) },
+        { label: t('auth.register.step_credentials_label'), hasError: stepHasError(2) },
+    ];
+
+    const handleFormSubmit = (e: React.SyntheticEvent) => {
+        e.preventDefault();
+
+        if (isLastStep) {
+            onSubmit(e);
         } else {
-            return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7, 11)}`;
+            nextStep();
         }
     };
 
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const formatted = formatPhoneNumber(e.target.value);
-        onInputChange('phone', formatted);
-    };
-
     return (
-        <form onSubmit={onSubmit} className="space-y-6">
-            {/* Dados Pessoais */}
-            <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <FormField label="Nome completo" htmlFor="name" error={errors.name} required>
-                        <Input
-                            id="name"
-                            name="name"
-                            autoComplete="name"
-                            value={data.name}
-                            onChange={(e) => {
-                                onInputChange('name', e.target.value);
-                            }}
-                            placeholder="Seu nome completo"
-                            required
-                            disabled={processing}
-                            className="h-11"
-                        />
-                    </FormField>
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+            {/* Step Indicator com suporte a clique e indicação de erro */}
+            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={goToStep} />
 
-                    <FormField label="E-mail Institucional" htmlFor="email" error={errors.email} required>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => {
-                                onInputChange('email', e.target.value);
-                            }}
-                            placeholder="usuario@example.com"
-                            required
-                            disabled={processing}
-                            className="h-11"
-                        />
-                    </FormField>
-                </div>
+            {/* Step Content — com transição */}
+            <div className="animate-fade-in-up min-h-[200px]" key={currentStep}>
+                {currentStep === 0 && (
+                    <RegisterStepPersonal data={data} onInputChange={onInputChange} errors={errors} processing={processing} />
+                )}
 
-                <FormField label="Número de celular" htmlFor="phone" error={errors.phone}>
-                    <Input
-                        id="phone"
-                        name="tel"
-                        type="tel"
-                        autoComplete="tel"
-                        value={data.phone}
-                        onChange={handlePhoneChange}
-                        placeholder="Exemplo: (77) 99999-9999"
-                        maxLength={15}
-                        disabled={processing}
-                        className="h-11"
-                    />
-                </FormField>
-            </div>
-
-            {/* Informações Institucionais */}
-            <div className="space-y-4">
-                <div className="border-border border-t pt-6">
-                    <div className="mb-4">
-                        <h3 className="text-foreground text-base font-semibold">Vínculo Institucional</h3>
-                        <p className="text-muted-foreground text-xs">Selecione a instituição e o setor aos quais você está vinculado</p>
-                    </div>
-                    <SeletorInstituicao
+                {currentStep === 1 && (
+                    <RegisterStepInstitution
                         instituicaos={instituicaos}
                         processing={processing}
                         onInstituicaoChange={(instId) => {
@@ -118,67 +106,43 @@ export function FormRegistroUsuario({ data, onInputChange, errors, processing, i
                         }}
                         errors={errors}
                     />
-                </div>
+                )}
+
+                {currentStep === 2 && (
+                    <RegisterStepCredentials data={data} onInputChange={onInputChange} errors={errors} processing={processing} />
+                )}
             </div>
 
-            {/* Credenciais de Acesso */}
-            <div className="space-y-4">
-                <div className="border-border border-t pt-6">
-                    <div className="mb-4">
-                        <h3 className="text-foreground text-base font-semibold">Credenciais de Acesso</h3>
-                        <p className="text-muted-foreground text-xs">
-                            Crie uma senha segura contendo letras maiúsculas, minúsculas, números e símbolos
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <FormField label="Senha" htmlFor="password" error={errors.password} required>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="new-password"
-                                value={data.password}
-                                onChange={(e) => {
-                                    onInputChange('password', e.target.value);
-                                }}
-                                placeholder="Mínimo 8 caracteres"
-                                required
-                                disabled={processing}
-                                className="h-11"
-                            />
-                        </FormField>
+            {/* Navigation Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+                {!isFirstStep && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="h-11 flex-1"
+                        onClick={prevStep}
+                        disabled={processing}
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        {t('auth.register.btn_back')}
+                    </Button>
+                )}
 
-                        <FormField label="Confirme sua senha" htmlFor="password_confirmation" error={errors.password_confirmation} required>
-                            <Input
-                                id="password_confirmation"
-                                name="password_confirmation"
-                                type="password"
-                                autoComplete="new-password"
-                                value={data.password_confirmation}
-                                onChange={(e) => {
-                                    onInputChange('password_confirmation', e.target.value);
-                                }}
-                                placeholder="Digite a senha novamente"
-                                required
-                                disabled={processing}
-                                className="h-11"
-                            />
-                        </FormField>
-                    </div>
-
-                    <PasswordStrengthMeter password={data.password} className="mt-2" />
-                </div>
-            </div>
-
-            <div className="pt-2">
-                <Button type="submit" className="h-12 w-full text-base font-medium" disabled={processing}>
-                    {processing ? (
-                        <>
-                            <LoaderCircle className="mr-2 h-5 w-5 animate-spin" />
-                            Criando conta...
-                        </>
+                <Button type="submit" className="h-12 flex-1 text-base font-medium" disabled={processing}>
+                    {isLastStep ? (
+                        processing ? (
+                            <>
+                                <LoaderCircle className="mr-2 h-5 w-5 animate-spin" />
+                                {t('auth.register.btn_submitting')}
+                            </>
+                        ) : (
+                            t('auth.register.btn_finish')
+                        )
                     ) : (
-                        'Concluir Cadastro Institucional'
+                        <>
+                            {t('auth.register.btn_next')}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
                     )}
                 </Button>
             </div>

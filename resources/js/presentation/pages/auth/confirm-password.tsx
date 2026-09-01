@@ -1,12 +1,12 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, ShieldCheck } from 'lucide-react';
 import { SyntheticEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/i18n';
 import InputError from '@/presentation/atoms/InputError';
+import { PasswordInput } from '@/presentation/atoms/PasswordInput';
 import AuthLayout from '@/presentation/templates/AuthLayout';
 
 export default function ConfirmPassword() {
@@ -25,19 +25,20 @@ export default function ConfirmPassword() {
     };
 
     return (
-        <AuthLayout
-            title={t('auth.confirmPassword.title')}
-            description={t('auth.confirmPassword.subtitle')}
-            maxWidth="md"
-        >
+        <AuthLayout title={t('auth.confirmPassword.title')} description={t('auth.confirmPassword.subtitle')} maxWidth="md">
             <Head title={t('auth.confirmPassword.head_title')} />
+
+            <div className="flex justify-center sm:justify-start">
+                <div className="bg-warning/10 flex size-12 items-center justify-center rounded-xl">
+                    <ShieldCheck className="text-warning size-6" />
+                </div>
+            </div>
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="password">{t('auth.confirmPassword.password')}</Label>
-                    <Input
+                    <PasswordInput
                         id="password"
-                        type="password"
                         name="password"
                         placeholder={t('auth.confirmPassword.password_placeholder')}
                         autoComplete="current-password"
@@ -46,10 +47,12 @@ export default function ConfirmPassword() {
                         onChange={(e) => {
                             setData('password', e.target.value);
                         }}
-                        className={errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}
+                        hasError={!!errors.password}
+                        aria-invalid={!!errors.password}
+                        aria-describedby={errors.password ? 'confirm-password-error' : undefined}
                         disabled={processing}
                     />
-                    <InputError message={errors.password} />
+                    <InputError id="confirm-password-error" message={errors.password} />
                 </div>
 
                 <Button type="submit" className="h-11 w-full text-base font-medium" disabled={processing}>

@@ -297,7 +297,8 @@ export const es = {
             activity_data: 'Datos de la Actividad',
             reservation_slots: 'Horarios de la Reserva',
             terms_title: 'Término de Compromiso y Responsabilidad',
-            terms_description: 'Declaro que conozco las normas de utilización de los espacios físicos de {{institution_name}} y me comprometo con el cuidado y conservación del lugar durante el período reservado.',
+            terms_description:
+                'Declaro que conozco las normas de utilización de los espacios físicos de {{institution_name}} y me comprometo con el cuidado y conservación del lugar durante el período reservado.',
         },
     },
     agenda: {
@@ -310,6 +311,9 @@ export const es = {
         hoje: 'Hoje',
     },
     auth: {
+        layout: {
+            mobile_tagline: 'Agilice las solicitudes y el seguimiento de espacios de la institución.',
+        },
         login: {
             title: 'Iniciar sesión en su cuenta',
             subtitle: 'Ingrese sus credenciales institucionales para acceder',
@@ -319,6 +323,7 @@ export const es = {
             email: 'Correo institucional',
             email_institutional: 'Correo Institucional',
             email_placeholder: 'usuario@example.com',
+            email_invalid: 'Formato de correo institucional inválido',
             password: 'Contraseña de acceso',
             password_label: 'Contraseña',
             password_placeholder: 'Su contraseña de acceso',
@@ -353,6 +358,22 @@ export const es = {
             has_account_text: '¿Ya posee una cuenta institucional?',
             do_login: 'Iniciar sesión',
             login_link: 'Entrar',
+            step_personal_label: 'Datos Personales',
+            step_institution_label: 'Vínculo Institucional',
+            step_credentials_label: 'Credenciales de Acceso',
+            step_personal_name_placeholder: 'Su nombre completo',
+            step_personal_email_placeholder: 'usuario@ejemplo.com',
+            step_personal_phone_placeholder: 'Ejemplo: (77) 99999-9999',
+            step_institution_title: 'Vínculo Institucional',
+            step_institution_desc: 'Seleccione la institución y el sector a los que está vinculado',
+            step_credentials_title: 'Credenciales de Acceso',
+            step_credentials_desc: 'Cree una contraseña segura que contenga mayúsculas, minúsculas, números y símbolos',
+            step_credentials_password_placeholder: 'Mínimo 8 caracteres',
+            step_credentials_confirm_placeholder: 'Ingrese la contraseña nuevamente',
+            btn_back: 'Volver',
+            btn_next: 'Siguiente',
+            btn_finish: 'Completar Registro Institucional',
+            btn_submitting: 'Creando cuenta...',
         },
         forgotPassword: {
             title: 'Recuperar Contraseña',
@@ -400,6 +421,7 @@ export const es = {
             sent_message: 'Se ha enviado un nuevo enlace de verificación a su correo institucional.',
             resend_button: 'Reenviar Correo de Verificación',
             resending: 'Enviando...',
+            resend_cooldown: 'Espere {{seconds}}s para reenviar',
             logout_link: 'Cerrar sesión',
         },
         profile: {
@@ -513,7 +535,8 @@ export const es = {
         institucional_titulo: 'Informes — Gestión Institucional',
         institucional_subtitulo: 'Supervise la ocupación global, inventario de espacios físicos y métricas consolidadas de {{institution_name}}.',
         empty_institucional_title: 'Seleccione un Informe Institucional',
-        empty_institucional_desc: 'Elija una de las categorías anteriores para ver indicadores, aplicar filtros por período y exportar documentos formateados.',
+        empty_institucional_desc:
+            'Elija una de las categorías anteriores para ver indicadores, aplicar filtros por período y exportar documentos formateados.',
         filtros_card_title: 'Filtros Analíticos y Período',
         filtros_card_desc: 'Ajuste los parámetros para refinar los datos consolidados del informe.',
         empty_results_title: 'Ningún registro encontrado',

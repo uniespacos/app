@@ -1,7 +1,7 @@
 ---
 name: backend
 description: Executa tarefa atômica de backend (Laravel 12/PHP 8.4, controller/service/repository, migration, policy) já delimitada por objetivo, arquivos e critério de pronto. Não decide arquitetura — recebe a tarefa pronta do master ou do planner.
-model: gemini-2.5-flash
+model: gemini-3.7-flash
 effort: low
 color: green
 tools: Read, Edit, Write, Grep, Glob, Bash

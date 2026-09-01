@@ -295,7 +295,8 @@ export const ptBR = {
             activity_data: 'Dados da Atividade',
             reservation_slots: 'Horários da Reserva',
             terms_title: 'Termo de Compromisso e Responsabilidade',
-            terms_description: 'Declaro que estou ciente das normas de utilização dos espaços físicos da {{institution_name}} e me comprometo com o zelo, guarda patrimonial e conservação do local durante o período reservado.',
+            terms_description:
+                'Declaro que estou ciente das normas de utilização dos espaços físicos da {{institution_name}} e me comprometo com o zelo, guarda patrimonial e conservação do local durante o período reservado.',
         },
     },
     agenda: {
@@ -308,6 +309,9 @@ export const ptBR = {
         hoje: 'Hoje',
     },
     auth: {
+        layout: {
+            mobile_tagline: 'Agilize a solicitação e o acompanhamento de espaços institucionais.',
+        },
         login: {
             title: 'Entrar na sua conta',
             subtitle: 'Informe suas credenciais institucionais para acessar',
@@ -318,6 +322,7 @@ export const ptBR = {
             email_institutional: 'E-mail Institucional',
             email_placeholder: 'usuario@example.com',
             password: 'Senha de acesso',
+            email_invalid: 'Formato de e-mail institucional inválido',
             password_label: 'Senha',
             password_placeholder: 'Sua senha de acesso',
             hide_password: 'Ocultar senha',
@@ -351,6 +356,22 @@ export const ptBR = {
             has_account_text: 'Já possui uma conta institucional?',
             do_login: 'Fazer login',
             login_link: 'Entrar',
+            step_personal_label: 'Dados Pessoais',
+            step_institution_label: 'Vínculo Institucional',
+            step_credentials_label: 'Credenciais de Acesso',
+            step_personal_name_placeholder: 'Seu nome completo',
+            step_personal_email_placeholder: 'usuario@example.com',
+            step_personal_phone_placeholder: 'Exemplo: (77) 99999-9999',
+            step_institution_title: 'Vínculo Institucional',
+            step_institution_desc: 'Selecione a instituição e o setor aos quais você está vinculado',
+            step_credentials_title: 'Credenciais de Acesso',
+            step_credentials_desc: 'Crie uma senha segura contendo letras maiúsculas, minúsculas, números e símbolos',
+            step_credentials_password_placeholder: 'Mínimo 8 caracteres',
+            step_credentials_confirm_placeholder: 'Digite a senha novamente',
+            btn_back: 'Voltar',
+            btn_next: 'Próximo',
+            btn_finish: 'Concluir Cadastro Institucional',
+            btn_submitting: 'Criando conta...',
         },
         forgotPassword: {
             title: 'Recuperar senha',
@@ -398,6 +419,7 @@ export const ptBR = {
             sent_message: 'Um novo link de verificação foi enviado para o seu endereço de e-mail institucional.',
             resend_button: 'Reenviar E-mail de Verificação',
             resending: 'Enviando...',
+            resend_cooldown: 'Aguarde {{seconds}}s para reenviar',
             logout_link: 'Encerrar sessão / Sair',
         },
         profile: {
@@ -511,7 +533,8 @@ export const ptBR = {
         institucional_titulo: 'Relatórios — Gestão Institucional',
         institucional_subtitulo: 'Monitore a ocupação global, inventário de espaços físicos e métricas consolidadas da {{institution_name}}.',
         empty_institucional_title: 'Selecione um Relatório Institucional',
-        empty_institucional_desc: 'Escolha uma das categorias acima para visualizar os indicadores, aplicar filtros por período e exportar documentos diagramados.',
+        empty_institucional_desc:
+            'Escolha uma das categorias acima para visualizar os indicadores, aplicar filtros por período e exportar documentos diagramados.',
         filtros_card_title: 'Filtros Analíticos & Período',
         filtros_card_desc: 'Ajuste os parâmetros para refinar os dados consolidados do relatório.',
         empty_results_title: 'Nenhum registro encontrado',
@@ -627,7 +650,8 @@ export const ptBR = {
         unauthenticated_title: 'Não autenticado',
         unauthenticated_desc: 'Você precisa estar autenticado no sistema para acessar este recurso.',
         forbidden_title: 'Acesso não autorizado',
-        forbidden_desc: 'Você não tem permissão para acessar este conteúdo. Se você tentava editar uma reserva, é possível que ela já tenha sido avaliada e não possa mais ser alterada.',
+        forbidden_desc:
+            'Você não tem permissão para acessar este conteúdo. Se você tentava editar uma reserva, é possível que ela já tenha sido avaliada e não possa mais ser alterada.',
         not_found_title: 'Página não encontrada',
         not_found_desc: 'O endereço acessado não existe ou o item que você procura foi removido.',
         method_not_allowed_title: 'Método não permitido',
