@@ -31,7 +31,7 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                 <div className="relative z-20 flex flex-col items-center gap-8">
                     {/* Logo */}
                     <Link href={route('home')} className="flex items-center gap-3 transition-opacity hover:opacity-90">
-                        <div className="flex size-48 items-center justify-center rounded-xl bg-white p-4 shadow-lg lg:size-56 xl:size-64">
+                        <div className="flex size-48 items-center justify-center rounded-xl bg-brand-surface p-4 shadow-lg lg:size-56 xl:size-64">
                             <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                         </div>
                     </Link>
@@ -63,7 +63,7 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                     {/* Header para Mobile */}
                     <div className="flex flex-col items-center justify-center gap-2 lg:hidden">
                         <Link href={route('home')} className="flex items-center gap-2.5">
-                            <div className="flex size-16 items-center justify-center rounded-xl bg-white p-1.5 shadow-md">
+                            <div className="flex size-16 items-center justify-center rounded-xl bg-brand-surface p-1.5 shadow-md">
                                 <img src="/images/uniespacos-logo.png" alt="UniEspaços" className="size-full object-contain" />
                             </div>
                         </Link>
