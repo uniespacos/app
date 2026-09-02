@@ -72,8 +72,6 @@ usar sempre o modelo mais leve).
 
 ## Armadilhas conhecidas
 
-- `ErrorHandlingTest > inertia request does not receive the envelope` falha localmente quando existe
-  `public/build/manifest.json`. É pré-existente, não é regressão sua.
 - O Vite às vezes passa a servir um módulo **vazio** (~167 bytes) depois de um arquivo ser reescrito;
   a tela quebra com `Element type is invalid`. Confirme com
   `curl -s http://localhost:5173/<caminho>.tsx | wc -c` e resolva com `touch` no arquivo.
@@ -102,3 +100,12 @@ tail -f storage/logs/laravel.log | grep telescope_entries`; fix ao vivo: `docker
   restart: 8s → 6s → 3s → 0.25s conforme OPcache aquece; não é regressão. (5) **Regra prática no
   frontend:** `prefetch={['mount', 'hover']}` em `<Link>` dentro de `.map()` dispara visita
   completa de página em background pra cada item da lista; use `prefetch="hover"` nesses casos.
+- **Container Reverb parado causa falhas intermitentes na suíte backend.** O conjunto de testes que
+  falha **muda entre execuções**, e o nome do teste nunca menciona Reverb — parece bug de regra de
+  negócio. Sintomas vistos: `ReservaArquivamentoTest > cancelar reserva ativa continua notificando`
+  e `ValidateReservationConflictsJobTest` esperando `'completed'` e recebendo `'failed'`. Raiz:
+  `uniespacos-reverb-1` fora do ar faz o broadcast lançar `BroadcastException: Pusher error: cURL
+  error 6: Could not resolve host: reverb`, o que derruba o job. Diagnóstico:
+  `docker ps -a --format '{{.Names}}\t{{.Status}}' | grep uniespacos` (procure `Exited`). Resolução:
+  `docker start uniespacos-reverb-1` e confirme a resolução de nome — não só o container de pé —
+  com `docker exec uniespacos-workspace-1 getent hosts reverb`.
