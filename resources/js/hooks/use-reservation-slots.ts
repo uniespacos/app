@@ -1,3 +1,4 @@
+import { assertNever } from '@/lib/utils/exhaustive';
 import { mapearStatusBackendParaSlot } from '@/lib/utils/reserva-status.helpers';
 import { Reserva, SlotCalendario } from '@/types';
 import { parse } from 'date-fns';
@@ -64,9 +65,12 @@ export function useReservationSlots(reserva: Reserva) {
                         proximoStatus = 'indeferida';
                         break;
                     case 'indeferida':
-                    default:
+                    case 'livre':
+                    case 'reservado':
                         proximoStatus = 'solicitado';
                         break;
+                    default:
+                        return assertNever(slot.status);
                 }
                 return { ...slot, status: proximoStatus };
             });
