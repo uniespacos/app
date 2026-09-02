@@ -7,7 +7,7 @@ describe('SituacaoIcon', () => {
         [SituacaoReserva.EM_ANALISE, 'text-warning-accent'],
         [SituacaoReserva.PARCIALMENTE_DEFERIDA, 'text-info-accent'],
         [SituacaoReserva.DEFERIDA, 'text-success-accent'],
-        [SituacaoReserva.INDEFERIDA, 'text-destructive'],
+        [SituacaoReserva.INDEFERIDA, 'text-destructive-accent'],
         [SituacaoReserva.INATIVA, 'text-neutral-accent'],
     ])('renders correct icon and color for %s', (situacao, expectedClass) => {
         const { container } = render(<SituacaoIcon situacao={situacao} className="h-5 w-5" />);

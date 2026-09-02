@@ -24,9 +24,9 @@ const breadcrumbs = [
 ];
 
 const tiposAcessoColors: Record<string, string | undefined> = {
-    Livre: 'bg-success-subtle text-success-accent border-success/25',
-    Restrito: 'bg-warning-subtle text-warning-accent border-warning/25',
-    Controlado: 'bg-destructive-subtle text-destructive-accent border-destructive/25',
+    Livre: 'bg-success-subtle text-success-accent border-success-accent/30',
+    Restrito: 'bg-warning-subtle text-warning-accent border-warning-accent/30',
+    Controlado: 'bg-destructive-subtle text-destructive-accent border-destructive-accent/30',
 };
 
 const nivelLabels: Record<number, string | undefined> = {

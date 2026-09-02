@@ -23,7 +23,7 @@ describe('role-labels', () => {
 
     describe('getRoleBadgeClass', () => {
         it('returns theme tokens for canonical roles', () => {
-            expect(getRoleBadgeClass(ROLE_INSTITUCIONAL)).toContain('text-destructive');
+            expect(getRoleBadgeClass(ROLE_INSTITUCIONAL)).toContain('text-destructive-accent');
             expect(getRoleBadgeClass(ROLE_GESTOR)).toContain('text-info-accent');
             expect(getRoleBadgeClass(ROLE_COMUM)).toContain('text-secondary-foreground');
             expect(getRoleBadgeClass('outro')).toContain('text-muted-foreground');

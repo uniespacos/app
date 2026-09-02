@@ -233,8 +233,8 @@ export const StepHorariosRecorrencia: React.FC<StepHorariosRecorrenciaProps> = (
             </div>
 
             {showRecurrenceAlert && (
-                <div className="bg-warning/10 border-warning/30 text-foreground flex items-start gap-2.5 rounded-xl border p-3 text-xs">
-                    <Repeat className="text-warning mt-0.5 h-4 w-4 shrink-0" />
+                <div className="bg-warning/10 border-warning-accent/30 text-foreground flex items-start gap-2.5 rounded-xl border p-3 text-xs">
+                    <Repeat className="text-warning-accent mt-0.5 h-4 w-4 shrink-0" />
                     <p className="text-muted-foreground">
                         {t('reservas.stepper.recurrence_notice')}
                     </p>

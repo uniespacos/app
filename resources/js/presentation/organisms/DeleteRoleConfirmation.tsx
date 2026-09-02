@@ -38,7 +38,7 @@ export function DeleteRoleConfirmation({ isOpen, role, onClose }: DeleteRoleConf
                     <>
                         Tem certeza que deseja deletar o papel <strong>{role?.name}</strong>?
                         {(role?.users_count || 0) > 0 && (
-                            <div className="border-warning/25 bg-warning-subtle mt-2 rounded border p-2 text-sm">
+                            <div className="border-warning-accent/30 bg-warning-subtle mt-2 rounded border p-2 text-sm">
                                 <strong>{role?.users_count}</strong> usuário(s) será(ão) movido(s) para o papel 'comum'.
                             </div>
                         )}{' '}

@@ -126,7 +126,7 @@ export default function RelatoriosGestorPage({ tipos_disponiveis, opcoes_inventa
                             )}
 
                             {status === 'error' && (
-                                <Alert variant="destructive" className="border-destructive/40">
+                                <Alert variant="destructive" className="border-destructive-accent/30">
                                     <AlertCircle className="h-4 w-4" />
                                     <AlertTitle>{t('relatorios.feedback.erro')}</AlertTitle>
                                     <AlertDescription>{erro}</AlertDescription>

@@ -94,7 +94,7 @@ export default function RolesPage() {
                         onClick={() => {
                             handleDelete(role);
                         }}
-                        className="text-destructive focus:text-destructive"
+                        className="text-destructive-accent focus:text-destructive-accent"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         {t('common.actions.delete')}

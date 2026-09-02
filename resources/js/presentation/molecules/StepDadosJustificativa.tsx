@@ -19,7 +19,7 @@ export const StepDadosJustificativa: React.FC<StepDadosJustificativaProps> = ({ 
                 <div className="flex items-center justify-between">
                     <Label htmlFor="titulo" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                         <Type className="text-primary h-3.5 w-3.5" />
-                        Título da Reserva / Evento <span className="text-destructive">*</span>
+                        Título da Reserva / Evento <span className="text-destructive-accent">*</span>
                     </Label>
                     <span className="text-muted-foreground text-[11px]">{formData.titulo.length}/255</span>
                 </div>
@@ -34,7 +34,7 @@ export const StepDadosJustificativa: React.FC<StepDadosJustificativaProps> = ({ 
                     className="bg-card h-9 text-xs sm:text-sm"
                     aria-invalid={Boolean(errors.titulo)}
                 />
-                {errors.titulo && <p className="text-destructive text-[11px] font-medium">{errors.titulo}</p>}
+                {errors.titulo && <p className="text-destructive-accent text-[11px] font-medium">{errors.titulo}</p>}
             </div>
 
             {/* Descrição e Justificativa */}
@@ -42,7 +42,7 @@ export const StepDadosJustificativa: React.FC<StepDadosJustificativaProps> = ({ 
                 <div className="flex items-center justify-between">
                     <Label htmlFor="descricao" className="text-foreground flex items-center gap-1.5 text-xs font-semibold">
                         <FileText className="text-primary h-3.5 w-3.5" />
-                        Justificativa e Detalhamento das Atividades <span className="text-destructive">*</span>
+                        Justificativa e Detalhamento das Atividades <span className="text-destructive-accent">*</span>
                     </Label>
                     <span className="text-muted-foreground text-[11px]">{formData.descricao.length}/1000</span>
                 </div>
@@ -58,7 +58,7 @@ export const StepDadosJustificativa: React.FC<StepDadosJustificativaProps> = ({ 
                     className="bg-card resize-none text-xs sm:text-sm"
                     aria-invalid={Boolean(errors.descricao)}
                 />
-                {errors.descricao && <p className="text-destructive text-[11px] font-medium">{errors.descricao}</p>}
+                {errors.descricao && <p className="text-destructive-accent text-[11px] font-medium">{errors.descricao}</p>}
             </div>
 
             {/* Campos Complementares em Grid */}

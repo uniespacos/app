@@ -114,7 +114,7 @@ export default function AndaresManager({ andares, onUpdate, onRemove, onAdd, err
                 {!podeAdicionarAbaixo && <p className="text-warning-accent text-xs">⚠️ Máximo de 2 subsolos atingido</p>}
             </div>
 
-            {errors?.andares && <p className="text-destructive text-center text-sm">{errors.andares}</p>}
+            {errors?.andares && <p className="text-destructive-accent text-center text-sm">{errors.andares}</p>}
         </div>
     );
 }

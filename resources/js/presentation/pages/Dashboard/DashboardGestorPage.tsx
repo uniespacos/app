@@ -110,7 +110,7 @@ export default function DashboardGestorPage(props: DashboardGestorProps) {
                                     {t('usuarios.roles.gestor')}
                                 </Badge>
                                 {statusDasReservas.pendentes > 0 && (
-                                    <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning text-xs font-medium">
+                                    <Badge variant="outline" className="border-warning-accent/30 bg-warning/10 text-warning-accent text-xs font-medium">
                                         {statusDasReservas.pendentes} {t('dashboard.stats.pendentes').toLowerCase()}
                                     </Badge>
                                 )}
