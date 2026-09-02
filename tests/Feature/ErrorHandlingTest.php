@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\Agenda;
 use App\Models\Espaco;
 use App\Models\Horario;
@@ -144,17 +145,22 @@ class ErrorHandlingTest extends TestCase
      * Requisição Inertia é AJAX (X-Requested-With), mas pede text/html — então
      * expectsJson() é false e ela não entra no ramo do envelope.
      *
-     * Sem X-Inertia-Version de propósito: o middleware compara o header com a
-     * versão dos assets, e um valor inventado devolve 409 antes do controller.
+     * O X-Inertia-Version vem da mesma fonte que o middleware usa. Sem ele, o
+     * header chega vazio e o Inertia devolve 409 antes do controller sempre que
+     * public/build/manifest.json existir, tornando o teste dependente de haver
+     * ou não um build local.
      */
     public function test_inertia_request_does_not_receive_the_envelope(): void
     {
         $atacante = User::factory()->create();
         $reserva = $this->reservaDeOutroUsuario();
 
+        $versaoAssets = app(HandleInertiaRequests::class)->version(request()) ?? '';
+
         $response = $this->actingAs($atacante)
             ->withHeaders([
                 'X-Inertia' => 'true',
+                'X-Inertia-Version' => $versaoAssets,
                 'X-Requested-With' => 'XMLHttpRequest',
                 'Accept' => 'text/html, application/xhtml+xml',
             ])
