@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.80](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.79...v1.3.0-rc.80) (2026-09-02)
+
+
+### Bug Fixes
+
+* consolidar 6 fases do plano de qualidade e conformidade (2026-09-01) ([#422](https://github.com/uniespacos/uniespacos/issues/422)) ([d6fd3a6](https://github.com/uniespacos/uniespacos/commit/d6fd3a67f49edaf44a390c26ad89030367e21a7a))
+
 ## [1.3.0-rc.79](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.78...v1.3.0-rc.79) (2026-09-01)
 
 
