@@ -54,9 +54,10 @@ npx prettier --write <arquivo>
 - **Frontend em atomic design:** `resources/js/presentation/{atoms,molecules,organisms,pages,templates}`.
   Primitivos shadcn ficam em `resources/js/components/ui`.
 - **Linter & Qualidade:** ESLint 9 Flat Config (`strict-type-checked`). **Tolerância Zero a Suppressions**:
-  Tolerância zero a novas supressões. Débito existente (medido em 2026-09-01): 92 supressões em 43 arquivos
-  no `eslint-suppressions.json`, mais 14 ocorrências inline. Verificação pura: `npm run lint:check`
-  (nunca `npm run lint`, que aplica `--fix` e altera o código-fonte). Débito: `npm run lint:debt`.
+  Tolerância zero a novas supressões. Débito existente (medido em 2026-09-01, reconferido em
+  2026-09-02): 92 supressões em 43 arquivos no `eslint-suppressions.json`, mais 9 ocorrências
+  inline. Verificação pura: `npm run lint:check` (nunca `npm run lint`, que aplica `--fix` e altera
+  o código-fonte). Débito: `npm run lint:debt`.
 
 Detalhe de convenção mora nas skills (carregam sob demanda, não pesam no contexto):
 `backend-conventions`, `frontend-conventions`, `testing-and-env`.

@@ -120,11 +120,12 @@ Siga rigorosamente as diretrizes e regras invioláveis definidas em @docs/REGRAS
 ### 4.1 Tolerância Zero a Suppressions no Linter
 
 - Nenhum `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore` é permitido em novo código.
-  O débito existente é rastreado em duas fontes distintas, medidas em 2026-09-01:
+  O débito existente é rastreado em duas fontes distintas, medidas em 2026-09-01 e reconferidas em
+  2026-09-02 após a consolidação das Fases 01-06 do plano de qualidade:
     - **`eslint-suppressions.json`** (supressões por contagem): 92 supressões em 43 arquivos.
-    - **Supressões inline:** 14 ocorrências (9 em produção, 5 em testes). Duas delas são
-      `eslint-disable` de arquivo inteiro (`ssr.tsx`, `ModuloForm.tsx`), de escopo indeterminado —
-      por isso as duas fontes não são somáveis em um total único.
+    - **Supressões inline:** 9 ocorrências (4 em produção, 5 em testes). Uma delas é
+      `eslint-disable` de arquivo inteiro (`ssr.tsx`), de escopo indeterminado — por isso as duas
+      fontes não são somáveis em um total único.
   Quitação via refatoração gradual. Para medir o débito real:
   `npm run lint:debt` (equivalente a `npx eslint resources/js --suppressions-location eslint-suppressions.empty.json`).
 - **PROIBIDO:** Introduzir `any`, `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore`.
