@@ -45,4 +45,12 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run ESLint (Frontend Linting)
-        run: npm run lint
+        run: npm run lint:check
+
+      - name: Reportar Débito de Lint (Supressões)
+        if: always()
+        run: |
+          echo "## 📊 Débito de Lint (supressões ativas)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          npx eslint resources/js --suppressions-location eslint-suppressions.empty.json 2>&1 | tail -3 >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
