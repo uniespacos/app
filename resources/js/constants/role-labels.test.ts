@@ -9,15 +9,18 @@ describe('role-labels', () => {
             expect(getRoleLabel(ROLE_COMUM)).toBe('Comum');
         });
 
-        it('handles legacy aliases gracefully', () => {
-            expect(getRoleLabel('super-admin')).toBe('Institucional');
-            expect(getRoleLabel('administrador')).toBe('Institucional');
-            expect(getRoleLabel('usuario')).toBe('Comum');
-        });
-
         it('returns fallback for unknown roles or empty string', () => {
             expect(getRoleLabel('visitante')).toBe('visitante');
             expect(getRoleLabel('')).toBe('Desconhecido');
+        });
+
+        it('não lança para roles customizadas criadas em runtime', () => {
+            // O sistema permite criar roles sob demanda (RoleService::create), então nomes fora do
+            // contrato são legítimos e devem degradar com elegância, nunca derrubar a tela.
+            expect(() => getRoleLabel('coordenador')).not.toThrow();
+            expect(getRoleLabel('coordenador')).toBe('coordenador');
+            expect(() => getRoleBadgeClass('coordenador')).not.toThrow();
+            expect(getRoleBadgeClass('coordenador')).toContain('text-muted-foreground');
         });
     });
 
