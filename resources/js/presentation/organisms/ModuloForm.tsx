@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -54,11 +53,10 @@ export default function ModuloForm({
                 ...formData,
                 andares: andaresComTerreo.map((andar) => ({ ...andar, nome: nivelParaNome(andar.nivel) })),
             });
-        } else if (data.andares.length === 0) {
-            setData((prev: CadastrarModuloForm) => ({
-                ...prev,
-                andares: [criarTerreoInicial()],
-            }));
+        } else {
+            setData((prev: CadastrarModuloForm) =>
+                prev.andares.length === 0 ? { ...prev, andares: [criarTerreoInicial()] } : prev,
+            );
         }
     }, [modulo, setData]);
 
