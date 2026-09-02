@@ -55,8 +55,8 @@ npx jest
 npx jest <caminho-do-arquivo>    # Teste focado para iteração rápida
 
 # Linter ESLint 9 Flat Config (Tolerância Zero)
-npx eslint resources/js          # ou npm run lint
-npx eslint resources/js --fix    # Autofix de regras estilísticas
+npx eslint resources/js          # ou npm run lint:check (verificação pura)
+npx eslint resources/js --fix    # Autofix de regras estilísticas (= npm run lint)
 
 # Formatação Prettier (apenas nos arquivos modificados na tarefa)
 npx prettier --write <arquivo>
