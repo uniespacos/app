@@ -6,6 +6,7 @@ import { StepperProgress } from '@/presentation/molecules/StepperProgress';
 import { StepHorariosRecorrencia } from '@/presentation/molecules/StepHorariosRecorrencia';
 import { StepDadosJustificativa } from '@/presentation/molecules/StepDadosJustificativa';
 import { StepRevisaoConfirmacao } from '@/presentation/molecules/StepRevisaoConfirmacao';
+import { assertNever } from '@/lib/utils/exhaustive';
 import { useReservaStepper } from '@/hooks/useReservaStepper';
 import { Espaco, SlotCalendario } from '@/types';
 import { ReservaFormData } from '@/types/reserva-stepper';
@@ -106,7 +107,7 @@ export const ReservaStepperModal: React.FC<ReservaStepperModalProps> = ({
                     />
                 );
             default:
-                return null;
+                return assertNever(currentStepId);
         }
     };
 
