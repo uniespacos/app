@@ -1,44 +1,26 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ChartContainer, ChartTooltipContent, type ChartConfig } from '../chart';
 
-describe('ChartTooltipContent optional chaining regression', () => {
-  it('should not throw when label is not a key in chartConfig', () => {
-    const config: ChartConfig = {
-      taxa_ocupacao_num: {
-        label: 'Taxa de Ocupação (%)',
-        color: '#3b82f6',
-      },
-    };
-
-    const payload = [
-      {
-        dataKey: 'taxa_ocupacao_num',
-        name: 'taxa_ocupacao_num',
-        value: 42,
-        payload: {},
-      },
-    ];
-
-    // This should not throw an error even though "Auditório Central" is not in chartConfig.
-    // Before the fix, accessing config[label].label would throw:
-    // "Uncaught TypeError: can't access property "label", x[o] is undefined"
-    // After the fix using optional chaining (config[label]?.label), it falls back to the raw label.
-
-    expect(() => {
-      render(
-        <ChartContainer config={config}>
-          <ChartTooltipContent
-            active={true}
-            payload={payload}
-            label="Auditório Central"
-          />
-        </ChartContainer>
-      );
-    }).not.toThrow();
+beforeAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({
+      width: 400,
+      height: 300,
+      top: 0,
+      left: 0,
+      bottom: 300,
+      right: 400,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }),
   });
+});
 
-  it('should display config label when label is a valid key in chartConfig', () => {
+describe('ChartTooltipContent - regressão config[label] undefined', () => {
+  it('usa o label bruto como fallback quando a categoria não está em chartConfig', () => {
     const config: ChartConfig = {
       taxa_ocupacao_num: {
         label: 'Taxa de Ocupação (%)',
@@ -55,22 +37,44 @@ describe('ChartTooltipContent optional chaining regression', () => {
       },
     ];
 
-    const { container } = render(
+    render(
       <ChartContainer config={config}>
-        <ChartTooltipContent
-          active={true}
-          payload={payload}
-          label="taxa_ocupacao_num"
-        />
+        <ChartTooltipContent active payload={payload} label="Auditório Central" />
       </ChartContainer>
     );
 
-    // When label is a valid key in chartConfig, use the config's label
-    const tooltipContent = container.querySelector('[data-slot="chart"]');
-    expect(tooltipContent).toBeTruthy();
+    expect(screen.getByText('Auditório Central')).toBeInTheDocument();
   });
 
-  it('should fallback to raw label when label key is not in chartConfig', () => {
+  it('usa o label do chartConfig quando a chave existe', () => {
+    const config: ChartConfig = {
+      taxa_ocupacao_num: {
+        label: 'Taxa de Ocupação (%)',
+        color: '#3b82f6',
+      },
+    };
+
+    const payload = [
+      {
+        dataKey: 'taxa_ocupacao_num',
+        name: 'taxa_ocupacao_num',
+        value: 42,
+        payload: {},
+      },
+    ];
+
+    render(
+      <ChartContainer config={config}>
+        <ChartTooltipContent active payload={payload} label="taxa_ocupacao_num" />
+      </ChartContainer>
+    );
+
+    const elements = screen.getAllByText('Taxa de Ocupação (%)');
+    expect(elements.length).toBeGreaterThan(0);
+    expect(elements[0]).toBeInTheDocument();
+  });
+
+  it('usa o label bruto como fallback para valores dinâmicos de espaço', () => {
     const config: ChartConfig = {
       metrica1: {
         label: 'Métrica 1',
@@ -87,20 +91,12 @@ describe('ChartTooltipContent optional chaining regression', () => {
       },
     ];
 
-    // Simulate a chart axis using dynamic values like space names
-    // The fix ensures that accessing config["Nome Dinâmico do Espaço"]?.label
-    // doesn't throw but instead returns undefined and falls back to the raw label string.
+    render(
+      <ChartContainer config={config}>
+        <ChartTooltipContent active payload={payload} label="Nome Dinâmico do Espaço" />
+      </ChartContainer>
+    );
 
-    expect(() => {
-      render(
-        <ChartContainer config={config}>
-          <ChartTooltipContent
-            active={true}
-            payload={payload}
-            label="Nome Dinâmico do Espaço"
-          />
-        </ChartContainer>
-      );
-    }).not.toThrow();
+    expect(screen.getByText('Nome Dinâmico do Espaço')).toBeInTheDocument();
   });
 });
