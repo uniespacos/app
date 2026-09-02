@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0-rc.81](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.80...v1.3.0-rc.81) (2026-09-02)
+
+
+### Bug Fixes
+
+* corrigir crash de tooltip com labels dinâmicos em gráficos de relatório ([#424](https://github.com/uniespacos/uniespacos/issues/424)) ([178a043](https://github.com/uniespacos/uniespacos/commit/178a04372631264a0c4ca19b9ebaa0190bfbe3c1))
+
 ## [1.3.0-rc.80](https://github.com/uniespacos/uniespacos/compare/v1.3.0-rc.79...v1.3.0-rc.80) (2026-09-02)
 
 
