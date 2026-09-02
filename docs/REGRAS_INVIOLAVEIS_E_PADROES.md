@@ -120,9 +120,14 @@ Siga rigorosamente as diretrizes e regras invioláveis definidas em @docs/REGRAS
 ### 4.1 Tolerância Zero a Suppressions no Linter
 
 - Nenhum `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore` é permitido em novo código.
-  Débito técnico existente (95 supressões em 45 arquivos, documentado em `docs/auditoria-sincronizacao-agentes/`)
-  será quitado via refatoração gradual. Para validar o state real:
-  `npx eslint resources/js --suppressions-location <(echo '{}')`.
+  O débito existente é rastreado em duas fontes distintas, medidas em 2026-09-01 e reconferidas em
+  2026-09-02 após a consolidação das Fases 01-06 do plano de qualidade:
+    - **`eslint-suppressions.json`** (supressões por contagem): 92 supressões em 43 arquivos.
+    - **Supressões inline:** 9 ocorrências (4 em produção, 5 em testes). Uma delas é
+      `eslint-disable` de arquivo inteiro (`ssr.tsx`), de escopo indeterminado — por isso as duas
+      fontes não são somáveis em um total único.
+  Quitação via refatoração gradual. Para medir o débito real:
+  `npm run lint:debt` (equivalente a `npx eslint resources/js --suppressions-location eslint-suppressions.empty.json`).
 - **PROIBIDO:** Introduzir `any`, `// eslint-disable...`, `// @ts-expect-error` ou `// @ts-ignore`.
 - Código novo ou alterado deve satisfazer o ESLint 9 (`strict-type-checked`) e TypeScript 5.8 em modo estrito.
 
@@ -165,8 +170,8 @@ Toda alteração deve ser validada e aprovada pelos 4 comandos essenciais:
 # 1. Checagem de Tipagem Estrita (Host)
 npx tsc --noEmit
 
-# 2. Linter com Tolerância Zero (Host)
-npm run lint
+# 2. Linter com Tolerância Zero — verificação pura, não muta código (Host)
+npm run lint:check
 
 # 3. Suíte Completa de Testes de Frontend (Host)
 npx jest

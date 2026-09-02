@@ -32,7 +32,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     }}
                     disabled={processing}
                 />
-                {errors.nome && <p className="text-destructive mt-1 text-sm">{errors.nome}</p>}
+                {errors.nome && <p className="text-destructive-accent mt-1 text-sm">{errors.nome}</p>}
             </div>
 
             <div className="space-y-2">
@@ -48,7 +48,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     }}
                     disabled={processing}
                 />
-                {errors.capacidade_pessoas && <p className="text-destructive mt-1 text-sm">{errors.capacidade_pessoas}</p>}
+                {errors.capacidade_pessoas && <p className="text-destructive-accent mt-1 text-sm">{errors.capacidade_pessoas}</p>}
             </div>
 
             <div className="space-y-2">
@@ -63,7 +63,7 @@ export function EspacoFormFields({ data, setData, errors, processing }: EspacoFo
                     }}
                     disabled={processing}
                 />
-                {errors.descricao && <p className="text-destructive mt-1 text-sm">{errors.descricao}</p>}
+                {errors.descricao && <p className="text-destructive-accent mt-1 text-sm">{errors.descricao}</p>}
             </div>
         </>
     );

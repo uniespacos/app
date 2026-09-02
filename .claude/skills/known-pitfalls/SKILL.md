@@ -5,16 +5,6 @@ description: Armadilhas e bugs pré-existentes do UniEspaços. Carregue quando i
 
 # Armadilhas conhecidas — UniEspaços
 
-## ErrorHandlingTest falha com manifest.json
-
-**Sintoma:** `ErrorHandlingTest > inertia request does not receive the envelope` falha localmente, espera 403 mas recebe 409.
-
-**Raiz:** Quando `public/build/manifest.json` existe em disco após um build de frontend, o teste quebra. É **pré-existente**, não relacionado a mudanças recentes.
-
-**Resolução:** Mover ou remover temporariamente `public/build/manifest.json` (`mv public/build/manifest.json /tmp/manifest.json`) antes de rodar os testes da feature.
-
----
-
 ## Caminho Órfão no `phpstan-baseline.neon`
 
 **Sintoma:** `composer analyse` (PHPStan Nível 9) falha acusando erro de baseline:
@@ -174,6 +164,36 @@ return response()->json($espaco);
 **Checklist antes de fechar tarefa de controller:**
 - [ ] Toda action que expõe ou altera dado de outro usuário chama `$this->authorize(...)`?
 - [ ] Query não é o guard — é só um otimização (ex.: `where('user_id', ...)`)?
+
+---
+
+## Container Reverb parado causa falhas intermitentes na suíte de testes
+
+**Sintoma:** Falhas aleatórias e aparentemente não relacionadas entre execuções:
+- `ReservaArquivamentoTest > cancelar reserva ativa continua notificando` falha com status `'failed'` em vez de `'completed'`
+- `ValidateReservationConflictsJobTest` falha esperando `'completed'` mas recebendo `'failed'`
+- O conjunto de testes que falha **muda entre execuções** — não é determinístico.
+
+**Raiz:** O container `uniespacos-reverb-1` está parado. Quando um Job ou Notification tenta fazer broadcast via Reverb, a conexão falha com:
+```
+BroadcastException: Pusher error: cURL error 6: Could not resolve host: reverb
+```
+Essa exceção não é capturada no job, derruba a execução e marca o job como `'failed'`. Como a exception não menciona "Reverb" no nome do teste, o problema parece ser de lógica de negócio.
+
+**Diagnóstico:**
+```bash
+docker ps -a --format '{{.Names}}\t{{.Status}}' | grep uniespacos
+```
+
+Procure por `Exited` em qualquer linha. Se `uniespacos-reverb-1` aparecer com status `Exited`, é isso.
+
+**Resolução:**
+```bash
+docker start uniespacos-reverb-1
+docker exec uniespacos-workspace-1 getent hosts reverb
+```
+
+Confirme que `reverb` resolve e o container está em `running`. Com o Reverb no ar, a suíte fecha em 256 passed / 0 failed.
 
 ---
 

@@ -8,6 +8,8 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
+        "lint:check": "eslint .",
+        "lint:debt": "eslint resources/js --suppressions-location eslint-suppressions.empty.json || true",
         "types": "tsc --noEmit",
         "test": "jest"
     },

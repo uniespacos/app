@@ -167,7 +167,7 @@ export default function EspacoCard({
                         className={cn(
                             'absolute top-2.5 right-2.5 z-10 flex h-11 min-h-[44px] w-11 min-w-[44px] items-center justify-center rounded-full',
                             'bg-background/85 hover:bg-background shadow-sm backdrop-blur-md transition-transform active:scale-90',
-                            isFavorited ? 'text-destructive' : 'text-foreground hover:text-destructive',
+                            isFavorited ? 'text-destructive-accent' : 'text-foreground hover:text-destructive-accent',
                             processing && 'cursor-not-allowed opacity-70',
                         )}
                     >

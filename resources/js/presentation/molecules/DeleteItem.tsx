@@ -108,7 +108,7 @@ export default function DeleteItem({ isOpen, route, itemName, showHeading = fals
             <div className="space-y-6">
                 {showHeading && <HeadingSmall title={itemName} description={`Excluir o(a) ${itemName} e as informações permanentemente`} />}
 
-                <div className="border-destructive/25 bg-destructive-subtle space-y-4 rounded-lg border p-4">
+                <div className="border-destructive-accent/30 bg-destructive-subtle space-y-4 rounded-lg border p-4">
                     <div className="text-destructive-accent relative space-y-0.5">
                         <p className="font-medium">Aviso</p>
                         <p className="text-sm">Por favor, prossiga com cautela, esta ação não pode ser desfeita.</p>

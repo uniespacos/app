@@ -95,7 +95,7 @@ export default function GerenciarEspacos() {
                     onClick={() => {
                         setRemoverEspaco(espaco);
                     }}
-                    className="text-destructive"
+                    className="text-destructive-accent"
                 >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir

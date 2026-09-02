@@ -57,7 +57,7 @@ export function StepIndicator({ steps, currentStep, onStepClick }: StepIndicator
                             <span
                                 className={cn(
                                     'text-center text-xs transition-colors duration-300',
-                                    hasError ? 'text-destructive font-medium' : isActive ? 'text-foreground font-medium' : 'text-muted-foreground',
+                                    hasError ? 'text-destructive-accent font-medium' : isActive ? 'text-foreground font-medium' : 'text-muted-foreground',
                                 )}
                             >
                                 {step.label}

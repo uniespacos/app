@@ -30,7 +30,7 @@ export default function ConfirmPassword() {
 
             <div className="flex justify-center sm:justify-start">
                 <div className="bg-warning/10 flex size-12 items-center justify-center rounded-xl">
-                    <ShieldCheck className="text-warning size-6" />
+                    <ShieldCheck className="text-warning-accent size-6" />
                 </div>
             </div>
 

@@ -62,7 +62,7 @@ export default function EvaluationForm({
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {isReavaliacao && (
-                        <Alert className="border-info/30 bg-info-subtle text-info-accent">
+                        <Alert className="border-info-accent/30 bg-info-subtle text-info-accent">
                             <Info className="text-info-accent h-4 w-4" />
                             <AlertTitle className="text-info-accent font-semibold">{t('reservas.avaliacao.reavaliacao_titulo')}</AlertTitle>
                             <AlertDescription className="text-info-accent/90 text-sm">
@@ -102,17 +102,17 @@ export default function EvaluationForm({
                             onValueChange={(val) => { onDecisaoChange(val as SituacaoReservaType); }}
                             disabled={isRadioGroupDisabled}
                         >
-                            <div className="has-[:checked]:border-success/25 has-[:checked]:bg-success-subtle flex items-center space-x-2 rounded-lg border p-3">
+                            <div className="has-[:checked]:border-success-accent/30 has-[:checked]:bg-success-subtle flex items-center space-x-2 rounded-lg border p-3">
                                 <RadioGroupItem value={SituacaoReserva.DEFERIDA} id="deferida" />
                                 <Label htmlFor="deferida" className="flex w-full cursor-pointer items-center gap-2">
                                     <CheckCircle className="text-success-accent h-4 w-4" />
                                     {t('reservas.avaliacao.deferir')}
                                 </Label>
                             </div>
-                            <div className="has-[:checked]:border-destructive/25 has-[:checked]:bg-destructive-subtle flex items-center space-x-2 rounded-lg border p-3">
+                            <div className="has-[:checked]:border-destructive-accent/30 has-[:checked]:bg-destructive-subtle flex items-center space-x-2 rounded-lg border p-3">
                                 <RadioGroupItem value={SituacaoReserva.INDEFERIDA} id="indeferida" />
                                 <Label htmlFor="indeferida" className="flex w-full cursor-pointer items-center gap-2">
-                                    <XCircle className="text-destructive h-4 w-4" />
+                                    <XCircle className="text-destructive-accent h-4 w-4" />
                                     {t('reservas.avaliacao.indeferir')}
                                 </Label>
                             </div>
@@ -128,7 +128,7 @@ export default function EvaluationForm({
                                 onChange={(e) => {
                                     setData('motivo', e.target.value);
                                 }}
-                                className="border-destructive/25 focus:border-destructive min-h-[100px]"
+                                className="border-destructive-accent/30 focus:border-destructive-accent min-h-[100px]"
                             />
                         </FormField>
                     )}
@@ -141,7 +141,7 @@ export default function EvaluationForm({
                             onChange={(e) => {
                                 setData('observacao', e.target.value);
                             }}
-                            className="border-info/25 focus:border-info/25 min-h-[100px]"
+                            className="border-info-accent/30 focus:border-info-accent min-h-[100px]"
                         />
                     </FormField>
 

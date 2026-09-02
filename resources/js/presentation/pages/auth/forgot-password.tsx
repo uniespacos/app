@@ -34,7 +34,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             {status && (
                 <div
                     role="status"
-                    className="bg-success-subtle text-success-accent border-success/20 rounded-lg border p-3 text-center text-sm font-medium"
+                    className="bg-success-subtle text-success-accent border-success-accent/30 rounded-lg border p-3 text-center text-sm font-medium"
                 >
                     {status}
                 </div>

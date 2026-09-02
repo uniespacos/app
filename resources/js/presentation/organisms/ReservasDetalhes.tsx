@@ -412,7 +412,7 @@ export default function ReservaDetalhes({
 
                 {/* Seção 5: Pareceres & Observações */}
                 {justificativaReserva && (
-                    <div className="bg-destructive-subtle/80 border-destructive-accent/30 text-destructive space-y-1.5 rounded-xl border p-3.5">
+                    <div className="bg-destructive-subtle/80 border-destructive-accent/30 text-destructive-accent space-y-1.5 rounded-xl border p-3.5">
                         <div className="flex items-center gap-2">
                             <AlertCircle className="text-destructive-accent h-4 w-4 shrink-0" />
                             <h4 className="text-destructive-accent text-xs font-semibold tracking-wider uppercase">

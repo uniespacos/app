@@ -16,10 +16,10 @@ export function FormField({ label, htmlFor, error, required, className, children
         <div className={cn('space-y-2', className)}>
             <Label htmlFor={htmlFor}>
                 {label}
-                {required && <span className="text-destructive"> *</span>}
+                {required && <span className="text-destructive-accent"> *</span>}
             </Label>
             {children}
-            {error && <p className="text-destructive text-sm">{error}</p>}
+            {error && <p className="text-destructive-accent text-sm">{error}</p>}
         </div>
     );
 }

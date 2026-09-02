@@ -26,6 +26,8 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
             setStatus('loading');
             setErro(null);
 
+            const filtrosAtuais = JSON.parse(filtrosSerializados) as FiltrosRelatorio;
+
             const metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
             const xsrfCookie = decodeURIComponent(
                 document.cookie
@@ -51,7 +53,7 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
                     method: 'POST',
                     credentials: 'same-origin',
                     headers,
-                    body: JSON.stringify({ tipo, ...filtros }),
+                    body: JSON.stringify({ tipo, ...filtrosAtuais }),
                     signal,
                 });
 
@@ -83,7 +85,6 @@ export function useDadosRelatorio(endpoint: string, tipo: TipoRelatorio | undefi
             clearTimeout(timer);
             controller.abort();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [endpoint, tipo, filtrosSerializados]);
 
     return { dados, status, erro };

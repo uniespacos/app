@@ -51,11 +51,11 @@ export default function AuthSplitLayout({ children, title, description, maxWidth
                     {/* Card de Destaques */}
                     <div className="animate-fade-in-up animation-delay-300 w-full space-y-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
                         <div className="flex items-start gap-3 text-xs text-white/90">
-                            <CalendarCheck className="text-success mt-0.5 size-4 shrink-0" />
+                            <CalendarCheck className="text-success-accent mt-0.5 size-4 shrink-0" />
                             <span>Grade de horários em tempo real e sem conflitos.</span>
                         </div>
                         <div className="flex items-start gap-3 text-xs text-white/90">
-                            <ShieldCheck className="text-info mt-0.5 size-4 shrink-0" />
+                            <ShieldCheck className="text-info-accent mt-0.5 size-4 shrink-0" />
                             <span>Validação institucional e autorização descentralizada.</span>
                         </div>
                     </div>

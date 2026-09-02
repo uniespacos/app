@@ -66,11 +66,11 @@ export const ReservaConflictAlert: React.FC<ReservaConflictAlertProps> = ({
         <div
             role="alert"
             aria-live="polite"
-            className={`bg-destructive/10 border-destructive/30 text-destructive animate-in fade-in slide-in-from-top-1 space-y-2 rounded-xl border p-3.5 text-xs duration-200 ${className ?? ''}`}
+            className={`bg-destructive/10 border-destructive-accent/30 text-destructive-accent animate-in fade-in slide-in-from-top-1 space-y-2 rounded-xl border p-3.5 text-xs duration-200 ${className ?? ''}`}
         >
             {realtimeConflictMessage && (
                 <div className="flex items-start gap-2.5">
-                    <AlertCircle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
+                    <AlertCircle className="text-destructive-accent mt-0.5 h-4 w-4 shrink-0" />
                     <div className="flex-1">
                         <span className="font-semibold">Conflito em Tempo Real: </span>
                         <span>{realtimeConflictMessage}</span>
@@ -80,7 +80,7 @@ export const ReservaConflictAlert: React.FC<ReservaConflictAlertProps> = ({
 
             {hasStaticConflict && (
                 <div className="flex items-start gap-2.5">
-                    <AlertTriangle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
+                    <AlertTriangle className="text-destructive-accent mt-0.5 h-4 w-4 shrink-0" />
                     <div className="flex-1">
                         <span className="font-semibold">Conflito de Horários Existente: </span>
                         <span>

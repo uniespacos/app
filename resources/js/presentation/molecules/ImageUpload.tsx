@@ -103,7 +103,7 @@ export function ImageUpload({
                     onChange={handleImagesUpload}
                     disabled={processing || imagesWithPreviews.length >= MAX_IMAGENS}
                 />
-                {errors.imagens && <p className="text-destructive mt-1 text-sm">{errors.imagens}</p>}
+                {errors.imagens && <p className="text-destructive-accent mt-1 text-sm">{errors.imagens}</p>}
             </div>
 
             {imagesWithPreviews.length > 0 ? (
