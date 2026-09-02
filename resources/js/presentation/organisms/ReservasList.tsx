@@ -164,7 +164,7 @@ export function ReservasList({ paginator, fallback, isGestor, reservaToShow, rou
                                     onClick={() => {
                                         setRemoverReserva(reserva);
                                     }}
-                                    className="text-destructive focus:text-destructive"
+                                    className="text-destructive-accent focus:text-destructive-accent"
                                 >
                                     <XCircle className="mr-2 h-4 w-4" />
                                     {t('reservas.acoes.cancelar')}

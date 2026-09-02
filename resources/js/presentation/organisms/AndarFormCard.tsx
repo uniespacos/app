@@ -82,7 +82,7 @@ export default function AndarFormCard({ andar, onUpdate, onRemove, todosAndares,
                                             onRemove(andar.id);
                                         }}
                                         disabled={!podeRemover}
-                                        className={!podeRemover ? 'cursor-not-allowed opacity-50' : 'text-destructive hover:text-destructive'}
+                                        className={!podeRemover ? 'cursor-not-allowed opacity-50' : 'text-destructive-accent hover:text-destructive-accent'}
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -131,7 +131,7 @@ export default function AndarFormCard({ andar, onUpdate, onRemove, todosAndares,
                         ))}
                     </div>
                     {andar.tipo_acesso.length === 0 && (
-                        <div className="text-destructive flex items-center space-x-1 text-sm">
+                        <div className="text-destructive-accent flex items-center space-x-1 text-sm">
                             <AlertTriangle className="h-4 w-4" />
                             <span>Selecione pelo menos um tipo de acesso</span>
                         </div>

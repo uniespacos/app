@@ -67,11 +67,11 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
                         key={req.id}
                         className={cn(
                             'flex items-center gap-1.5 transition-colors',
-                            req.isValid ? 'text-success font-medium' : 'text-muted-foreground',
+                            req.isValid ? 'text-success-accent font-medium' : 'text-muted-foreground',
                         )}
                     >
                         {req.isValid ? (
-                            <Check className="text-success h-3 w-3 shrink-0" />
+                            <Check className="text-success-accent h-3 w-3 shrink-0" />
                         ) : (
                             <X className="text-muted-foreground/60 h-3 w-3 shrink-0" />
                         )}

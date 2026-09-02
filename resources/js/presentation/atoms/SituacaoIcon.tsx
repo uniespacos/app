@@ -27,7 +27,7 @@ export function SituacaoIcon({ situacao, className = 'h-4 w-4' }: SituacaoIconPr
         case SituacaoReserva.EM_ANALISE:
             return <Icone className={`${className} text-warning-accent`} />;
         case SituacaoReserva.INDEFERIDA:
-            return <Icone className={`${className} text-destructive`} />;
+            return <Icone className={`${className} text-destructive-accent`} />;
         case SituacaoReserva.INATIVA:
             return <Icone className={`${className} text-neutral-accent`} />;
         default:

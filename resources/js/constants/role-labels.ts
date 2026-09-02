@@ -23,9 +23,9 @@ export function getRoleBadgeClass(roleName: string): string {
         case ROLE_INSTITUCIONAL:
         case 'super-admin':
         case 'administrador':
-            return 'bg-destructive-subtle text-destructive border-destructive/25';
+            return 'bg-destructive-subtle text-destructive-accent border-destructive-accent/30';
         case ROLE_GESTOR:
-            return 'bg-info-subtle text-info-accent border-info/25';
+            return 'bg-info-subtle text-info-accent border-info-accent/30';
         case ROLE_COMUM:
         case 'usuario':
             return 'bg-secondary text-secondary-foreground border-border';

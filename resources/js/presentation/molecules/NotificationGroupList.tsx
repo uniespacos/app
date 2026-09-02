@@ -58,11 +58,11 @@ export const NotificationGroupList: React.FC<NotificationGroupListProps> = ({ no
     const getIcon = (tipo?: string) => {
         switch (tipo) {
             case 'reserva_deferida':
-                return <CheckCircle2 className="text-success h-4 w-4 shrink-0" />;
+                return <CheckCircle2 className="text-success-accent h-4 w-4 shrink-0" />;
             case 'reserva_indeferida':
-                return <XCircle className="text-destructive h-4 w-4 shrink-0" />;
+                return <XCircle className="text-destructive-accent h-4 w-4 shrink-0" />;
             case 'reserva_solicitada':
-                return <Clock className="text-warning h-4 w-4 shrink-0" />;
+                return <Clock className="text-warning-accent h-4 w-4 shrink-0" />;
             default:
                 return <Bell className="text-primary h-4 w-4 shrink-0" />;
         }

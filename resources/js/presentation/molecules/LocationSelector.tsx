@@ -63,7 +63,7 @@ export function LocationSelector({
                             ))}
                         </SelectContent>
                     </SelectUI>
-                    {errors.unidade_id && <p className="text-destructive mt-1 text-sm">{errors.unidade_id}</p>}
+                    {errors.unidade_id && <p className="text-destructive-accent mt-1 text-sm">{errors.unidade_id}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -88,7 +88,7 @@ export function LocationSelector({
                                 ))}
                         </SelectContent>
                     </SelectUI>
-                    {errors.modulo_id && <p className="text-destructive mt-1 text-sm">{errors.modulo_id}</p>}
+                    {errors.modulo_id && <p className="text-destructive-accent mt-1 text-sm">{errors.modulo_id}</p>}
                 </div>
             </div>
 
@@ -121,7 +121,7 @@ export function LocationSelector({
                             </Tooltip>
                         </TooltipProvider>
                     </div>
-                    {errors.andar_id && <p className="text-destructive mt-1 text-sm">{errors.andar_id}</p>}
+                    {errors.andar_id && <p className="text-destructive-accent mt-1 text-sm">{errors.andar_id}</p>}
                 </div>
 
                 <div className="space-y-2">

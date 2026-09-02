@@ -119,7 +119,7 @@ export default function UsuariosPage() {
                     Permissões
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
+                    className="text-destructive-accent focus:text-destructive-accent"
                     onClick={() => {
                         setRemoverUsuario(user);
                     }}

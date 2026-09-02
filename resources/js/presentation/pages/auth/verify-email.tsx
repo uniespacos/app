@@ -37,14 +37,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
             <div className="flex justify-center sm:justify-start">
                 <div className="bg-success/10 flex size-12 items-center justify-center rounded-xl">
-                    <MailCheck className="text-success size-6" />
+                    <MailCheck className="text-success-accent size-6" />
                 </div>
             </div>
 
             {status === 'verification-link-sent' && (
                 <div
                     role="status"
-                    className="bg-success-subtle text-success-accent border-success/20 mb-4 rounded-lg border p-3 text-center text-sm font-medium"
+                    className="bg-success-subtle text-success-accent border-success-accent/30 mb-4 rounded-lg border p-3 text-center text-sm font-medium"
                 >
                     {t('auth.verifyEmail.sent_message')}
                 </div>
@@ -65,7 +65,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </Button>
 
                 <div className="border-border text-muted-foreground border-t pt-4 text-center text-sm">
-                    <TextLink href={route('logout')} method="post" className="text-destructive font-medium hover:underline">
+                    <TextLink href={route('logout')} method="post" className="text-destructive-accent font-medium hover:underline">
                         {t('auth.verifyEmail.logout_link')}
                     </TextLink>
                 </div>
